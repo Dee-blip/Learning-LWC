@@ -1,0 +1,26 @@
+.button{
+    color: #fff;
+    background-color: #6cb472;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.button:disabled{
+    color: rgb(201, 196, 196);
+    background-color: #6cb472;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+
+.header {
+    padding: 15px 20px;
+    font-size: 1.15rem;
+    font-weight: 300;
+}
+
+.item {
+    padding: 10px 20px;
+    /* font-size: .95rem;
+    font-weight: 300; */
+}

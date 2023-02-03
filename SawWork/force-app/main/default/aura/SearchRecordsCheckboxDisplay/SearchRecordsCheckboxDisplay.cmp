@@ -1,0 +1,58 @@
+<!--Created By: kusharma IW-->
+<aura:component controller="SearchRecordsCheckboxDisplayCtrl" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <aura:attribute name="Spinner" type="Boolean" default="false"/>
+    <aura:attribute name="searchString" type="String" default=""/>
+    <aura:attribute name="avaliableOpts" type="String[]" default=""/>
+    <aura:attribute name="selectedOpts" type="String[]" default=""/>
+    <aura:attribute name="allAvaliableOpts" type="String[]" default=""/>
+    <aura:attribute name="selectedValuesParam" type="String" default=""/>
+    <aura:attribute name="queryString" type="String" default="SELECT Product_Name__c FROM EB_Product__c WHERE EB_ProductType__c = 'Product' Group By Product_Name__c"/>
+    <aura:attribute name="fieldAPIName" type="String" default="Product_Name__c"/>
+    <aura:attribute name="objectType" type="String" default="EB_ProductType__c"/>
+    <aura:attribute name="objectDisplayName" type="String" default="Products"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name ="selectedCount" type="integer" default="0"/>
+    <aura:attribute name ="availableCount" type="integer" default="0"/>
+    <!--<aura:registerEvent name="PassparameterfromChild" type="c:PassparameterfromChild"/>-->
+
+    
+    <div class="slds-m-around_small slds-box" style="width: 30rem;  max-height: 45rem">
+        <div class="slds-text-heading_medium">
+            Product Information
+        </div>
+        
+        <lightning:input style="padding-bottom: 1rem;" name="searchStrings" type="String" value="{!v.searchString}" onchange="{!c.searchProducts}" class="slds-size_1-of-1" placeholder="Search Products.."/>
+        
+        <div class="slds-text-heading_small">
+            Selected {!v.objectDisplayName}: {!v.selectedCount}
+        </div>
+        <div class = "slds-scrollable" style="height: auto; width: 30rem; max-height:20rem">
+            
+            <aura:iteration items="{!v.selectedOpts}" var="item" indexVar="index">
+                <div class="slds-form-element__control">
+                    <span class="slds-checkbox slds-text-body_large">
+                        <lightning:input type="checkbox" name="{!index}" label="{!item}" onclick="{!c.itemDeselected}" value = "{!item}" checked="true"/>
+                    </span>
+                </div>
+            </aura:iteration>
+        </div>    
+        <br/>
+        <div class="slds-text-heading_small slds-border_top">
+            Avaliable {!v.objectDisplayName}: {!v.availableCount}
+        </div>    
+        <div class = "slds-scrollable" style="height: auto; width: 30rem; max-height:20rem">
+            <aura:iteration items="{!v.avaliableOpts}" var="item" indexVar="index">
+                <div class="slds-form-element__control">
+                    <span class="slds-checkbox slds-text-body_large">
+                        <lightning:input type="checkbox" name="{!index}" label="{!item}" onclick="{!c.itemSelected}" value = "{!item}"/>
+                    </span>
+                </div>    
+            </aura:iteration>
+        </div>
+    </div>
+    <aura:if isTrue="{!v.Spinner}">
+		<lightning:spinner variant="brand" size="large" />
+    </aura:if>
+</aura:component>

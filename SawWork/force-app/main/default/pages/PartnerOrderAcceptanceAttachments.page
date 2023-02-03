@@ -1,0 +1,3 @@
+<apex:page standardController="Partner_Order_Acceptance_Document__c">
+    <c:NotesAndAttachmentVfComp parentSobjectId="{!Partner_Order_Acceptance_Document__c.Id}"/>
+</apex:page>

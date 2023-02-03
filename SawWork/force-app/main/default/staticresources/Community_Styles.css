@@ -1,0 +1,194 @@
+
+.akamai .navbar .brand {
+    line-height: 32px;
+}
+
+.akamai .navbar .brand.akamai {
+    background: url(/resource/1381489064000/Community_akamai_logo) center no-repeat;
+    background-size: cover;
+    text-indent: -20000px;
+    margin: 4px 30px 4px 20px;
+    width: 96px;
+    height: 42px;
+    padding: 0;
+}
+
+.akamai .navbar .brand.open-logo {
+    text-transform: uppercase;
+    text-align: center;
+    float: right;
+    letter-spacing: .2em;
+    color: #3F3F3F;
+    margin: 0;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
+}
+
+.akamai .navbar .brand.open-logo .gray {
+    color: #B5B5B5;
+}
+
+.akamai .navbar li {
+    line-height: 32px;
+    font-size: .9em;
+}
+
+.akamai .navbar li.divider-vertical {
+    height: 36px;
+    border: none;
+    border-left: 1px solid #cdced0;
+    margin-top: 8px;
+}
+
+.akamai .navbar li a {
+    padding: 10px 10px 10px;
+}
+
+.akamai .navbar .navbar-search {
+    margin-top: 11px;
+    margin-bottom: 11px;
+}
+
+
+.akamai .ribbon-wrapper-new {
+    width: 85px;
+    height: 88px;
+    overflow: hidden;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+
+.akamai .ribbon-orange {
+  /* ribbon implementation, adapted from http://css-tricks.com/snippets/css/corner-ribbon/ */
+    font: bold 15px Sans-Serif;
+    color: #333;
+    text-align: center;
+    text-shadow: rgba(255, 255, 255, 0.5) 0px 1px 0px;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    position: relative;
+    padding: 7px 0;
+    left: -5px;
+    top: 15px;
+    width: 120px;
+    background-color: #F6A349;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#f6a349), to(darkorange));
+    background-image: -webkit-linear-gradient(top, #f6a349, darkorange);
+    background-image: -moz-linear-gradient(top, #f6a349, darkorange);
+    background-image: -ms-linear-gradient(top, #f6a349, darkorange);
+    background-image: -o-linear-gradient(top, #f6a349, darkorange);
+    color: #6a6340;
+    -webkit-box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3);
+}
+
+.akamai .ribbon-orange:before {
+    left: 0;
+}
+
+.akamai .ribbon-orange:after {
+    right: 0;
+}
+
+
+
+
+
+
+.akamai footer {
+    background-color: #474a4c;
+    font-size: 0.6875em;
+    padding: 18px 0 20px;
+    min-width: 964px;
+}
+
+.akamai footer .footer-links {
+    color: #a1a1a1;
+}
+
+.akamai footer .footer-links a {
+    margin-right: 5px;
+    color: #a1a1a1 !important;
+}
+
+.akamai footer .icons a {
+    margin-right: 0px;
+}
+
+.akamai footer .copyright {
+    color: white;
+}
+
+
+
+
+
+
+
+
+
+    .threecolumn {
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    .zen-bodyZen {
+        margin-bottom: -8px !important;
+    }
+
+    .bodyDiv {
+        margin-bottom: 8px !important;
+    }
+
+    #bodyDiv {
+        margin-bottom: -8px !important;
+    }
+
+    #body_content {
+        width: 99%;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    .nav {
+        list-style-type: none !important;
+        margin-top: 7px !important;
+        margin-right: 20px !important;
+    }
+
+    .pull-right {
+        float: right !important;
+    }
+
+    .pull-left {
+        float: left !important;
+    }
+
+    .center {
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    
+
+    .outer-container {
+        display:block;
+        height:100px;
+    }
+
+    .outer-wrap {
+        display:table;
+        height:100%;
+        width:100%;
+    }
+
+    .inner-cell {
+        display:table-cell;
+        vertical-align:middle;
+        text-align:center;
+    }

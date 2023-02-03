@@ -1,0 +1,14 @@
+<template> 
+    <div class="first-row-bold">
+        <lightning-datatable
+            key-field="Id"
+            data={AuditTrails}
+            columns={columns}
+            hide-checkbox-column = "true"
+            wrap-text-max-lines="3"
+            column-widths-mode="auto"
+            min-column-width="250"
+        >
+        </lightning-datatable>
+    </div>
+</template>

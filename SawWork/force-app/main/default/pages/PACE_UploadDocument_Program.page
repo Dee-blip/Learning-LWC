@@ -1,0 +1,32 @@
+<apex:page controller="PACE_Program2Controller" showHeader="false" tabStyle="Deployment_Step__c">
+<apex:pageBlock >
+<apex:messages />
+<apex:pageBlockSection >
+
+  <apex:outputPanel rendered="{!!mode}">
+ 
+  <apex:pageBlockSection >
+     
+     <apex:form >
+       <b> Title </b><apex:inputTextarea value="{!documentTitle}"  style="width:300px"/><br/>
+       <b> Link  </b><apex:inputTextarea value="{!link}" style="width:300px"/><br />
+      
+       <apex:commandButton action="{!uploadLink}" value="Add" />
+       <apex:commandButton value="Cancel" onclick="window.close()"/><br/>
+      </apex:form>
+</apex:pageBlockSection>
+
+  </apex:outputPanel>
+ 
+  <apex:outputPanel rendered="{!mode}">
+  <script type="text/javascript"> 
+     window.opener.parent.location.href=window.opener.parent.location;
+     window.close();      
+  </script>
+  </apex:outputPanel>
+  
+</apex:pageBlockSection>
+ 
+</apex:pageBlock>
+  
+</apex:page>

@@ -1,0 +1,109 @@
+<!--=====================================================================================================+
+    Component name      :   SC_CaseTransition
+    Developer           :   Vandhana Krishnamurthy
+    Created             :   17-August-2019
+    Purpose             :   Create Case Transition on Technical Case Feed Layout's Transition Quick Action
+                            
+    Last Modified     	Developer           		Purpose            
+    ***********************************************************
+    17 August 2019     	Vandhana  K			Initial Development(JIRA ESESP-2318)
++=====================================================================================================-->
+
+<aura:component controller="SC_CaseTransitionControllerV2" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global">
+	
+    <!--<aura:handler name="init" value="{!this }" action="{!c.init }"/>-->
+    <aura:attribute name="action" type="String" access="global"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    
+    <aura:attribute name="caseId" type="Id" />
+    <aura:attribute name="spinner" type="Boolean" default="true" />
+    <aura:attribute name="caseObj" type="Case" access="global"/>
+    <aura:attribute name="currentShift" type="String"/>
+    <aura:attribute name="wakeupTime" type="String"/>
+    <aura:attribute name="akatecRecTypeId" type="String" />
+    
+    <aura:attribute name="Name" type="String"/>
+    <aura:attribute name="showNewCT" type="Boolean"/>
+    <aura:attribute name="hideNewCT" type="Boolean"/>
+    <aura:attribute name="blankShift" type="Boolean" default="true" />
+    
+    <div>
+        <aura:if isTrue="{!v.spinner}">
+            <lightning:spinner variant="brand" size="medium" alternativeText="Please wait..."/>
+        </aura:if>
+    </div>
+    
+    <aura:if isTrue="{!!v.caseObj.has_active_transition__c}">
+        <aura:if isTrue="{!v.showNewCT}">
+            <div aura:id="accSecId" class="hideSec" style="padding-left: 10px;">
+                <lightning:card>
+                    <div style="padding-left: 10px;">
+                        <h1><lightning:icon iconName="standard:product_transfer" size="medium" alternativeText="Case Transition"/><span>&nbsp;Let's Transition!</span></h1>
+                    </div>
+                    
+                    <lightning:recordEditForm recordTypeId="{!v.akatecRecTypeId}" objectApiName="Case_Transition__c">
+                        <td style="padding: 10px;">
+                            <table class="tableStyle">
+                                <tr>
+                                    <td class="tableStyle"><b>Transition Approver</b></td>
+                                    <td class="tableStyle"><ui:outputText value="{!v.Name}" /></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td class="tableStyle"><b>Current Shift</b></td>
+                                    <td class="tableStyle"><ui:outputText value="{!v.currentShift}" /></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td class="tableStyle"><b>Target Shift</b></td>
+                                    <td class="tableStyle" style="width: 270px;"><lightning:inputField aura:id="targetShift" fieldName="Target_Shift__c" onchange="{!c.updateWakeupTime}"/></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td class="tableStyle"><b>Warm Transition Needed</b></td>
+                                    <td class="tableStyle" style="margin:0px;"><lightning:inputField aura:id="warmTrans" fieldName="Warm_Transition_Needed__c" /></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td class="tableStyle"><b>Wakeup Time</b></td>
+                                    <td class="tableStyle"><ui:outputText value="{!v.wakeupTime}" /></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td colspan="2" style="padding-top: 10px">
+                                        <lightning:button disabled="{!v.blankShift}" label="Create Transition from Summary" variant="brand" onclick="{!c.saveCaseTransition}"/>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                
+                            </table>
+                        </td>
+                        
+                    </lightning:recordEditForm>
+                </lightning:card>
+            </div>
+        </aura:if>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.caseObj.has_active_transition__c}">
+        <lightning:card>
+            <p class="slds-p-horizontal_small">
+                <p style="padding: left:10px">
+                    <lightning:icon iconName="action:priority" style="left-padding: 10px" size="medium" alternativeText="Indicates approval"/>&nbsp;A Transition for this Case is already present!</p>
+            </p>
+        </lightning:card>
+    </aura:if>
+    
+    <aura:if isTrue="{!!v.caseObj.has_active_transition__c}">
+        <aura:if isTrue = "{!v.hideNewCT}">
+            <lightning:card iconName="action:remove" title="Oh, snap!">
+                <p class="slds-p-horizontal_small">
+                    <p style="padding: left:10px">Pending Approval from Shift Lead or Manager.<br/>
+                        Whaaaa? <a target="_new" href="https://ac.akamai.com/docs/DOC-19486">Help Me!</a></p>
+                </p>
+            </lightning:card>
+        </aura:if>
+    </aura:if>
+
+</aura:component>

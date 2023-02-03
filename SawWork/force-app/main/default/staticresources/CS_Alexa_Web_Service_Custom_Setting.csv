@@ -1,0 +1,12 @@
+Name ,Value__c
+ActionName,UrlInfo
+ResponseGroupName,RankByCountry
+ServiceHost,awis.amazonaws.com
+HashAlgorithm,HmacSHA256
+DateformatAws,yyyy-MM-dd\'T\'HH:mm:ss\'Z\'
+AccessKeyId,AKIAIL335Q6PMXIKIUFQ
+SecretAccessKey,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
+EmailAddresses,"standon@akamai.com,sathanga@akamai.com,ashivash@akamai.com"
+AlexaBatchRequestSize,1
+CronBatchSize,40
+PricePerCallout,0.00045

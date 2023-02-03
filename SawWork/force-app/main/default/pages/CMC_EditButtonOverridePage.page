@@ -1,0 +1,35 @@
+<!--------------------------------------------------------------
+Page Name		: CMC_EditButtonOverridePage
+Controller 		: 
+Author 			: Aditya Sonam
+Created Date	: 01-March-2017
+CR				: 3426181
+---------------------------------------------------------------->
+<apex:page standardController="EB_AkaMailer__c" cache="false">
+    <apex:includeScript value="/support/console/28.0/integration.js" />
+    <apex:includeScript value="{!$Resource.JQuery_New}" />
+    <apex:variable value="{!EB_AkaMailer__c.RecordType.Name}" var="recTypeName" id="recTypeNameId" rendered="true"/>
+    <apex:variable value="{!EB_AkaMailer__c.EB_Status__c}" var="statusName" id="statusNameId" rendered="true"/>
+    <apex:variable value="{!EB_AkaMailer__c.Id}" var="mailerId" id="mailerId" rendered="true"/>    
+    <script type="text/javascript">
+		window.document.onload = new function(e)
+    	{
+            if({!EB_AkaMailer__c.RecordType.Name == 'CMC'}){
+                if({!EB_AkaMailer__c.EB_Status__c == 'Draft'})
+                {
+                    window.open(window.location.protocol+'//'+window.location.hostname+'/apex/CMC_IncidentNotificationTool?id='+'{!EB_AkaMailer__c.Id}','_self');
+                }
+                else
+                {
+                    alert("Processed mailer can not be edited.");
+                    window.open(window.location.protocol+'//'+window.location.hostname+'/'+'{!EB_AkaMailer__c.Id}','_self');
+                }
+            }
+            else
+            {
+                alert("You do not have permission to edit this record.");
+                window.open(window.location.protocol+'//'+window.location.hostname+'/'+'{!EB_AkaMailer__c.Id}','_self');
+            }
+        }
+    </script>
+</apex:page>

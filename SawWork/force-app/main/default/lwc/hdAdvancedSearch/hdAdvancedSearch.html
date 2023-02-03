@@ -1,0 +1,94 @@
+<template>
+    <div class="slds-border_bottom slds-border_top slds-border_left slds-border_right" style="position:relative">
+        <lightning-spinner alternative-text="Loading" size="medium" if:true={isLoading}></lightning-spinner>
+        <div class="slds-notify slds-notify_alert slds-alert_error" role="alert" if:true={isError}>
+            <h2>{errorMessage}</h2>
+        </div>
+        <h2 class="slds-expression__title slds-m-left_small slds-m-top_small">Conditions</h2>
+        <div class="slds-m-left_small">
+            <lightning-layout>
+                <lightning-layout-item size={colSize}>
+                    <lightning-combobox name="progress" label="Take Action When" placeholder="Take Action When" required
+                        data-id="logicalOperator" value=" AND " options={criteriaOptions}
+                        onchange={handleConditionsCriteriaChange}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+                <lightning-layout-item padding="horizontal-large" size={colSize}>
+                    <lightning-input type="text" label="Filter Logic" if:true={isCustomLogicSelected} required
+                        data-id="customLogic"></lightning-input>
+                </lightning-layout-item>
+            </lightning-layout>
+        </div>
+        <div class="slds-filters">
+            <ol class="slds-list_vertical slds-list_vertical-space">
+                <template iterator:it={conditions}>
+                    <li class="slds-expression__row" key={it.value.order}>
+                        <lightning-layout>
+                            <lightning-layout-item padding="horizontal-small" size="4" small-device-size="4"
+                                medium-device-size="4">
+                                <lightning-combobox name="fieldNames" label="Field" options={fieldmetadata} required
+                                    data-id={it.value.order} onchange={handleFieldNameChange}></lightning-combobox>
+                            </lightning-layout-item>
+                            <lightning-layout-item padding="horizontal-small" size="3" small-device-size="3"
+                                medium-device-size="3">
+                                <lightning-combobox name="Operator" label="Operator" options={it.value.operators}
+                                    required onchange={handleOperatorChange} data-id={it.value.order}>
+                                </lightning-combobox>
+                            </lightning-layout-item>
+                            <lightning-layout-item padding="horizontal-small" size="4" small-device-size="4"
+                                medium-device-size="4">
+                                <template if:true={it.value.isLWCInput}>
+                                    <h2 class="slds-m-top_xxxx-small slds-form-element__label">Value</h2>
+                                    <lightning-input type={it.value.type} data-id={it.value.order}
+                                        message-toggle-active="" message-toggle-inactive="" label="Value"
+                                        variant="label-hidden" onchange={handleFieldValueChange} required>
+                                    </lightning-input>
+                                </template>
+                                <template if:true={it.value.isPicklist}>
+                                    <template if:true={it.value.picklistValues}>
+                                        <h2 class="slds-m-top_xxxx-small slds-form-element__label">Value</h2>
+                                        <lightning-combobox variant="label-hidden" label=""
+                                            placeholder="Select an option" options={it.value.picklistValues}
+                                            onchange={handleFieldValueChange} data-id={it.value.order} required>
+                                        </lightning-combobox>
+                                    </template>
+                                </template>
+                                <template if:true={it.value.isLookup}>
+                                    <template if:true={it.value.picklistValues}>
+                                        <h2 class="slds-m-top_xxxx-small slds-form-element__label">Value</h2>
+                                        <div>
+                                            <c-hd-lookup show-dropdown="true" object-name={it.value.lookupType}
+                                                data-id={it.value.order} onselectedrec={handleFieldValueChange}>
+                                            </c-hd-lookup>
+                                        </div>
+                                    </template>
+                                </template>
+                            </lightning-layout-item>
+                            <lightning-layout-item padding="horizontal-small" size="1" small-device-size="1"
+                                medium-device-size="1">
+                                <ul class="slds-button-group-row slds-m-top_large">
+                                    <li class="slds-button-group-item">
+                                        <lightning-button-icon icon-name="utility:delete" size="medium" variant="bare"
+                                            onclick={handleRemoveClicked}>
+                                        </lightning-button-icon>
+                                    </li>
+                                </ul>
+                            </lightning-layout-item>
+                        </lightning-layout>
+                    </li>
+                </template>
+            </ol>
+            <div class="slds-filters__footer slds-grid slds-shrink-none">
+                <button class="slds-button_reset slds-text-link" onclick={handleAddClicked}>Add Filter</button>
+                <button class="slds-button_reset slds-text-link slds-col_bump-left"
+                    onclick={handleRemoveAllClicked}>Remove All</button>
+            </div>
+        </div>
+        <div class="slds-border_top slds-clearfix slds-m-top_small">
+            <lightning-button label="Search" variant="brand" class="slds-float_right slds-m-around_small"
+                onclick={handleSearchClick}>
+            </lightning-button>
+        </div>
+    </div>
+
+</template>

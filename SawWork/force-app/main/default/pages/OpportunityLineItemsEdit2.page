@@ -1,0 +1,152 @@
+<apex:page id="oliEdit" standardController="OpportunityLineItem" extensions="OpportunityLineItemsExtension" title="Opportunity Product TEST" tabStyle="Opportunity">
+<apex:pageMessages id="pageMessageMissingId" rendered="{!missingSalesforId}"/>
+<apex:outputPanel rendered="{!NOT(isEligibleToEditProduct)}">
+ <apex:pageMessage detail="{!partnerManageProductsErrorMessage}" severity="Error" rendered="{!NOT(isEligibleToEditProduct)}"/>
+ <apex:outputLink value="/{!OpportunityLineItem.OpportunityId}"><apex:outputText value="<<Return to Opportunity"/></apex:outputLink>
+ </apex:outputPanel>
+    <apex:form id="OpptyProdForm" rendered="{!(!missingSalesforId && isEligibleToEditProduct)}">     
+        <apex:pageMessages id="oliPageMessages"/>
+<!--        <apex:PageMessage id="cancellationReasonRequiredError" detail="{!cancellationReasonError}" severity="error" strength="3" rendered="{!showCancellationReasonRequiredError}"/>    -->
+        <apex:PageMessage id="opptyCategoryRequiredError" detail="{!opptyCategoryError}" severity="error" strength="3" rendered="{!showOpptyCategoryRequiredError}"/>
+<!--        <apex:PageMessage id="missingProductFeatureRequiredError" detail="{!missingProductFeatureError}" severity="error" strength="3" rendered="{!fillMissingProductFeature}"/>
+        <apex:PageMessage id="competitorRequiredError" detail="{!competitorError}" severity="error" strength="3" rendered="{!fillCompetitor}"/>    -->
+        <apex:sectionHeader id="oliHeader" title="{!OpportunityLineItem.Product_Name__c}"/>
+        <apex:actionStatus id="Opportunitystatus">
+        <apex:facet name="start">
+        <c:enhancedActionStatus BackColor="#ffffff" borderColor="#ffffff" borderSize="2" height="50px" width="150px" ImageUrl="/changemgmt/img/spinner24.gif" Message="Loading..." messageStyle="color:darkred;font-size:11pt;font-weight:bold;"/>
+        </apex:facet>   
+        </apex:actionStatus>
+        <apex:pageBlock id="oliPageBlock" mode="maindetail" title="Opportunity Product Edit">
+            <apex:pageBlockButtons id="oliBtns" >
+               <apex:commandButton id="oliSaveBtn" action="{!save}" value="Save" status="Opportunitystatus" rerender="OpptyProdForm" />
+               <apex:commandButton id="oliCancelBtn" value="Cancel" action="{!cancel}" status="Opportunitystatus" rerender="OpptyProdForm"/>               
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection id="oliPageBlockProdInfo" title="Product Information" collapsible="false">
+               <apex:inputField id="oliMRR" value="{!oli.UnitPrice}"/>          
+               <apex:inputField id="oliProdName" value="{!oli.Product_Name__c}"/>
+               <apex:inputField id="oliOneTimeFee" value="{!oli.NRR__c}"/>
+               <!--apex:inputField id="oliResellerRetailPrice" value="{!oli.Reseller_Retail_Price__c}"/-->
+               <apex:inputField id="oliOpptyId" value="{!oli.OpportunityId}"/>
+               <!--apex:inputField id="oliForecastMRR" value="{!oli.Forecast_MRR__c}"/-->                                                            
+               <apex:InputText rendered="{!OpportunityLineItem.PricebookEntry.Product2.UOM__c=='Applications'}" value="{!oli.Quantity__c}"></apex:InputText>
+<!--               <apex:pageblocksectionItem rendered="{!showCancellationReason}">
+                   <apex:OutputLabel value="Cancellation Reason: "></apex:OutputLabel>
+                  <apex:inputField id="oliProdInfoFieldInput" value="{!opp.Cancellation_Reason__c}" styleclass="inputBorder" style="border:3px solid #F7F7F7;border-left-color:rgb(204,0,0)"></apex:inputField>
+               </apex:pageblocksectionItem> 
+               <apex:pageblocksectionItem rendered="{!NOT(showCancellationReason)}">
+                   <apex:OutputLabel value="Cancellation Reason: "></apex:OutputLabel>
+                  <apex:OutputField value="{!opp.Cancellation_Reason__c}"></apex:OutputField>
+               </apex:pageblocksectionItem>    -->
+               <apex:pageblocksectionItem rendered="{!if(oli.UnitPrice<0, true, false)}">
+                   <apex:OutputLabel value="Loss Category: "></apex:OutputLabel>
+                  <apex:inputField id="oliOpptyCategoryFieldInput" value="{!opp.Opportunity_Category__c}" styleclass="inputBorder" style="border:3px solid #F7F7F7;border-left-color:rgb(204,0,0)"></apex:inputField>
+               </apex:pageblocksectionItem>
+               <apex:pageblocksectionItem rendered="{!if(oli.UnitPrice>=0, true, false)}">
+                   <apex:OutputLabel value="Loss Category: "></apex:OutputLabel>
+                  <apex:OutputField value="{!opp.Opportunity_Category__c}"></apex:OutputField>
+               </apex:pageblocksectionItem>
+               <apex:pageblocksectionItem rendered="{!isZeroMrrError}">
+                   <apex:OutputLabel value="Zero MRR Amount: "></apex:OutputLabel>
+                  <apex:inputField id="zeroMrrAmount" value="{!opp.Zero_MRR_Amount__c}" styleclass="inputBorder" style="border:3px solid #F7F7F7;border-left-color:rgb(204,0,0)"></apex:inputField>
+               </apex:pageblocksectionItem>
+               <apex:pageblocksectionItem rendered="{!NOT(isZeroMrrError)}">
+                   <apex:OutputLabel value="Zero MRR Amount: "></apex:OutputLabel>
+                  <apex:OutputField value="{!opp.Zero_MRR_Amount__c}"></apex:OutputField>
+               </apex:pageblocksectionItem>
+<!--               <apex:inputField id="oliLossType" value="{!oli.LMRR_Type__c}" rendered="{!if(oli.UnitPrice<0, true, false)}">
+                   <apex:actionSupport event="onchange" action="{!setCancellationReason}" status="Opportunitystatus" rerender="oliPageBlock">
+                   </apex:actionSupport>
+               </apex:inputField>    -->
+               <apex:pageblocksectionItem rendered="{!if(oli.UnitPrice<0, true, false)}">
+                   <apex:OutputLabel value="Opportunity Sub-Category: "></apex:OutputLabel>
+                  <apex:inputField id="oliOpptySubCategoryFieldInput" value="{!opp.Opportunity_Sub_Category__c}" styleclass="inputBorder" style="border:3px solid #F7F7F7;border-left-color:rgb(204,0,0)"></apex:inputField>
+               </apex:pageblocksectionItem>
+               <apex:pageblocksectionItem rendered="{!if(oli.UnitPrice>=0, true, false)}">
+                   <apex:OutputLabel value="Opportunity Sub-Category: "></apex:OutputLabel>
+                  <apex:OutputField value="{!opp.Opportunity_Sub_Category__c}"></apex:OutputField>
+               </apex:pageblocksectionItem>
+               <apex:pageblocksectionItem rendered="{!if(oli.UnitPrice<0, true, false)}">
+                   <apex:OutputLabel value="Cancellation/Lost Reason: "></apex:OutputLabel>
+                  <apex:inputField id="oliClosedLostReasonFieldInput" value="{!opp.Loss_Reason__c}" styleclass="inputBorder" style="border:3px solid #F7F7F7;border-left-color:rgb(204,0,0)"></apex:inputField>
+               </apex:pageblocksectionItem>
+               <apex:pageblocksectionItem rendered="{!if(oli.UnitPrice>=0, true, false)}">
+                   <apex:OutputLabel value="Cancellation/Lost Reason: "></apex:OutputLabel>
+                  <apex:OutputField value="{!opp.Loss_Reason__c}"></apex:OutputField>
+               </apex:pageblocksectionItem>
+               <apex:pageblocksectionItem rendered="{!fillMissingProductFeature}">
+                   <apex:OutputLabel value="Missing Product Feature: "></apex:OutputLabel>
+                  <apex:inputField id="oliMissingProductFeatureFieldInput" value="{!opp.Missing_Product_Feature__c}" styleclass="inputBorder" style="border:3px solid #F7F7F7;border-left-color:rgb(204,0,0)"></apex:inputField>
+               </apex:pageblocksectionItem>
+               <apex:pageblocksectionItem rendered="{!NOT(fillMissingProductFeature)}">
+                   <apex:OutputLabel value="Missing Product Feature: "></apex:OutputLabel>
+                  <apex:OutputField value="{!opp.Missing_Product_Feature__c}"></apex:OutputField>
+               </apex:pageblocksectionItem>
+               <apex:pageblocksectionItem rendered="{!fillCompetitor}">
+                   <apex:OutputLabel value="Competitor-Primary: "></apex:OutputLabel>
+                  <apex:inputField id="oliCompetitorFieldInput" value="{!opp.Competitor__c}" styleclass="inputBorder" style="border:3px solid #F7F7F7;border-left-color:rgb(204,0,0)"></apex:inputField>
+               </apex:pageblocksectionItem>
+               <apex:pageblocksectionItem rendered="{!NOT(fillCompetitor)}">
+                   <apex:OutputLabel value="Competitor-Primary: "></apex:OutputLabel>
+                  <apex:OutputField value="{!opp.Competitor__c}"></apex:OutputField>
+               </apex:pageblocksectionItem>
+               <apex:pageblocksectionItem rendered="{!fillConsolidationAccount}">
+                   <apex:OutputLabel value="Consolidation Account: "></apex:OutputLabel>
+                  <apex:inputField id="oliConsolidationAccount" value="{!opp.Consolidation_Account__c}" styleclass="inputBorder" style="border:3px solid #F7F7F7;border-left-color:rgb(204,0,0)"></apex:inputField>
+               </apex:pageblocksectionItem>
+               <apex:pageblocksectionItem rendered="{!NOT(fillConsolidationAccount)}">
+                   <apex:OutputLabel value="Consolidation Account: "></apex:OutputLabel>
+                  <apex:OutputField value="{!opp.Consolidation_Account__c}"></apex:OutputField>
+               </apex:pageblocksectionItem>
+               <apex:pageblocksectionItem rendered="{!fillAggregationPartner}">
+                   <apex:OutputLabel value="Aggregation Partner: "></apex:OutputLabel>
+                  <apex:inputField id="oliAggregationPartner" value="{!opp.Aggregation_Partner__c}" styleclass="inputBorder" style="border:3px solid #F7F7F7;border-left-color:rgb(204,0,0)"></apex:inputField>
+               </apex:pageblocksectionItem>
+               <apex:pageblocksectionItem rendered="{!NOT(fillAggregationPartner)}">
+                   <apex:OutputLabel value="Aggregation Partner: "></apex:OutputLabel>
+                  <apex:OutputField value="{!opp.Aggregation_Partner__c}"></apex:OutputField>
+               </apex:pageblocksectionItem>
+         <apex:pageblocksectionItem rendered="{!fillInitialOutClauseDesc}">
+                   <apex:OutputLabel value="Initial Out Clause Description: "></apex:OutputLabel>
+                   <apex:inputField value="{!opp.Initial_Out_Clause_Description__c}" styleclass="inputBorder" style="border:3px solid #F7F7F7;border-left-color:rgb(204,0,0)"></apex:inputField>
+               </apex:pageblocksectionItem>
+               <apex:pageblocksectionItem rendered="{!not(fillInitialOutClauseDesc)}">
+                   <apex:OutputLabel value="Initial Out Clause Description: "></apex:OutputLabel>
+                   <apex:OutputField value="{!opp.Initial_Out_Clause_Description__c}"></apex:OutputField>                   
+               </apex:pageblocksectionItem>
+               <apex:pageblocksectionItem rendered="{!fillUnacceptableTnC}">
+                   <apex:OutputLabel value="Unacceptable Terms and Conditions: "></apex:OutputLabel>
+                   <apex:inputField value="{!opp.Unacceptable_Terms_and_Conditions__c}" styleclass="inputBorder" style="border:3px solid #F7F7F7;border-left-color:rgb(204,0,0)"></apex:inputField>
+               </apex:pageblocksectionItem>
+               <apex:pageblocksectionItem rendered="{!not(fillUnacceptableTnC)}">
+                   <apex:OutputLabel value="Unacceptable Terms and Conditions: "></apex:OutputLabel>
+                   <apex:OutputField value="{!opp.Unacceptable_Terms_and_Conditions__c}"></apex:OutputField>                   
+               </apex:pageblocksectionItem>
+               <apex:PageblocksectionItem rendered="{!isRenewalOppty}">
+                  <apex:OutputLabel value="Invoiced Monthly Commitment: "></apex:OutputLabel>
+                  <apex:OutputText value="{0, number, #,###.00}">
+                     <apex:Param value="{!oli.Average_Renewal_Commit_MRR__c}" />
+                  </apex:OutputText>
+               </apex:pageBlockSectionItem>
+               <apex:PageblocksectionItem rendered="{!isRenewalOppty}">
+                    <apex:OutputLabel value="Invoiced Monthly Usage: "></apex:OutputLabel>
+                    <apex:OutputText value="{0, number, #,###.00}">
+                        <apex:Param value="{!oli.Average_Renewal_Usage_MRR__c}" />
+                    </apex:OutputText>
+                </apex:pageBlockSectionItem>
+            </apex:PageBlockSection>
+            <apex:pageBlockSection id="oliPageBlockSysInfo" title="System Information" collapsible="false">
+            <apex:inputField id="oliAKAMCreatedBy" value="{!oli.AKAM_Created_By__c}"/>
+            <apex:inputField id="oliAKAMModifiedBy" value="{!oli.AKAM_Modified_By__c}"/>
+            <apex:inputField id="oliAKAMCreatedDate" value="{!oli.AKAM_Created_Date__c}"/>
+            <apex:inputField id="oliAKAMModifiedDate" value="{!oli.AKAM_Modified_Date__c}"/>
+            <apex:inputField id="oliAKAMSystem" value="{!oli.AKAM_System__c}"/>
+            <apex:inputField id="oliAKAMOpptyProdId" value="{!oli.AKAM_Opportunity_Product_ID__c}"/>
+            <apex:inputField id="oliValidationOverride" value="{!oli.Validation_Override__c}"/>            
+            </apex:pageBlockSection>
+            <apex:pageBlockSection id="oliPageBlockDesInfo" title="Description Information" collapsible="false" columns="1">
+            <apex:inputText id="oliLineDescription" value="{!oli.Description}" style="width:600px"/>
+            <apex:inputTextarea id="oliComments" value="{!oli.Comments__c}" style="width:600px"/>
+            </apex:pageBlockSection>
+         </apex:pageBlock>
+     </apex:form>
+</apex:page>

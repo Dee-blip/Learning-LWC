@@ -1,0 +1,65 @@
+.hidden
+{
+    display: none;
+}
+
+.labelStyle
+{
+    font-weight: bold !important;
+}
+
+
+/* .createBtn
+{
+--sds-c-button-brand-color-background: #2c70cb;
+} */
+
+.fullHeight
+{
+    height : 100%;
+}
+
+.fiftyHeight
+{
+    height : 50%;
+}
+
+.viewportHeight
+{
+    height: 155vh;
+}
+
+.lgc-bg 
+{
+    background-color: rgb(242, 242, 242);
+}
+
+.listClass
+{
+    height :80%;
+    overflow: scroll;
+}
+
+.suggestedSectionHeight
+{
+    max-height: 180vh;
+}
+
+
+.left-align
+{
+    text-align : left;
+}
+
+.overflowClass
+{
+    overflow-y: scroll;
+}
+
+.redColor{
+    color: red;
+}
+
+.fileUpload{
+    margin-top: -18px;
+}

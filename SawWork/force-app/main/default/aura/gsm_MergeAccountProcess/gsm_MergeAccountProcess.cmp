@@ -1,0 +1,31 @@
+<aura:component controller="gsm_AccountMergeFlowController" implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="losingRecordId" type="Id" />
+    <aura:attribute name="winningRecordId" type="Id" />
+    <aura:attribute name="reqStatus" type="String"/>
+    <aura:attribute name="Name" type="String"/>
+    <aura:attribute name="errorMessage" type="String"/>
+    <aura:attribute name="successMessage" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <c:SF1_CustomLoader />
+    <lightning:card iconName="standard:account">
+        <aura:set attribute="title">
+        	<strong>Merge Accounts: {!v.Name}</strong>
+        </aura:set>
+        <div class="slds-hide" aura:id="errorMessageId">
+            <ui:message severity="error" closable="false" title="Note:">
+                {!v.errorMessage}    
+            </ui:message>
+        </div>
+        <div class="slds-box slds-theme_shade slds-theme_alert-texture slds-hide" 
+             style="color:green;" aura:id="mergeRequestSuccessId">
+            <p><strong>{!v.successMessage} </strong></p>
+        </div>
+        <div class="slds-form-element slds-align_absolute-center"> 
+            <br/>
+            <lightning:button variant="neutral" label="Back" onclick="{! c.redirectToAccountReq }" 
+                              iconName="standard:account" iconPosition="left"
+                              type="submit" aura:id="backButtonId" class="slds-show"/>
+       </div>
+    </lightning:card>
+</aura:component>

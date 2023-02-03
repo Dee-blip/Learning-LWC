@@ -1,0 +1,56 @@
+<!--Added by Jay on 23/03/2015 for 2824410 : LOE tracking Ability on Service Incident -->
+<apex:page standardController="BMCServiceDesk__Incident__c" extensions="ServiceIncidentLOE" sidebar="false" showHeader="false" >
+    <style>
+        .actionLink {
+ 			 color: #015ba7;
+  			 text-decoration: none;
+  			font-weight: normal;
+		}
+    </style>
+    <apex:pageblock >
+        <apex:pageBlockSection columns="1">
+            	<center>
+                     <a href="/apex/SC_SI_LOECreationPage?Incidentid={!serviceIncidentId}&IncidentNumber={!BMCServiceDesk__Incident__c.name}">
+                         <input type="button" value="Add New LOE"/>
+                     </a>	
+            	</center>
+            <apex:pageblockTable value="{!serviceIncidentAgeList}" var="x">
+                <apex:column width="10%" headerValue="Edit">
+                    <apex:facet name="footer">
+                        <a class="actionLink" href="/apex/ServiceIncidentLOE?id={!serviceIncidentId}&totalRecord=1000" target="new">See All Records</a>
+                    </apex:facet>    
+                    <a class="actionLink" href="/{!x.Id}/e?isdtp=vw&retURL=/apex/ServiceIncidentLOE?id={!BMCServiceDesk__Incident__c.Id}">Edit LOE</a>
+                </apex:column>
+                <apex:column width="15%" headerValue="User">
+                     <apex:facet name="header">
+                   </apex:facet>
+                    {!x.user__r.name}
+                </apex:column>
+                <apex:column width="10%" headerValue="Type">
+                    {!x.Type__c}
+                </apex:column>
+               
+                 <apex:column width="15%" headerValue="Start Date">
+                     <apex:outputText value="{0, date, MMMM d','  yyyy}">
+    					<apex:param value="{!x.Start_Date__c}" /> 
+					</apex:outputText>
+                </apex:column>
+                 <apex:column width="15%" headerValue="End Date">
+                     <apex:outputText value="{0, date, MMMM d','  yyyy}">
+    					<apex:param value="{!x.End_Date__c}" /> 
+					</apex:outputText>
+                </apex:column>
+                <apex:column width="10%" headerValue="LOE(Hours)">
+                    <apex:facet name="footer">
+                        Total: <span class="t2">{!BMCServiceDesk__Incident__c.Total_LOE_on_Service_Incident__c}</span><BR/>
+                   </apex:facet>
+                    {!x.LOE__c}
+                </apex:column>
+                 <apex:column width="25%" headerValue="Comments">
+                    {!x.comments__c}
+                </apex:column>
+            </apex:pageblockTable>
+        </apex:pageBlockSection>
+    </apex:pageblock>
+   
+</apex:page>

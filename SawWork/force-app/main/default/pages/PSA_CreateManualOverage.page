@@ -1,0 +1,2 @@
+<apex:page standardController="PS_Overage_Hours__c" extensions="PSA_OverageController" action="{! openNewOverageCreatePage}">
+</apex:page>

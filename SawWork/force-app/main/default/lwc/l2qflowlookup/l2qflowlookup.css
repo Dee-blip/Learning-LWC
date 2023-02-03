@@ -1,0 +1,10 @@
+.warning-msg {
+	margin: 3px 0;
+	padding: 10px;
+	border-radius: 4px 4px 4px 4px;
+	background-color: #ffb75d;
+}
+
+.iconDisplay {
+	display:block !important;
+}

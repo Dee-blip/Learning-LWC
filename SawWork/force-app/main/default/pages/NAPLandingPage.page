@@ -1,0 +1,12 @@
+<apex:page standardStylesheets="false" sidebar="false" showHeader="false">
+  <!-- SFDC-7653 - @nadesai : Redirect to APPLandingPage page along with Page parameters-->
+  <script type="text/javascript">
+    window.onload = function () {
+      var redirectionURL = "{!$CurrentPage.URL}";
+      redirectionURL = redirectionURL.replace(/NAPLandingPage/i, "APPLandingPage"); //SFDC-7680
+      if ("{!$CurrentPage.URL}" != redirectionURL) { //SFDC-7681
+        window.location = redirectionURL;
+      }
+    }
+  </script>
+</apex:page>

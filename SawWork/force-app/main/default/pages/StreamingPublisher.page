@@ -1,0 +1,181 @@
+<!--
+    @author : Thippeswamy Jayaramappa <tjayaram@akamai.com>
+    Date : May 22, 2015
+    Release: 4.8
+    purpose: this page will subscribe for push Notifications.
+            Each streaming topic will have listener. If any page raises event , then topic will be created.
+            Similarly data will be thrown to destintion page through event fire.
+            Client will subscribe through event firing and will get data through event.
+            Each page can individually register to streaming. But we prefer this as we need around 4 JS to subscribe.
+            Also few times JS might conflict and it might fail.  might need more time in debugging.
+            So this method is preferred.  
+-->
+<apex:page sidebar="false" showHeader="false" controller="StreamingPublisher" > 
+    <apex:includeScript value="{!URLFOR($Resource.StreaingAPI_v1 , '/cometd/cometd.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.StreaingAPI_v1 , '/cometd/jquery.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.StreaingAPI_v1 , '/cometd/json2.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.StreaingAPI_v1 , '/cometd/query_cometd.js')}"/>
+    <apex:includeScript value="/support/console/32.0/integration.js" />  
+   
+    <script type="text/javascript">
+        var userId = '{!$User.Id}';
+    	
+    	var streamingJSONString = '{!streamingConstantsList}';
+    	var streamingJSONObjects = JSON.parse(streamingJSONString);
+        var bulletinSubscriptionObject;
+        var caseUpdatesSubscriptionObject;
+    	var SISubscriptionObject;
+    	var TaskSubscriptionObject;
+        var CaseTaskSubscriptionObject;
+    	var reattemptsCounter = 0;
+
+        $(document).ready(function() {
+            // Connect to the CometD endpoint
+            if ('{!profilecheck}'=='true'){
+                initiateConnection();
+            	enableDefaultNotifications();
+                subscriptionReconnect();
+            }    
+        });
+    
+    	function initiateConnection(){
+             $.cometd.init({
+                   url: window.location.protocol+'//'+window.location.hostname+'/cometd/28.0/',
+                   requestHeaders: { Authorization: 'OAuth {!$Api.Session_ID}'}
+               });
+        }
+    
+        function enableDefaultNotifications(){
+            //default notifications. no need of subscribing
+            createStreamingBulletinMessage();
+            createStreamingMyCaseUpdatesTopic();
+            createStreamingSITopic();
+            createStreamingTaskTopic();
+            createStreamingCaseTaskTopic();
+        } 
+    
+    	function disconnectStreamingMyCaseUpdatesTopic(){
+            if(streamingJSONObjects['Enable Case Notifications Streaming'].Keyvalue__c == 'true'){
+                	$.cometd.unsubscribe(caseUpdatesSubscriptionObject); 
+            }  
+        }
+
+        function createStreamingMyCaseUpdatesTopic(){
+            if(streamingJSONObjects['Enable Case Notifications Streaming'].Keyvalue__c == 'true'){
+                caseUpdatesSubscriptionObject = $.cometd.subscribe('/topic/SCC_Case_List?ownerid='+userId, function(message) { 
+                    sforce.console.fireEvent('CaseNotification_'+userId, JSON.stringify(message)); 
+                });
+            }    
+        }
+		    
+        function createStreamingBulletinMessage(){
+            if (streamingJSONObjects['Enable Bulletin Streaming'].Keyvalue__c == 'true'){
+                bulletinSubscriptionObject = $.cometd.subscribe('/topic/BulletinMessage', function(message) { 
+                   sforce.console.fireEvent('BulletinMessageGlobalNotifcation', message); 
+                });
+            }    
+        }
+    
+    	function disconnectStreamingBulletinMessage(){
+            if(streamingJSONObjects['Enable Bulletin Streaming'].Keyvalue__c == 'true'){
+                	$.cometd.unsubscribe(bulletinSubscriptionObject); 
+            }  
+        }
+    
+ 		function createStreamingSITopic(){
+            if (streamingJSONObjects['Enable SI Streaming'].Keyvalue__c == 'true'){
+                SISubscriptionObject = $.cometd.subscribe('/topic/ServiceIncident', function(message) {
+                   sforce.console.fireEvent('ServiceIncidentGlobalNotification', message); 
+                });
+            }
+        } 
+    
+    	function disconnectStreamingSITopic(){
+            if(streamingJSONObjects['Enable SI Streaming'].Keyvalue__c == 'true'){
+                	$.cometd.unsubscribe(SISubscriptionObject); 
+            } 
+        }
+    
+    	function createStreamingTaskTopic(){
+            if (streamingJSONObjects['Enable LOE Streaming'].Keyvalue__c == 'true'){
+                TaskSubscriptionObject = $.cometd.subscribe('/topic/Task?ownerid='+userId, function(message) {
+                    console.log(message);
+                   sforce.console.fireEvent('TaskNotification_'+userId, message); 
+                });
+            }
+        } 
+    
+    	function disconnectStreamingTaskTopic(){
+            if(streamingJSONObjects['Enable LOE Streaming'].Keyvalue__c == 'true'){
+                	$.cometd.unsubscribe(TaskSubscriptionObject); 
+            } 
+        }
+    
+        function createStreamingCaseTaskTopic(){
+            if (streamingJSONObjects['Enable Case Task Streaming'].Keyvalue__c == 'true'){
+                CaseTaskSubscriptionObject = $.cometd.subscribe('/topic/TaskUpdates', function(message) {
+                    console.log(message);
+                   sforce.console.fireEvent('CaseTaskNotification', message); 
+                });
+            }
+        } 
+    
+        function disconnectStreamingCaseTaskTopic(){
+            if(streamingJSONObjects['Enable Case Task Streaming'].Keyvalue__c == 'true'){
+                    $.cometd.unsubscribe(CaseTaskSubscriptionObject); 
+            } 
+        }
+    	/* Multiple times Streaming gets disconnected. even though we register event listeners,
+        we were not able to find connection status.
+        $.comedt.status is not giving right values.
+        so we are continously creating connection and disconnection in some interval.
+        this interval is again driven from custom settings.
+        Also every time we reconnect we dont refresh page. when connection gets lost , again we try to connect in some interval.
+        during this , data might be lost.
+        so after say 5 reconnections , raise global event called force refresh. all pages listening to this
+        will refresg page. this 5 is again driven from custom settings
+    	*/
+    
+        function subscriptionReconnect() {
+            setTimeout(function(){ 
+                reattemptsCounter = reattemptsCounter + 1;
+                if (reattemptsCounter == streamingJSONObjects['Global Notify Counter'].Keyvalue__c){
+                    //throw global attempts;
+                    reattemptsCounter = 0;
+                    //after some reconnets we would have lost data. so refresh page
+                    sforce.console.fireEvent('GlobalRefreshStreamingNotify', 'Global refresh'); 
+                }    
+            	
+                disconnectStreamingBulletinMessage();
+                disconnectStreamingMyCaseUpdatesTopic();
+                disconnectStreamingSITopic();
+                disconnectStreamingTaskTopic();
+                disconnectStreamingCaseTaskTopic();
+                $.cometd.disconnect();
+                initiateConnection();
+            	createStreamingBulletinMessage();
+                createStreamingMyCaseUpdatesTopic();
+                createStreamingSITopic();
+                createStreamingTaskTopic();
+                createStreamingCaseTaskTopic();
+            	subscriptionReconnect();            
+            }, streamingJSONObjects['Publisher Time out'].Keyvalue__c);
+        }
+        
+        function permanentDisConnect() {
+             disconnectStreamingBulletinMessage();
+             disconnectStreamingMyCaseUpdatesTopic(); 
+             disconnectStreamingSITopic();
+             disconnectStreamingTaskTopic();
+             createStreamingCaseTaskTopic();
+           	 $.cometd.disconnect();
+        }
+
+    	if ('{!profilecheck}'=='true'){
+            $(window).on('beforeunload', function(e) {
+                permanentDisConnect();
+            });
+        }    
+       
+   </script>
+ </apex:page>

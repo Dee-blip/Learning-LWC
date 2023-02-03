@@ -1,0 +1,60 @@
+.slds-hide {
+	visibility: hidden;
+	opacity: 0;
+	transition: visibility 0s linear 0.33s, opacity 0.33s linear;
+}
+.slds-show {
+	visibility: visible;
+	opacity: 1;
+	transition-delay: 0s;
+}
+
+table,
+th,
+td {
+	border: 1px solid rgb(217, 219, 221);
+	border-collapse: collapse;
+	/* text-align: center; */
+}
+th {
+	color: #006dcc !important;
+}
+th,
+td {
+	padding: 5px;
+}
+th {
+	text-align: left;
+}
+.warning-msg {
+	margin: 3px 0;
+	padding: 10px;
+	border-radius: 4px 4px 4px 4px;
+	background-color: rgb(4, 132, 75);
+	width: 20%;
+	color: white;
+	/* height: 4px; */
+}
+.iconClass {
+	color: white !important;
+}
+
+.error-msg {
+	margin: 3px 0;
+	padding: 10px;
+	border-radius: 4px 4px 4px 4px;
+	background-color: #c23934;
+	color: #ffffff;
+	width: 50%;
+}
+.close {
+	cursor: pointer;
+	color: white;
+	font-size: 40px;
+	padding: 12px 16px;
+	transform: translate(0%, -50%);
+}
+
+.close:hover {
+	/* background: #c23934; */
+}

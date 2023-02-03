@@ -1,0 +1,379 @@
+<apex:page standardController="Case" extensions="SC_AttachAccuracyCheckController" showHeader="false" sidebar="false" title="Case-Artile Accuracy Check" id="pageIdAccuracyCheck">
+    <apex:includeScript value="/support/console/44.0/integration.js"/>
+    <apex:includeScript value="{!$Resource.JQuery_New}"/>
+    
+    <style>
+        .container{
+            width: 95%;
+            border: 1px solid #dce0e8;
+            padding: 2px;
+            margin: 11px;
+            border-radius: 5px;
+        }
+        
+        .content{
+            width: 100%;
+            padding: 25px;
+            margin: 25px;
+        }
+        .header {
+            background-color:#d0d7e1;;
+            padding: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 3px;
+        }
+        .container .content {
+            display: block;
+            padding : 5px;
+        }
+        .afterSaveSuccessMsg{
+            width: auto;
+            padding: 6px;
+            margin: 10px;
+            background-color: rgb(235, 255, 236);
+            font-weight: bold;
+            color: #288a47;
+            border-radius: 3px;
+        }
+        .errorMsg{
+            width: auto;
+            padding: 6px;
+            margin: 10px;
+            background-color: #ffe6e4;
+            font-weight: bold;
+            color: Red;
+            border-radius: 3px;
+        }
+        .noCaseForParticipant{
+            width: auto;
+            padding: 15px;
+            margin: 30px;
+            background-color: rgb(69, 107, 65);
+            font-weight: bold;
+            color: #ffffff;
+            border-radius: 3px;
+            text-align: center;
+            font-size: medium;
+            font-family: serif;
+        }
+        
+        .noPermissionOnPage{
+            width: auto;
+            padding: 15px;
+            margin: 30px;
+            background-color: rgb(69, 107, 65);
+            font-weight: bold;
+            color: #ffffff;
+            border-radius: 3px;
+            text-align: center;
+            font-size: medium;
+            font-family: serif;
+        }
+        .multipleArticles{
+            width: auto;
+            padding: 6px;
+            margin: 10px;
+            background-color: rgb(235, 255, 236);
+            font-weight: bold;
+            color: #288a47;
+            border-radius: 3px;
+        }
+        
+        .redIcon{color:red;}
+        .redText{color:red;}
+        
+        #fade{
+            display: none;
+            position:absolute;
+            top: 0%;
+            left: 0%;
+            width: 100%;
+            height: 100%;
+            background-color: #ababab;
+            z-index: 1001;
+            -moz-opacity: 0.8;
+            opacity: .70;
+            filter: alpha(opacity=80);
+        }
+        .loadingClass{
+            display: none;
+            position: absolute;
+            top: 45%;
+            left: 45%;
+            width: 150px;
+            height: 30px;
+            padding: 10px 15px 0px;
+            border: 3px solid #ababab;
+            box-shadow: 1px 1px 10px #0071d2;
+            border-radius: 20px;
+            background-color: #3d8ddc;
+            z-index: 1002;
+            overflow: auto;
+            text-align: center;
+        }
+        
+    </style>
+    <apex:form id="formId">
+        
+        <!--Action status to show processing-->
+        <apex:actionStatus id="statusId">
+            <apex:facet name="start">    
+                <div class="loadingClass" style="display:block;">
+                    <img id="loadingImgId" src="{!$Resource.CMCLoadingImage}" width="20" height="20" style="display:inline;"/>&nbsp;&nbsp;<b style ="color: white;vertical-align: super;" id="textModalId">Fetching Records...</b>
+                </div>
+            </apex:facet>
+            <apex:facet name="stop"> </apex:facet>
+        </apex:actionStatus>
+        
+        <div id="fade"></div>
+        
+        <apex:actionFunction name="controllerSave" reRender="isSuccess,caseId,afterSaveMessageblock,afterSaveErrorMessageblock,hasMoreThanOneArticleId" action="{!saveAccuracyCheck}" id="controllerSave" status="statusId" oncomplete="afterSaveFunctionality(); return false;">
+            <apex:param name="eachCaseID" value="" assignTo="{!eachCaseID}"/>
+        </apex:actionFunction>
+        <apex:actionFunction action="{!refreshPage}" name="refreshPage" reRender="isInAkapediaId" status="statusId" oncomplete="cloaseModal(); return false;"/>
+        
+        <div class="noCaseForParticipant" style="display:none">
+            This participant has no closed cases in past {!inputdateNumber} days that need accuracy check(s).
+        </div>
+        
+        <div class="noPermissionOnPage" style="display:none">
+            You don't have sufficient permission to view this page. Please contact your administrator for more information.
+        </div>
+        
+        <div class= "pagination" align="center" style="padding-top: 2%;">
+            <apex:commandLink value="|<<" reRender="formId" action="{!first}" title="First Page" status="statusId" onclick="openModal();stopUnsavedPageNavigation(event);" oncomplete="closeModal();return false;"/>&nbsp;&nbsp;&nbsp;&nbsp;
+            <apex:commandLink value="<<" reRender="formId" action="{!previous}" title="Previous Page" status="statusId" onclick="openModal();stopUnsavedPageNavigation(event);" oncomplete="closeModal();return false;"/>&nbsp;&nbsp;&nbsp;&nbsp;
+            <apex:outputText >Showing page {!getPageNumber} of {!getTotalPageNumber}</apex:outputText>&nbsp;&nbsp;&nbsp;&nbsp;
+            <apex:commandLink value=">>" reRender="formId" action="{!next}" title="Next Page" status="statusId" onclick="openModal();stopUnsavedPageNavigation(event);" oncomplete ="closeModal();return false;"/>&nbsp;&nbsp;&nbsp;&nbsp;
+            <apex:commandLink value=">>|" reRender="formId" action="{!last}" title="Last Page" status="statusId" onclick="openModal();stopUnsavedPageNavigation(event);" oncomplete ="closeModal();return false;"/>
+        </div>
+        
+        <apex:repeat value="{!caseList}" var="cas" id="caseListId">
+            
+            <div class="container" id="containerId" html-dataId ="container{!cas.id}">
+                <apex:inputHidden id="isSuccess" value="{!isSuccess}"/>
+                <apex:inputHidden id="caseId" value="{!eachCaseID}"/>
+                <apex:inputHidden id="noCaseToDisplayId" value="{!noCaseToDisplay}"/>
+                <apex:inputHidden id="hasPermissionToViewId" value="{!hasPermissionToView}"/>
+                <apex:inputHidden id="hasMoreThanOneArticleId" value="{!hasMoreThanOneArticle}"/>
+                <apex:inputHidden id="isInAkapediaId" value="{!isInAkapedia}"/>
+                
+                <div class="afterSaveSuccessMsg" id="afterSaveMessageblock" style="display:none;" html-dataId ='{!cas.id}'>
+                    Record Saved.
+                </div>
+                <div class="errorMsg" id="afterSaveErrorMessageblock" style="display:none;">
+                    Error: Please fill all required(*) fields.
+                </div>
+                <div class="multipleArticles" style="display:none" html-dataId = 'multipleArticle{!cas.Id}'>
+                    Successfully saved. There are multiple articles attached to this case. Please manually detach the inaccurate article(s).
+                </div>
+                
+                <div class="header">
+                    <span style="margin-left:1%;">AKAM Case ID:&nbsp;&nbsp; <a onclick="openCaseURL('{!cas.Id}','{!cas.Akam_Case_Id__c}');" target="_blank">{!cas.Akam_Case_Id__c}</a></span>
+                    <span class ="expandCls" style="float:right;"><div onclick="hideShowContent(event);">Collapse</div></span>
+                </div>
+                
+                <div class="content" id="contentId">
+                    
+                    Has Article Linked?&nbsp;&nbsp; <apex:outputField id="Has_Article_Linked" title="Has_Article_Linked" value="{!cas.Has_Article_Linked__c}"/><br/><br/>
+                    Article Number(s):&nbsp;&nbsp;
+                    
+                    <apex:variable var="count" value="{!0}"/>
+                    <apex:repeat value="{!caseArticleMap[cas.Id]}" var="x">
+                        <apex:variable var="count" value="{!count + 1}"/>
+                        <apex:outputText rendered="{!if(count > 1,true,false)}">,</apex:outputText>
+                       <!-- <a href="/{!knowledgeArticleNumberMap[x]}" target="_blank">{!x}</a> -->
+                        <a onClick="openKnowledgeArticle('{!knowledgeArticleNumberMap[x]}');" style="cursor: pointer;">{!x}</a>
+                    </apex:repeat> <br/><br/>
+                    
+                    <span id ="attachAccurateId" style="display:{! if((cas.Has_Article_Linked__c || cas.Accurate_Attach__c == 'No'),'inline-flex','none')}" >
+                        Accurate Attach? <span id="required_Accurate_Attach" style="display:inline-block" class='redIcon'>*</span>&nbsp;&nbsp;
+                        <apex:inputField id="Is_Accurate_Attach" html-dataId="accurateAttach{!cas.Id}" value="{!cas.Accurate_Attach__c}" style="display:block"/><!--display:{! if(cas.Has_Article_Linked__c,'inline-block','none')}-->
+                    </span>
+                    
+                    <span id ="noAttachAccurateId" style="display:{! if((!cas.Has_Article_Linked__c && cas.Accurate_Attach__c == ''),'inline-flex','none')}">
+                        Non-Attach Indicator <span id="required_Non_Attach_Indicator" style="display:inline-block" class='redIcon'>*</span>&nbsp;&nbsp;
+                        <apex:inputField id="Non_Attach_Indicator" html-dataId="nonAttachIndtr{!cas.Id}" value="{!cas.Non_Attach_Indicator__c}" style="block"/><!--display:{! if(cas.Has_Article_Linked__c,'none','inline-block')}-->
+                    </span>
+                    
+                    <apex:commandButton id="btn"
+                                        onclick="callValidationCheck(event,'{!cas.Id}','{!cas.Has_Article_Linked__c}'); return false;" title="Save" value="Save" 
+                                        style="width:8%;height:19px;padding:0px;border-radius:5px;margin-left:2%;" >
+                    </apex:commandButton> 
+                    
+                </div>
+            </div>
+        </apex:repeat>
+        
+        <script type="text/javascript">
+        
+        var $j = jQuery.noConflict();
+        
+        $j( document ).ready(function() {
+            if({! !isInAkapedia}){
+                $j(".pagination").hide();
+                $j(".loadingClass")[0].style.left ="37%";
+                // $j(".noCaseForParticipant").text('No Action Required: Accuracy check has been completed on this case.');
+            }
+            if({! !hasPermissionToView}){
+                $j(".noPermissionOnPage").show();
+                $j(".pagination").hide();
+            }
+            else if({!noCaseToDisplay}){
+                if({!isInAkapedia}){ $j(".noCaseForParticipant").show();}
+                $j(".pagination").hide();
+            }
+        });
+        
+        function hideShowContent(event){
+            $jcontent = $j(event.target).parent().parent().parent().children('[id*="contentId"]');
+            $jcontent.slideToggle("slow", function () {
+                $j(event.target).text(function () {
+                    //change text based on condition
+                    return $j(event.target).parent().parent().parent().children('[id*="contentId"]').is(":visible") ? "Collapse" : "Expand";
+                });
+            });
+        }
+        
+        function openCaseURL(eachCaseId,akamCaseId){
+            if(sforce.console.isInConsole()) //Checks that it is in console
+                openLinkConsole(eachCaseId,akamCaseId); 
+            else
+                window.open('/'+eachCaseId);
+        }
+        
+        function openLinkConsole(SF_Id,Numb) 
+        {
+            Tab_Id = Numb;
+            var nativeReportURL = 'https://'+window.location.hostname+'/'+SF_Id;
+            if(sforce.console.isInConsole())
+                sforce.console.generateConsoleUrl(['/'+SF_Id], openConsoleUrl);
+            else
+                window.open(nativeReportURL,'_blank');  
+        }   
+        
+        var openConsoleUrl = function(result)
+        {
+            sforce.console.openConsoleUrl(null, result.consoleUrl,true,[Tab_Id],null,openSuccess);
+        }
+        
+        var openSuccess = function(result) 
+        {
+            //Report whether opening the new tab was successful
+            if (result.success == false)
+                alert('The corresponding tab is already opened');
+        }
+        
+        //Calling Save
+        function callSaveAF(paramVal){           
+            var caseIdPara = paramVal;           
+            controllerSave(caseIdPara);
+            return false;
+            
+        }
+        
+        function callValidationCheck(event,caseId,hasArticle){
+            
+            openModal('save');
+            var accurateAttach = 'accurateAttach'+caseId;
+            var nonAttachIndtr = 'nonAttachIndtr'+caseId;
+            var accurateAttachVal = $j("[dataid='"+accurateAttach+"']").val();
+            var nonAttachIndtrVal = $j("[dataid='"+nonAttachIndtr+"']").val();
+            $j(".pagination").children().css('pointer-events','none');
+            
+            if(hasArticle === 'true' && accurateAttachVal == ''){
+                $j(event.target).parent().parent().children('[id*="afterSaveErrorMessageblock"]').show();
+                setTimeout(function(){$j(event.target).parent().parent().children('[id*="afterSaveErrorMessageblock"]').hide();},2000);
+                $j(".pagination").children().css('pointer-events','auto');
+                closeModal();
+            }
+            
+            else if(hasArticle === 'false' && accurateAttachVal == '' && nonAttachIndtrVal == ''){
+                $j(event.target).parent().parent().children('[id*="afterSaveErrorMessageblock"]').show();
+                setTimeout(function(){$j(event.target).parent().parent().children('[id*="afterSaveErrorMessageblock"]').hide();},2000);
+                $j(".pagination").children().css('pointer-events','auto');
+                closeModal();
+            }
+            
+            else{
+                callSaveAF(caseId);
+            }
+        }
+        
+        function afterSaveFunctionality(){ 
+            
+            var saveSuccess = $j("[id*='isSuccess']").val();
+            var caseId = $j("[id*='caseId']").val();
+            var hasMoreThanOneArticle = $j("[id*='hasMoreThanOneArticleId']").val();
+            if(saveSuccess === 'true'){
+                var id = caseId;
+                var containerId = 'container'+id;
+                var multipleArticlesId = 'multipleArticle'+id;
+                //closeModal();
+                if(hasMoreThanOneArticle === 'true'){
+                    $j("[html-dataid=" + multipleArticlesId + "]").show();
+                    setTimeout(function(){$j("[html-dataid=" + multipleArticlesId + "]").hide();},3000);
+                    if({!isInAkapedia}){
+                        setTimeout(function(){$j("[html-dataid=" + containerId + "]").hide();},3000);
+                        setTimeout(function(){openModal('refresh');refreshPage(); $j(".pagination").children().css('pointer-events','auto');},3000);
+                    }
+                }
+                else{
+                    $j("[html-dataid=" + id + "]").show();
+                    setTimeout(function(){$j("[html-dataid=" + id + "]").hide();},1000);
+                    if({!isInAkapedia}){
+                        setTimeout(function(){$j("[html-dataid=" + containerId + "]").hide();},1000);
+                        setTimeout(function(){openModal('refresh');refreshPage(); $j(".pagination").children().css('pointer-events','auto');},1000);
+                    }
+                }
+                //if({!isInAkapedia}){
+                    //setTimeout(function(){openModal('refresh');refreshPage(); $j(".pagination").children().css('pointer-events','auto');},4000);
+                //}
+                closeModal();
+            }
+            
+        }
+        
+        function stopUnsavedPageNavigation(event){
+            $jnoAttachAccurate = $j(event.target).parent().parent().children('[id*="containerId"]').children('div#contentId').children('span#noAttachAccurateId').children('select');
+            $jattachAccurate = $j(event.target).parent().parent().children('[id*="containerId"]').children('div#contentId').children('span#attachAccurateId').children('select');   
+            for(var i =0;i<$jnoAttachAccurate.length;i++){
+                if($jnoAttachAccurate[i].value !== ''){
+                    $jnoAttachAccurate[i].value = ''; 
+                } 
+            }
+            for(var i =0;i<$jattachAccurate.length;i++){
+                if($jattachAccurate[i].value !== ''){
+                    $jattachAccurate[i].value = '';
+                } 
+            }
+        }
+        
+        //function to fade screen while processing
+        function openModal(calledFrom) {
+            if(calledFrom === 'save'){
+                $j("[id*='textModalId']").text("Saving Records.");
+            }
+            if(calledFrom === 'refresh'){
+                $j("[id*='textModalId']").text("Refreshing Content");
+            }
+            document.getElementById('fade').style.display = 'block';
+        }
+        function closeModal() {
+            document.getElementById('fade').style.display = 'none';
+        }
+        
+        //open Knowledge article in console
+        function openKnowledgeArticle(knowledgeArticleId){
+            if(sforce.console.isInConsole()){ //Checks that it is in console
+                openLinkConsole(knowledgeArticleId, ''); 
+            } 
+            else{           
+                window.open('/'+knowledgeArticleId,'_blank');
+            }
+        }
+        
+        </script>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,13 @@
+.c-modal-header {
+    padding-top: 10px;
+    text-align:center;
+    position: relative;
+    background: #fff;
+    /* display: flex; */
+  }
+  .c-modal-title {
+    /* background-color: white; */
+    font-size: 22px;
+    font-weight: 300;
+    color: #777;
+  }

@@ -1,0 +1,11 @@
+<apex:page standardController="Account_Merge_Request__c">
+    <apex:includeLightning />
+    <div id="lightning" />
+	<script>
+    	$Lightning.use("c:gsm_MergeAccountsApp", function () {
+	        $Lightning.createComponent("c:gsm_MergeAccountProcess", {recordId: "{!Account_Merge_Request__c.Id}",losingRecordId: "{!Account_Merge_Request__c.Losing_Account__c}",winningRecordId: "{!Account_Merge_Request__c.Winning_Account__c}",reqStatus: "{!Account_Merge_Request__c.Merge_Status__c}",Name: "{!Account_Merge_Request__c.Name}"}, "lightning", function (cmp) {
+	          // do some stuff
+	        });
+	    });
+    </script>
+</apex:page>

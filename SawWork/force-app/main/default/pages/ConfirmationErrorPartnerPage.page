@@ -1,0 +1,44 @@
+<!-- Author: Ruchika Sharma
+    Version: 1.0
+    Created date: 02/03/2019
+    SFDC-4389: Confirmation message for partners and internal users
+-->
+<apex:page controller="genericButtonPageController" action="{!init}">
+    <script>
+        window.onload = function () {
+            var message = '{!message}';
+            var messageFlag = message.substr(message.indexOf(":") + 1, message.length);
+            var outputMessage = message.substr(0, message.indexOf(":"));
+            var isEnabledUser = new Boolean();
+            var fromButton = '{!fromButton}';
+            if (messageFlag == "1")
+                isEnabledUser = true;
+            else {
+                isEnabledUser = false;
+                window.alert(outputMessage);
+
+            }
+
+            if (isEnabledUser && fromButton.includes("UnlockPartner")) {
+
+                var ans = confirm(outputMessage);
+                if (ans) {
+                    //location.href = redirectionURL; 
+                    unlockRecord();
+
+                }
+            }
+        }
+        function redirectToRecordJS() {
+            window.parent.location.href = "{! '/' + recordId}";
+        }
+    </script>
+    <!-- rendered="{!IF(NOT(contains(fromButton,'UnlockPartner')),true, false)}" -->
+    <apex:form >
+        <!-- SFDC-6889 handle page redirection oncomplete -->
+        <apex:actionFunction name="unlockRecord" action="{!unlockRecord}" oncomplete="redirectToRecordJS()" rerender="back,msg" status="myStatus"
+        />
+    </apex:form>
+    <apex:outputLink id="back" value="/{!recordId}" style="padding: 10px;"> Back </apex:outputLink>
+    <apex:pageMessages id="msg" escape="false" />
+</apex:page>

@@ -1,0 +1,90 @@
+<!--=====================================================================================================+
+    Component name      :   SC_New_OA_Case
+    Author              :   Pinkesh
+    Created             :   07-Feb-19
+    Purpose             :   This is a component to the create New OA case
+
+	Last Modified 	Developer	Purpose            
+    ============= 	=========	============ 
+    24-Apr-19     	Vikas  		Used the same component to create Escalation case from AD detail page.
++=====================================================================================================-->
+<aura:component controller="SC_OrderApprovals_LightningCtrl" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasSObjectName" access="global" >
+    <!-- Attribute List -->
+    <aura:attribute name="recordTypeMap" type="Map" />
+    <aura:attribute name="defaultRecordType" type="String" />
+    <aura:attribute name="Spinner" type="boolean" default="false" />
+    <aura:attribute name="showPopup" type="boolean" default="false" />
+    <aura:attribute name="showRTSelection" type="boolean" default="false" />
+    <aura:attribute name="escalationErrorMessage" type="String" />
+    
+    <!-- init method to get all OA related Case recordtypes -->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    
+    <aura:if isTrue="{!v.Spinner}">
+        <div class="slds-m-around_large" style="height:50%">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    
+                    <div aura:id="spinnerId" class="slds-spinner_container" style="top: auto;">
+                        <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-fixed" role="alert">
+                            <span class="slds-assistive-text">Loading</span>
+                            <div class="slds-spinner__dot-a"></div>
+                            <div class="slds-spinner__dot-b"></div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if> 
+    
+    <aura:if isTrue="{!v.showPopup}">
+        <!-- Modal Header -->
+        <aura:if isTrue="{!v.showRTSelection}">
+        <div class="slds-modal__header">
+            <h2 id="header43" class="slds-text-heading--medium">
+                New Order Approval Case
+            </h2>
+        </div>
+        </aura:if>
+        <!-- End of Modal Header -->
+        
+        <!-- Modal Body -->
+        <aura:if isTrue="{!!v.showRTSelection}">
+            <div aura:id="errorMsgId" style="padding-top: 90px;font-size: medium;">
+                <center>
+                <p>{!v.escalationErrorMessage}</p>
+                </center>
+            </div>
+        </aura:if>
+        <!-- display record type selection values --> 
+        <aura:if isTrue="{!v.showRTSelection}">
+            <div class="slds-modal__content slds-p-around--medium">
+                <p style="margin-top: 1.5rem">Select a Record Type for this Case</p>
+                <div class="slds-form_stacked" style="margin-top: -15px;">
+                    <fieldset class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            <lightning:radioGroup aura:id="recordType"
+                                                  name="recordTypeList"
+                                                  options="{!v.recordTypeMap}"
+                                                  value="{!v.defaultRecordType}"
+                                                  type="radio"
+                                                  class="slds-radio topdown-radio-container slds-clearfix"/>
+                        </div>
+                    </fieldset>
+                </div> 
+            </div>
+        </aura:if>
+        <!-- End of Modal Body -->
+        
+        <!-- Modal Footer -->
+        <aura:if isTrue="{!v.showRTSelection}">
+            <div class="slds-align_absolute-center" style="padding: 1rem;">
+                <button class="slds-button slds-button--brand" onclick="{!c.createCase}">Next</button>
+                <button class="slds-button slds-button--neutral" onclick="{!c.closeModal}">Cancel</button>
+            </div>
+        </aura:if>
+        <!-- End of Modal Footer -->
+    </aura:if>
+</aura:component>

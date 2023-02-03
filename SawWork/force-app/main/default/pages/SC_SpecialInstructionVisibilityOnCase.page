@@ -1,0 +1,84 @@
+<!--=====================================================================================================+
+    Page Name           :   SC_SpecialInstructionVisibilityOnCase
+    Author              :   Aditya Sonam
+    Created             :   27-Jun-2016
+    Purpose             :   This page display Account's Special Instruction associated with BOCC Case
+
+    Last Modified    Developer       CR        Purpose            
+    =============    =========     =======    =========
+
++=====================================================================================================-->
+
+<apex:page showheader="false" standardStylesheets="false" standardController="Case" extensions="SpecialInstructionsListController" lightningStylesheets="true">
+    
+    <style type="text/css">
+        .styleTitle {
+        font-weight:normal;
+        font-family:sans-serif;
+        font-size:12px;
+        color:#1382cf;
+        line-height:30px;
+        vertical-align: top;
+        
+        }
+        .styleMessage { 
+        font-weight:400;
+        font-style:italic;
+        color:#788792;
+        font-size:13px;
+        line-height:40px; 
+        text-align: center;
+        }
+        .imageClass{
+        overflow:auto;
+        }
+        
+    </style>
+    
+    <div>
+        <apex:outputText style="float:right; margin-right:5px;font-size:11px;" rendered="{!instCount > 0}" value="Total : {!instCount}"></apex:outputText>
+    </div> 
+    
+    <div class="styleMessage">
+        <apex:outputText value="No Special Instructions available" rendered="{! splInstrList.size = 0 && caseWithAccount}"> </apex:outputText>
+        <!--<apex:outputLabel value="No Special Instructions available." rendered="{! splInstrList.size = 0 && caseWithAccount}" styleClass="styleMessage" >
+</apex:outputLabel>-->
+        
+        <apex:outputText value="No Account selected" rendered="{!!caseWithAccount}"> </apex:outputText>
+        <!-- <apex:outputLabel value="No Account selected." rendered="{! !caseWithAccount}" styleClass="styleMessage" >
+</apex:outputLabel> -->
+        
+    </div>
+    
+    <apex:form > 
+        <apex:repeat var="splIstrVar" value="{!splInstrList}">
+            <div class ="imageClass">
+                <div style="float: left;">
+                    <apex:image value="https://{!logoUrl}{!specialInstructionLogoNameMap[splIstrVar.Flag_Icon__c]}" rendered="{!splIstrVar.Flag_Icon__c != null}" style="height :25px;"/>
+                </div>
+                <div style="margin-left: 40px;">
+                    <apex:outputLink onclick="openCaseInSubtab('{!splIstrVar.Id}');return false;" target="_blank" styleClass="styleTitle">
+                        {!splIstrVar.Title_Formula__c}
+                    </apex:outputLink>
+                </div>
+            </div>
+        </apex:repeat>                   
+    </apex:form>
+    
+    <apex:includeScript value="/soap/ajax/26.0/connection.js"/>
+    <apex:includeScript value="/support/console/32.0/integration.js"/>
+    <script type ="text/javascript">
+    function openCaseInSubtab(recId){
+        var redirectUrl = recId;
+        if (sforce.console.isInConsole()) {
+            sforce.console.getEnclosingTabId(function(enclosingResult){
+                sforce.console.getEnclosingPrimaryTabId(function(primaryResult){
+                    sforce.console.openSubtab(primaryResult.id, redirectUrl, true, '', null);
+                });
+            });
+        } else {
+            window.open('/'+redirectUrl);
+        }
+    } 
+    </script>
+</apex:page>

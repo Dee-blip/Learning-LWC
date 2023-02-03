@@ -1,0 +1,17 @@
+<aura:component controller="HD_Lightining_Reporting"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickAction"
+                access="global">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <aura:attribute name="report" type="String" />
+    
+    
+    <div class="listViewContent slds-table--header-fixed_container">
+        <div class="slds-scrollable_y" style="height: 50rem; width: 100%;">
+        <div class="slds-scrollable_x" style="width: 100%;">
+            <!--aura:unescapedHtml value="{!v.report}" /-->
+            <ui:outputRichText value="{!v.report}" />
+        </div>
+        </div>
+    </div>
+    
+</aura:component>

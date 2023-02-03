@@ -1,0 +1,25 @@
+.THIS.buttonNormal {
+    font-size: 0.2rem;
+    font-weight: normal;
+}
+
+.THIS.warningSection {
+	color:red;
+	font-size: 1rem;
+	
+
+}
+.THIS.warningSectionClick {
+	color:red;
+	font-size: 1rem;
+	text-decoration: underline;
+
+}
+
+
+
+.THIS.noWarningSection {
+	color:green;
+	font-size: 1rem;
+	
+}

@@ -1,0 +1,84 @@
+<template>
+    <div style="zoom:90%">
+
+        <div class="slds-card slds-page-header"
+            style="height: auto;margin-top: 15px;max-height: 80vh;padding-top: 0px;padding-bottom: 4px;">
+            <div class="slds-grid slds-gutters">
+
+                <!-- *************************** HEADER **********************************************-->
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div>
+                        <template if:true={showSIspinner}>
+                            <div style="opacity: 0.7;" class="slds-spinner_container">
+                                <lightning-spinner alternative-text="Loading" variant="brand" size="medium">
+                                </lightning-spinner>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="slds-media__figure slds-col slds-size_1-of-5">
+
+
+                        <ul class="slds-list_horizontal slds-media_center">
+                            <li>
+                                <template if:true={displaySI}>
+                                    <lightning-button-icon icon-name="utility:chevrondown" variant="bare"
+                                        style="padding-right: 6px; padding-left: 2px;" alternative-text="Collapse"
+                                        title="Collapse" onclick={hideOpenSITable}>
+                                    </lightning-button-icon>
+                                </template>
+
+                                <template if:false={displaySI}>
+                                    <lightning-button-icon icon-name="utility:chevronright" variant="bare"
+                                        style="padding-right: 6px; padding-left: 2px;" alternative-text="Collapse"
+                                        title="Collapse" onclick={showOpenSITable}>
+                                    </lightning-button-icon>
+                                </template>
+                            </li>
+
+                            <li style="margin-right: 5px;">
+                                <lightning-icon icon-name="standard:custom_notification" size="medium">
+                                </lightning-icon>
+                            </li>
+
+                            <li>
+                                <div class="slds-media__body">
+                                    <div class="slds-page-header__name">
+                                        <div class="slds-page-header__name-title">
+                                            <h2>
+                                                <span class="slds-text-heading_small slds-truncate"><b>Recent Incidents ({TotalCount})</b></span>
+                                            </h2>
+                                        </div>
+                                    </div>
+                                    <p class="slds-page-header__name-meta">Updated <lightning-relative-date-time
+                                            value={ServiceIncidentnow}></lightning-relative-date-time>
+                                    </p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+
+
+                    <div class="slds-col rightAlign" style="padding-top:12px;">
+                        <button class="slds-button" onclick={getdata}>
+                            <lightning-icon icon-name="action:refresh" alternative-text="Refresh Dashboard"
+                                size="x-small">
+                            </lightning-icon>
+                        </button>
+                    </div>
+
+                </header>
+            </div>
+        </div>
+
+        <!-- LWC Datatable Styling -->
+        <div class="datatableStyle" style="padding-top: 0px; border-radius: 4px;">
+            <div id="divForDatatable" class="panelServiceIncidents" style="height:30vh;">
+                <lightning-datatable data={data} columns={columns} hide-checkbox-column=false key-field=id
+                    default-sort-direction={defaultSortDirection} sorted-direction={sortDirection} sorted-by={sortedBy}
+                    onsort={onHandleSort}  wrap-text-max-lines=2></lightning-datatable>
+            </div>
+        </div>
+    </div>
+</template>

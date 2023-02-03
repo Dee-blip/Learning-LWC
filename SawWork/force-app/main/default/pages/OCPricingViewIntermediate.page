@@ -1,0 +1,8 @@
+<apex:page standardController="Online_Channel_Package_Pricing__c" extensions="OCPricingViewIntermediate" action="{!pageRedirect}">
+<!--  -->
+
+  <!-- Begin Default Content REMOVE THIS -->
+
+Intermediate Page
+  <!-- End Default Content REMOVE THIS -->
+</apex:page>

@@ -1,0 +1,68 @@
+<template>  
+      
+    <lightning-card class="slds-card__header-title" title="Quality Coachings" icon-name="standard:record">  
+  
+        <div class="slds-m-around_medium">  
+  
+            <div if:true={records.data}>  
+  
+                <template for:each={records.data} for:item="rec">    
+  
+                    <div key={rec.qualityCoachRec.Id} class="slds-box">  
+                     
+  
+                        <lightning-record-view-form record-id={rec.qualityCoachRec.Id}   
+                                               object-api-name={objectName}> 
+                                               <div class="slds-grid">
+                                                   <div class="slds-cols slds-size__1-of-2" style="width:50%">
+                                                    <label class="slds-form-element__label" for="form-element-01">Quality Coaching Number</label> <br/> 
+                                                    <lightning-formatted-url value={rec.IdURL}  label={rec.qualityCoachRec.Name} target="_blank" ></lightning-formatted-url>
+                                                    <br/>
+                                                    <label class="slds-form-element__label" for="form-element-01">Critera met</label> <br/> 
+                                                    {rec.qualityCoachRec.Total_Score__c}<br/>
+                                                    <label class="slds-form-element__label" for="form-element-01">Created By</label> <br/> 
+                                                    <lightning-formatted-url value={rec.cretedByURL}  label={rec.qualityCoachRec.CreatedBy.Name} target="_blank" ></lightning-formatted-url><br/>
+                                                    
+                                                <!--<label class="slds-form-element__label" for="form-element-01">Created By</label>    
+                                                <lightning-output-field variant="label-hidden" field-name="CreatedById">
+                                                </lightning-output-field>-->
+                                                   </div>
+                                                   <div class="slds-cols slds-size__1-of-2" >
+                                                    <label class="slds-form-element__label" for="form-element-01">Cumulative Score</label> <br/> 
+                                                    {rec.qualityCoachRec.Cumulative_Score__c}<br/>
+                                                    <label class="slds-form-element__label" for="form-element-01">Created Date</label> <br/> 
+                                                    {rec.qualityCoachRec.CreatedDate}<br/>
+                                                    <!--<label class="slds-form-element__label" for="form-element-01">Cumulative Score</label>  
+                                                    <lightning-output-field variant="label-hidden" field-name="Cumulative_Score__c">
+                                                    </lightning-output-field>
+                                                    
+                                                    
+                                                    <label class="slds-form-element__label" for="form-element-01">Created Date</label>  
+                                                    <lightning-output-field variant="label-hidden" field-name="CreatedDate">
+                                                    </lightning-output-field>-->
+                                                </div>
+                                               </div>
+                                               
+                                              
+                                                
+                                                
+                                               
+                                                
+                                                
+                                            
+                                          
+                                                              
+                                               
+                        </lightning-record-view-form>
+  
+                    </div>  
+                      
+                </template>  
+  
+            </div>  
+  
+        </div>  
+  
+    </lightning-card>  
+      
+</template>

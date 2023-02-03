@@ -1,0 +1,302 @@
+<aura:component controller="SF1_Controller_OpportunityGetBaseLine">
+<aura:attribute name="accId" type="Id" />
+<aura:attribute name="oppId" type="Id"/>
+<aura:attribute name="currencyCode" type="String" />
+<aura:attribute name="closeDate" type="Date"/>
+<aura:attribute name="selectThisContract" type="Boolean" />
+
+<aura:attribute name="listOfMergeContractHeader" type="Merge_Contract_Header__c[]"/>
+<aura:attribute name="selectedContractIDs" type="Merge_Contract_Header__c[]" />
+<aura:attribute name="mapOfMergeContractHeader" type="map" default="{}" />
+ 
+<aura:attribute name="displayInfoBox" type="Boolean" default="false"/>
+<aura:attribute name="displayErrorBox" type="Boolean" default="false"/>
+<aura:attribute name="message" type="String" default=""/>
+
+<!-- Ids of selected Contracts -->
+
+<!-- show the particular contracts -->
+<aura:attribute name="productsToShow" type="Product2[]"/>
+<!-- show modal content accordingly -->
+<aura:attribute name="showModal" type="Boolean" default="false"/>
+
+<!-- Initialization event for navigation -->
+ <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+
+  <header class="slds-docked-composer__header slds-shrink-none" style="margin-top:2.5%;">
+    <article class="slds-tile slds-tile_board ">
+      <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-8">
+          <lightning:icon iconName="standard:contract" size="small" alternativeText="Opportunity"/>
+        </div>
+        <div class="slds-col slds-size_6-of-8 slds-truncate">
+          <h1 class="slds-text-heading--small ">
+            <div class="slds-truncate" style="text-align:center; ">Select Contracts</div>
+          </h1>
+        </div>
+        <div class="slds-col slds-size_1-of-8"></div>
+      </div>
+    </article>
+  </header>
+  <c:SF1_CustomLoader />
+
+  <div id="scrollableDiv" class="slds-scrollable_y" style="height: 78vh;">
+    <!-- display Info if no contracts found -->
+    <aura:if isTrue="{!v.displayInfoBox}">
+      <div style="margin-top:5vh;">
+      <ui:message title="Success" severity="confirm" closable="false">
+        {!v.message}
+      </ui:message>
+  </div>
+    </aura:if>
+        <!-- display Error if no contracts found -->
+    <aura:if isTrue="{!v.displayErrorBox}">
+      <div style="margin-top:5vh;">
+      <ui:message title="Error" severity="error" closable="false">
+        {!v.message}
+      </ui:message>
+  </div>
+    </aura:if>
+
+
+
+    <!-- display contracts -->
+
+    <ul class="slds-has-dividers_around-space " style="margin-top:2.5%">
+
+      <aura:iteration items="{!v.listOfMergeContractHeader}" var="eachContract">
+        <li class="slds-item slds-color__background_gray-3">
+
+          
+    <article class="slds-tile slds-tile_board">
+      <lightning:tile >
+        <aura:set attribute="media">
+          <lightning:icon iconName="standard:contract" size="medium" alternativeText="Opportunity..."/>
+          <!-- <lightning:input type="checkbox-button" label=" " name="input2" checked="{! v.selectContract }"/> -->
+        </aura:set>
+        <ul >
+          <li class="slds-item slds-has-flexi-truncate">
+            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+              <div class="slds-p-horizontal_small slds-size_6-of-8 slds-has-flexi-truncate">
+                <strong><ui:outputText value="{! eachContract.Original_Contract_Id__c }"/></strong>
+              </div>
+              <div class="slds-p-horizontal_small slds-size_2-of-8">
+                <div class="slds-col_bump-left slds-text-align_right">
+                  <lightning:input type="checkbox-button" label=" " name="{! eachContract.Id }" checked="false" onchange="{!c.toggleTheContract}"/>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </lightning:tile>
+      <lightning:tile >
+        <ul >
+          <li class="slds-item slds-truncate">
+            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+              <div class="slds-p-horizontal_small slds-size_3-of-6">Currency</div>
+              <div class="slds-p-horizontal_small slds-size_3-of-6">
+                <aura:if isTrue="{!eachContract.Currency__c != null }">
+                  <div class="slds-truncate">
+                    <ui:outputText value="{! eachContract.Currency__c }"/>
+                  </div>
+                  <aura:set attribute="else">
+                    --
+                  </aura:set>
+                </aura:if>
+
+              </div>
+            </div>
+          </li>
+
+          <li class="slds-item slds-truncate">
+            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+              <div class="slds-p-horizontal_small slds-size_3-of-6">Type</div>
+              <div class="slds-p-horizontal_small slds-size_3-of-6">
+                <aura:if isTrue="{!eachContract.Contract_Type__c != null }">
+                  <div class="slds-truncate">
+                    <ui:outputText value="{!eachContract.Contract_Type__c}"/>
+                  </div>
+                  <aura:set attribute="else">
+                    --
+                  </aura:set>
+                </aura:if>
+
+                <!-- <aura:if isTrue="{!v.contract.Contract_Type__c == 'Indirect Customer'}">
+                    Indirect
+                  </aura:if>
+                  <aura:if isTrue="{!v.contract.Contract_Type__c == 'Direct Customer'}">
+                    Direct
+                  </aura:if> -->
+              </div>
+            </div>
+          </li>
+
+          <li class="slds-item slds-truncate">
+            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+              <div class="slds-p-horizontal_small slds-size_3-of-6">
+                <div class="slds-truncate_container_75">
+                  Eff. End Date
+                </div>
+              </div>
+              <div class="slds-p-horizontal_small slds-size_3-of-6">
+                <aura:if isTrue="{!eachContract.Effective_End_Date__c != null }">
+                  <ui:outputDate value="{!eachContract.Effective_End_Date__c}"/>
+                  <aura:set attribute="else">
+                    --
+                  </aura:set>
+                </aura:if>
+              </div>
+            </div>
+          </li>
+
+          <li class="slds-item slds-has-flexi-truncate">
+
+            <div class="slds-grid slds-border_top" >
+              <a style="padding-top:3%">
+                <div  onclick="{!c.openModal}" name="{!eachContract.Contract_Products__r}">View Products ({! eachContract.Contract_Product_Count__c })</div>
+              </a>
+            </div>
+          </li>
+
+        </ul>
+      </lightning:tile>
+    </article>
+
+
+        </li>
+      </aura:iteration>
+      <li>
+        &nbsp;
+      </li>
+      <li>
+        &nbsp;
+      </li>
+      <li>
+        &nbsp;
+      </li>
+    </ul>
+
+  </div>
+
+
+<footer class="slds-docked-composer__footer slds-shrink-none">
+
+
+    <div class="slds-align_absolute-center">
+
+    	<lightning:button aura:id="backButton" type="button" class="slds-button slds-button_brand" onclick="{! c.goToOpportunity }">Back</lightning:button>
+    	<div style="padding-left:50px;">&nbsp;</div>
+    	
+      <lightning:button aura:id="gcbButton" type="button" disabled="true" class="slds-button slds-button_brand" onclick="{! c.getContractBaselineFun }">Get Contract Baseline</lightning:button>
+  
+
+    </div>
+  </footer>
+
+  <!-- modal to display products -->
+ 
+
+   <div id= "popUp" style="{!v.showModal == true ? 'display:block' : 'display:none'}">
+    <div role="dialog" tabindex="-1" aura:id="Modalbox" aria-labelledby="header43" class="slds-modal  slds-modal_large slds-fade-in-open">
+      <div class="slds-modal__container">
+        <div class="slds-modal__header">
+          <button class="slds-button slds-button--icon-inverse slds-modal__close" onclick="{!c.closeModal}">
+            <span>
+              <lightning:icon iconName="utility:close" size="medium" alternativeText="close"/>
+              <span class="slds-assistive-text">Close</span>
+            </span>
+          </button>
+          <h6 id="modal-heading-01" class="slds-text-heading--small">Contract Products</h6>
+        </div>
+        <div class="slds-modal__content slds-p-around--medium">
+
+
+
+
+
+	
+      
+
+
+
+
+          <div style="-webkit-overflow-scrolling: touch;">
+            <ul class="slds-has-dividers_around-space ">
+             
+                <aura:iteration items="{! v.productsToShow }" var="aProduct">
+                  <li class="slds-item slds-color__background_gray-3">
+      <article class="slds-tile slds-tile_board">
+    <lightning:tile >
+      <aura:set attribute="media">
+        <lightning:icon iconName="standard:product" size="medium" alternativeText="Contract..."/>
+        <!-- <lightning:input type="checkbox-button" label=" " name="input2" checked="{! v.selectContract }"/> -->
+      </aura:set>
+      <ul >
+        <li class="slds-item slds-has-flexi-truncate">
+          <strong><ui:outputText value="{! aProduct.Name }"/></strong>
+        </li>
+      </ul>
+    </lightning:tile>
+    <lightning:tile >
+      <ul >
+
+        <li class="slds-item slds-has-flexi-truncate">
+          <div class="slds-grid slds-wrap slds-grid_pull-padded">
+            <div class="slds-p-horizontal_small slds-size_2-of-6">Commit</div>
+            <div class="slds-p-horizontal_small slds-size_4-of-6">{!aProduct.CurrencyIsoCode}&nbsp;
+              <aura:if isTrue="{!aProduct.Average_Renewal_Commit_MRR__c == null }">
+                <ui:outputNumber value="0" format="0.00"/>
+                <aura:set attribute="else">
+                  <ui:outputNumber value="{! aProduct.Average_Renewal_Commit_MRR__c }" format="0.00"/>
+                </aura:set>
+              </aura:if>
+            </div>
+          </div>
+        </li>
+
+        <li class="slds-item slds-has-flexi-truncate">
+          <div class="slds-grid slds-wrap slds-grid_pull-padded">
+            <div class="slds-p-horizontal_small slds-size_2-of-6">Usage</div>
+            <div class="slds-p-horizontal_small slds-size_4-of-6">{!aProduct.CurrencyIsoCode}&nbsp;
+              <aura:if isTrue="{!aProduct.Average_Renewal_Usage_MRR__c == null }">
+                <ui:outputNumber value="0" format="0.00"/>
+                <aura:set attribute="else">
+                  <ui:outputNumber value="{! aProduct.Average_Renewal_Usage_MRR__c }" format="0.00"/>
+                </aura:set>
+              </aura:if>
+            </div>
+          </div>
+        </li>
+
+      </ul>
+    </lightning:tile>
+
+  </article>
+                  </li>
+                </aura:iteration>
+              
+            </ul>
+          </div>
+
+
+
+
+
+
+
+
+
+        </div>
+        <div class="slds-modal__footer">
+          <div style="align:">
+            <button class="slds-button slds-button--neutral" onclick="{!c.closeModal}">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slds-backdrop slds-backdrop--open" aura:id="ModalClose"></div>
+  </div>
+
+
+</aura:component>

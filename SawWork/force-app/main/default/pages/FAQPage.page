@@ -1,0 +1,36 @@
+<!-- Modified by ssawhney for CR 2679231 - Wizards: Addition to FAQ-->
+<apex:page showHeader="false" sidebar="false">
+
+<h3>FAQ</h3><br /><br />
+
+<strong>1. How do I participate in the Wizards program?</strong> <br />
+If you have an idea, click on the "Add Idea" button, fill out the form fields with as much detail as you can and submit your idea. The review panel will evaluate your idea and reach out to you in case they need more details.
+<br /><br />
+
+<strong>2. How many ideas can I submit? </strong> <br />
+You can submit as many ideas as you like.
+<br /><br />
+
+<strong>3. What happens after I submit an idea? </strong> <br />
+Your idea will be reviewed by a panel of SMEs periodically. After a couple of rounds of shortlisting, the top ideas will be presented by the individual/team at the Idea Jam to be held in Q4 2014.
+<br /><br />
+<strong>4. On what basis will my idea be evaluated?</strong> <br />
+The main evaluation criteria are - 'return on investment', 'business impact', 'innovative-ness' and 'feasibility of execution'.
+<br /><br />
+<strong>5. How soon will I get to know if my idea was selected or not? </strong> <br />
+Selected ideas will be announced during the months of August-September.
+<br /><br />
+<strong>6. What is the duration of the program? / What is the program structure?</strong> <br />
+Wizards2014 was launched on May 6, 2014. The ideas portal opens in June 2014. Selected ideas will be announced during the months of August-September. Final shortlisted ideas will get to present their idea at the Idea Jam to be held in Q4 2014. Following this, top management with consider the ideas for execution.
+<br /><br />
+<strong>7. Whom can I contact if I have any questions about the program?</strong> <br />
+You can email your queries to wizards@akamai.com.
+<br /><br />
+<strong>8. What do voting and commenting imply?</strong> <br />
+These features have been provided for employee engagement and healthy discussion. If you like/dislike any idea, you may vote correspondingly but the number of votes will not affect evaluation. Each employee is free to comment on an idea they have related skills/expertise in or even if they have ideas/suggestions.
+<!-- Start of changes by ssawhney for CR 2679231-->
+<br /><br />
+<strong>9. While adding an idea, what does the "team members" field refer to?</strong> <br />
+It refers to the group of people who came up with the idea. List all names separated by comma.
+<!-- End of changes by ssawhney for CR 2679231-->
+</apex:page>

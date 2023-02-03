@@ -1,0 +1,30 @@
+<apex:page standardController="Contingency__c" extensions="PACE_ContingencyEditExtension">
+ <apex:form >
+ <apex:sectionheader title="Contingency Edit" subtitle="{!if(Contingency__c.Id==null,'New Contingency',Contingency__c.Name)}"></apex:sectionheader>
+ 
+ 
+ <apex:pageblock mode="edit" id="contingency" title="Contingency Edit">
+ 
+ <apex:pageblockbuttons >
+ <apex:commandbutton action="{!save}" value="Save"></apex:commandbutton>
+ <apex:commandbutton action="{!saveandnew}" value="Save & New"></apex:commandbutton>
+ <apex:commandbutton action="{!cancel}" value="Cancel"></apex:commandbutton>
+ </apex:pageblockbuttons>
+ 
+ <apex:pagemessages ></apex:pagemessages> 
+ 
+ <apex:pageblocksection id="Information" title="Information">
+  <apex:inputfield value="{!Contingency__c.Name}" required="true"></apex:inputfield>
+  <apex:inputfield value="{!Contingency__c.Status__c}" required="true"></apex:inputfield>
+  <apex:inputfield value="{!Contingency__c.Details__c}"></apex:inputfield>
+  <apex:inputfield value="{!Contingency__c.Priority__c}"></apex:inputfield>
+  <apex:inputfield value="{!Contingency__c.Assigned_To__c}"></apex:inputfield>
+  <apex:inputfield value="{!Contingency__c.Due_Date__c}"></apex:inputfield>  
+ </apex:pageblocksection>
+ 
+ <apex:pageblocksection id="Program" title="Program">
+  <apex:inputfield value="{!Contingency__c.Phase__c}" required="true"></apex:inputfield>   
+ </apex:pageblocksection>
+ </apex:pageblock>
+ </apex:form>
+</apex:page>

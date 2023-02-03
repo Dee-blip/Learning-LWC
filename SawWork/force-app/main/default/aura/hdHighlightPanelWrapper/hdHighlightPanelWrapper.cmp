@@ -1,0 +1,5 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+    <aura:handler event="force:refreshView" action="{! c.handleForceRefreshViewForLWC }"></aura:handler>
+    <aura:attribute name="recordId" type="String" />
+    <c:hdHighlightPanel aura:id="highlightPanel" recordId="{!v.recordId}"></c:hdHighlightPanel>
+</aura:component>

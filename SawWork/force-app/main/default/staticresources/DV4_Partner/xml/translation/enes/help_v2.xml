@@ -1,0 +1,40 @@
+<help>
+		<!-- Timeout message -->
+		<message id="timeout"><![CDATA[Su solicitud ha expirado. Por favor, vuelva a introducir la URL.]]></message>
+		<!-- tooltip messages -->
+		<message id="search_panel_help"><![CDATA[¡Realice una comprobación de rendimiento global al instante en su sitio! Simplemente introduzca la dirección Web más abajo y póngala a prueba. Observará una comparación entre el rendimiento real de su sitio frente a un rendimiento estimado con las capacidades dinámicas de aceleración de la aplicación y el sitio de Akamai.
+        
+Esta versión de DV4 proporciona vistas de ciudades y regiones adicionales a medida de su mercado objetivo.]]>
+        </message>
+		<message id="weeklong_graph_help"><![CDATA[Proporciona un límite para la mejora de rendimiento esperada en una semana de una ciudad dada a la región en la que tiene sede Origin.]]></message>
+		<message id="average_global_performance_help"><![CDATA[Compara el rendimiento estimado con Akamai con el rendimiento real directo a Origin. Divide el tiempo total de descarga de una página en el tiempo de conexión, tiempo en conseguir el primer byte y tiempo de descarga.]]></message>
+		<message id="performance_by_city_help"><![CDATA[Compara el rendimiento estimado entre Akamai y Origin, por ciudad.]]></message>
+		<message id="performance_by_region_help"><![CDATA[Compare el rendimiento medio estimado entre Akamai y Origin, por continente.]]></message>
+		<message id="m4"><![CDATA[Los puntos del mapa indican las ubicaciones de los agentes de pruebas de Akamai. Haga clic en esos puntos para simular los tiempos de conexión del usuario desde esas ubicaciones.]]></message>
+		<message id="email_result"><![CDATA[Enviar resultados por email.]]></message>
+		<message id="print_result"><![CDATA[Imprimir los resultados.]]></message>
+		<message id="weeklong_performance_benchmark"><![CDATA[Proporciona un límite para la mejora de rendimiento esperada en una semana de una ciudad dada a la región en la que tiene sede Origin.]]></message>
+		<message id="save_pdf"><![CDATA[Guardar como PDF]]></message>
+		<!-- Loading messages -->
+		<message id="measure_default_peformance">
+			<![CDATA[Midiendo el rendimiento predeterminado del sitio]]>
+		</message>
+		<message id="weeklong_report_request">
+			<![CDATA[Enviando Solicitud de Informe Semanal]]>
+		</message>
+		<message id="previous_weeklong_list_loading">
+			<![CDATA[Cargando lista de Informe Semanal Anterior]]>
+		</message>
+		<message id="weeklong_report_loading">
+			<![CDATA[Cargando Informe Semanal]]>
+		</message>
+		<message id="additional_site_revenue_per_month">
+			<![CDATA[Basado en las tasas de abandono del sitio a causa del rendimiento, tal y como registró Forrester 2009 eCommerce]]>
+		</message>
+		<message id="calculate_improvement">
+			<![CDATA[Calculando métricas de mejora de rendimiento]]>
+		</message>
+		<message id="present_improvement">
+			<![CDATA[Presentando mejora del rendimiento]]>
+		</message>
+	</help>

@@ -1,0 +1,226 @@
+<aura:component controller="SF1_EditFundRequestController" implements="force:lightningQuickActionWithoutHeader,force:hasRecordId" >
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="hasEditingRights" type="Boolean" />
+    <aura:attribute name="hasNoEditingRights" type="Boolean" />
+    <aura:attribute name="pageObject" type="SFDC_MDF__c" />
+    <aura:attribute name="privateNote" type="String" />
+    <aura:attribute name="showError" type="Boolean"  default="false"/>
+    <aura:attribute name="message" type="String" />
+    <aura:attribute name="updatedInput" type="String" />
+    <aura:attribute name="activityTypeOptions" type="String[]"/>
+    <aura:attribute name="activitySpender" type="String[]"/>
+    <aura:attribute name="SOEValues" type="String[]"/>
+    <aura:attribute name="SpenderValue" type="Boolean"/>
+    <aura:attribute name="ActivityType" type="String" />
+    <aura:attribute name="ActivitySpenderr" type="String" />
+    <aura:attribute name="SOEorPubSecEvent" type="String" />
+    <aura:attribute name="showhasEditingRights" type="String" />
+    <aura:attribute name="showhasnoEditingRights" type="String" />
+    
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    
+    <span id="oppSpinner" style="display:none; position: absolute; top: 50%; left: 50%;">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--medium slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading..</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </span>
+    
+    
+    <div class="forceMobileOverlay">
+        <div class="panel-header">
+            <h2 class="title slds-truncate">Edit Fund Request</h2>
+            
+            <lightning:button variant="brand" label="Save"  type="submit" onclick="{!c.saveFundObj}" />
+            
+            <lightning:button variant="brand" label="Cancel"  type="submit" onclick="{!c.goBackToRecord}"/>
+            
+        </div>
+    </div>
+    
+    <br></br><br></br><br></br>
+    
+    <aura:if isTrue="{!v.hasEditingRights}">
+        <div class="hasEditingRights" >
+            
+            <section>
+                <div class="riseTransitionEnabled">
+                    <div class="mdp forcePageBlock forceRecordLayout">
+                        <div class="test-id__section slds-section  slds-is-open mdp forcePageBlockSection forcePageBlockSectionEdit">
+                            <div class="test-id__section-content slds-section__content section__content slds-p-top--none">
+                                <div class="slds-form slds-is-editing" role="list">
+                                    
+                                    <div class="slds-grid mdp forcePageBlockSectionRow">
+                                        <div class="slds-has-flexi-truncate slds-p-horizontal_medium mdp forcePageBlockItem forcePageBlockItemEdit" role="listitem" style="">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input label="Name" name="myname" value="{!v.pageObject.Name}"  />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate slds-p-horizontal_medium mdp forcePageBlockItem forcePageBlockItemEdit" role="listitem" style="">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input type="number" label="Requested Amount" name="myname" value="{!v.pageObject.Amount__c}"  />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-grid mdp forcePageBlockSectionRow">
+                                        <div class="slds-has-flexi-truncate slds-p-horizontal_medium mdp forcePageBlockItem forcePageBlockItemEdit" role="listitem" style="">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input type="number" label="Total Activity Cost" name="myname" value="{!v.pageObject.Total_Activity_Event_Cost__c}"  />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate slds-p-horizontal_medium mdp forcePageBlockItem forcePageBlockItemEdit" role="listitem" style="">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                                                <div class="slds-form-element__control">
+                                                    <label class="slds-form-element__label" for="input-01">Fund Request Contact</label>
+                                                    <c:SF1_LookupComponent placeholderText="Contacts" type="Contact" value="{!v.pageObject.Fund_Request_Contact__c}"
+                                                                           fieldsToShowInSuggestion="Account.Name" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-grid mdp forcePageBlockSectionRow">
+                                        <div class="slds-has-flexi-truncate slds-p-horizontal_medium mdp forcePageBlockItem forcePageBlockItemEdit" role="listitem" style="">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                                                <div class="slds-form-element__control">
+                                                    <label class="slds-form-element__label" for="input-01">Campaign</label>
+                                                    <c:SF1_LookupComponent placeholderText="Campaigns" type="Campaign" value="{!v.pageObject.Fund_Request_Campaign__c}" fieldsToShowInSuggestion="AKAM_Campaign_ID__c" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate slds-p-horizontal_medium mdp forcePageBlockItem forcePageBlockItemEdit" role="listitem" style="">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input label="Activity Location" name="myname" value="{!v.pageObject.Program_Location__c}"  />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-grid mdp forcePageBlockSectionRow">
+                                        <div class="slds-has-flexi-truncate slds-p-horizontal_medium mdp forcePageBlockItem forcePageBlockItemEdit" role="listitem" style="">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:select label="Activity Type" aura:id="selectionActivity" onchange="{!c.changeSelection}" value="{!v.ActivityType}">
+                                                        <aura:iteration items="{!v.activityTypeOptions}" var="actType">
+                                                            <option text="{!actType}" label="{!actType}"/>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate slds-p-horizontal_medium mdp forcePageBlockItem forcePageBlockItemEdit" role="listitem" style="">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:select label="Activity Spender" aura:id="selection" onchange="{!c.changeSelectionActivitySpender}" value="{!v.ActivitySpenderr}">
+                                                        <aura:iteration items="{!v.activitySpender}" var="actSpend">
+                                                            <option text="{!actSpend}" label="{!actSpend}"/>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-grid mdp forcePageBlockSectionRow">
+                                        <div class="slds-has-flexi-truncate slds-p-horizontal_medium mdp forcePageBlockItem forcePageBlockItemEdit" role="listitem" style="">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input type="date" label="Activity Start Date" name="startDate" value="{!v.pageObject.Activity_Date__c}"  />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate slds-p-horizontal_medium mdp forcePageBlockItem forcePageBlockItemEdit" role="listitem" style="">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input type="date" label="Activity End Date" name="endDate" value="{!v.pageObject.Program_End_Date__c}"  />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-grid mdp forcePageBlockSectionRow">
+                                        <div class="slds-has-flexi-truncate slds-p-horizontal_medium mdp forcePageBlockItem forcePageBlockItemEdit" role="listitem" style="">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input label="Other Activity Type" name="myname" value="{!v.pageObject.Other_Program_Type__c}"  />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate slds-p-horizontal_medium mdp forcePageBlockItem forcePageBlockItemEdit" role="listitem" style="">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                                                <div class="slds-form-element__control">
+                                                    <label class="slds-form-element__label" for="input-01">Plan Activity</label>
+                                                    <c:SF1_LookupComponent placeholderText="Plan Activities" type="Plan_Activity__c" value="{!v.pageObject.Plan_Activity__c}"
+                                                                           fieldsToShowInSuggestion="AKAM_Plan_Activity_Id__c" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-grid mdp forcePageBlockSectionRow">
+                                        <div class="slds-has-flexi-truncate slds-p-horizontal_medium mdp forcePageBlockItem forcePageBlockItemEdit" role="listitem" style="">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                                                <div class="slds-form-element__control">
+                                                   <ui:inputCheckbox aura:id="spenderId" value="{!v.SpenderValue}" label="Spender Confirmed" change="{!c.changeSelectionSpender}" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-has-flexi-truncate slds-p-horizontal_medium mdp forcePageBlockItem forcePageBlockItemEdit" role="listitem" style="">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning:select label="SOE or PubSec Event" aura:id="selectionSOE" onchange="{!c.changeSelectionSOE}" value="{!v.SOEorPubSecEvent}">
+                                                        <aura:iteration items="{!v.SOEValues}" var="SOEvalue">
+                                                            <option text="{!SOEvalue}" label="{!SOEvalue}"/>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-grid mdp forcePageBlockSectionRow">
+                                        <div class="slds-has-flexi-truncate slds-p-horizontal_medium mdp forcePageBlockItem forcePageBlockItemEdit" role="listitem" style="">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                                                <div class="slds-form-element__control">
+                                                    <div class="uiInput uiInputTextArea uiInput--default uiInput--textarea">
+                                                        <lightning:textarea name="Activity Description" value="{!v.pageObject.Program_Description__c}" label="Activity Description" maxlength="1024" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <br></br><br></br>
+            
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.hasNoEditingRights}">
+        <div class="noEditingRights" >
+            <ui:message title="Error" severity="error" closable="false">You don't have sufficient access rights to edit this fund request!!</ui:message>
+        </div>
+    </aura:if>
+    
+    
+</aura:component>

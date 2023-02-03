@@ -1,0 +1,1337 @@
+<!--------------------------------------------------------------
+Page Name       : Akapedia
+Controller      : SC_AkapediaController
+Author          : Aditya Sonam
+Created Date    : 12-July-2017
+JIRA            : ESESP-671
+
+|  HISTORY  |                                                                            
+
+|  DATE          DEVELOPER     JIRA       DESCRIPTION                                                       
+
+|  ===========   =========    =======     =========== 
+
+|  22-Nov-2017   Pinkesh     ESESP-746 -  KCS: adding new KCS KDE value,  Enhancements and Fixes for Akapedia Dashboard 
+
+|  23-Nov-2017   Vikas       ESESP-781 -  KCS Enhancement : Accuracy Check Akapedia Dashboard Changes
+
+|  06-Feb-2019   Vamsee,Pinkesh,Sumukh  ESESP-1773 -  Akatec Lightning Migration   
+
+|  31-Jul-2019   Pinkesh     ESESP-2525 -  Button in Akapedia for Content Quality
+
+---------------------------------------------------------------->
+<apex:page controller="SC_AkapediaController" sidebar="true" title="Akapedia-Dashboard" standardStylesheets="false" showHeader="true" id="akapediaId" cache="false" label="Akapedia-Dashboard">
+    <apex:includeScript value="/support/console/43.0/integration.js" />
+    <apex:includeScript value="{!$Resource.JQuery_New}" />
+    <apex:includeScript value="{!$Resource.Bootbox }"/>
+    <apex:includeScript value="{!$Resource.BootstrapMinJS }"/>
+    <apex:includeScript value="{!URLFOR($Resource.AkapediaStaticResource,'/jquery.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.AkapediaStaticResource,'/typeahead.bundle.min.js')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.SCNewHomePage,'css/bootstrap_jquerydatatable.css')}"/>
+     <!-- Checking to see if the page is opened in lightning theme -->
+    <apex:variable var="isLightning" value="{! $User.UIThemeDisplayed == 'Theme4d' || $User.UIThemeDisplayed == 'Theme4u' }" />
+
+    
+    <style> 
+        
+        /* css for search bar and date range section*/     
+        .input-group.input-group-unstyled input.form-control {
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+        height:30px;
+        }
+        body {
+        font-size: 12px !important;
+        }        
+        /* css for search bar and date range section*/        
+        .form-inline .form-control {
+        height:30px;
+        margin-right: -15px;
+        height: 33.5px !important;
+        border: 1px solid #b0b5b6;
+        vertical-align: middle !important;
+        padding-bottom: 7px !important;
+        }
+        
+        /* css for field set*/        
+        fieldset.scheduler-border {
+        border: 2.5px groove #0f93be !important;
+        padding: 0 1.4em 1.4em 1.4em !important;
+        margin: 0 0 1.5em 0 !important;
+        -webkit-box-shadow:  0px 0px 0px 0px #000;
+        box-shadow:  0px 0px 0px 0px #000;
+        }
+        
+        /* css for legend border*/ 
+        legend.scheduler-border {
+        font-size: 15px !important;
+        font-weight: bold !important;
+        text-align: left !important;
+        width:auto;
+        padding:0 10px;
+        border-bottom:none;
+        }
+        
+        legend {
+        margin-bottom: 0px !important;
+        }
+        
+        
+        /*----table CSS Start---- */       
+        .mainTable{ 
+        clear: left;
+        outline-width: 0;
+        }
+        
+        .form-inline{
+        float:left;
+        margin-left: 1%;
+        font-size: 14px;
+        }
+        
+        .form-group {
+        margin-bottom: 2%;
+        }
+        
+        body .bPageBlock .pbBody {
+        padding: 0px;
+        font-family: serif !important;
+        }   
+        
+        .tableStyle {
+        margin: 0 auto;
+        width: 100%;
+        clear: both;
+        border-collapse: collapse;
+        table-layout: auto;
+        word-wrap:break-word;
+        }
+        
+        tr thead{
+        font-size: 12px;
+        border: none;
+        }
+        
+        tbody{
+        font-size: 12px;
+        }
+        
+        tr{
+        height:30px !important;
+        border: 1px White;
+        }
+        
+        .button-control {
+        background-color: rgb(87, 181, 210) !important;
+        width: 50px !important;
+        }
+        
+        .wrapper {
+        width: 100%;
+        position: relative;
+        border: 1px solid #239cc3;
+        background: White;
+        overflow: hidden;
+        border-radius: 7px;
+        }
+        
+        .container {
+        overflow-y: scroll;
+        height: 250px;
+        border-top: 41px solid transparent;
+        border-bottom: 41px solid transparent;
+        width: 99% !important;
+        }
+        
+        .containerScoreAndFlag {
+        padding-left: 10px;
+        overflow-y: scroll;
+        height: 200px;
+        border-top: 30px solid transparent;
+        border-bottom: 20px solid transparent;
+        width: 99% !important;
+        }    
+        
+        .left {
+        float: left;
+        }
+        
+        table {
+        border-spacing: 0;
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: -2%;
+        }
+        
+        
+        thead tr th div,
+        tfoot tr td div {
+        position: absolute;
+        color: #4d4d4d;
+        padding: 10px;
+        line-height: normal;
+        width: 13%;
+        z-index: 2;
+        text-align: left;
+        font-weight: bold;
+            font-size: 9.5px;
+        top: 0;
+        margin-top: 2px;
+        //border-bottom: 1px solid #239cc3 !important;
+        }
+        
+        #theadId{
+            border-bottom: 1px solid #239cc3 !important;
+        }
+
+        
+        /*----Add border to bootstrap table---- */    
+        table.table-hover.table-condensed thead tr th div,
+        tfoot tr td div { 
+        border-bottom: 0px !important;
+        }
+        table.table-hover.table-condensed thead tr{
+        height: 14px !important;
+        }
+        .table.table-hover.table-condensed>thead>tr>th {
+        vertical-align: bottom;
+        border-bottom: 1px solid #3aa6c9;
+        }
+        .glyphicon-plus,.glyphicon-remove {
+        left: 0px !important;
+        }
+        
+        /*----table CSS END---- */  
+        
+        /* overide page block background to white */   
+        .bPageBlock {
+        border-top: 3px solid #1797c0 !important;
+        margin-top: 1px !important;
+        background-color: rgb(255, 255, 255) !important;
+        
+        }
+        .Custom35Tab .brdPalette {
+        border-top-color: #1797c0;
+        }
+        
+        /* Css for search dropdown list */       
+        .tt-menu{
+        list-style-type: none !important;
+        margin-left: 0px !important;
+        padding: 2px !important;
+        width: auto !important;
+        background-color: white !important;
+        color: #121213;
+        border-radius: 3px;
+        box-shadow: 0px 0px 5px 0px rgb(163, 162, 162);
+        }
+        
+        /* Change the link color on hover */
+        .tt-selectable:hover{
+        background-color: #388BF5;
+        color: white;
+        }
+        .partTableHover tr:hover{
+        background: #EEEEEE !important;
+        }
+        .partTableHover{
+        margin-top: -30px;
+        }
+        .partTableHover td{
+        border-bottom: 1px solid #ddd;
+            padding: 1px;
+        }        
+        //.btn-info:hover{color: black;}
+        
+        /* Css for search dropdown list */      
+        .tt-suggestion {
+        border-top: none !important;
+        border-left: none !important;
+        border-right: none !important;
+        padding-top: 3px !important;
+        padding-bottom: 10px !important;
+        }
+        
+        /* Search bar icon style*/ 
+        .glyphicon {
+        left: 4px;
+        color:white !important;
+        }
+        
+        /* Participants add session button style*/   
+        .addSessionBtnCls{
+        border: 1px solid #949899;
+        border-bottom-color: #9c9d9d;
+        box-shadow: 0px 0px 2px 0px rgb(137, 138, 138);
+        }
+        
+        /* overriding typehead for input search bar*/   
+        .tt-input{
+        border-right: none !important!important;
+        border-bottom-right-radius: 0px !important;
+        border-top-right-radius: 0px; !important
+        }
+        
+        /* Date Field Style */ 
+        .dateSelection{
+        width: 125px !important;
+        background-color: #ffffff !important;
+        border: 1px solid #b0b5b6 !important;
+        height: 33px;
+        
+        }
+        
+        /*Action Status style processing */    
+        .loadingClass{
+        display: none;
+        position: absolute;
+        top: 45%;
+        left: 45%;
+        width: 200px;
+        height: 50px;
+        padding:10px 15px 0px;
+        border: 3px solid #ababab;
+        box-shadow:1px 1px 10px #ababab;
+        border-radius:20px;
+        background-color: white;
+        z-index: 1002;
+        text-align:center;
+        overflow: auto;
+        }
+        
+        .loadingClassArt{
+        display: none;
+        position: absolute;
+        top: 45%;
+        left: 35%;
+        width: 200px;
+        height: 37px;
+        padding:5px;
+        border: 3px solid #ababab;
+        box-shadow:1px 1px 10px #ababab;
+        border-radius:20px;
+        background-color: white;
+        z-index: 1002;
+        text-align:center;
+        overflow: none;
+        }
+        
+        .loadingClassFlag{
+        display: none;
+        position: absolute;
+        top: 45%;
+        right: 35%;
+        width: 200px;
+        height: 37px;
+        padding:5px;
+        border: 3px solid #ababab;
+        box-shadow:1px 1px 10px #ababab;
+        border-radius:20px;
+        background-color: white;
+        z-index: 1002;
+        text-align:center;
+        overflow: none;
+        }
+        
+        /*Action Status style processing*/    
+        #fade{
+        display: none;
+        position:absolute;
+        top: 0%;
+        left: 0%;
+        width: 100%;
+        height: 100%;
+        background-color: #ababab;
+        z-index: 1001;
+        -moz-opacity: 0.8;
+        opacity: .70;
+        filter: alpha(opacity=80);
+        }
+        
+        #fadeParticpantsTable{
+        display: none;
+        position:absolute;
+        top: 0%;
+        left: 0%;
+        width: 100%;
+        height: 100%;
+        background-color: #ababab;
+        z-index: 1001;
+        -moz-opacity: 0.8;
+        opacity: .70;
+        filter: alpha(opacity=80);
+        }  
+        
+        
+        #fadeFlag{
+        display: none;
+        position:absolute;
+        top: 0%;
+        left: 0%;
+        width: 100%;
+        height: 100%;
+        background-color: lightgray;
+        z-index: 1001;
+        -moz-opacity: 0.9;
+        opacity: .90;
+        filter: alpha(opacity=80);
+        }
+        
+        #fadeArticle{
+        display: none;
+        position:absolute;
+        top: 0%;
+        left: 0%;
+        width: 100%;
+        height: 100%;
+        background-color: lightgray;
+        z-index: 1001;
+        -moz-opacity: 0.9;
+        opacity: .90;
+        filter: alpha(opacity=80);
+        }
+        
+        /* Particpants columns styling*/        
+        .c1{
+        margin-left: -10px !important;
+        }
+        
+        .c11{
+        border:none !important;
+        }
+        .table,.mainTable a{
+        cursor: pointer;
+        font-weight : normal;
+        color : #428bca; 
+        }
+        
+        .closeButton
+        {
+        flex: 1; /* additionally, equal width */
+        border: none;
+        padding : 0;
+        margin-right: 13px;
+        width:30px;
+        height:18px;
+        font-size: 10px;
+        background-color: #FF6347;
+        background-image: none;
+        }   
+        
+        .viewButton
+        {
+        flex: 1; /* additionally, equal width */
+        border: none;
+        padding : 0;
+        width:30px;
+        height:18px;
+        font-size: 10px;
+        background-color: #3aa6c9;;
+        font-weight: bold;
+        background-image: none;
+        color: #fff;
+        } 
+        
+        .selectOptionStyle
+        {
+        position:absolute;
+        left:160px;
+        top:-5px;
+        width:25%;
+        height:27px;
+        box-shadow: 5px 5px 4px #888888;
+        }
+        
+        .btn-info 
+        {
+        color: #fff;
+        background-color: #5bc0de;
+        border-color: #46b8da;
+        
+        }
+        
+        .btnReport
+        {
+        display: inline-block;
+        padding: 5px 5px;
+        margin-bottom: 0;
+        font-size: 13px;
+        font-weight: 300;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        cursor: pointer;
+        user-select: none;
+        background-image: none;
+        //border: 1px solid transparent;
+        border-radius: 4px;
+        }
+        
+        .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12,.row {
+        width: 27% !important;
+        }   
+        
+        .btn-primaryCustom
+        {    
+        color: #fff;
+        background-color: #337ab7;
+        border-color: #2e6da4;
+        display: inline-block;
+        padding: 3px 7px;
+        margin-bottom: 0;
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        cursor: pointer;
+        user-select: none;
+        background-image: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        }
+        
+        .btn-primaryCustom:hover 
+        {
+        color: #fff;
+        background-color: #286090;
+        border-color: #204d74;
+        }
+        
+        .btn-defaultCustom
+        {    
+        color: #333;
+        background-color: #fff;
+        border-color: #ccc;
+        display: inline-block;
+        padding: 3px 7px;
+        margin-bottom: 0;
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        cursor: pointer;
+        user-select: none;
+        background-image: none;
+        border: 1px solid darkgrey;
+        border-radius: 4px;
+        }
+        
+        .btn-defaultCustom:hover 
+        {
+        color: #333;
+        background-color: #e6e6e6;
+        border-color: #adadad;
+        }
+        .colAqiMargin{
+        margin-left: 1%;
+        }
+        
+        .homeButton{
+        cursor: pointer;
+        left: 85%;
+        position: absolute;
+        background-color: #009bbd;
+        border-radius: 12px;
+        border-width: thin;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        color: white;
+        top: 5%;
+        box-shadow: 5px 5px 4px #888888;
+        text-indent: 10px;
+        vertical-align: baseline;
+        height:30px;
+        }
+        
+        .glyphicon-Home-Style{
+        position: absolute;
+        top: 6%;
+        left: 85%;
+        padding-left: 6px;
+        color: #ffffff !important; 
+        }
+        
+    </style>
+    
+    <apex:form id="formId">
+        <apex:messages />
+        
+        <apex:actionPoller interval="1800" status="statusId" action="{!refreshPage}" rerender="panelId,articleSection,flagSection,inputUserNameId,type" oncomplete="changeDataTextColor();uptUsrNameOnPollerRefrsh();closeModal();" onsubmit="openModal();"/>
+        
+        <!--Action status to show processing-->
+        <apex:actionStatus id="statusId">
+            <apex:facet name="start">
+                <div class="fadeModal"/>     
+                <div class="loadingClass" style="display:block;">
+                    <img id="creatingMailerModalId" src="{!$Resource.CMCLoadingImage}" width="25" height="25" style="display:inline;"/>&nbsp;&nbsp;<b id="textModalId">Fetching Records...</b>
+                </div>
+            </apex:facet>
+            <apex:facet name="stop"> </apex:facet>
+        </apex:actionStatus>
+        
+        <div id="fade"></div>
+        
+        <!--Action Function for Sorting, User Date Search and User Input Search-->
+        <apex:actionFunction action="{!sortTable}" id="sortTableId" name="sortTable" rerender="out,panelId" status="statusId" oncomplete="changeDataTextColor();closeModal();">
+            <apex:param assignTo="{!sortColumnVal}" name="sortColumnVal" value="" id="sortColumnValId"/>
+        </apex:actionFunction>
+        
+        <!-- sort Articles -->
+        <apex:actionFunction action="{!sortArticles}" id="sortArtFn" name="sortArticleFn" rerender="articleSection" status="articleRef" oncomplete="closeModalArticle()">
+            <apex:param assignTo="{!articleColumn}" name="articleSortCol" value=""/>
+        </apex:actionFunction>
+        
+        <!-- sort Flags -->
+        <apex:actionFunction action="{!sortFlags}" id="sortFlagFn" name="sortFlagFn" rerender="flagSection" status="flagRef" oncomplete="closeModalFlag()">
+            <apex:param assignTo="{!flagColumn}" name="flagSortCol" value=""/>
+        </apex:actionFunction>
+        
+        <apex:actionFunction action="{!updateUserName}" id="searchInputUserId" name="searchInputUser" status="statusId" reRender="panelId,articleSection,flagSection,usrDateRangeForReporting,OP1" oncomplete="changeDataTextColor();closeModal();displayErrorMessage();">
+            <apex:param name="inputUserName" assignTo="{!inputUserName}" value="" id="inputUserName"/>
+        </apex:actionFunction>
+        
+        <apex:actionFunction action="{!updateDateRange}" id="updateDateRangeId" name="updateDateRange" status="statusId" reRender="panelId,articleSection,flagSection,usrDateRangeForReporting,OP1" oncomplete="changeDataTextColor();closeModal();">
+            <apex:param name="inputDate" assignTo="{!inputDate}" value="" id="inputDateId"/>
+        </apex:actionFunction>
+        
+        <apex:actionFunction action="{!refreshPage}" id="refreshPageId" name="refreshPageOnError" status="statusId" reRender="panelId,articleSection,flagSection" oncomplete="changeDataTextColor();closeModal();"/>
+        
+        <!--Refresh Articles Function-->
+        <apex:actionFunction name="dismissArticleAction" action="{!dismissArticle}" status="articleRef" reRender="articleSection" oncomplete="closeModalArticle()">  
+            <apex:param name="dismissArticleId" value="" assignTo="{!dismissArticleId}"/>
+        </apex:actionFunction>
+        
+        <!-- Refresh Flags on change of Participant List Function-->
+        <apex:actionFunction name="updateFlagAction" action="{!populateFlagsTable}" status="flagRef" reRender="flagSection" oncomplete="closeModalFlag()">  
+            <apex:param name="partOpt" value="" assignTo="{!flagFilter}"/>
+        </apex:actionFunction>
+        
+        <!-- Refresh Flags Function-->
+        <apex:actionFunction name="closeFlagAction" action="{!dismissFlag}" status="flagRef" reRender="flagSection" oncomplete="closeModalFlag()">  
+            <apex:param name="closeFlagId" value="" assignTo="{!closeFlagId}"/>
+            <apex:param name="closeComment" value="" assignTo="{!closeComment}"/>
+        </apex:actionFunction>
+        
+        <div class="alert alert-danger" role="alert" style ="margin-top:2%;display:none">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>&nbsp;
+            Error : You don't have permission to view this page. Only Managers, KCS KDEs and KCS coaches can view the Akapedia Dashboard.
+        </div>
+        
+        <!-- PageBlock to show particpants under logged in user or input user -->
+        <apex:pageBlock id="participantId" rendered="true">
+            
+            <apex:inputHidden id="userSearchList" value="{!userListOnSearch}"/><!--stores all users to be shown while searching -->
+            <apex:inputHidden id="hasAccess" value="{!hasAccess}"/><!--control page view access-->
+            <apex:inputHidden id="isValidUsrEntry" value="{!isValidUsrEntry}"/>
+            <apex:inputHidden id="usrDateRangeForReporting" value="{!usrDateRangeForReporting}"/>
+            <apex:inputHidden id="usrDateRangeForReportingLightning" value="{!usrDateRangeForReportingLightning}"/>
+            
+            
+            <!--Manager/Coach Lookup Field-->
+            <div class="form-group form-inline" style="margin-top:1%;" id="searchDivId">
+                <label class="control-label">Manager/Coach:&emsp;</label>
+                <input value="{!loggedInUserName}" onkeypress="onKeyUp();" id = "inputUserNameId" type="text" class="typeahead form-control" placeholder="Search..." style ="width: 250px;"/>                
+                <button class="form-control  button-control" type="button" onclick="searchRecord(); return false;">
+                    <span class="glyphicon glyphicon-search" ></span>
+                </button>
+                &emsp;&emsp;&emsp;
+                
+                <!--DateTime Range---->
+                <select id="type" name="type" required="true" class="dateSelection" data-show-icon="true">
+                    <option value="Past 7 Days">Past 7 Days</option>
+                    <option value="Past 30 Days" selected ="selected">Past 30 Days</option>
+                    <option value="Past 60 Days">Past 60 Days</option>
+                    <option value="Past 90 Days">Past 90 Days</option>
+                </select>
+                &emsp;&emsp;&emsp;
+                
+                <!--Show Coaches & Show Untrained checkboxes-->
+                <label class="control-label">Show Coaches&nbsp;</label>
+                <apex:inputCheckbox value="{!isShowCoach}" id="isShowCoach" onchange="searchRecord();"/>
+                &emsp;
+                <label class="control-label">Show Untrained&nbsp;</label>
+                <apex:inputCheckbox value="{!isShowUntrained}" id="isShowUntrained" onchange="searchRecord();"/>
+                
+                <!-- ESESP-2525 changes starts -->
+                &emsp;
+                <a href="{!OCQLink}" target="_blank"><label class="control-label" style="cursor: pointer;">Content Quality</label></a>
+                <!-- ESESP-2525 changes ends -->
+                
+                <div>
+                   <input class="homeButton" id="LightningHomeButton" type="button" value="  Return to Lightning Home" onclick="redirectHomeTab();" style="cursor: pointer;display:none" title="Go to Lightning Home" rendered="{!isLightning}"/>
+                   <input class="homeButton" id= "ClassicHomeButton" type="button" value="  Return to Classic Home" onclick="redirectHomeTab();" style="cursor: pointer;display:none" title="Go to Home_2.0" rendered="{!!isLightning}"/>
+
+
+               
+                    <span class="glyphicon glyphicon-home glyphicon-Home-Style"></span>   
+                </div>
+                
+                
+            </div>
+            
+            <!--Particpiants Block -->
+            <div class="mainTable" id="mainTableId" tabindex="1">
+                <fieldset class="scheduler-border">
+                    <legend class="scheduler-border">Participants</legend>
+                    <apex:outputPanel layout="block" id="panelId" style="margin-top:1%">
+                        <div class="wrapper" id ="wrapperId">
+                            <div class="container" id ="containerId">
+                                <table id="thisTableId" class="partTableHover">
+                                    <div id="fadeParticpantsTable"/>
+                                    
+                                    <!--Table Header-->   
+                                    <thead id = "theadId">
+                                        <tr>
+                                            <th>Image<div class="c0"> &nbsp;</div></th>
+                                            <th>Name<div class="c1" id="columnNameId">Name<i class="fa fa-fw fa-sort" onclick="sortData('name'); return false;"></i></div></th>
+                                            <th>KCS Level<div class="c1">KCS Level<i class="fa fa-fw fa-sort" onclick="sortData('KCSLevel'); return false;"></i> </div></th>
+                                            <th>Coach<div class="c1">Coach<i class="fa fa-fw fa-sort" onclick="sortData('coach'); return false;"></i></div></th>
+                                            <th>Avg. AQI<center><div class="colAqiMargin">Avg. AQI<i class="fa fa-fw fa-sort" onclick="sortData('avgAQI'); return false;"></i></div></center></th>
+                                            <th>Use(KBAR)<center><div class="cAll">Use (KBAR)<i class="fa fa-fw fa-sort" onclick="sortData('useKBAR'); return false;"></i></div></center></th>
+                                            <!--Added for ESESP-781-->
+                                            <th>Use(Accuracy)<center><div class="cAll">Use (Accuracy)<i class="fa fa-fw fa-sort" onclick="sortData('useAccuracy'); return false;"></i></div></center></th>
+                                            <th><div class="c11">&nbsp;</div></th>
+                                            <!--End of ESESP-781-->
+                                            <th>Fix(#Edited)<center><div class="cAll">Fix (#Edited)<i class="fa fa-fw fa-sort" onclick="sortData('fixEdit'); return false;"></i></div></center></th>
+                                            <th>Add(#Created)<center><div class="cAll">Add (#Created)<i class="fa fa-fw fa-sort" onclick="sortData('addCreated'); return false;"></i></div></center></th>
+                                            <th>Impact:Reuse<center><div class="cAll">Impact:Reuse<i class="fa fa-fw fa-sort" onclick="sortData('impactReuse'); return false;"></i> </div></center></th>
+                                            <th>Impact:View<center><div class="cAll">Impact:View <i class="fa fa-fw fa-sort" onclick="sortData('impactView'); return false;"></i></div></center></th>
+                                            <th><div style="disple:none;">Last 1:1 Session </div><center><div class="cAll">Last 1:1 Session<i class="fa fa-fw fa-sort" onclick="sortData('lastOneOnOneSession'); return false;"></i></div></center></th>
+                                            <th>addSession<div class="c11">&nbsp;</div></th>
+                                            <th style="display:none;">isSessionElementRed</th>
+                                        </tr>
+                                    </thead>
+                                    
+                                    <!--Table Data-->  
+                                    <tbody id ="bodyId">
+                                        <apex:repeat value="{!wrappedObjects}" var="eachPart" id="wrappedObjectId">
+                                            <tr>
+                                                <apex:outputPanel layout="none" rendered="{!populateTable}">
+                                                    <td width="4%"><apex:image value="{!eachPart.photolink}" height="40%" width="40%"/></td>
+                                                </apex:outputPanel>
+                                                <apex:outputPanel layout="none" rendered="{!populateTable}">
+                                                    <td width="12%"><apex:outputText value="{!eachPart.name}" /></td>
+                                                </apex:outputPanel>
+                                                <apex:outputPanel layout="none" rendered="{!populateTable}">
+                                                    <td width="9%"><apex:outputText value="{!eachPart.KCSLevel}" /></td>
+                                                </apex:outputPanel>
+                                                <apex:outputPanel layout="none" rendered="{!populateTable}">
+                                                    <td width="12%"><apex:outputText value="{!eachPart.coach}" /></td>
+                                                </apex:outputPanel>
+                                                <apex:outputPanel layout="none" rendered="{!populateTable}">
+                                                    <td width="9%"><center><a onclick='openParticipantsReports("{!eachPart.name}","AQI","{!eachPart.Alias}");'><apex:outputText value="{!eachPart.avgAQI}" />% (<apex:outputText value="{!eachPart.articleScored}" />)</a></center></td>
+                                                </apex:outputPanel>
+                                                <apex:outputPanel layout="none" rendered="{!populateTable}">
+                                                    <td width="9%"><center><a onclick='openParticipantsReports("{!eachPart.name}","KBAR","{!eachPart.Alias}");'><apex:outputText value="{!eachPart.useKBAR}" />%</a></center></td>
+                                                </apex:outputPanel>
+                                                
+                                                <!--Added for ESESP-781-->
+                                                <apex:outputPanel layout="none" rendered="{!populateTable}">
+                                                    <td width="8%"><center><a onclick='openParticipantsReports("{!eachPart.name}","Accuracy","{!eachPart.Alias}");'><apex:outputText value="{!eachPart.useAccuracy}"/>% (<apex:outputText value="{!eachPart.totalAccuracyCheckedCase}" />)</a></center></td>
+                                                </apex:outputPanel>
+                                                <apex:outputPanel layout="none" rendered="{!populateTable}">
+                                                    <td width="2%">
+                                                        <button type="button" id ="addSessionBtnId" style ="height:12px,width=12px" class="addSessionBtnCls" title="Click to check Accuracy" onClick='openAccuracyCheckEditPage("{!eachPart.name}","true"); return false;'>
+                                                            <left><apex:image url="{!$Resource.AkapediaPlusIcon }" height="12px" width="12px"/></left>
+                                                        </button>
+                                                    </td>
+                                                </apex:outputPanel>
+                                                <!--End of ESESP-781-->
+                                                
+                                                <!--<td>&nbsp; &nbsp;</td>-- <th><center><div class="c0">&nbsp;</div></center></th>-->
+                                                <apex:outputPanel layout="none" rendered="{!populateTable}">
+                                                    <td width="9%"><center><a onclick='openParticipantsReports("{!eachPart.name}","Fix","{!eachPart.Alias}");'><apex:outputText value="{!eachPart.fixEdit}" /></a></center></td>
+                                                </apex:outputPanel>
+                                                <apex:outputPanel layout="none" rendered="{!populateTable}">
+                                                    <td width="9%"><center><a onclick='openParticipantsReports("{!eachPart.name}","Add","{!eachPart.Alias}");'><apex:outputText value="{!eachPart.addCreated}" /></a></center></td>
+                                                </apex:outputPanel>
+                                                <apex:outputPanel layout="none" rendered="{!populateTable}">
+                                                    <td width="9%"><center><apex:outputText value="{!eachPart.impactReuse}" /></center></td>
+                                                </apex:outputPanel>
+                                                <apex:outputPanel layout="none" rendered="{!populateTable}">
+                                                    <td width="9%"><center><apex:outputText value="{!eachPart.impactView}" /></center></td>
+                                                </apex:outputPanel>
+                                                <apex:outputPanel layout="none" rendered="{!populateTable}">
+                                                    <td width="9%"><center><apex:outputText value="{!eachPart.lastOneOnOneSession}"/></center></td>
+                                                </apex:outputPanel>
+                                                <apex:outputPanel layout="none" rendered="{!populateTable}">
+                                                    <td width="4%">
+                                                        <button type="button" id ="addSessionBtnId" style ="height:12px,width=12px" class="addSessionBtnCls" title="Click to create session" onClick='openCoachingEditPage("{!eachPart.name}","true","{!eachPart.userId}"); return false;'>
+                                                            <left><apex:image url="{!$Resource.AkapediaPlusIcon }" height="12px" width="12px"/></left>
+                                                        </button>
+                                                    </td>
+                                                </apex:outputPanel>
+                                                <apex:outputPanel layout="none" rendered="{!populateTable}">
+                                                    <td style="display:none;"><center><apex:outputText value="{!eachPart.isSessionElementRed}"/></center></td>
+                                                </apex:outputPanel>
+                                            </tr><!--End of table rows-->
+                                        </apex:repeat>
+                                    </tbody> <!--End of table body-->
+                                </table> <!--End of table-->
+                            </div> <!--End of Container Div-->
+                        </div> <!--End of Wrapper Div-->
+                    </apex:outputPanel> <!--End of output panel-->
+                </fieldset> <!--End of scheduler-border-->
+            </div> <!--End of Participants Block-->
+            
+            <!-- ------------------------------- ARTICLES WITHOUT SCORECARD SECTION --------------------------------- -->
+            
+            <div id="articleDiv" class="mainTable col" style="width: 50%; float:left;">
+                <fieldset class="scheduler-border" style="position:relative">
+                    <legend class="scheduler-border">Articles to Score :</legend>
+                    <button type="button" class="btnReport btn-info" onClick="openLinkConsole('{!articleReport}?cancelURL=%2F{!articleReport}','All Scorecards I Scored');" style="position:absolute;right:30px;top:-15px;box-shadow: 5px 5px 4px #888888">View Historical Scores</button>
+                    
+                    <apex:outputPanel layout="block" id="OP1">
+                        
+                        <div class="wrapper" style="margin-top:2%;">
+                            <div class="containerScoreAndFlag">
+                                
+                                <div id="fadeArticle">
+                                    <div class="loadingClassArt" style="display:block;vertical-align: middle;">
+                                        <img src="{!$Resource.CMCLoadingImage}" width="22" height="22" />&nbsp;&nbsp;<b>Refreshing Articles...</b>       
+                                    </div> 
+                                </div>
+                                
+                                <apex:dataTable id="articleSection" value="{!allArticles}" var="kbA" styleClass="table table-hover table-condensed" style="cursor:default">
+                                    <apex:column width="30%">
+                                        <apex:facet name="header">Author<i class="fa fa-fw fa-sort" onclick="sortArticle('CreatedBy.Name');return false;"></i></apex:facet>
+                                        <apex:outputText styleClass="tdScroll" >{!kbA.Owner.Name}</apex:outputText>
+                                    </apex:column>       
+                                    <apex:column width="40%">
+                                        <apex:facet name="header">Title<i class="fa fa-fw fa-sort" onclick="sortArticle('Title');return false;"></i></apex:facet>
+                                        <a onClick="openLinkConsole('{!kbA.Id}','{!JSENCODE(kbA.Title)}')" >{!kbA.Title}</a>
+                                    </apex:column>
+                                    <apex:column width="15%">
+                                        <apex:facet name="header">Age<i class="fa fa-fw fa-sort" onclick="sortArticle('FirstPublishedDate');return false;"></i></apex:facet>
+                                        <apex:outputText value="{0,number,0} {!if((todayDate - kbA.FirstPublishedDate) > 1,'days','day')}"> 
+                                            <apex:param value="{!(floor(todayDate - kbA.FirstPublishedDate))}"/>
+                                        </apex:outputText>
+                                    </apex:column>
+                                    <apex:column width="15%" style="padding-left:10px">
+                                        <apex:facet name="header">Action</apex:facet>
+                                        <button class="addSessionBtnCls" title="Create new Scorecard" type="button" onClick="openLinkConsole('{!kbA.Id}','{!kbA.Title}')">
+                                            <!-- <span class="glyphicon glyphicon-plus" ></span>-->
+                                            <apex:image url="{!$Resource.AkapediaPlusIcon }" height="12px" width="12px"/>
+                                        </button>
+                                        <button title="Dismiss Article" type="button" onClick="dismissArticleCall('{!kbA.Id}')">
+                                            <apex:image url="{!$Resource.AkapediaCrossIcon }" height="12px" width="12px" style="padding:1px" />
+                                        </button>
+                                    </apex:column>
+                                    
+                                </apex:dataTable>
+                            </div>
+                        </div>
+                    </apex:outputPanel>
+                </fieldset>
+            </div>
+            
+            <!-- ------------------------------- FLAG SECTION --------------------------------- -->
+            
+            <div id="flagDiv" class="mainTable col" style="width: 50%; float:right;clear:right !important;">
+                
+                <fieldset class="scheduler-border" style="position:relative">
+                    <legend class="scheduler-border">Flags to Check</legend>
+                    <button type="button" class="btnReport btn-info" title="Go to Report" onClick="openLinkConsole('{!flagReport}?cancelURL=%2F{!flagReport}','All Flags Assigned to Me');" style="position:absolute;right:30px;top:-15px;box-shadow: 5px 5px 4px #888888">View Historical Flags</button>
+                    
+                    <apex:selectList id="partList" size="1" value="{!flagFilter}" styleClass="form-control selectOptionStyle">
+                        <!-- <apex:actionSupport event="onchange" action="{!populateFlagsTable}" reRender="flagSection" status="flagRef"/> -->
+                        <apex:selectOption itemLabel="My Participants" itemValue="My Participants"/>
+                        <apex:selectOption itemLabel="All Participants" itemValue="All Participants"/>
+                    </apex:selectList>
+                    
+                    <apex:outputPanel layout="block">
+                        
+                        <div class="wrapper" style="margin-top:2%;">
+                            <div class="containerScoreAndFlag">      
+                                
+                                <div id="fadeFlag">
+                                    <div>   
+                                        <div class="loadingClassFlag" style="display:block;vertical-align: middle;">
+                                            <img src="{!$Resource.CMCLoadingImage}" width="22" height="22" />&nbsp;&nbsp;<b>Refreshing Flags...</b>       
+                                        </div>             
+                                    </div>
+                                </div>
+                                
+                                <apex:dataTable value="{!allFlags}" var="eachFlag" id="flagSection" styleClass="table table-hover table-condensed" style="cursor:default">
+                                    
+                                    <apex:column width="30%">
+                                        <apex:facet name="header">Flagger<i class="fa fa-fw fa-sort" onclick="sortFlag('CreatedBy.Name');return false;"></i></apex:facet>
+                                        <apex:outputText styleClass="tdScroll" >{!eachFlag.CreatedBy.Name}</apex:outputText>
+                                    </apex:column>       
+                                    <apex:column width="40%">
+                                        <apex:facet name="header">Title<i class="fa fa-fw fa-sort" onclick="sortFlag('Article_Title__c');return false;"></i></apex:facet>
+                                        <a onClick="openLinkConsole('{!eachFlag.Id}','{!JSENCODE(eachFlag.Knowledge__r.Title)}')" >{!eachFlag.Knowledge__r.Title}</a>
+                                    </apex:column>
+                                    <apex:column width="15%">
+                                        <apex:facet name="header">Age<i class="fa fa-fw fa-sort" onclick="sortFlag('Age_days__c');return false;"></i></apex:facet>
+                                        <apex:outputText styleClass="tdScroll" value="{!eachFlag.Age_days__c} {!if(eachFlag.Age_days__c > 1, 'days','day')}"></apex:outputText>
+                                    </apex:column>
+                                    <apex:column width="15%">
+                                        <apex:facet name="header">Action</apex:facet>
+                                        <button value="View" class="viewButton" title="View Flag" type="button" onClick="openLinkConsole('{!eachFlag.Id}','{!JSENCODE(eachFlag.Knowledge__r.Title)}')">
+                                            View</button>
+                                        <button title="Close Flag" type="button" onClick="closeFlagWithComments('{!eachFlag.Id}')">
+                                            <apex:image url="{!$Resource.AkapediaCrossIcon }" height="12px" width="12px" style="padding:1px"/>
+                                        </button>
+                                    </apex:column>
+                                    
+                                </apex:dataTable>
+                            </div>
+                        </div>
+                    </apex:outputPanel>
+                </fieldset>
+            </div>
+        </apex:pageBlock> <!--End of Page Block-->
+    </apex:form>
+    
+    
+    <script type="text/javascript">
+    
+    var $j = jQuery.noConflict();
+    
+    window.onload = function()
+    {
+        
+        var isLightning={!isLightning};
+        if(isLightning)
+            {    $j("#LightningHomeButton").css("display","inline-block");
+                }
+        else
+            {
+                 $j("#ClassicHomeButton").css("display","inline-block");
+                }
+        if(!sforce.console.isInConsole()){
+            $j(".alert").text("This is a console only page. Please go to GSS Service Cloud Console for better view.")
+            $j(".alert").show();
+        }
+        $j("[id*='type']").focus();
+        
+        var isMangerOrCoach = "{!hasAccess}";
+        if(isMangerOrCoach == "false"){
+            $j("[id*='participantId']").hide();
+            $j(".alert").show();
+        }
+        changeDataTextColor();
+        
+        //Condition to handle firefox styles
+        if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
+            $j("[class*='btnReport']")[0].style.top = '-30px';
+            $j("[class*='btnReport']")[1].style.top = '-30px';
+            $j("[class*='selectOptionStyle']")[0].style.top = '-30px';
+            $j("[class*='dateSelection']")[0].style.borderRadius = '3px';
+        }  
+        closeModalFlag();
+    }
+    
+    var substringMatcher = function(strs) {
+        return function findMatches(q,cb) {
+            var matches, substringRegex;
+            
+            // an array that will be populated with substring matches
+            matches = [];
+            
+            // regex used to determine if a string contains the substring `q`
+            substrRegex = new RegExp(q, 'i');
+            
+            // iterate through the pool of strings and for any string that
+            // contains the substring `q`, add it to the `matches` array
+            $j.each(strs, function(i, str) {
+                if (substrRegex.test(str)) {
+                    matches.push(str);  
+                }
+            });
+            
+            cb(matches);
+        };
+    };
+    
+    var users = JSON.parse($j("[id*='userSearchList']").val());
+    
+    $j('#searchDivId .typeahead').typeahead({
+        hint: false,
+        highlight: true,
+        minLength: 3
+    },
+                                            {
+                                                name: 'users',
+                                                source: substringMatcher(users)
+                                            });
+    
+    
+    //function to sort KBAR
+    function sortData(colName){
+        var statusText = $j("[id*='textModalId']").text("Sorting Records...");
+        $j("[class*='loadingClass']")[0].style.marginTop='-5%';
+        document.getElementById('fadeParticpantsTable').style.display = 'block';
+        sortTable(colName);
+    }
+    
+    //function to sort Articles
+    function sortArticle(articleColumn){
+        openModalArticle();
+        sortArticleFn(articleColumn);
+    }
+    
+    //function to sort Flags
+    function sortFlag(flagColumn){
+        openModalFlag();
+        sortFlagFn(flagColumn);
+    }
+    
+    function onKeyUp(){
+        if(this.event.which == 13){
+            this.event.preventDefault();
+            searchRecord();
+        }
+    }
+    
+    //function to search participants based on user input
+    function searchRecord(){
+        openModal();
+        var isMatch = false;
+        var searchList = JSON.parse($j("[id*='userSearchList']").val());
+        var inputUserName = document.getElementById("inputUserNameId").value;
+        var loggenInUserFullName = "{!$User.FirstName}"+" "+"{!$User.LastName}";
+        var loggenInUserFullNameReverse = "{!$User.LastName}"+" "+"{!$User.FirstName}";
+        
+        if(searchList.indexOf(inputUserName) !== -1){
+            var afterFirstBrace = inputUserName.substr(inputUserName.indexOf("(") + 1);
+            afterFirstBrace =  afterFirstBrace.substring( 0, afterFirstBrace.indexOf( ")" ) );
+            var strRegex = new RegExp(afterFirstBrace, 'i');
+            
+            $j.each(searchList, function(i, str) {
+                if (strRegex.test(str)) {
+                    isMatch = true;
+                }
+            });
+            
+            if(isMatch){
+                searchInputUser(afterFirstBrace);
+            }
+            else{
+                isValidEnteredUser();
+            }
+            
+        }
+        else if(loggenInUserFullName === inputUserName || loggenInUserFullNameReverse === inputUserName){
+            openModal();
+            refreshPageOnError();
+            $j("[id*='type']").val('Past 30 Days');
+        }
+            else{
+                closeModal();
+                $j(".alert").text("Entered User Name/Email doesn't match the search criteria.")
+                $j(".alert").show();
+                setTimeout(function() {$j(".alert").hide();}, 3000);
+            }
+        
+    }
+    
+    function isValidEnteredUser(){
+        closeModal();
+        alert('isValidEnteredUser');
+        $j("[id*='participantId']").hide();
+        $j(".alert").text("Entered user doesn't have permission to view this page. Redirecting to main page.")
+        $j(".alert").show();
+        setTimeout(function() {$j(".alert").hide();$j("[id*='participantId']").show();}, 3000);
+        
+    }
+    
+    function displayErrorMessage(){
+        $j(".alert").hide(); 
+        if($j('#thisTableId > tbody  > tr').length == 0){
+            $j(".alert").text("Entered user doesn't have any participants. Loading Logged-In participants.")
+            $j(".alert").show();
+            $j("[id*='participantId']").hide();
+            setTimeout(function() {$j(".alert").hide();$j("[id*='participantId']").show();}, 3000);
+            uptUsrNameOnPollerRefrsh();
+            $j('.typeahead').unbind("blur");
+            refreshPageOnError();
+        }
+    }
+    
+    //function to load table with user input date range
+    $j(".dateSelection").change(function() {
+        openModal();
+        var userdateSelection = $j("[id*='type']").val();
+        updateDateRange(userdateSelection);
+    });
+    
+    
+    //refresh Flags on change of Participants List
+    $j(".selectOptionStyle").change(function() 
+                                    {
+                                        openModalFlag();
+                                        var partValue = $j("[id*='partList']").val();
+                                        updateFlagAction(partValue);
+                                    });
+    
+    
+    //function to open coaching edit page
+    function openCoachingEditPage(userName,openBtnLock, userSFID){
+        if(openBtnLock){
+            var coachingEditNativeUrl = 'https://'+window.location.hostname+'/aGO/e?'+"{!coachingUserFieldId}"+'='+userName;
+            var coachingEditConsoleUrl = 'aGO/e?'+"{!coachingUserFieldId}"+'='+userName;
+            if(sforce.console.isInConsole()){ //Checks that it is in console
+                if({!isLightning}){
+                    var defaultsObj = {'KCS_User__c' : userSFID}; 
+                    
+                    sforce.one.createRecord('SC_KCS_Coaching_Record__c',null,defaultsObj);
+                }
+                else{
+                    openLinkConsole(coachingEditConsoleUrl,userName+' 1:1 Session'); 
+                }
+            } 
+            else{           
+                window.open(coachingEditNativeUrl,'_blank');
+            }
+        }
+    }
+    
+    
+    //function to open Accuracy check page for ESESP-781
+    function openAccuracyCheckEditPage(userName,openBtnLock){
+        if(openBtnLock){
+            var dateRange = $j("[id*='type']").val()
+            if(sforce.console.isInConsole()) //Checks that it is in console
+                //srcUp('apex/SC_AttachAccuracyCheck_Akapedia?UN='+userName,'createAccuracyCheck');
+                openLinkConsole('apex/SC_AttachAccuracyCheck?UN='+userName+'&dateRange='+dateRange,userName+' Use Accuracy'); 
+            else
+                window.open('/apex/SC_AttachAccuracyCheck?UN='+userName+'&dateRange='+dateRange);
+        }
+    }
+
+    var lightningParameters;
+
+    //function to open participants report
+    function openParticipantsReports(participantsName,source, participantsAlias){
+        var consoleReportURL;
+        var nativeReportURL;
+        var dateRange = $j("[id*='usrDateRangeForReporting']").val();
+        var dateRangeLightning = $j("[id*='usrDateRangeForReportingLightning']").val();
+        
+        
+        if(source === 'KBAR'){
+            consoleReportURL = '{!KBARReportId}?pv0='+participantsName+'&pv1='+dateRange;
+            lightningParameters = '?fv0='+participantsName+'&fv1='+dateRange+'&fv0='+participantsName;
+            nativeReportURL = 'https://'+window.location.hostname+'/'+'{!KBARReportId}?pv0='+participantsName+'&pv1='+dateRange;
+        }
+        else if(source === 'Fix'){
+            consoleReportURL = '{!fixReportId}?pv0='+participantsAlias+'&pv1='+dateRange;
+            lightningParameters = '?fv0='+participantsAlias+'&fv1='+dateRange+'&fv0='+participantsAlias;
+            nativeReportURL = 'https://'+window.location.hostname+'/'+'{!fixReportId}?pv0='+participantsAlias+'&pv1='+dateRange;
+        }
+        else if(source === 'AQI'){
+             consoleReportURL = '{!avgAQIReportId}?pv0='+participantsName+'&pv1='+dateRange;
+             lightningParameters = '?fv0='+participantsName+'&fv1='+dateRange+'&fv0='+participantsName;
+             nativeReportURL = 'https://'+window.location.hostname+'/'+'{!avgAQIReportId}?pv0='+participantsName+'&pv1='+dateRange;
+        }
+        //Added for ESESP-781 to redirect to the "AccuracyCheckReport" 
+        else if(source === 'Accuracy'){
+             consoleReportURL = '{!accuracyCheckReportId}?pv0='+participantsName+'&pv1='+dateRange;
+             lightningParameters = '?fv0='+participantsName+'&fv1='+dateRange+'&fv0='+participantsName;
+             nativeReportURL = 'https://'+window.location.hostname+'/'+'{!accuracyCheckReportId}?pv0='+participantsName+'&pv1='+dateRange;
+        }
+        else{
+            consoleReportURL = '{!addReportId}?pv0='+participantsName+'&pv1='+dateRange;
+            lightningParameters = '?fv0='+participantsName+'&fv1='+dateRange+'&fv0='+participantsName;
+            nativeReportURL = 'https://'+window.location.hostname+'/'+'{!addReportId}?pv0='+participantsName+'&pv1='+dateRange;          
+        }
+        
+        if(sforce.console.isInConsole()){ //Checks that it is in console 
+            openLinkConsole(consoleReportURL,'Akapedia-Report');           
+        } 
+        else{ 
+            window.open(nativeReportURL,'_blank');
+        }
+    }
+    
+    //function to color each td element value
+    function changeDataTextColor(){
+        var tableData = document.getElementById('bodyId');
+        var rowLength = tableData.rows.length;
+        
+        for(var i=0; i<rowLength; i++){
+            var row = tableData.rows[i];          
+            var AQIElement = parseInt(row.children[4].innerText.trim());
+            var KBARElement = parseInt(row.children[5].innerText.trim());
+            var accuracyCheckElement = parseInt(row.children[6].innerText.trim());//To get the "Use(Accuracy)" 6th column column's data(ESESP-781)
+            var sessionElement = parseInt(row.children[12].innerText.trim());//Changed 10 to 12 as two columns were added extra
+            var isSessionElementRed = row.children[14].innerText.trim();//Changed 12 to 14 as two columns were added extra
+            if(AQIElement < 85){
+                row.children[4].children[0].children[0].style.color = "#DD0000";
+                row.children[4].children[0].children[0].style.fontWeight = "bold";
+            }
+            
+            if(KBARElement < 70){
+                row.children[5].children[0].children[0].style.color = "#DD0000";
+                row.children[5].children[0].children[0].style.fontWeight = "bold";
+            }
+            
+            //To color the Use(Accuracy) column
+            if(accuracyCheckElement < 70){
+                row.children[6].children[0].children[0].style.color = "#DD0000";
+                row.children[6].children[0].children[0].style.fontWeight = "bold";
+            }
+            
+            if(isSessionElementRed.toLowerCase() == "true"){
+                row.children[12].style.color = "#DD0000";//Changed 10 to 12 as two columns were added extra
+                row.children[12].style.fontWeight = "bold";//Changed 10 to 12 as two columns were added extra
+            }
+            if(sessionElement == 0){
+                row.children[12].innerText ='Today';//Changed 10 to 12 as two columns were added extra
+                row.children[12].style.textAlign ='center';//Changed 10 to 12 as two columns were added extra
+            }
+        }
+    }
+    
+    function redirectHomeTab(){
+        var callback = function (result) { 
+            var id;
+            if (result.success) { 
+                var tempItem = JSON.parse(result.items);
+                for (var i = 0, len = tempItem.length; i < len; i++) {
+                    
+                   if({!isLightning})
+                       {
+                           if(tempItem[i].label == "Home") {
+                        sforce.console.setSelectedNavigationTab(null,tempItem[i].navigationTabId);
+                        sforce.console.focusNavigationTab(null,tempItem[i].navigationTabId);
+                    }
+                       }
+                    else
+                        {
+                    if(tempItem[i].label == "Classic Home") {
+                        sforce.console.setSelectedNavigationTab(null,tempItem[i].navigationTabId);
+                        sforce.console.focusNavigationTab(null,tempItem[i].navigationTabId);
+                    }
+                            }
+                }
+            }
+            else {                 
+                alert('Something went wrong. Please refresh the page.');
+            }
+        };
+        sforce.console.getNavigationTabs(callback);
+    }
+    
+    // START OF CHANGES BY VANDHANA
+    // FUNCTIONS FOR FLAG AND ARTICLES
+    function openLinkConsole(SF_Id,Numb) 
+    {
+        Tab_Id = Numb;
+        var nativeReportURL = 'https://'+window.location.hostname+'/'+SF_Id;
+        if(sforce.console.isInConsole())
+            sforce.console.generateConsoleUrl(['/'+SF_Id], openConsoleUrl);
+        else
+            window.open(nativeReportURL,'_blank');  
+    }   
+    
+    var openConsoleUrl = function(result)
+    {   
+        if({!isLightning}){
+            var lightningURL = result.consoleUrl + lightningParameters;
+            lightningParameters ='';
+            sforce.console.openConsoleUrl(null, lightningURL,true,[Tab_Id],null,openSuccess);
+        }
+        else{
+            sforce.console.openConsoleUrl(null, result.consoleUrl,true,[Tab_Id],null,openSuccess);
+        }
+    }
+    
+    var openSuccess = function(result) 
+    {
+        //Report whether opening the new tab was successful
+        if (result.success == false)
+            alert('The corresponding tab is already opened');
+    }
+    
+    function closeFlagWithComments(flagId) 
+    {
+        bootbox.prompt({
+            title: "Please enter close comments for the flag",
+            inputType: 'textarea',
+            callback: function(result)
+            {
+                if(result != undefined) 
+                {
+                    if(result.trim() != "")
+                    {
+                        openModalFlag();
+                        closeFlagAction(flagId,result);
+                    }
+                    else
+                    {
+                        if(result.trim() == "")
+                            bootbox.alert("Close comment cannot be blank.");
+                    }
+                }
+            }
+        });
+    }
+    
+    function dismissArticleCall(articleId) 
+    {
+        bootbox.confirm({
+            message: "Are you sure you want to dismiss this article?",
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                },
+                cancel: {
+                    label: 'Cancel',
+                }
+            },
+            callback: function (result) 
+            {
+                if(result)
+                {
+                    openModalArticle();
+                    dismissArticleAction(articleId);
+                }   
+            }
+        });
+    }
+    
+    //function to set user name on auto-refresh
+    function uptUsrNameOnPollerRefrsh(){
+        document.getElementById("inputUserNameId").value = "{!$User.FirstName}"+" "+"{!$User.LastName}"+" ("+"{!$User.Email}"+")";
+        $j("[id*='type']").val('Past 30 Days');
+    }
+    
+    function openModalFlag() {
+        document.getElementById('fadeFlag').style.display = 'block';
+    }
+    
+    //function to remove fade screen after processing
+    function closeModalFlag() {
+        document.getElementById('fadeFlag').style.display = 'none';
+    }
+    
+    function openModalArticle() {
+        document.getElementById('fadeArticle').style.display = 'block';
+    }
+    
+    //function to remove fade screen after processing
+    function closeModalArticle() {
+        document.getElementById('fadeArticle').style.display = 'none';
+    }
+    
+    //function to fade screen while processing
+    function openModal() {
+        document.getElementById('fade').style.display = 'block';
+    }
+    
+    //function to remove fade screen after processing
+    function closeModal() {
+        var statusText = $j("[id*='textModalId']").text("Fetching Records...");
+        document.getElementById('fade').style.display = 'none';
+        $j("[id*='type']").focus();
+    }
+    
+    </script> 
+</apex:page>

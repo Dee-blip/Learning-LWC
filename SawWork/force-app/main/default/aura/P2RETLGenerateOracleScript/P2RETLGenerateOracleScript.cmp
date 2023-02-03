@@ -1,0 +1,3 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+    <iframe src="{! '/apex/P2RETL_GenerateOracleTableScript_Page'}" width="1063px;" height="650px;" frameBorder="0" />
+</aura:component>

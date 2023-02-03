@@ -1,0 +1,3 @@
+<apex:page standardController="Rebate_Payout__c">
+    <c:NotesAndAttachmentVfComp parentSobjectId="{!Rebate_Payout__c.Id}"/>
+</apex:page>

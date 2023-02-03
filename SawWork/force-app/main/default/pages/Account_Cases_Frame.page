@@ -1,0 +1,10 @@
+<apex:page StandardController="Account" extensions="Account_Cases_Dashboard_Controller">
+[<apex:outputLink target="_blank" value="{!accountCasesHistory.Value__c + account.AKAM_Account_ID__c}">View All Cases History</apex:outputLink>]
+<br /><br />
+<apex:outputPanel >
+<apex:iframe height="380px" scrolling="true" src="{!accountCasesTop.Value__c + account.AKAM_Account_ID__c}"/>
+
+</apex:outputPanel>
+
+
+</apex:page>

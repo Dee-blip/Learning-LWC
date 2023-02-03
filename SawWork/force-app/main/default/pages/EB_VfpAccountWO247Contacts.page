@@ -1,0 +1,121 @@
+<!--
+Author: Sharath K
+Description: This page generates a custom report of Accounts without 24X7 contacts.
+-->
+<apex:page controller="EB_CtrlAccountWO247Contacts" sidebar="false" >
+<apex:form >
+
+<table width="100%" border="0">
+  <tr> 
+    <td width="200" valign="top">
+ 
+      <apex:pageBlock title="QuickFind" mode="edit" id="criteria">
+      
+      <table cellpadding="2" cellspacing="2">
+      <tr>
+      <td>
+      For quick verification, you can now quickly search through the list of customers that that do not have 24x7 contacts.
+      </td>
+      </tr>
+      <tr>
+             <td style="font-weight:bold;">AKAM Account ID<br/>
+             <apex:inputText value="{!AkamAccountId}"/>
+             </td>
+      </tr>
+      <tr>
+             <td style="font-weight:bold;">Account Name<br/>
+             <apex:inputText value="{!AccountName}"/>
+             </td>
+      </tr>
+      <tr>
+             <td style="font-weight:bold;">Support Level<br/>
+             <apex:inputText value="{!SupportLevel}"/>
+             </td>
+      </tr>
+      <tr>
+             <td style="font-weight:bold;">Customer Tier<br/>
+             <apex:inputText value="{!CustomerTier}"/>
+             </td>
+      </tr>
+      <tr>
+          <td>
+              <apex:commandButton value="Apply" action="{!applyFilter}" reRender="AccountsList,debug"/>
+              <apex:commandButton value="Clear" action="{!clearFilter}" reRender="AccountsList,debug,criteria"/>
+          </td>
+      </tr>
+      </table>
+ 
+      </apex:pageBlock>
+ 
+    </td>
+    <td valign="top">
+ 
+    
+    <apex:pageBlock id="AccountsList" title="Accounts Sans 24X7 Contacts">
+        
+       <apex:panelGrid columns="6" width="300px" cellspacing="5px" >
+        <apex:commandLink action="{!first}" > First </apex:commandlink>
+        <apex:commandLink action="{!previous}" rendered="{!hasPrevious}" > Previous</apex:commandlink>
+        <apex:commandLink action="{!next}" rendered="{!hasNext}" >Next </apex:commandlink>
+        <apex:commandLink action="{!last}" > Last</apex:commandlink>
+        <apex:commandLink action="{!printPoupup}" target="_blank"> Print </apex:commandLink>
+        </apex:panelGrid>
+        
+        <apex:pageBlockTable value="{!accountsSans24X7Contacts}" var="a">
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Account Id" action="{!toggleSortOrder}" rerender="AccountsList,debug">
+                        <apex:param name="sortField" value="AKAM_Account_ID__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!a.AKAM_Account_ID__c}"/>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Account Name" action="{!toggleSortOrder}" rerender="AccountsList,debug">
+                        <apex:param name="sortField" value="name" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!a.Name}"/>
+            </apex:column>
+           
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Support Level" action="{!toggleSortOrder}" rerender="AccountsList,debug">
+                        <apex:param name="sortField" value="Support_Level__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!a.Support_Level__c}"/>
+            </apex:column>
+             <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Customer Tier" action="{!toggleSortOrder}" rerender="AccountsList,debug">
+                        <apex:param name="sortField" value="Customer_Tier__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!a.Customer_Tier__c}"/>
+            </apex:column>            
+        </apex:pageBlockTable>
+
+        
+   
+ 
+    </apex:pageBlock>
+ 
+    </td>
+  </tr>
+  </table>
+ 
+  <apex:pageBlock title="Debug - SOQL" id="debug" rendered="{!renderDebugBool}">
+      <apex:outputText value="{!debugSoql}" />           
+  </apex:pageBlock>    
+ 
+ 
+
+
+    
+  <!--  <apex:image url="http://chart.apis.google.com/chart?chs=500x450&cht=p3&chd=t:{!Premiumcount},{!Prioritycount},{!Indirectcount},{!Othercount}&chdl=Premium|Priority|Customer+Direct|Standard&chtt=Accounts+Sans+24x7+contacts&chts=B74A4A,11.5"/>
+    
+    <apex:image url="http://chart.apis.google.com/chart?chs=300x250&cht=p3&chd=t:{!customerAACount},{!customerACount},{!customerBCount},{!customerCCount},{!customerOCount}&chdl=A%2B|A|B|C|Others&chtt=Accounts+Sans+24x7+contacts&chts=B74A4A,11.5"/> -->
+</apex:form>
+</apex:page>

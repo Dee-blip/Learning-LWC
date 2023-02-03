@@ -1,0 +1,32 @@
+<apex:page controller="RebateTermsConditionsController" >
+<script type="text/javascript">
+function openRebateDocumentInNewWindow()
+{
+url='{!$Label.Partner_Reabte_TC_Doc_Link}';
+ child =window.open(url,'_blank','height=400,width=600,resizable=yes');
+ child.focus();
+}
+</script>
+<apex:form id="rebateTCForm">
+ <apex:pageMessages />
+ <apex:pageBlock >
+  <apex:CommandLink action="{!goBack}" style="font-size:14px;font-weight:Bold;" value="{!returnUrlLabel}"></apex:CommandLink>
+  <br></br><br></br>
+  <apex:pageBlockSection columns="1">
+  <apex:outputText id="termsConditionText">
+     {!rebateTCText}<br></br><br></br>{!rebateTCText1}<br></br><br></br> <apex:outputLink style="Color:Blue;" onclick="openRebateDocumentInNewWindow();">{!$Label.Rebate_TC_Label}</apex:outputLink>
+   </apex:outputText>
+   </apex:pageBlockSection>
+  <br></br>
+  <apex:pageBlockSection columns="1">
+  <apex:pageMessage detail="{!notificationMessage}" severity="warning"></apex:pageMessage>
+  </apex:pageBlockSection>
+   
+   <apex:pageBlockButtons location="bottom">
+    <apex:commandButton title="Accept" action="{!accept}" value="Accept"/>
+    <apex:commandButton title="Reject" action="{!reject}" value="Reject"/>
+   </apex:pageBlockButtons>
+ </apex:pageBlock>
+</apex:form>
+
+</apex:page>

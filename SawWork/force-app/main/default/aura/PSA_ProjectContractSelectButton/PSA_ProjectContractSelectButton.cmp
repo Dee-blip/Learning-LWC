@@ -1,0 +1,19 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId"> 
+    <aura:html tag="style">
+.cuf-content {
+  padding: 0 0rem !important;
+}
+.slds-p-around--medium {
+  padding: 0rem !important;
+}
+.slds-modal__container{
+  width : 100% !important;
+  height: 100% !important;
+  max-width : 100% !important;
+  max-height: 100% !important;
+  padding: 1% ;
+}
+</aura:html>
+<!-- <c:projectContractSelect recId="{!v.recordId}" onclose="{!c.closeQA}" ></c:projectContractSelect> -->
+<c:psaProjectContractSelect recId="{!v.recordId}" onclose="{!c.closeQA}" ></c:psaProjectContractSelect>
+</aura:component>

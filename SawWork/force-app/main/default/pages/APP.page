@@ -1,0 +1,1336 @@
+<apex:page standardStylesheets="false" sidebar="false" showHeader="false" controller="NAPRebrandedPageController" action="{!sendErrorMail}">
+    <apex:includeLightning />
+    <html xmlns:ng="http://angularjs.org" ng-app="NAPRebrandedPage" lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <!-- SFDC-7653 - @nadesai -->
+        <title>{! $Label.NapRebrand_Label1 }</title>
+
+        <apex:includeScript value="{!URLFOR($Resource.NAPRebrandedPage, 'NAPRebrandedPage/js/jquery.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.NAPRebrandedPage, 'NAPRebrandedPage/js/bootstrap.min.js')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.NAPRebrandedPage, 'NAPRebrandedPage/css/bootstrap.min.css')}" />
+        <apex:includeScript value="{!URLFOR($Resource.NAPRebrandedPage, 'NAPRebrandedPage/js/angular.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.NAPRebrandedPage, 'NAPRebrandedPage/js/toastr.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.NAPRebrandedPage, 'NAPRebrandedPage/js/angular-animate.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.NAPRebrandedPage, 'NAPRebrandedPage/js/angular-sanitize.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.NAPRebrandedPage, 'NAPRebrandedPage/js/ui-bootstrap-tpls.min.js')}" />
+
+        <apex:stylesheet value="{!URLFOR($Resource.NAPRebrandedPage, 'NAPRebrandedPage/css/font-awesome.min.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.NAPRebrandedPage, 'NAPRebrandedPage/css/style.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.NAPRebrandedPage, 'NAPRebrandedPage/css/toastr.min.css')}" />
+        <script src="/soap/ajax/32.0/connection.js" type="text/javascript"></script>
+        <script src="/soap/ajax/32.0/apex.js" type="text/javascript"></script>
+        <script>
+            (function (i, s, o, g, r, a, m) {
+                i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                    m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+            ga('create', 'UA-94107812-3', 'auto');
+            ga('send', 'pageview');
+            window.$Label = window.$Label || {};
+            $Label.Nap_CopyLinkNotification = '{!JSENCODE($Label.Nap_CopyLinkNotification)}';
+
+        </script>
+
+        <script type="text/javascript">
+            var __sfdcSessionId = '{!GETSESSIONID()}';
+            sforce.connection.sessionId = "{!$Api.Session_ID}";
+
+            var napApp = angular.module('NAPRebrandedPage', ['ngAnimate', 'ngSanitize', 'ui.bootstrap']);
+
+            var napAppController = napApp.controller('NAPPageController', function ($scope, $filter, $sce) {
+                $scope.currentPage = {!pageJSON
+            };
+
+            $scope.searchParam = $scope.currentPage.searchparam;
+
+            if ($scope.currentPage.redirectLocation && $scope.currentPage.redirectLocation.length > 0) {
+                window.location.href = $scope.currentPage.redirectLocation;
+            }
+
+            $scope.isCurrentUserSubscribedToFileLibrary = $scope.currentPage.isCurrentUserSubscribedToFileLibrary;
+            $scope.selectedLanguage = 'All Languages';
+
+            //intiliaze NAP Object Search lists 
+            $scope.contacts = [];
+            $scope.opportunitys = [];
+            $scope.fundrequests = [];
+            $scope.fundclaims = [];
+            $scope.partnerorderacceptances = [];
+            $scope.searchresultflag = false;
+
+            //News subscription logic start
+            $scope.populateNewsSubsciptionObject = function () {
+
+                Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.NAPRebrandedPageController.getNewsSettingsObject}', "",
+                    function (result, event) {
+                        var EventType;
+                        if (result.type == null || result.type == "") {
+                            var type = [];
+                        } else {
+                            var type = result.type.split(";");
+                        }
+
+                        if (result.EventType == null || result.EventType == "") {
+                            EventType = [];
+                        } else {
+                            EventType = result.EventType.split(";");
+                        }
+
+                        $scope.newsSubscription = {
+                            newsEmail: result.email,
+                            newsEnable: result.enable,
+                            newsFrequency: result.frequency,
+                            newsFrequeryUrgencyOverride: result.frequencyOverrideWithUrgency,
+                            newsOnlyRecieveOTNewsCheck: result.onlyRecieveOTNews,
+                            newsType: type,
+                            allFrequencies: result.allFrequency,
+                            allNewTypes: result.allNewsTypes,
+                            frequencyValidation: false,
+                            newsTypeValidation: false,
+                            eventTypeValidation: false,
+                            eligibleForOT: result.eligibleForOT,
+                            EventType: EventType,
+                            allEventTypes: result.allEventTypes
+                        }
+                        $scope.$apply();
+                    }
+                );
+            };
+
+            $scope.changeNewsSettings = function (value) {
+                if (value == "newsEnable")
+                    $scope.newsSubscription.newsEnable = !$scope.newsSubscription.newsEnable;
+                else if (value == "newsFrequeryUrgencyOverride")
+                    $scope.newsSubscription.newsFrequeryUrgencyOverride = !$scope.newsSubscription.newsFrequeryUrgencyOverride;
+                else if (value == "newsOnlyRecieveOTNewsCheck") {
+                    $scope.newsSubscription.newsOnlyRecieveOTNewsCheck = !$scope.newsSubscription.newsOnlyRecieveOTNewsCheck;
+                    //if user select Only receive OT news highlight OT News Type
+                    var subscribedTypes = $scope.newsSubscription.newsType;
+                    if ($scope.newsSubscription.newsOnlyRecieveOTNewsCheck) {
+                        $scope.newsSubscription.newsType = [];
+                        $scope.newsSubscription.newsType.push("OT");
+                    } else if (!$scope.newsSubscription.newsOnlyRecieveOTNewsCheck) {
+                        if (subscribedTypes.indexOf("OT") != -1)
+                            $scope.updateNewsType("OT");
+                    }
+                }
+            }
+
+            $scope.updateNewsFrequency = function (frequency) {
+                $scope.newsSubscription.newsFrequency = frequency;
+                $scope.newsSubscription.frequencyValidation = false;
+            }
+
+            // Begin SFDC-9601 - Harsh Pandey                        
+            $scope.copyLinkFunction = function (name) {
+                var baseURL = window.location.href;       
+                const elem = document.createElement('textarea');
+           		elem.value = baseURL+'&news_id='+name;
+   				document.body.appendChild(elem);
+   				elem.select();
+   				document.execCommand('copy');
+   				document.body.removeChild(elem);
+                toastr.options = {
+                    "positionClass": "toast-top-right",
+                    "preventDuplicates": false,
+                    "timeOut": 2500
+                    };
+                toastr.success('',$Label.Nap_CopyLinkNotification);                                                                
+            }
+            // End SFDC-9601 - Harsh Pandey
+
+            $scope.updateNewsType = function (newsType) {
+                $scope.newsSubscription.newsTypeValidation = false;
+                var subscribedTypes = $scope.newsSubscription.newsType;
+                if (subscribedTypes.indexOf(newsType) != -1) {
+                    var index = $scope.newsSubscription.newsType.indexOf(newsType);
+                    $scope.newsSubscription.newsType.splice(index, 1);
+                } else {
+                    $scope.newsSubscription.newsType.push(newsType);
+                }
+                //handle Only receive OT news case
+                if ($scope.newsSubscription.newsOnlyRecieveOTNewsCheck == true) {
+                    if ($scope.newsSubscription.newsType.length >= 2 || (subscribedTypes.length == 1 && subscribedTypes.indexOf("OT") == -1)) {
+                        $scope.newsSubscription.newsOnlyRecieveOTNewsCheck = false;
+                    }
+                }
+            }
+
+            $scope.updateEventType = function (EventType) {
+                $scope.newsSubscription.newsTypeValidation = false;
+                var SubscripedEventType = $scope.newsSubscription.EventType;
+                if (SubscripedEventType.indexOf(EventType) != -1) {
+                    var index = $scope.newsSubscription.EventType.indexOf(EventType);
+                    $scope.newsSubscription.EventType.splice(index, 1);
+                } else {
+                    $scope.newsSubscription.EventType.push(EventType);
+                }
+
+            }
+
+            $scope.setNewsSubscriptionSettings = function () {
+                if ($scope.newsSubscription.newsFrequency == "") {
+                    $scope.newsSubscription.frequencyValidation = true;
+                } else if ($scope.newsSubscription.newsType.length == "0" && $scope.newsSubscription.EventType.length == "0") {
+                    $scope.newsSubscription.newsTypeValidation = true;
+                } else {
+                    $scope.setNewsSubscription();
+                }
+            };
+
+            $scope.setNewsSubscription = function () {
+                Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.NAPRebrandedPageController.saveNewsSubscriptionDetails}',
+                    $scope.newsSubscription.newsFrequency, $scope.newsSubscription.newsType, $scope.newsSubscription.EventType, $scope.newsSubscription.newsEnable, $scope.newsSubscription.newsFrequeryUrgencyOverride, $scope.newsSubscription.newsOnlyRecieveOTNewsCheck,
+                    function (result, event) {
+                        console.log(result);
+
+                        toastr.options = {
+                            "positionClass": "toast-bottom-right"
+                        }
+                        toastr.info(result)
+                        $scope.$apply();
+                        //document.getElementById('loading-in-table').style.visibility='hidden';
+                    }
+                );
+            }
+            //News Subscription logic end
+
+            $scope.searchObjects = function (searchText) {
+
+                window.location.href = "/partners/s/custom-search-results?searchText=" + searchText;
+                /*Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.NAPRebrandedPageController.search}',searchText,
+                        function(result,event)
+                        {
+                            if(result.length >0)
+                            {
+                                $scope.contacts                = result[0];
+                                console.log($scope.contacts);
+                                $scope.opportunitys            = result[1];
+                                $scope.fundrequests            = result[2];
+                                $scope.fundclaims              = result[3];
+                                $scope.partnerorderacceptances = result[4];
+                                console.log(result);
+                                console.log($scope.partnerorderacceptances);
+                                $scope.searchresultflag = true;
+                                $scope.$apply();
+                            }                      
+                        }
+                );*/
+            };
+            if ($scope.searchParam != null) {
+                $scope.searchObjects($scope.searchParam);
+            } else {
+                $scope.searchParam = 'Enter the Search Term';
+            }
+
+            angular.forEach($scope.currentPage.subMenuItems, function (subMenuItem) {
+                angular.forEach(subMenuItem.contentBlocksInCurrentSubMenu, function (contentBlock) {
+                    if (contentBlock.hasTagFilters && contentBlock.hasFileContent && !contentBlock.showNoFileFoundError) {
+                        $scope.selectedLanguage = contentBlock.languageFilter;
+                    }
+                });
+
+            });
+
+            $scope.setSelectedNewsType = function (contentBlock, selectedNewsType) {
+                contentBlock.selectedNewsType = selectedNewsType;
+                return false;
+            };
+
+            $scope.showAllNews = function (contentBlock) {
+                window.location.href = contentBlock.allNewsPath;
+            };
+
+            /*
+            $scope.checkAllNewsTypes = function(ithContentBlock) {
+                ithContentBlock.selectedNewsTypes = ithContentBlock.newsTypeFilterOptions.slice();
+            };
+            */
+
+            $scope.uncheckAllNewsTypes = function (ithContentBlock) {
+                ithContentBlock.selectedNewsType = '';
+            };
+
+            $scope.isNewsTypeChecked = function (ithContentBlock, key) {
+                if (ithContentBlock.selectedNewsType == null || ithContentBlock.selectedNewsType == '')
+                    return false;
+
+                if (ithContentBlock.selectedNewsType == key)
+                    return 'glyphicon glyphicon-ok';
+                return false;
+            };
+
+
+
+            $scope.checkAll = function (ithContentBlock) {
+
+                console.log('inside checkall ' + ithContentBlock.selectedTags + 'and:' + ithContentBlock.setOftagFiltersForCurrentBlock);
+
+                ithContentBlock.selectedTags = ithContentBlock.setOftagFiltersForCurrentBlock.slice();
+
+            };
+
+            $scope.uncheckAll = function (ithContentBlock) {
+                console.log('unchecking');
+                ithContentBlock.selectedTags = [];
+            };
+
+            $scope.isChecked = function (contentBlock, key) {
+
+                if (contentBlock.selectedTags == null || contentBlock.selectedTags.length == 0)
+                    return false;
+
+                if (contentBlock.selectedTags.indexOf(key) >= 0)
+                    return 'glyphicon glyphicon-ok';
+                return false;
+            };
+
+            $scope.setSelectedLanguage = function (language) {
+                $scope.selectedLanguage = language;
+                return false;
+            };
+
+
+            $scope.setSelectedTags = function (contentBlock, selectedTag) {
+
+                console.log('setSelectedTags before: ' + contentBlock.selectedTags);
+                if (contentBlock.selectedTags.indexOf(selectedTag) >= 0) {
+                    contentBlock.selectedTags.splice(contentBlock.selectedTags.indexOf(selectedTag), 1);
+                } else {
+                    contentBlock.selectedTags.push(selectedTag);
+                }
+
+                console.log('setSelectedTags after: ' + contentBlock.selectedTags);
+
+                return false;
+            };
+
+            $scope.setFileSubscriptionDetails = function (contentDocumentId, activeSubscription) {
+
+                angular.forEach($scope.currentPage.subMenuItems, function (subMenuItem) {
+                    console.log('subMenuItem' + subMenuItem);
+                    angular.forEach(subMenuItem.contentBlocksInCurrentSubMenu, function (contentBlock) {
+                        angular.forEach(contentBlock.filesInCurrentContentBlock, function (fileItem) {
+                            if (fileItem.contentDocumentId == contentDocumentId)
+                                fileItem.activeSubscription = activeSubscription;
+
+                        });
+                    });
+                });
+
+                Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.NAPRebrandedPageController.saveFileSubscriptionDetails}',
+                    contentDocumentId, activeSubscription,
+                    function (result, event) {
+                        console.log(result);
+                        $scope.$apply();
+                        //document.getElementById('loading-in-table').style.visibility='hidden';
+                    }
+                );
+            };
+
+            $scope.setLibrarySubscriptionDetails = function (subscribeToLibrary, filesInContentBlock) {
+                $scope.isCurrentUserSubscribedToFileLibrary = subscribeToLibrary;
+                angular.forEach(filesInContentBlock, function (fileItem) {
+                    fileItem.activeSubscription = (fileItem.backupactiveSubscription || subscribeToLibrary);
+                });
+
+                Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.NAPRebrandedPageController.setLibrarySubscriptionDetails}',
+                    subscribeToLibrary,
+                    function (result, event) {
+                        console.log(result);
+                    }
+                );
+
+
+            }
+
+            $scope.redirect = function (pagelink, target) {
+                window.open(pagelink, target);
+            }
+
+            //News subscription logic start
+            $scope.populateLightningObject = function (subMenuId) {
+                console.log("subMenuId :: "+subMenuId);
+                console.log('populating lightning');
+                Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.NAPRebrandedPageController.getLightningComponentSettingObject}', subMenuId,
+                    function (result, event) {
+                        $Lightning.use("c:PartnerPortalLightningApplication", function() {
+                        $Lightning.createComponent("c:PartnerPortalComponentCreatorComp",
+                            { lightningComponentName : result.lightningComponentName, lightningFlowName : result.lightningFlowname , arguments: "" },
+                            "lightning",
+                            function(component) {
+                                console.log("lightning component created");
+                            }
+                        );
+                        });
+                    }
+                );
+            };
+                
+        });
+
+            napApp.directive('tabs', function () {
+                return {
+                    restrict: 'E',
+                    transclude: true,
+                    scope: {},
+                    controller: ["$scope", function ($scope) {
+                        var panes = $scope.panes = [];
+
+                        $scope.select = function (pane) {
+                            angular.forEach(panes, function (pane) {
+                                pane.selected = false;
+                            });
+                            pane.selected = true;
+                        }
+
+                        this.addPane = function (pane) {
+                            if (panes.length == 0) $scope.select(pane);
+                            panes.push(pane);
+                        }
+                    }],
+                    template:
+                        '<div class="tabbable">' +
+                        '<ul class="nav nav-tabs" id ="search-object-tabs" >' +
+                        '<li ng-repeat="pane in panes" ng-class="{active:pane.selected}">' +
+                        '<a href="" ng-click="select(pane)" data-toggle="tab">{{pane.title}}</a>' +
+                        '</li>' +
+                        '</ul>' +
+                        '<div class="tab-content" ng-transclude></div>' +
+                        '</div>',
+                    replace: true
+                };
+            }).
+                directive('pane', function () {
+                    return {
+                        require: '^tabs',
+                        restrict: 'E',
+                        transclude: true,
+                        scope: { title: '@' },
+                        link: function (scope, element, attrs, tabsCtrl) {
+                            tabsCtrl.addPane(scope);
+                        },
+                        template:
+                            '<div class="tab-pane" ng-class="{active: selected}" ng-transclude>' +
+                            '</div>',
+                        replace: true
+                    };
+                })
+
+
+            napApp.directive('indexTable2', function () {
+                function parseProps(str) {
+
+                    var i, props = str.split(",");
+                    for (i = 0; i < props.length; i++) {
+
+                        if (props[i].includes(",")) {
+
+                        }
+                        else {
+                            props[i] = trim(props[i]);
+                        }
+                    }
+                    return props;
+                }
+
+                function trim(s) {
+                    return s.replace(/^\s*(\w*)\s*$/, "$1");
+                }
+
+                return {
+                    restrict: 'A',
+                    template:
+                        '<tr><th ng-repeat="head in headers" ng-bind-html="head"></th> </tr>' +
+                        '<tr ng-repeat="component in components">' +
+                        '<td ng-repeat="name in props">' +
+                        '<div ng-if="name == \'Name\'"> <a class= "search-id" ng-href="/partners/{{component[\'Id\']}}" target="_blank" ng-bind-html="component[name]"></a></div>' +
+                        '<div ng-if= "name.includes(\'Date\')"> {{component[name] | date:"MM/dd/yyyy h:mma"}}</div>' +
+                        '<div ng-if="!name.includes(\'Date\') && !name.includes(\'.\') && name != \'Name\' && name != \'Id\'" ng-bind-html="component[name]"></div>' +
+                        '<div ng-if="name.includes(\'.\')" ng-bind-html ="component[name.substring(0,name.indexOf(\'.\'))][name.substring(name.indexOf(\'.\')+1,name.length)]"> {{name}}</div>' +
+                        '</td>' +
+                        '</tr>',
+                    scope: {
+                        components: '='
+                    },
+                    link: function (scope, elem, attrs) {
+                        scope.props = parseProps(attrs.columns);
+                        scope.headers = parseProps(attrs.headers);
+                    }
+                };
+            });
+
+
+            napApp.filter('filterOnTags', function () {
+                return function (filesInCurrentContentBlock, selectedTags, hasTagFilters) {
+                    console.log('in filterOnTags selectedtags:' + selectedTags + ' and filesInCurrentContentBlock:' + filesInCurrentContentBlock + ' and hasTagFilters:' + hasTagFilters);
+
+                    if (!hasTagFilters || selectedTags.length == 0)
+                        return filesInCurrentContentBlock;
+
+                    console.log('passed');
+
+                    var filteredFiles = filesInCurrentContentBlock.slice();
+
+
+                    for (var i = filesInCurrentContentBlock.length - 1; i >= 0; i--) {
+                        angular.forEach(selectedTags, function (tag) {
+                            if (filesInCurrentContentBlock[i].fileTags.indexOf(tag.toLowerCase()) == -1) {
+                                //this tag isnt in this file
+                                filteredFiles.splice(i, 1);
+                                console.log('file is getting removed because' + tag);
+                            }
+                        });
+                    }
+
+                    console.log('returning files' + filteredFiles.length);
+                    return filteredFiles;
+                };
+
+            });
+
+            napApp.filter('filterOnNewsType', function () {
+                return function (newsItems, selectedNewsType) {
+
+                    if (selectedNewsType == null || selectedNewsType == '')
+                        return newsItems;
+
+                    var filteredNewsItems = newsItems.slice();
+
+                    for (var i = newsItems.length - 1; i >= 0; i--) {
+
+                        if ((newsItems[i].itemType == 'Events' && newsItems[i].eventsType != selectedNewsType) || (newsItems[i].itemType != 'Events' && newsItems[i].newsType != selectedNewsType)) {
+                            // this news doesnt have this newstype
+                            filteredNewsItems.splice(i, 1);
+                        }
+                    }
+                    return filteredNewsItems;
+                };
+
+            });
+
+            napApp.filter('unsafe', function ($sce) { return $sce.trustAsHtml; });
+        </script>
+
+        <!--script>
+            $Lightning.use("c:PartnerPortalLightningApplication", function() {
+            $Lightning.createComponent("c:PartnerPortalComponentCreatorComp",
+                { lightningComponentName : "PartnerPortalFlowWrapper", lightningFlowName : "PST_Ticketing_Process" , arguments: "" },
+                "lightning",
+                function(component) {
+                    console.log("button was created");
+                    // do some stuff
+                }
+            );
+            });
+        </script-->
+
+        <style>
+            .no-files-div {
+                margin-top: 20px;
+                background-color: #ddd;
+            }
+
+            .detail-menu-nav-items li {
+                background: none;
+                border-bottom: 1px solid #ddd;
+                /*margin-bottom: 31px;*/
+            }
+
+            .files-list-title {
+                width: 450px;
+                float: left;
+            }
+
+            .files-list-attributes {
+                width: 175px;
+                float: left;
+            }
+
+            .detail-menu-nav-items {
+                border: none;
+                margin-bottom: 0px;
+            }
+
+            .content-or-no-file-message {
+                clear: both;
+                padding-top: 30px;
+            }
+
+            .files-icon-display-outer-div {
+                margin-bottom: 30px;
+            }
+
+
+            #search-object-tabs li a {
+                height: 51px;
+                width: auto;
+                min-width: 100px;
+                margin-right: 3px;
+                background: #E4E4E4;
+            }
+
+            #search-object-tabs {
+                border-bottom: none;
+            }
+
+            #search-object-tabs li a {
+                font-family: 'Ubuntu-Light';
+                font-size: 16px;
+                color: #ABABAB;
+                padding: 10px 15px;
+                text-align: center;
+            }
+
+            #search-object-tabs li.active,
+            #search-object-tabs li.active a {
+                background: white;
+                color: #FF9933;
+                border-radius: 4px 4px 0px 0px;
+                border: none;
+            }
+
+            .search-object-row {
+                padding-top: 30px;
+            }
+
+            .no-search-results,
+            .search-table {
+                background: white;
+                width: 71%;
+            }
+
+            .no-search-results {
+                padding: 10px;
+
+            }
+
+            .search-id {
+                color: #337ab7;
+                text-decoration: none;
+            }
+
+            .btn-search {
+                color: #fff;
+                background-color: #0099CC;
+                border-color: #0099CC;
+                width: 90px;
+            }
+
+
+            .filter-dropdown {
+
+                width: 160px;
+
+            }
+
+            .file-browser-actions {
+                padding-left: 10px;
+                margin-left: 10px;
+            }
+
+            .newslink-bg-div {
+                padding: 5px;
+                margin: 10px;
+                background-color: #d9edf7;
+
+            }
+
+            .newsitem-title {
+                padding: 5px;
+                margin-top: 2px;
+                !important;
+            }
+
+            .newsitem-title-open {
+                /* background-color: #FFAA00;
+            background-color: #6d7993;*/
+                background-color: #fba100;
+            }
+
+            .newslink-fontawesome-icon {
+                margin-right: 10px;
+            }
+
+            .news-bucket-div {
+                border-radius: 5px;
+                display: block;
+                margin-top: 15px;
+                border: 1px solid #000;
+            }
+
+            .news-bucket-title-div {
+                padding: 10px;
+                background-color: #d5d5d5;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+
+            .news-item-date {
+                text-align: right;
+                margin-right: 10px;
+            }
+
+            .newstype-button {
+                margin-right: 5px;
+                margin-top: -5px;
+                cursor: default;
+                display: inline-block;
+            }
+
+            .newstype-glyphicon {
+                float: right;
+                margin-left: 5px;
+                display: inline-block;
+            }
+
+            .newstitle-left {
+                float: left;
+                width: 60%;
+            }
+
+            .newstype-and-icon-container {
+                float: right;
+                width: 30%;
+                display: table-cell;
+                vertical-align: middle;
+            }
+
+            .newsitem-panel-heading {
+                height: 40px;
+                vertical-align: middle;
+            }
+
+            .nav,
+            .pagination,
+            .carousel,
+            .panel-title a {
+                cursor: pointer;
+            }
+
+            .activeNewsOption,
+            .inactiveNewsOption {
+                font-size: 38px;
+                cursor: pointer;
+            }
+
+            .activeNewsOption,
+            .inactiveNewsOption {
+                font-size: 38px;
+                cursor: pointer;
+            }
+
+            i.activeNewsOption {
+                color: #5bc0de
+            }
+
+            /*i.inactive {color: #d9534f}*/
+
+            .newsOptionActive {
+                background-color: #5bc0de;
+                color: black;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="loading">
+            <img id="loading-image" src="/changemgmt/img/spinner24.gif" alt="Loading..." />
+        </div>
+
+        <div ng-controller="NAPPageController" ng-hide="currentPage.redirectLocation">
+            <div class="container-non-responsive">
+
+                <div class="kontent-container">
+                    <div class="top-menu-bar">
+                        <div class="col-xs-1">
+                            <!-- SFDC-7677 @nadesai -->
+                            <a href="/partners/apex/APPLandingPage">
+                                <!-- SFDC-7653 @nadesai -->
+                                <img src="{!URLFOR($Resource.NAPRebrandedPage,'NAPRebrandedPage/images/Akamai-Logo-RGB.png')}" class="akamai-top-menu-logo img-responsive"
+                                />
+                            </a>
+                        </div>
+
+                        <div class="col-xs-2 partner-portal-top">
+                            Partner Portal&nbsp;
+                            <span class="glyphicon glyphicon-menu-down" id="banner-trigger-down" aria-hidden="true"></span>
+                        </div>
+
+                        <div class="dropdown top-hello">
+                            <button type="button" class="dropdown-toggle dropdown-top" id="logout-button" data-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false">
+
+                                Hello {{currentPage.currentUserFirstName}}
+
+                                <span class="glyphicon glyphicon-menu-down" aria-hidden="true">
+                                </span>
+                            </button>
+
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="/partners/secur/logout.jsp">Logout</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- end of top-hello -->
+                    </div>
+                    <!-- end of top-menu-bar -->
+                    <div class="alert alert-danger fade in alert-div-customized" ng-show="currentPage.errorMessage && currentPage.errorMessage.length>0">
+                        <a href="#" class="close" data-dismiss="alert">×</a>
+                        {{currentPage.errorMessage}}
+                    </div>
+                    <!-- end of alert-div-customized -->
+                    <div class="row2">
+                        <div id="magic-banner">
+                            <div class="row" id="m80">
+                                <div class="col-xs-4 banner-heading">
+                                    Select a New Category
+                                    <span class="glyphicon glyphicon-menu-up" id="banner-trigger-up" aria-hidden="true"></span>
+                                </div>
+                                <div class="col-xs-8 banner-side-heading">
+                                    Learn about the program access support
+                                </div>
+                            </div>
+                            <!-- end of m80 -->
+                            <div class="banner-row">
+                                <div class="col-xs-1 banner-image-div" ng-repeat="pageMenuItem in currentPage.pageMenuItems" ng-click="redirect(pageMenuItem.link,'_self')">
+                                    <i class="{{pageMenuItem.image}} banner-image"></i>
+                                    <div class="banner-image-text">
+                                        {{pageMenuItem.title}}
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end of banner-row -->
+
+                        </div>
+                        <!-- end of magic-banner -->
+                    </div>
+                    <!-- end of row2 -->
+                    <div class="title-blue-bg">
+                        <div class="row" id="blue-title-row">
+                            <div class="col-xs-12" id="n3">
+                                <div class="col-xs-3 title-blue">
+                                    {{currentPage.currentPageMenuItem.Title__c}}
+                                </div>
+                                <div class="col-xs-9 page-description">
+                                    {{currentPage.currentPageMenuItem.Description__c}}
+                                </div>
+                            </div>
+                            <!-- end of n3 -->
+                        </div>
+                        <!-- end of blue title row -->
+                        <div class="row" id="n2">
+                            <div class="col-xs-12" id="n1">
+                                <div class="col-xs-3 sidemenu">
+                                    <div class="col-xs-3 black-sidemenu" id="sidebar">
+
+                                        <a ng-repeat="mainMenuItem in currentPage.mainMenuItems" ng-attr-href="{{mainMenuItem.isClickable ? mainMenuItem.link : '#'}}"
+                                            class="black-sidemenu-item" ng-class="{'active-main-menu-item' : mainMenuItem.isActive, 'no-access' : !mainMenuItem.isClickable }"
+                                            ng-attr-data-toggle="{{mainMenuItem.isClickable ? 'all-access' : 'tooltip' }}" ng-attr-title="{{mainMenuItem.isClickable ? mainMenuItem.title : 'You do not have access to this section!'}}">
+                                            {{mainMenuItem.title}}
+                                        </a>
+                                    </div>
+                                    <!-- end of black-sidemenu -->
+                                    <div class="col-xs-3 white-sidemenu">
+                                        <a ng-repeat="permanentMenuItem in currentPage.permanentMenuItems" href="{{permanentMenuItem.link}}" target="_blank" class="white-sidemenu-item">
+                                            {{permanentMenuItem.title}}
+                                        </a>
+                                    </div>
+                                    <!-- end of white-sidemenu -->
+                                </div>
+                                <!-- end of sidemenu -->
+
+                                <div class="col-xs-8 no-left-padding">
+                                    <ul class="nav nav-tabs" id="content-tabs">
+
+                                        <li ng-repeat="subMenuItem in currentPage.subMenuItems" ng-class="{active: subMenuItem.isActive}">
+                                            <a href="#{{subMenuItem.Id}}" data-toggle="tab" id="submenu-link-{{subMenuItem.Id.toLowerCase()}}" class="submenu-links">{{subMenuItem.title}}</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!--  end of no-left-padding -->
+
+                                <div class="col-xs-8 right-tabbed">
+                                    <div class="tab-content" id="temp-tab-id">
+                                        <div ng-repeat="subMenuItem in currentPage.subMenuItems" class="tab-pane id-u2" id="{{subMenuItem.Id}}" ng-class="{active: subMenuItem.isActive}">
+                                            <div class="detail-menu-nav-items-div" ng-show="subMenuItem.hasDetailMenus">
+                                                <!-- detail menu items for this subMenu -->
+                                                <ul class="nav nav-tabs detail-menu-nav-items">
+                                                    <li ng-repeat="detailMenuItem in subMenuItem.detailMenuItemsInCurrentSubMenu" ng-class="{active: detailMenuItem.isActive}">
+                                                        <a href="#{{detailMenuItem.Id}}" data-toggle="tab" id="detailmenu-link-{{detailMenuItem.Id.toLowerCase()}}" class="detailmenu-links">{{detailMenuItem.title}}</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <!--end of detail-menu-nav-items-div -->
+                                            <div class="tab-content inner-content" ng-show="subMenuItem.hasDetailMenus">
+                                                <div class="tab-pane" ng-repeat="contentBlock in subMenuItem.contentBlocksInCurrentSubMenu" id="{{contentBlock.parentDetailMenuId}}"
+                                                    ng-class="{active: contentBlock.isActive}">
+                                                    <ng-include src="'filetemplate.html'"></ng-include>
+                                                    <ng-include src="'napSearchtemplate.html'"></ng-include>
+                                                    <div ng-if="contentBlock.newsItemContainers" ng-include="'newsListings.html'"></div>
+                                                    <div ng-if="contentBlock.isNewsSubscriptionSetting" ng-include="'newsSettings.html'"></div>
+
+                                                </div>
+                                                <!-- end of tab-pane with ng-repeat contentBlock -->
+                                            </div>
+                                            <!-- end of tab-content inner-content -->
+
+
+                                            <div class="tab-pane id-unkn content-without-detail-menu" ng-repeat="contentBlock in subMenuItem.contentBlocksInCurrentSubMenu"
+                                                ng-show="!subMenuItem.hasDetailMenus && !contentBlocksInCurrentSubMenu.hasDetailMenuParent"
+                                                id="{{contentBlock.parentSubMenuId}}">
+                                                <ng-include src="'filetemplate.html'"></ng-include>
+                                                <ng-include src="'napSearchtemplate.html'"></ng-include>
+                                                <div ng-if="contentBlock.newsItemContainers" ng-include="'newsListings.html'"></div>
+                                                <div ng-if="contentBlock.isNewsSubscriptionSetting" ng-include="'newsSettings.html'"></div>
+                                                <div ng-if="contentBlock.isLightningComponent" ng-init="populateLightningObject(subMenuItem.Id)">
+                                                    <div id="lightning" />
+                                                </div>
+
+                                            </div>
+                                            <!-- end of id-unkn -->
+                                        </div>
+                                        <!-- end of id-2 -->
+                                    </div>
+                                    <!-- end of temp-tab-id -->
+                                </div>
+                                <!-- end of right-tabbed -->
+                            </div>
+                            <!-- end of n1 -->
+                        </div>
+                        <!-- end of n2 -->
+                    </div>
+                    <!-- end of title-blue-bg -->
+                </div>
+                <!-- end of kontent-container -->
+
+            </div>
+            <!-- end of container-non-responsive -->
+        </div>
+        <!-- end of ng-controller -->
+        <script language="javascript" type="text/javascript">
+            $(window).load(function () {
+                $('#loading').hide();
+            });
+        </script>
+    </body>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#banner-trigger-down").click(function () {
+                $("#magic-banner").slideToggle("slow");
+            });
+            $("#banner-trigger-up").click(function () {
+                $("#magic-banner").slideToggle("slow");
+            });
+            $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+            var hash = window.location.hash;
+            var url_params = getAllUrlParams(window.location.href);
+            if (url_params.submenu_id != null) {
+                setTimeout(function () { $('#submenu-link-' + url_params.submenu_id).tab('show') }, 1000);
+            }
+            if (url_params.detailmenu_id != null) {
+                setTimeout(function () { $('#detailmenu-link-' + url_params.detailmenu_id).tab('show') }, 1000);
+            }
+
+            $('.detailmenu-links, .submenu-links').click(function (e) {
+
+                var menuitemid = this.id.substring(this.id.lastIndexOf('-link-') + '-link-'.length);
+
+                if (this.id.indexOf('submenu') != -1) {
+                    url_params.submenu_id = menuitemid;
+                    delete url_params.detailmenu_id;
+                }
+                else {
+                    url_params.detailmenu_id = menuitemid;
+                }
+
+
+                var params = '?' + jQuery.param(url_params);
+                // no parameter was set so we don't need the question mark
+                params = params == '?' ? '' : params;
+
+                window.history.replaceState({}, "", location.protocol + '//' + location.host + location.pathname + params);
+
+                e.preventDefault();
+            });
+
+        });
+
+
+        function getAllUrlParams(url) {
+
+            // get query string from url (optional) or window
+            var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
+
+            // we'll store the parameters here
+            var obj = {};
+
+            // if query string exists
+            if (queryString) {
+
+                // stuff after # is not part of query string, so get rid of it
+                queryString = queryString.split('#')[0];
+
+                // split our query string into its component parts
+                var arr = queryString.split('&');
+
+                for (var i = 0; i < arr.length; i++) {
+                    // separate the keys and the values
+                    var a = arr[i].split('=');
+
+                    var paramName = a[0];
+
+                    // set parameter value (use 'true' if empty)
+                    var paramValue = typeof (a[1]) === 'undefined' ? true : a[1];
+
+                    // keep case consistent
+                    paramName = paramName.toLowerCase();
+                    paramValue = paramValue.toLowerCase();
+
+                    // if parameter name already exists
+                    if (obj[paramName]) {
+                        // convert value to array (if still string)
+                        if (typeof obj[paramName] === 'string') {
+                            obj[paramName] = [obj[paramName]];
+                        } else {
+                            // put the value on the end of the array
+                            obj[paramName].push(paramValue);
+                        }
+                    }
+                    // if param name doesn't exist yet, set it
+                    else {
+                        obj[paramName] = paramValue;
+                    }
+                }
+            }
+
+            return obj;
+        }
+    </script>
+    <script type="text/ng-template" id="group-template.html">
+<div tabindex="0" class="accordion-toggle newsitem-title" ng-class="{'newsitem-title-open' : isOpen}" ng-click="toggleOpen()" uib-accordion-transclude="heading">
+  <div class="panel-heading newsitem-panel-heading">
+    <h4 class="panel-title" style="color:#000000">
+      <span uib-accordion-header>
+      {{heading}}
+      </span>
+    </h4>
+  </div>
+</div>
+<div class="panel-collapse collapse" uib-collapse="!isOpen">
+  <div class="panel-body" ng-transclude></div>
+</div>
+</script>
+
+    <script type="text/ng-template" id="newsListings.html">
+<div class="row"
+<!--if content block has tag filters -->
+<div  class = "col-xs-3" ng-show="contentBlock.isNewsFilter">
+  <div class="btn-group">
+    
+    <button ng-show ="!contentBlock.isIndividualNewsItem" type ="button" class = "dropdown-toggle filter-dropdown"  data-toggle="dropdown"  aria-haspopup="true" aria-expanded="false"> Filter by Type  <span class="caret"></span>
+    </button>
+    
+    <button class="btn btn-info btn-sm newstype-button ng-binding" ng-show ="contentBlock.isIndividualNewsItem" ng-click="showAllNews(contentBlock)">Click to show All</button>
+    
+    <ul class="dropdown-menu" ng-click = "$event.stopPropagation()">
+      <li><a ng-click="uncheckAllNewsTypes(contentBlock)"> View All<span class="glyphicon glyphicon-remove-sign"></span></a>
+      </li>
+      <li class="divider"></li>
+      <li ng-repeat="ithTypeDropDown in contentBlock.newsTypeFilterOptions"> <a data-ng-click="setSelectedNewsType(contentBlock, ithTypeDropDown)">{{ithTypeDropDown}}<span data-ng-class="isNewsTypeChecked(contentBlock, ithTypeDropDown)"></span></a>
+      </li>
+    </ul>
+  </div>
+</div>
+</div>
+<div ng-repeat="kontainer in contentBlock.newsItemContainers" ng-show="(kontainer.newsItems | filterOnNewsType:contentBlock.selectedNewsType).length>0" class="news-bucket-div">
+  <div ng-show ="!contentBlock.isIndividualNewsItem" class="news-bucket-title-div">
+    {{kontainer.containerTitle}}
+  </div>
+  <uib-accordion close-others="false">
+    <div uib-accordion-group class="panel-default" is-open="newsItem.accordionControl" template-url="group-template.html" ng-repeat="newsItem in kontainer.newsItems | filterOnNewsType:contentBlock.selectedNewsType">
+      <uib-accordion-heading >
+            <div class="newstitle-left">
+                {{newsItem.title}}
+            </div>
+        <div class="btn btn-info btn-sm newstype-button" ng-click="copyLinkFunction(newsItem.name1)" id ="copyLinkDiv">Copy Link</div>        
+        <div ng-show="newsItem.itemType!='Events'" class="btn btn-info btn-sm newstype-button">{{newsItem.newsType}}</div>
+        <div ng-show="newsItem.itemType=='Events'" class="btn btn-info btn-sm newstype-button">{{newsItem.eventsType}}</div>
+                 <div class="newstype-glyphicon"><i class="glyphicon pull-right" ng-class="{'glyphicon-chevron-down': newsItem.accordionControl, 'glyphicon-chevron-right': !newsItem.accordionControl}"></i></div>
+      </uib-accordion-heading>
+      <div class="row news-item-date">
+        {{newsItem.formattedDate}}
+      </div>
+      <div ng-bind-html="newsItem.richTextContent | unsafe">
+      </div>
+      <div class="row" ng-repeat="newsLink in newsItem.links">
+        <a href="{{newsLink.linkDestination}}" style="text-decoration:none" target="_blank">
+          <div class="newslink-bg-div">
+            <span class="fa fa-link newslink-fontawesome-icon" />{{newsLink.displayText}}
+          </div>
+        </a>
+      </div>
+    </div>
+  </uib-accordion>
+</div>
+</script>
+
+    <script type="text/ng-template" id="newsSettings.html">
+
+<div ng-show="contentBlock.isNewsSubscriptionSetting" >
+  
+  <div id ="subscription" ng-init="populateNewsSubsciptionObject()">
+
+   <div class = "row detail-sub-header"> 
+      <h2 align="center">News And Events Subscription for {{currentPage.currentUserFirstName}}</h2>
+   </div>
+   <hr><br> 
+   <p ng-if="newsSubscription.frequencyValidation" style="color : red;"> *Please select frequency to enable news subscription</p>
+   <p ng-if="newsSubscription.newsTypeValidation" style="color : red;">* Please select at least one News Type or Events Type to enable news and events subscription</p>
+    <table>
+    <tr>
+      <td width="30%">Email : </td>
+      <td width="70%">{{newsSubscription.newsEmail}} </td>
+    </tr>
+
+    <tr>
+      <td width="30%">*Frequency : </td>
+      <td width="70%">
+          <span ng-repeat="o in newsSubscription.allFrequencies">
+             <button ng-class ="o == newsSubscription.newsFrequency ? 'btn newsOptionActive' : 'btn' " id="frequency{{o}}"  ng-click="updateNewsFrequency(o)">{{o}}</button>
+          </span>
+      </td>
+    </tr>
+
+    <tr style="margin-top:10px;">
+      <td width="32%">*News Type : (Multiselect)</td>
+      <td width="70%">
+        <!--<select name="News Type">
+             <option ng-repeat="o in newsSubscription.newsType" value="{{o}}">{{o}}</option>
+          <select>-->
+          <span ng-repeat="o in newsSubscription.allNewTypes">
+             <button ng-class ="newsSubscription.newsType.indexOf(o) != -1 ? 'btn newsOptionActive' : 'btn' " id="newsType{{o}}" ng-click="updateNewsType(o)">{{o}}</button>
+          </span>
+          
+      </td>
+    </tr>
+
+    <tr style="margin-top:10px;">
+      <td width="32%">*Events Type : (Multiselect)</td>
+      <td width="70%">
+        <!--<select name="News Type">
+             <option ng-repeat="o in newsSubscription.newsType" value="{{o}}">{{o}}</option>
+          <select>-->
+          <span ng-repeat="o in newsSubscription.allEventTypes">
+             <button ng-class ="newsSubscription.EventType.indexOf(o) != -1 ? 'btn newsOptionActive' : 'btn' " id="EventType{{o}}" ng-click="updateEventType(o)">{{o}}</button>
+          </span>
+          
+      </td>
+    </tr>
+
+    <tr>
+      <td width="32%">Enable Email Notification : </td>
+      <td width="70%">
+        <!--<input type="checkbox" name="enable" ng-model="newsSubscription.newsEnable" required>-->
+        <div id="emailEnable">
+          <i class="fa fa-toggle-on activeNewsOption" ng-if="newsSubscription.newsEnable == true" ng-click="changeNewsSettings('newsEnable');"></i>
+          <i class="fa fa-toggle-on fa-rotate-180 inactiveNewsOption" ng-if="newsSubscription.newsEnable == false" ng-click="changeNewsSettings('newsEnable');"></i>
+        </div>
+      </td>
+    </tr>
+    
+    <tr>
+      <td width="32%">Override frequency with Urgency : </td>
+      <!--<td><input type="checkbox" name="frequencyOverrideWithUrgency" ng-model="newsSubscription.newsFrequeryUrgencyOverride" required>-->
+      <td width="70%">
+        <div id="frequencyOverride">
+          <i class="fa fa-toggle-on activeNewsOption" ng-if="newsSubscription.newsFrequeryUrgencyOverride == true" ng-click="changeNewsSettings('newsFrequeryUrgencyOverride');"></i>
+          <i class="fa fa-toggle-on fa-rotate-180 inactiveNewsOption" ng-if="newsSubscription.newsFrequeryUrgencyOverride == false" ng-click="changeNewsSettings('newsFrequeryUrgencyOverride');"></i>
+        </div>
+      </td>
+    </tr>
+
+    <!--<tr ng-if="newsSubscription.eligibleForOT">
+      <td width="32%">Only receive OT news : </td>
+      <!--<td><input type="checkbox" name="onlyRecieveOTNews" ng-model="newsSubscription.newsOnlyRecieveOTNewsCheck" required>-->
+      <!--<td width="70%"><div id="onlyOTNews">
+          <i class="fa fa-toggle-on activeNewsOption" ng-if="newsSubscription.newsOnlyRecieveOTNewsCheck == true" ng-click="changeNewsSettings('newsOnlyRecieveOTNewsCheck');"></i>
+          <i class="fa fa-toggle-on fa-rotate-180 inactiveNewsOption" ng-if="newsSubscription.newsOnlyRecieveOTNewsCheck == false" ng-click="changeNewsSettings('newsOnlyRecieveOTNewsCheck');"></i>
+        </div>
+      </td>
+    </tr>-->
+    
+    </table>
+    </br>
+    <button align="center" class = "dropdown-toggle filter-dropdown" ng-click="setNewsSubscriptionSettings(newsFrequency)">Update Subscription</button>
+    
+    </div>
+
+</div>
+<style>
+td {
+    padding-top: .5em;
+    padding-left: .5em;
+    padding-bottom: .5em;
+}
+</style>
+</script>
+
+    <script type="text/ng-template" id="filetemplate.html">
+<!--     <div class="content-or-no-file-message" data-toggle="collapse">
+  -->    
+<div class="content-or-no-file-message">
+  <div ng-bind-html="contentBlock.richText | unsafe" class="content-block-div">
+  </div>
+  <!-- SFDC-770 -->
+  <div class="alert no-files-div" role="alert" ng-show="contentBlock.showNoFileFoundError">
+    No matching files were found.
+  </div>
+  <!-- end of no file message -->
+</div>
+<!--if content block has files -->
+<div ng-if = "contentBlock.hasFileContent && !contentBlock.showNoFileFoundError">
+  <!--row of buttons and dropdowns -->
+  <div class="row file-browser-actions">
+    <!--if content block has file filters (language or tag) -->
+    <div ng-if = "contentBlock.hasLanguageFilters || contentBlock.hasTagFilters">
+      <!--if content block has language filters -->
+      <div class = "col-xs-3" ng-show="contentBlock.hasLanguageFilters">
+        <div class="btn-group">
+          <button type ="button" class = "dropdown-toggle filter-dropdown"  data-toggle="dropdown"  aria-haspopup="true" aria-expanded="false"> {{selectedLanguage}}  <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li data-ng-repeat="language in contentBlock.languageFilterOptions">
+              <a data-ng-click="setSelectedLanguage(language)">{{language}}</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!--if content block has tag filters -->
+      <div  class = "col-xs-3" ng-show="contentBlock.hasTagFilters">
+        <div class="btn-group">
+          <button type ="button" class = "dropdown-toggle filter-dropdown"  data-toggle="dropdown"  aria-haspopup="true" aria-expanded="false"> All Tags  <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" ng-click = "$event.stopPropagation()">
+            <li><a data-ng-click="checkAll(contentBlock)">Check All <span class="glyphicon glyphicon-ok-sign"></span></a>
+            </li>
+            <li><a ng-click="uncheckAll(contentBlock)"> Uncheck All <span class="glyphicon glyphicon-remove-sign"></span></a>
+            </li>
+            <li class="divider"></li>
+            <li ng-repeat="ithTagDropDown in contentBlock.setOftagFiltersForCurrentBlock"> <a data-ng-click="setSelectedTags(contentBlock, ithTagDropDown)">{{ithTagDropDown}}<span data-ng-class="isChecked(contentBlock, ithTagDropDown)"></span></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class= "col-xs-3" ng-if="contentBlock.hasFileBrowser">
+      <button type="button" class = "filter-dropdown" ng-show = "!isCurrentUserSubscribedToFileLibrary" ng-click = "setLibrarySubscriptionDetails(true,contentBlock.filesInCurrentContentBlock)" > Subscribe to library </button>
+      <button type="button" class = "filter-dropdown" ng-show = "isCurrentUserSubscribedToFileLibrary" ng-click = "setLibrarySubscriptionDetails(false,contentBlock.filesInCurrentContentBlock)"> Unsubscribe to library </button>
+    </div>
+  </div>
+  <div ng-if="contentBlock.showNoFilesForURLParamError">
+    <!-- SFDC-7653 - @nadesai -->
+    <h4 align="center" style="color:red">There were no results found for the search parameters listed in the URL. We are displaying all files in the {! $Label.NapRebrand_Label2 } Library. You can still use the language and tag picklists to search for library content.</h4>
+  </div>
+  <!--files to be displayed -->
+  <div ng-repeat= "fileItem in contentBlock.filesInCurrentContentBlock |
+    filterOnTags:contentBlock.selectedTags:contentBlock.hasTagFilters |orderBy : 'fileName'"ng-if="(!contentBlock.hasLanguageFilters)|| (contentBlock.hasLanguageFilters && (fileItem.fileLanguage == selectedLanguage|| selectedLanguage == 'All Languages'))"
+    class="files-{{contentBlock.fileDisplayType}}-display-outer-div">
+    <div ng-if = "contentBlock.fileDisplayType=='tiles'">
+      <a href="{{fileItem.fileDownloadLink}}">
+      <img src="{{fileItem.fileImageLink}}" width="200px" height="200px"/>
+      <span class="files-{{contentBlock.fileDisplayType}}-caption-text">
+      {{fileItem.fileName}}
+      </span>
+      </a>
+      <span class="icon-mail-add" data-toggle = "tooltip" title = "Subscribe" data-placement="bottom" ng-show = "!fileItem.activeSubscription" ng-click = "setFileSubscriptionDetails(fileItem.contentDocumentId,true,fileItem.contentVersionId)">
+      </span>
+      <span class="icon-mail-cancel" data-toggle = "tooltip" title = "Unsubscribe" data-placement="bottom" ng-show= "fileItem.activeSubscription" ng-click = "setFileSubscriptionDetails(fileItem.contentDocumentId,false,fileItem.contentVersionId)" >
+    </div>
+    <div ng-if="contentBlock.fileDisplayType=='icons' || contentBlock.fileDisplayType=='list'">
+      <a href="{{fileItem.fileDownloadLink}}">
+        <div class="files-{{contentBlock.fileDisplayType}}-image-div">
+          <span class="fa fa-{{fileItem.fontAwesomeClass}} file-{{contentBlock.fileDisplayType}}-font-awesome"></span>
+        </div>
+        <div class="files-{{contentBlock.fileDisplayType}}-caption-text">
+          <div class="files-{{contentBlock.fileDisplayType}}-title">
+            {{fileItem.fileName}}
+          </div>
+          <div class="files-{{contentBlock.fileDisplayType}}-attributes" ng-if = "contentBlock.fileDisplayType=='list'">
+            {{fileItem.fileExtension}}  |  {{fileItem.fileSize}}  |  {{fileItem.lastModifiedDate}}
+          </div>
+          <div class="files-icon-attributes" ng-if = "contentBlock.fileDisplayType=='icons'">
+            {{fileItem.fileExtension}} | {{fileItem.fileSize}}
+          </div>
+        </div>
+      </a>
+      <span style = "padding-left:10px;"class="icon-mail-add" ng-show = "!fileItem.activeSubscription" data-toggle = "tooltip" title = "Subscribe" data-placement="bottom" ng-click = "setFileSubscriptionDetails(fileItem.contentDocumentId,true,fileItem.contentVersionId)"/>
+      <span style = "padding-left:10px;" class="icon-mail-cancel" data-toggle = "tooltip" title = "Unsubscribe" ng-show= "fileItem.activeSubscription" data-placement="bottom" ng-click = "setFileSubscriptionDetails(fileItem.contentDocumentId,false,fileItem.contentVersionId)" />
+    </div>
+  </div>
+</div>
+</script>
+    <script type="text/ng-template" id="napSearchtemplate.html">
+<div class = "container" ng-show ="contentBlock.hasNapSearch">
+    <div class="row">
+        <form name="myForm">
+            <div class = "col-xs-5"><input type="text" name="searchTextName" class="form-control" placeholder="{{searchParam}}" ng-model="searchText" ng-minlength="3"></div>
+            <div class = "col-xs-1"><button type="button" class="btn btn-search " ng-disabled = "myForm.searchTextName.$error.minlength || searchText==''" ng-click="searchObjects(searchText)">Search</button></div>
+            <div class = "col-xs-1"><button type="button" class="btn btn-search" ng-click="searchText=''">Clear</button></div>
+    </div>
+    <div class= "row"role="alert" style ="color: red;">
+    <span class="col-xs-4" ng-show="myForm.searchTextName.$error.minlength">
+    Please enter at least 3 characters!
+    </span>
+    </div>
+    </form>
+    <div class = "row search-object-row" ng-show="searchresultflag">
+        <tabs>
+            <pane title="Contacts ({{contacts.length}})">
+                <div>
+                    <table ng-if="contacts.length>0" class="table table-bordered search-table" index-table2="" headers = "Name,Account,Country,Email,User Active Login" components="contacts" columns="Name,Account.Name,MailingCountry,Email,Active_Partner__c"></table>
+                </div>
+                <div ng-show="!contacts.length"  class="no-search-results"> No Contacts found! </div>
+            </pane>
+            <pane title="Opportunities ({{opportunitys.length}})">
+                <div>
+                    <table ng-if="opportunitys.length>0" class="table table-bordered search-table" index-table2="" headers="Name,Partner Account,Customer Account,Stage,Created Date" components="opportunitys" columns="Name,Partner_Involved__r.Name,Account.Name,StageName,CreatedDate">
+                    </table>
+                    <div ng-show="!opportunitys.length"  class="no-search-results"> No Opportunity found! </div>
+                </div>
+            </pane>
+            <pane title="Fund Requests ({{fundrequests.length}})">
+                <div >
+                    <table ng-if="fundrequests.length>0" class="table table-bordered search-table" index-table2="" headers="Name,Partner Account,Status,Requested Amount,Activity Start Date" components="fundrequests" columns="Name,Account__r.Name, Status__c,Amount__c, Activity_Date__c">
+                    </table>
+                </div>
+                <div ng-show="!fundrequests.length" class="no-search-results"> No Fund Requests found! </div>
+            </pane>
+            <pane title="Fund Claims ({{fundclaims.length}})">
+                <div>
+                    <table  ng-if="fundclaims.length>0" class="table table-bordered search-table" index-table2="" headers="Name,Partner Account,Status,Claimed Amount,Approved Date" components="fundclaims" columns="Name,Account__r.Name,Status__c,Amount__c,Approved_Date__c">
+                    </table>
+                    <div ng-show="!fundclaims.length"  class="no-search-results"> No Fund Claims found! </div>
+                </div>
+            </pane>
+            <pane title="Partner Order Acceptances ({{partnerorderacceptances.length}})">
+                <div>
+                    <table ng-if="partnerorderacceptances.length>0" class="table table-bordered search-table" index-table2="" headers="Name,Opportunity Name,Partner Account,Customer Account,Acceptance Status,Acceptance By,Last Modified Date" components="partnerorderacceptances" columns="Name,Opportunity__r.Name, Partner_Involved_Name__c, Customer_Name__c, Order_Acceptance_Status__c,Accepted_By__r.Name,LastModifiedDate">
+                    </table>
+                    <div ng-show="!partnerorderacceptances.length"  class="no-search-results"> No Partner Order Acceptances found! </div>
+                </div>
+            </pane>
+        </tabs>
+    </div>
+</div>
+</script>
+
+    </html>
+</apex:page>

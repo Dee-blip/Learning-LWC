@@ -1,0 +1,77 @@
+<aura:component controller="EditFundClaimLightningController" 
+				implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" 
+				access="global" >
+    
+    <!-- Include Static Resource-->
+    <!--<ltng:require styles="/resource/bootstrap/css/bootstrap.min.css" 
+				  scripts="/resource/bootstrap/js/jquery.js,/resource/bootstrap/js/bootstrap.min.js"/> -->
+     
+    <!--<aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>-->
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    
+    <!-- Define Attribute-->
+    <aura:attribute name="fundClaimId" type="String"/>
+    <aura:attribute name="fundClaimSpenderAtt" type="String"/>
+    <aura:attribute name="fundClaimUrl" type="String"/>
+    <aura:attribute name="showSuccessMessage" access="public" type="Boolean" default="false"/>
+    <aura:attribute name="showErrorMessage" access="public" type="Boolean" default="false"/>
+    <br></br>
+    
+    <aura:if isTrue="{!v.Spinner}">
+        <div class="slds-spinner_container">
+          <div role="status" class="slds-spinner slds-spinner--medium">
+            <span class="slds-assistive-text">Loading</span>
+            <ui:spinner aura:id="spinner"/>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+          </div>
+        </div>
+     </aura:if>
+    
+    <ui:outputURL value="{!v.fundClaimUrl}" label="Back to Fund Claim"/> 
+    <br></br><br></br>
+        
+    <div id="container" class="container-fluid">
+        <h3 class="pageHeading">Edit Fund Claim</h3>
+        <br></br><br></br>
+        
+        <div class="error-class">
+            <aura:renderIf isTrue="{!v.showSuccessMessage}">
+            <ui:message title="Success" severity="confirm" closable="true">
+               Record Updated Successfully.
+             </ui:message>
+            </aura:renderIf>
+            
+            <aura:renderIf isTrue="{!v.showErrorMessage}">
+                <ui:message title="Error" severity="confirm" closable="true">
+                   Error updating record. Please contact admin.
+                 </ui:message>
+            </aura:renderIf>
+        </div>
+        
+        <br></br>
+        
+        <table class="fund-spender-table">
+            <tr>
+            	<td>
+                    <div class="form-group">
+                        <label>Fund Claim Activity Spender</label>
+                        <ui:inputSelect class="form-control" value="{!v.fundClaimSpenderAtt}">
+                            <!--Try aura iteration to populate the picklist value -->    
+                            <ui:inputSelectOption text="Partner"/>
+                                <ui:inputSelectOption text="Akamai" value="true"/>
+                        </ui:inputSelect>
+                    </div>
+                </td>
+            </tr>
+            
+        </table>
+        <br></br>
+        
+    </div>
+    <br></br><br></br><br></br>
+    <div class="col-md-4 text-center">
+        <ui:button class="btn btn-default button-class" press="{!c.updateRecord}">Save</ui:button>
+  </div>
+</aura:component>

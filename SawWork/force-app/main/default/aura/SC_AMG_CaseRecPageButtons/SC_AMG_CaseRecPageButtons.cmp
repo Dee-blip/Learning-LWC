@@ -1,0 +1,67 @@
+<aura:component
+  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader"
+  controller="SC_AMG_Lightning"
+  extends="c:AuraUtils"
+  access="global"
+>
+  <div class="slds-box slds-box_xx-small slds-theme_default">
+    <div class="slds-grid slds-wrap slds-gutters_xxx-small">
+      <div class="slds-col slds-size_4-of-12">
+        <lightning:button
+          class="myCaseButton"
+          variant="brand"
+          label="Confluence"
+          onclick="{!c.redirectToURL}"
+        />
+      </div>
+      <div class="slds-col slds-size_4-of-12">
+        <lightning:button
+          class="myCaseButton"
+          variant="brand"
+          label="CRISP"
+          onclick="{!c.redirectToURL}"
+        />
+      </div>
+      <div class="slds-col slds-size_4-of-12">
+        <lightning:button
+          class="myCaseButton"
+          variant="brand"
+          label="Helpdesk"
+          onclick="{!c.redirectToURL}"
+        />
+      </div>
+      <br />
+      <div class="slds-col slds-size_3-of-12">
+        <lightning:button
+          class="myCaseButton"
+          variant="brand"
+          label="Portal"
+          onclick="{!c.redirectToURL}"
+        />
+      </div>
+      <div class="slds-col slds-size_3-of-12">
+        <lightning:button
+          class="myCaseButton"
+          variant="brand"
+          label="Siebel"
+          onclick="{!c.redirectToURL}"
+        />
+      </div>
+      <div class="slds-col slds-size_3-of-12">
+        <lightning:button
+          class="myCaseButton"
+          variant="brand"
+          label="PRISM"
+          onclick="{!c.redirectToURL}"
+      /></div>
+      <div class="slds-col slds-size_3-of-12">
+        <lightning:button
+          class="myCaseButton"
+          variant="brand"
+          label="A360"
+          onclick="{!c.redirectToURL}"
+        />
+      </div>
+    </div>
+  </div>
+</aura:component>

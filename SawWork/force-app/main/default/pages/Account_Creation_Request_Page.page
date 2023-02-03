@@ -1,0 +1,3 @@
+<apex:page standardController="Account" extensions="AccountCreationController" action="{!AddNewAccount}" lightningStylesheets="true" >
+  
+</apex:page>

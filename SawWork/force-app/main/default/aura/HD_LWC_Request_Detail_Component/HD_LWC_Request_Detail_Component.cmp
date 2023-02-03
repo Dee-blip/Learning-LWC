@@ -1,0 +1,22 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId"  controller="HD_Request_Detail_Input_Lightning">
+    <aura:attribute name="recordId" type="Id" default="a5UR0000000EG34MAG"/>
+    <aura:attribute name="sredit_mode" default="false" type="Boolean"/>
+    <aura:attribute name="srdt_mode" default="true" type="Boolean"/>
+    <aura:handler event="c:Update_SR_Edit" action="{!c.updateEditForm}" />
+    
+    
+    <div>
+        <div class="{!v.srdt_mode? 'slds-show': 'slds-hide'}">
+            <c:hdRequestDetails aura:id="srDetailLWC" recordId="{!v.recordId}" oneditclick="{!c.edit_sr}" ></c:hdRequestDetails>
+        </div>
+        
+        <aura:If isTrue="{!v.sredit_mode}">
+            <div  id='service_request_form' >
+                <section id="sectionid_edit" class="slds-popover slds-size--2-of-2" role="dialog" aria-describedby="dialog-body-id-43" style="background-color:#FAFAF9;padding: .75rem 1rem; ">
+                    <span class="sr-header">SR Edit</span><span id='sr_edit_cancel_link' class="sr_link"> <a href='' onclick="{!c.cancel_sr_form}">Cancel</a></span>
+                </section>
+                <c:HD_SR_Edit recordId="{!v.recordId}"/>
+            </div>
+        </aura:If>
+    </div>
+</aura:component>

@@ -1,0 +1,56 @@
+<apex:page Controller="MSMController" Title="Manual Step Manager" sideBar="false" showHeader="false" docType="html-5.0" action="{!setDataByRelease}">
+	<style type="text/css">
+		#col1,#col2,#col3,#col4{width:49%;display:inline-block;background-color: #F7F7FA;border-radius: 5px;}
+		#row1{height:10vh; width:94%;background-color: #F7F7FA;border-radius: 5px;padding-top: 10px;padding-right: 3px;padding-bottom: 5px;padding-left: 50px;}
+		#row2{height:100%;width:100%;}
+		#row3{height:10px;width:100%;}
+		#half{height:50%;}
+	</style>
+	<apex:form >
+		<!-- <apex:actionPoller action="{!setGraphData}" reRender="chart" interval="5"/> -->
+		<!-- <apex:panelGrid columns="2" id="graphGrid"> --> 
+		<div id="row1">
+				<p>
+				<b style="font-size:18px;padding-top:15px;padding-bottom: 15px;">Order By Release :&nbsp;  
+				<apex:selectList value="{!selectedRelease}"  size="1">
+					<apex:selectOptions value="{!allReleases}" ></apex:selectOptions>
+					<apex:actionSupport event="onchange" action="{!setDataByRelease}" reRender="chart1, chart2, head" />
+				</apex:selectList>
+				</b></p> <br/> <br/>
+		</div>
+		<div id="row3">
+		</div>
+		<div id="row2">
+			<div id="col3">
+			<div>
+				<div >
+				<br/><br/>
+				<apex:outputPanel id="head">
+				<center><b style="font-size:18px;padding-top:15px;padding-bottom: 15px;">Total Requests :&nbsp; {!totalRequests}</b></center>
+				</apex:outputPanel>
+				<br/><br/>
+				</div>
+					<apex:chart id="chart1" height="400" width="100%" data="{!barGraphData}" >
+			    	<apex:axis type="Numeric" position="left" fields="data1" title="Number Of Requests" grid="true" minimum="0" steps="{!graphMaxVal}"/>
+			        <apex:axis type="Category" position="bottom" fields="name" title="Request Status" />
+			        <apex:barSeries colorSet="grey,orange,green,red" colorsProgressWithinSeries="true" orientation="vertical" axis="left" xField="name" yField="data1" />
+			    	</apex:chart>
+			</div>
+			</div>
+			<div id="col4">
+			
+				<div>
+				<br/><br/>
+				<center><b style="font-size:18px;padding-top:15px;padding-bottom: 15px;">Requests By Teams</b></center>
+				<br/><br/>
+				</div>
+		        <apex:chart id="chart2" height="400" width="100%" data="{!pieGraphData}">
+		    	<apex:pieSeries labelField="name" dataField="data1" donut="50"/>
+		    	</apex:chart> 
+		    <!-- <b id="header" style="font-size:18px;padding-top:15px;padding-bottom: 15px;">Requests By Teams</b> -->
+			</div>
+		</div>
+			
+		
+	</apex:form>
+</apex:page>

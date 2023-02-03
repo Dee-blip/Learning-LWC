@@ -1,0 +1,26 @@
+<template>
+    <div class="slds-grid slds-gutters">
+        <div class="slds-col slds-size_6-of-12">
+          <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_2-of-3">
+              <lightning-input
+                label="Attach files"
+                name="file uploader"
+                onchange={handleFilesChange}
+                type="file"
+                multiple
+              ></lightning-input>
+            </div>
+            <div class="slds-col slds-size_1-of-3 slds-p-top_x-large">
+              <div class="slds-grid slds-gutters_direct-xxx-small">
+              <div class="slds-col">
+              <lightning-helptext content={toolTipMessage}></lightning-helptext>
+            </div><div class="slds-col">
+              <lightning-badge label={fileMessage}></lightning-badge>
+            </div>
+          </div>
+            </div>
+            </div>
+          </div>
+        </div> 
+</template>

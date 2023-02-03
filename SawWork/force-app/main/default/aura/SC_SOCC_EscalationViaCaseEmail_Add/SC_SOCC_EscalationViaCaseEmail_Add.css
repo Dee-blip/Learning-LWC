@@ -1,0 +1,30 @@
+.THIS {
+}
+
+.THIS table { 
+    table-layout: fixed; 
+}
+.THIS .cell-content{ 
+    overflow: hidden; 
+    max-width: 100%; 
+    /* text-overflow: ellipsis; */
+    white-space: normal !important;
+}
+
+.THIS thead tr th {
+    background: rgb(28, 88, 115)!important;
+    color:white !important;
+}
+
+.THIS .sectionHeading{
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: rgb(8, 7, 7);
+    text-align: left;
+}
+
+.THIS .table-fixed-cell{
+    position: sticky;
+    top: 0rem;
+    z-index: 20000;
+}

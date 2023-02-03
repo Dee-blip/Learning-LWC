@@ -1,0 +1,4 @@
+<apex:component controller="HD_ApprovalEmailController" access="global">
+    <apex:attribute name="relatedToId" assignTo="{!targetObjectId}" type="String" description="incident record id"/>
+    To approve or reject this Incident <a href="{!url}">click here</a>. 
+</apex:component>

@@ -1,0 +1,56 @@
+<!--
+  @description       : 
+  @author            : apyati
+  @group             : 
+  @last modified on  : 08-17-2021
+  @last modified by  : apyati
+  Modifications Log 
+  Ver   Date         Author   Modification
+  1.0   07-28-2021   apyati   Initial Version
+-->
+<template>
+<!---
+    <div if:true={isLoading}>
+        <div class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </div>
+-->
+    <template if:true={isLoading}>
+        <div>
+            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+        </div>
+    </template>
+
+    <header class="slds-modal__header">
+        <h2 id="modal-heading-02" class="slds-modal__title slds-hyphenate">Change Currency</h2>
+    </header>
+    <div class="slds-card">
+        <template if:true={error}>
+            <div class="slds-modal__content slds-var-p-around_medium" style="overflow: initial;">
+                {error}
+            </div>
+        </template>
+
+        <template if:true={showCurrency}>
+            <div class="slds-modal__content slds-var-p-around_medium overflowmodal">
+                <div class="slds-scrollable overflowmodal" style="height:100px;">
+                    <lightning-combobox name="currency" label="Currency " placeholder="Choose Currency" onchange={handleChange}
+                        value={selectedCurrency} options={currencyOptions} required dropdown-alignment="auto">
+                    </lightning-combobox>
+                </div>
+            </div>
+
+            <footer class="slds-modal__footer slds-align_absolute-center">
+                <lightning-button label="Cancel" title="Cancel" variant="neutral" onclick={handleClose}>
+                </lightning-button>
+                <lightning-button label="Save" title="Save" variant="brand" onclick={handleSave}></lightning-button>
+            </footer>
+
+        </template>
+    </div>
+</template>

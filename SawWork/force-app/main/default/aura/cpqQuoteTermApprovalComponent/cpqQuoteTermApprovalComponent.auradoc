@@ -1,0 +1,10 @@
+<aura:documentation>
+	<aura:description>
+		<p>
+			<code>c:cpqQuoteTermApprovalComponent</code> is A url Addressable component.
+			This component is used to Approve/Reject the Approval details
+			It Makes use of LDS to update the record.
+			The Update button modify itself to display Approve/Reject
+		</p>
+	</aura:description>
+</aura:documentation>

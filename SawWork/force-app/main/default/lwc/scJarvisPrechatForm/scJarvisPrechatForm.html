@@ -1,0 +1,106 @@
+<!--
+  @description       : 
+  @author            : Vishnu Vardhan
+  @group             : 
+  @last modified on  : 02-02-2022
+  @last modified by  : Vishnu Vardhan
+  Modifications Log
+  Ver   Date         Author           Modification
+  1.0   12-27-2021   Vishnu Vardhan   Initial Version
+-->
+<template>
+
+    <div>
+        <div class="prechatUI">
+            <div class="slds-p-top_small">
+                <h2 class="formheader">{LABELS.CHAT_HEAD}</h2>
+                <p class="header-sub">{LABELS.CHAT_HEAD_SUB}</p>
+            </div>
+                <div class="prechatContent">
+                <!-- Record Type selection screen -->
+                <div class={rtSreenCss}>
+                    <div class="rt-selection slds-p-around_medium" data-id="Technical Support" onclick={handleRtDescClick}>
+                        <h3 class="rt-header">{LABELS.RT_AKATECH}</h3>
+                        <p>{LABELS.RT_DESC_AKATECH}</p>
+                    </div>
+
+                    <div class="rt-selection slds-p-around_medium" data-id="Business Support" onclick={handleRtDescClick}>
+                        <h3 class="rt-header">{LABELS.RT_AMG}</h3>
+                        <p>{LABELS.RT_DESC_AMG} </p>
+                    </div>
+                </div>
+
+                <!-- Pre Chat Screen - Field visibility is controlled by selected RT  -->
+                <div class={formCss}>
+                    <div onclick={clearRtSelection} class="slds-p-bottom_small">
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <div class="slds-combobox_container">
+                                    <div class="slds-combobox">
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                            <button type="button" class="slds-input_faux slds-combobox__input slds-combobox__input-value">
+                                                <span class="slds-truncate" if:true={selectedRt} >{selectedRt.label}</span>
+                                            </button>
+                                            <div class="slds-input__icon-group slds-input__icon-group_right">
+                                                <lightning-icon icon-name="utility:down" size="xx-small" class="slds-input__icon slds-input__icon_right slds-icon_container">
+                                                </lightning-icon>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <lightning-spinner if:true={showSpinner} variant="brand" size="large"> </lightning-spinner>
+
+                    <!-- Prechat Fields - visibility controlled by selected RT -->
+                    <div if:true={showChat} class="leftalign">
+
+                        <lightning-combobox if:true={isAkatec} name="Product" label="Product" options={pWrap.productList} placeholder="Select Product" data-inpid="product"
+                            variant="label-hidden" class="slds-p-bottom_small jarvischat" value={productId} required onchange={handleFormChange}> </lightning-combobox>
+                        
+                        <lightning-input if:false={hideSubject} type="text" placeholder={LABELS.PH_SUBJECT} max-length="255" label={LABELS.LB_SUBJECT} variant="label-hidden" data-inpid="subject"
+                            value={subject} class="slds-p-bottom_small" required onchange={handleFormChange}>
+                        </lightning-input>
+
+                        <lightning-textarea if:false={hideDesc} placeholder={LABELS.PH_DESCRIPTION} max-length="32000" label={LABELS.LB_DESCRIPTION} variant="label-hidden"
+                            value={description}
+                            data-inpid="description" class="slds-p-bottom_small" required onchange={handleFormChange}>
+                        </lightning-textarea>
+
+                        <lightning-input if:true={isAmg} type="text" placeholder={LABELS.PH_CASEID} data-inpid="akamcaseid" max-length="20"
+                            value={akamcaseid} label={LABELS.LB_CASEID} variant="label-hidden" class="slds-p-bottom_small" onchange={handleFormChange}>
+                        </lightning-input>
+
+                        <div class="btn-container slds-p-top_small" if:false={hideStartButton}>
+                            <lightning-button label={LABELS.BT_START} disabled={isFormInvalid} variant="brand" onclick={handleStartChat}></lightning-button>
+                        </div>
+                    </div>
+
+                    <!-- If Agent Unavailable -->
+                    <div if:true={showOfflinePage} class="chat-offline-text">
+                        <br />
+                        <p>{LABELS.MSG_CHAT_UNAVAILABLE}</p>
+                        <br />
+                        <div if:false={pWrap.hasCaseCreateAccess}>      
+                            <lightning-formatted-rich-text value={LABELS.MSG_VISIT_HELP} > </lightning-formatted-rich-text>
+                        </div>
+                        
+                        <div if:true={pWrap.hasCaseCreateAccess}>
+                            <p>{LABELS.MSG_OPEN_CASE}</p>
+
+                            <div class="btn-container startbutton slds-p-top_small">
+                                <lightning-button label={LABELS.BT_CREATECASE}  variant="brand" onclick={goToCreateCase}></lightning-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</template>

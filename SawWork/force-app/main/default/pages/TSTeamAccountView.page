@@ -1,0 +1,37 @@
+<apex:page standardController="TS_TeamAccount__c" sidebar="false" standardStylesheets="false">
+    <head>
+        <apex:includeScript value="{!URLFOR($Resource.JQuery111, 'jquery-1.11.2/dist/jquery.min.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.JQueryUI111, 'jquery-ui.min.js')}"/>
+        
+        <apex:includeScript value="{!URLFOR($Resource.bootstrap3, 'dist/js/bootstrap.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.bootstrap3, 'dist/js/bootstrap.min.js')}"/>
+        
+        <apex:stylesheet value="{!URLFOR($Resource.bootstrap3, 'dist/css/bootstrap.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.bootstrap3, 'dist/css/bootstrap.min.css')}"/>
+        
+        <apex:stylesheet value="{!URLFOR($Resource.jQueryDataTablesZip, 'jQueryDataTables/css/jquery.dataTables.css')}"/>
+    </head>
+    <body>
+        <div class="container-fluid">
+            <apex:form >
+                <apex:pageBlock >
+                    <apex:pageBlockButtons >
+                        <apex:commandButton value="Edit Support Team" action="{!edit}" styleClass="btn btn-default"/>
+                    </apex:pageBlockButtons>
+                    <apex:pageBlockSection columns="1" title="Product Member Details">
+                        <apex:outputField value="{!TS_TeamAccount__c.Name}"/>
+                        <apex:outputField value="{!TS_TeamAccount__c.TS_Support_Team__c}"/>
+                        <apex:outputField value="{!TS_TeamAccount__c.Team_Account__c}"/> 
+                    </apex:pageBlockSection>
+                    <apex:pageBlockSection columns="2" title="System Information">
+                        <apex:pageblockSectionItem >
+                            <apex:outputLabel >Created By</apex:outputLabel>
+                            <apex:outputText value="{!TS_TeamAccount__c.CreatedBy.Name}"/>    
+                        </apex:pageblockSectionItem>
+                        <apex:outputField value="{!TS_TeamAccount__c.CreatedDate}"/>    
+                    </apex:pageBlockSection>
+                </apex:pageBlock>
+            </apex:form>
+        </div>
+    </body>
+</apex:page>

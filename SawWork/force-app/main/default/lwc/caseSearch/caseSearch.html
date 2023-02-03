@@ -1,0 +1,61 @@
+<template>
+    <div class="slds-box slds-theme_default" style="font-family: Roboto;">
+        <button type="button" onclick={workdropdown} style="background-color: transparent; border: transparent"><lightning-icon icon-name="utility:chevrondown" alternative-text="Chevron Down" size="xx-small"></lightning-icon></button> <span class= "title">   Cases</span><br><br>
+
+        <div if:true={showcaselist}>
+            <p class="resultText">Showing <b class="resultValue">{totalRecords}</b> results for <b class="resultValue">{searchCaseText}</b></p><br><br>
+            <template if:true={cases}>
+                <template for:each={cases} for:item="c">
+                    <lightning-tile title="Subject" key={c.Id}>
+                    <a onclick={gettesting} data-id={c.Id} data-akamid={c.AKAM_Case_ID__c} data-title={c.Subject} data-rank={c.caserank} class="customAnchorTag">{c.Subject}</a>
+                    <div style="margin-bottom: 10px;font-size: 10px;color:#7B7B7B;line-height: 13px;">
+                        <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small fieldTitle" title="AkamCaseID" if:true={c.AKAM_Case_ID__c}>Akam Case ID: </span>
+                        <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small fieldValue" title="AkamCaseID" if:true={c.AKAM_Case_ID__c}>{c.AKAM_Case_ID__c}</span>
+                        <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small fieldTitle" title="CaseStatus" if:true={c.Status}>Status: </span>
+                        <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small fieldValue" title="CaseStatus" if:true={c.Status}>{c.Status}</span>
+                        <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small fieldTitle" title="CreationDate" if:true={c.AKAM_Created_Date__c}>Creation Date: </span>
+                        <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small fieldValue" title="CreationDate" if:true={c.AKAM_Created_Date__c}>{c.AKAM_Created_Date__c}</span>
+                    </div>
+                    <div class="descriptionLimit"><lightning-formatted-rich-text value={c.Description}></lightning-formatted-rich-text></div><br>
+                </lightning-tile>
+                </template>
+            </template>
+
+            <br/>
+            <div style="border-top-color: rgb(221, 219, 218);border-top-style: solid;border-top-width: 1px;padding-top: 10px;padding-bottom: 30px">
+                <lightning-button-group style="color: #006DCC;float: right;">
+                    <lightning-button label="Prev" disabled={isPrev} onclick={handlePrev} name="prev"></lightning-button>
+                    <lightning-button label="Next" disabled={isNext} onclick={handleNext} name="next"></lightning-button>
+                </lightning-button-group>
+            </div>
+        </div>
+    </div>
+    <br><br>
+    <div class="slds-box slds-theme_default" style="font-family: Roboto;">
+        <button type="button" onclick={workdropdowncomments} style="background-color: transparent; border: transparent"><lightning-icon icon-name="utility:chevrondown" alternative-text="Chevron Down" size="xx-small"></lightning-icon></button> <span class= "title">   Comments</span><br><br>
+        <div if:true={showcommentlist}>
+            <template for:each={communityComments} for:item="cc">
+                <lightning-tile title="Comment" key={cc.Id}>
+                    <p>
+                        <a onclick={redirectoncase} data-id={cc.Parent_ID__c} data-ccakamid={cc.Parent_Name__c} data-cctitle={cc.Id} data-ccrank={cc.ccrank} style="background-color: transparent; border: transparent;float: left;">
+                            <lightning-icon icon-name="standard:case_comment" alternative-text="Case Comment" size="xx-small" style="background: #006DCC;"></lightning-icon>
+                        </a>
+                        <lightning-formatted-rich-text class="descriptionLimitComments" value={cc.Comment__c}></lightning-formatted-rich-text>
+                    </p>
+                    <div style="font-size: 10px;color:#7B7B7B;line-height: 13px;padding-left: 30px;margin-bottom: -30px;">
+                        <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small fieldValue dateformatchange" title="createdbyuser" if:true={cc.Commented_By_User__c}>{cc.Commented_By_User__c}</span>
+                        <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small fieldValue dateformatchange" title="createdbyuser" if:true={cc.AKAM_Created_By__c}> •  {cc.AKAM_Created_Date__c}</span>
+                        <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small fieldValue dateformatchange" title="createddate" if:true={cc.AKAM_Created_Date__c}> •  {cc.Parent_Name__c}</span>
+                    </div>
+                    <br><br>
+                    </lightning-tile>
+            </template>
+            <div style="border-top-color: rgb(221, 219, 218);border-top-style: solid;border-top-width: 1px;padding-top: 10px;padding-bottom: 30px">
+                <lightning-button-group style="color: #006DCC;float: right;">
+                    <lightning-button label="Prev" disabled={isPrevComments} onclick={handlePreviousClick} name="prev"></lightning-button>
+                    <lightning-button label="Next" disabled={isNextComments} onclick={handleNextClick} name="next"></lightning-button>
+                </lightning-button-group> 
+            </div>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,9 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId"
+	access="global" controller="HD_ActionAudit">
+	<aura:attribute name="recordId" type="String" />
+    <aura:attribute name="startTime" type="DateTime" />
+    <aura:attribute name="actionName" type="String" />
+    <aura:attribute name="idleTime" type="Integer" />
+    <aura:handler event="c:HD_ActionAuditEvent" action="{!c.fireMe}" />
+	
+</aura:component>

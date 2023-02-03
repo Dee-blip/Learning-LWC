@@ -1,0 +1,66 @@
+<aura:component  implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
+    
+    <!-- aura attributes -->
+    <aura:attribute name="listOptions" type="List" default="[]"/>
+    <aura:attribute name="defaultOptions" type="List"/>
+    <aura:attribute name="requiredOptions" type="List" default="[]"/>
+    <aura:attribute name="colOptions" type="List"/>
+    <aura:attribute name="finalColumns" type="List"/>
+    <aura:attribute name="colMap" type="Map"/>
+    <!-- aura attributes -->
+    
+    <!-- aura registered events -->
+    <aura:registerEvent name ="renderCustomizeForm" type="c:HD_CMR_RenderCustomizeFormEvent" />
+    <aura:registerEvent name="hd_setCustomColumns" type="c:hd_setCustomColumns"/>
+    <aura:registerEvent name="update_columns" type="c:HD_CMR_UpdateColumnsEvent"/>
+   
+    <!-- aura registered events -->
+    
+    <!-- aura handlers events -->
+    <aura:handler name="init" value="{! this }" action="{! c.initialize }"/>
+    <!-- aura registered events -->
+    
+    
+    <div id="customColId" aura:id="auraCustomColId">
+        <div aura:id="Accspinner" class="slds-spinner_container slds-hide">
+            <div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+                <span class="slds-assistive-text">Processing</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+        <div aria-hidden="false"  role="dialog" class="slds-backdrop slds-modal slds-fade-in-open custom-hide-modal" aura:id="createformid" id="formid">
+            
+            <div class="slds-modal__container custom-modal-body" aura:id="createformid2">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.hideCustomizeForm}">
+                        <lightning:icon iconName="utility:close" />
+                    </button>
+                    <h2 id="createheader" class="slds-text-heading--medium">
+                        Select Columns to Display
+                    </h2>
+                </div>
+                
+                <div class="modal-body scrollable slds-modal__content slds-p-around--medium">
+                    
+                    <lightning:dualListbox aura:id="selectOptions" 
+                                           name="Select Options"  
+                                           label="Select Options" 
+                                           sourceLabel="Available Fields" 
+                                           selectedLabel="Selected Fields" 
+                                           options="{! v.listOptions }"
+                                           value="{! v.defaultOptions }"
+                                           requiredOptions="{! v.requiredOptions }"
+                                           onchange="{! c.handleChange }"
+                                           max="7" />
+                </div>
+                <div class="slds-modal__footer">
+                    <div class="slds-button-group" role="group">
+                        <ui:button class="slds-button slds-button--neutral" label="Save" aura:id="Save" press="{!c.saveColumns}"></ui:button>
+                        <button class="slds-button slds-button--neutral" aura:id = "Cancel" onclick = "{!c.hideCustomizeForm}">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

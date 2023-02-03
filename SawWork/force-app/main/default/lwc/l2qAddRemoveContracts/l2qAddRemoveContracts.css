@@ -1,0 +1,68 @@
+.align-center{
+    text-align: center;
+}
+.align-right{
+    text-align: right;
+}
+.padding-top{
+    padding-top: 1rem;
+} 
+.padding-right{
+    padding-right: 1rem;
+}
+.border-bottom-shadow{
+    margin-top: 10px;
+    border-top: 2px solid #dddbda;
+}
+.top-component{
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+.modal-height{
+    min-height: 480px;
+}
+.datatable-height{
+    height: 400px;
+}
+.header-font-weight{
+    font-weight: 400;
+}
+.flex-align-center{
+    height: 10em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.flex-center{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.error-message{
+    color: #c23934;
+    padding-bottom: 1rem;
+}
+.slds-modal__close{
+    background-color :white;
+}
+.wrapped-header-datatable .slds-table .slds-th__action .slds-truncate{
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: unset;
+    white-space: pre-line;
+    /* word-wrap: break-word; */
+}
+
+.wrapped-header-datatable .slds-table .slds-th__action {
+    height: 5rem;
+}
+
+.wrapped-header-datatable .slds-table .slds-line-height_reset{
+    height: 3rem;
+}
+.slds-truncate{
+    white-space: pre-line;
+}
+.slds-table .slds-cell-wrap{
+    white-space: pre-line !important;
+}

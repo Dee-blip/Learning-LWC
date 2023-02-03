@@ -1,0 +1,97 @@
+<!--
+  @description       : This component is used to submit for product approval
+  @author            : apyati
+  @team              : GSM
+  @last modified on  : 01-19-2022
+  @last modified by  : apyati
+  Modifications Log
+  Ver   Date         Author   Modification
+ * 1.0   09-07-2021   apyati   Created for SFDC-8603
+-->
+<template>
+
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+        aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <template if:true={isLoading}>
+            <lightning-spinner variant="brand" size="large">
+            </lightning-spinner>
+        </template>
+
+        <div style="max-width:60rem;min-width:60rem;" class="slds-modal__container">
+
+            <div class="slds-modal__header">
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={handleCancel}
+                    alternative-text="close" variant="bare-inverse" class="slds-modal__close"></lightning-button-icon>
+
+                <header class="slds-card__header slds-text-heading_medium header-font-weight"> POC DSR for CHIME
+                </header>
+            </div>
+
+
+            <div class="slds-modal__content slds-p-horizontal_medium slds-p-bottom_medium" id="modal-content-id-1">
+
+                <template if:true={showErrorMessage}>
+                    <div class="slds-col align-center error-message">
+                        {showErrorMessage}
+                    </div>
+                </template>
+
+                <template if:true={showEditForm}>
+                    <div class="slds-card">
+                        <!--- <lightning-record-form object-api-name="Deal_Support_Request__c" layout-type="Full" 
+                            columns="2" mode="edit" onsubmit={handleSubmit} onsuccess={handleSuccess}>
+                        </lightning-record-form>-->
+                        <!---
+                        <lightning-record-edit-form object-api-name="Deal_Support_Request__c" onload={handleLoad}
+                            record-type-id={presalesactivityrectype} columns="2" mode="edit" onsubmit={handleSubmit} onsuccess={handleSuccess}>
+                            <lightning-messages>
+                            </lightning-messages>
+                            <lightning-input-field field-name="Name">
+                            </lightning-input-field>
+                        </lightning-record-edit-form>
+                        -->
+                        <lightning-record-edit-form object-api-name="Deal_Support_Request__c"
+                            record-type-id={presalesactivityrectype} columns="2" mode="edit" onsubmit={handleSubmit}
+                            onsuccess={handleSuccess} onerror={handleError}>
+                            <lightning-messages></lightning-messages>
+
+                            <template for:each={fieldsArray} for:item="section">
+                                <lightning-layout multiple-rows="0" title={section.sectionName} size="12" key={section}>
+                                    <div
+                                        style=" width: 100%;height: 29px;vertical-align: middle;background-color: rgb(243, 242, 242);">
+                                        <h3 class=" slds-var-m-bottom_medium" style="padding: 6px;
+                                        vertical-align: middle;">{section.sectionName}</h3>
+                                    </div>
+                                    <div style="width:100%;height:10px ;overflow-x: auto;display: block;"></div>
+                                    <template for:each={section.sectionfields} for:item="sectionfield">
+                                        <lightning-layout-item key={sectionfield.fieldName} size="6">
+                                            <lightning-input-field field-name={sectionfield.fieldName}
+                                                name={sectionfield.fieldName} value={sectionfield.fieldValue}
+                                                disabled={sectionfield.disabled}>
+                                            </lightning-input-field>
+                                        </lightning-layout-item>
+                                    </template>
+                                </lightning-layout>
+                            </template>
+                            <div class="slds col slds-modal__footer slds-var-m-top_medium slds-align_absolute-center">
+                                <lightning-button class="slds-var-m-left_x-small" variant="brand" type="submit"
+                                    name="save" label="Save">
+                                </lightning-button>
+                                <lightning-button class="slds-var-m-left_x-small" variant="neutral"
+                                    onclick={handleCancel} name="Cancel" label="Cancel">
+                                </lightning-button>
+                            </div>
+                        </lightning-record-edit-form>
+
+
+
+                    </div>
+                </template>
+            </div>
+        </div>
+    </section>
+
+    <div class="slds-backdrop slds-backdrop_open"></div>
+
+
+</template>

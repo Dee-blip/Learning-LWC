@@ -1,0 +1,4 @@
+.jarvischat .slds-dropdown_length-with-icon-10 {
+    max-height: calc((1.5rem + 1rem) * 5) !important;
+    overflow-y: auto;
+}

@@ -1,0 +1,93 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride" access="global" controller="SC_SI_PageLayoutButton_Controllor">
+    
+    <aura:attribute name="showModal" type="Boolean" default='false' />
+    <aura:attribute name="showTransitionModal" type="Boolean" default='false' />
+    <aura:attribute name="showAddCaseModal" type="Boolean" default="false"/>
+    <aura:attribute name="isOwnerUser" type="Boolean" default="true" />  
+    <!--<aura:attribute name="isOwnerIRAPT" type="Boolean" default="true"/>-->
+    <aura:attribute name="disableTransition" type="Boolean" default="true" /> 
+    <aura:attribute name="disableAddCase" type="Boolean" default="true" /> 
+    <aura:attribute name="showCommunityModal" type="Boolean" default='false' />
+    <aura:attribute name="disableCommunity" type="Boolean" default="true" /> 
+    <aura:attribute name="buttonLabel" type="String" default='Create Community Post' />
+    <aura:attribute name="action" type="String" default='Create' />
+    <aura:attribute name="existingPostBody" type="String" default='' />
+    <aura:attribute name="incidentName" type="String" default='' />
+    <aura:attribute name="previousOwner" type="Id" />
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+    <aura:attribute name="showSpinner" type="Boolean" default='false' />
+    <aura:attribute name="isIraptUser" type="Boolean" default="false" />
+    <aura:attribute name="disableImpProds" type="Boolean" default="true" />
+    <aura:attribute name="disableExternalDep" type="Boolean" default="true" />
+    
+    <lightning:quickActionAPI aura:id="quickActionAPI" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    
+    <div aura:id="uploadCard" class="slds-card__header slds-is-relative" style= "bottom: 9px"  >
+        <div class="slds-form--compound">
+            
+            <aura:if isTrue="{!v.isIraptUser}">
+                <div class="slds-grid">
+                    <div class="slds-col slds-size_1-of-2 slds-p-right_small">  
+                        <lightning:button label="{!v.buttonLabel}" disabled="{!v.disableCommunity}" class="slds-button_stretch right_button" onclick="{! c.handleCommunity}"/>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-p-left_small">  
+                        <lightning:button label="Transition"  disabled="{!v.disableTransition}" class="slds-button_stretch left_button" onclick="{! c.handleTransition }"/>
+                    </div>             
+                </div>
+            </aura:if>
+            
+            
+            <div class="slds-grid">
+                
+                <div class="slds-col slds-size_1-of-2 slds-p-right_small">  
+                    <lightning:button label="Add Impacted Product" disabled="{!v.disableImpProds}"  class="slds-m-top_medium slds-button_stretch right_button" onclick="{! c.handleClick }"/>
+                </div>  
+                <div class="slds-col slds-size_1-of-2 slds-p-left_small" > 
+                    <lightning:button label="Link Case" class="slds-m-top_medium slds-button_stretch left_button" disabled="{!v.disableAddCase}" onclick="{! c.handleAddCaseClick }"/>
+                </div>
+            </div>
+            
+            <aura:if isTrue="{!v.isIraptUser}">
+                <div class="slds-grid">
+                    <div class="slds-col slds-size_1-of-2 slds-p-right_small">
+                        <lightning:button label="Create External Dependency" disabled="{!v.disableExternalDep}" class="slds-m-top_medium slds-button_stretch center_button" onclick="{!c.handleExternalDependency}"/>
+                    </div>
+                </div>
+            </aura:if>
+            
+            
+            <aura:if isTrue="{!v.showSpinner}">
+                <div class="slds-spinner_container" aura:id="uploadSpinner">
+                    <div class="slds-spinner slds-spinner--medium slds-spinner_brand" aria-hidden="false" role="alert">
+                        <div class="slds-spinner__dot-a"></div>
+                        <div class="slds-spinner__dot-b"></div>
+                    </div>
+                </div>
+            </aura:if>
+        </div>
+    </div>
+    
+    
+    
+    
+    <aura:if isTrue="{!v.showModal}">
+        <!--<c:sc_SI_Impacted_Products recordId="{!v.recordId}" fromSideSection = "true" onrefreshAction="{!c.handleRefresh}"/> -->
+         <c:sc_SI_ImpactedProducts_v2 recordId="{!v.recordId}" fromSideSection = "true" onrefreshAction="{!c.handleRefresh}"/> 
+    </aura:if>
+    
+    <aura:if isTrue="{!v.showTransitionModal}">
+        <c:SC_SI_TransitionComponent fromSideSection = "true" recordId="{!v.recordId}" showTransitionModal="{!v.showTransitionModal}" previousOwner="{!v.previousOwner}" />
+    </aura:if>
+    
+    <aura:if isTrue="{!v.showAddCaseModal}">
+        <c:SC_SI_AddCases incidentName="{!v.incidentName}" recordId="{!v.recordId}" showAddCaseModal="{!v.showAddCaseModal}" />
+    </aura:if>
+    
+    <aura:if isTrue="{!v.showCommunityModal}">
+        <c:sc_SI_CommunityPost label="{!v.buttonLabel}" recordId="{!v.recordId}" onrefreshAction="{!c.handleRefresh}"/>
+    </aura:if>
+    
+</aura:component>

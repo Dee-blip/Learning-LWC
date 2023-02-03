@@ -1,0 +1,103 @@
+<template>
+    <!--The component to show preview-->
+        <article class="slds-card question-card">
+            <div class="slds-grid slds-wrap">
+                
+                <div class="slds-col slds-size_7-of-8 slds-p-left_large slds-p-right_x-large slds-p-bottom_small slds-p-top_small">
+                    <!--<p>{question.Section_Serial_Number__c}.{question.Serial_Number__c}</p>-->
+                    <span style="display: inline-block">
+                        <template if:true={question.Required__c}>
+                            <p class="mandatory-question">*</p></span>
+                         </template>    
+                    </span>
+                    <span style="display: inline-block" class="slds-p-left_x-small">
+                        <lightning-formatted-rich-text
+                            value={question.Question_Text__c}
+                        >
+                        </lightning-formatted-rich-text>          
+                    </span>       
+                </div>
+                  
+                <div class="slds-col slds-size_1-of-8 slds-p-left_large slds-p-bottom_small slds-p-top_small">
+                    <template if:true={question.Help_Text__c}>
+                            <lightning-helptext content={question.Help_Text__c} icon-name="action:info">
+                            </lightning-helptext>
+                    </template>
+                    <!-- SFDC-7844 :@nadesai -Start -->
+                    &nbsp;&nbsp;
+                    <c-chime-audit-trail-wrapper question={question} response={response} chimeid={chimeid}>
+                    </c-chime-audit-trail-wrapper>
+                    <!-- SFDC-7844 :@nadesai - End -->
+                </div>
+
+                <template for:each={optionsMap} for:item="optionVal" for:index="index">
+                    <div key={optionVal} data-record-id={optionVal} data-id={optionVal.label} class={optionUnselectedClasses} onclick={handleUserResponse}>
+                        <div class="slds-box slds-box_x-small option">
+                            <template if:true={optionVal.showDependent}>
+                                <div class="slds-grid">
+                                    <lightning-icon icon-name="utility:choice" size="x-small"></lightning-icon>
+                                    <p class="optionText slds-p-left_medium">{optionVal.label}</p>
+                                </div>
+                            </template>
+                            <template if:false={optionVal.showDependent}>
+                                <div class="slds-grid">
+                                    <lightning-icon icon-name="utility:routing_offline" size="x-small"></lightning-icon>
+                                    <p class="optionText slds-p-left_medium">{optionVal.label}</p>
+                                </div>
+                            </template>
+                        </div>
+                        <template if:false={previewmode}>
+                            <template if:true={showDependentAdmin}>
+                                <!--template if:false={question.Parent_Question__c}-->
+                                    <template if:true={optionVal.showDepentent}>
+                                        <c-dependent-questionnaire-section productid={question.CHIME_Product__c} 
+                                                                    optionval={optionVal.label}
+                                                                    parentquestion={question}
+                                                                    chimeformmode={previewmode}
+                                                                    showdependentpreview={showdependentpreview}>
+                                        </c-dependent-questionnaire-section>
+                                    </template>
+                                <!--/template-->
+                            </template>
+                        </template>
+                    </div>
+                </template>
+                <template if:true={previewmode}>
+                    <template if:true={showDependentAdmin}>
+                        <!--template if:false={hasParent}-->
+                            <template if:true={showDependentOnSelection}>
+                                <c-dependent-questionnaire-section productid={question.CHIME_Product__c} 
+                                                            optionval={selectedOptions}
+                                                            parentquestion={question}
+                                                            chimeformmode={previewmode}>
+                                </c-dependent-questionnaire-section>
+                            </template>
+                        <!--/template-->
+                    </template>
+                </template>
+
+                <!--<template for:each={options} for:item="optionVal">
+                    <div key={optionVal} data-record-id={optionVal} class={optionClasses} onclick={handleOptionClicked}>
+                        <div class="slds-box option">
+                            <template if:true={optionSelected}>
+                                <div class="slds-grid">
+                                    <lightning-icon icon-name="utility:choice" size="x-small"></lightning-icon>
+                                    <p class="optionText">{optionVal}</p>
+                                </div>
+                            </template>
+                            <template if:false={optionSelected}>
+                                <div class="slds-grid">
+                                    <lightning-icon icon-name="utility:choice" size="x-small"></lightning-icon>
+                                    <lightning-icon icon-name="utility:routing_offline" size="x-small"></lightning-icon>
+                                    <p class="optionText">{optionVal}</p>
+                                </div>
+                            </template>
+                            
+                        </div>
+                    </div>
+                </template>-->
+            </div>
+        </article>
+    <!--End of Preview template-->
+
+</template>

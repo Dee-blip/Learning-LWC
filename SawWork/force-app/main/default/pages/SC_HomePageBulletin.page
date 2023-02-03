@@ -1,0 +1,64 @@
+<apex:page Controller="SC_HomePageBulletinCtrl" showHeader="false" sidebar="false">
+    <apex:includeScript value="{!$Resource.JQuery_New}"/>
+    <apex:includeScript value="/support/console/32.0/integration.js"/>
+     <style>
+        .sd_widget_window_fixedwidth.sd_widget_window_fixedheight{ 
+            width: 1000px !important;
+            height: 150px !important;
+        }
+     </style>
+    
+    <apex:form style="width:1000px;height:120px;overflow:auto" rendered="{!(profileCheck=='true')}">
+        <apex:actionfunction name="forceRefreshMessages" action="{!loadScrollMessage}" reRender="bPanel,bulletinMessageid" oncomplete="setBulletinFn()" />
+        <apex:inputHidden value="{!bulletinMessageEncoded}" id="bulletinMessageid"/>
+        <apex:actionPoller interval="10" reRender="bPanel" rendered="{!enablePolling}" oncomplete="setBulletinFn();" />
+        <div style="overflow:auto;">
+            <apex:outputPanel id="bPanel">
+                <apex:outputText rendered="{!(bulletinMessage=='')}">No Messages at this time!!</apex:outputText>
+                <apex:outputText rendered="{!!(bulletinMessage=='')}" value="{!bulletinMessage}" escape="true" />
+            </apex:outputPanel>
+        </div>
+    </apex:form>
+    <script type="text/javascript">
+        var oldMsg='';
+    	$(document).ready(function() {
+            setBulletinFn();
+            if ('{!profilecheck}'=='true'){
+                /*raise event. There is Listener in custom console component.
+                page Name STREAMINGPUBLISHER is listening to this message. once we throw event ,
+                page will subsribe for streaming topic.
+                */
+                sforce.console.addEventListener('BulletinMessageGlobalNotifcation', BulletinMessageGlobalNotifcation);
+                sforce.console.addEventListener('GlobalRefreshStreamingNotify', globalRefreshBulletNotify);
+            }    
+          });
+    	
+    	var BulletinMessageGlobalNotifcation = function (result) {
+            forceRefreshMessages();
+        }; 
+    
+    	var globalRefreshBulletNotify = function(result){
+            forceRefreshMessages();
+        }; 
+      
+        function setBulletinFn(){
+            var msg = $("input[id$=bulletinMessageid]").val();
+            var encodedMessage = msg.replace(/\\/g, '');
+            if(msg != '' && ('{!profilecheck}'=='true') ) {
+                if(oldMsg!=msg) {
+                    sforce.console.setCustomConsoleComponentButtonText(encodedMessage,function(result){
+                        sforce.console.scrollCustomConsoleComponentButtonText(30, 1, true, null);
+                        sforce.console.setCustomConsoleComponentButtonStyle('color:white'); 
+                        oldMsg=msg;                
+                    });
+                }
+            }
+            else {
+                sforce.console.setCustomConsoleComponentButtonText('');
+                oldMsg='';
+            }
+        }   
+      
+    </script>
+    
+</apex:page>

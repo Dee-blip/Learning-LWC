@@ -1,0 +1,334 @@
+<!--=====================================================================================================+
+    Component name      :   SC_Akatec_HomePage_AllOpenCases_LC
+    Author              :   Sumukh SS
+    Purpose             :   Component for lightning Home Page - Showing technical record types
+                            
+    Last Modified Developer           Purpose            
+    ============= ========================  =======
+    10-FEB-19     Sumukh SS   ESESP-1900	 Initial Development
+ 15 July 2019  Sumukh SS	  ESESP-2314     Additional Features demoed to Jackson as mentioned in Jira
+    26-FEB-2020   Harshil     ESESP-2917     Added Support country column for all open cases table and added dynamic case geo color support 
++=====================================================================================================-->
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:appHostable" controller="SC_Akatec_Lightning_Homepage" access="global" >
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <meta charset="UTF-8"/>
+    <ltng:require scripts="{!
+                           $Resource.SC_Akatec_LightningMigration  + '/SC_Akatec_Lightning_Resource/jquery-2.2.4.min.js' 
+                           }" afterScriptsLoaded="{!c.scriptsLoaded}"/>
+    
+    
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <!--Attribute for saving the count of technical cases -->
+    <aura:attribute name="TechnicalCount" type="string"/>  
+    
+    <aura:attribute name="UserProfile" type="string"/>  
+    
+    <aura:attribute name="AllCaseList" type="List"/>
+    
+    <aura:attribute name="ReporteeList" type="string"/>  
+    
+    <!--Attribute for holding the case ID the user has choosen to assign-->
+    <aura:attribute name="AssignedCaseID" type="string"/>      
+    <aura:attribute name="PollID" type="string"/>      
+    
+    <aura:handler name="destroy" value="{!this}" action="{!c.destroy}"/>
+        <aura:attribute name="valuegeo" type="List" default=""/>
+
+      
+    <aura:attribute name="optionsgeo" type="List" default="[
+                                                           {'label': 'NORTHAM', 'value': 'NORTHAM'},
+                                                           {'label': 'LATAM', 'value': 'LATAM'},
+                                                           {'label': 'APJ', 'value': 'APJ'},
+                                                           {'label': 'EMEA', 'value': 'EMEA'}
+                                                           ]"/>
+    
+    <aura:registerEvent name="c:SC_Akatec_MyOpenCases_Refresher" type="c:SC_Akatec_MyOpenCases_Refresher"/>
+    
+    <aura:attribute name="spinner" type="Boolean" default="true"/>  
+    
+    <!--Boolean attribute for showing / hiding assign modal box-->
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="isOpenManager" type="boolean" default="false"/>
+    
+    
+    <aura:if isTrue="{!v.isOpen}">
+        
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open ">
+            <div class="slds-modal__container">
+                <!-- ###### MODAL BOX HEADER Start ######-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeModel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">👨‍💻Assign Case?</h2>
+                </header>
+                <!--###### MODAL BOX BODY Part Start######-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    Are you sure you want to Assign yourself this Case?
+                </div>
+                <!--###### MODAL BOX FOOTER Part Start ######-->
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral" 
+                                      label="Nooo!"
+                                      title="Cancel"
+                                      onclick="{! c.closeModel }"/>
+                    <lightning:button variant="success" 
+                                      label="Oh Yes!"
+                                      title="Assign"
+                                      onclick="{!c.handleClick }"/>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>            
+    </aura:if>
+    
+    
+    <aura:if isTrue="{!v.isOpenManager}">
+        
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open ">
+            <div class="slds-modal__container">
+                <!-- ###### MODAL BOX HEADER Start ######-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeModel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">👨‍💻Assign Case to which reportee?</h2>
+                </header>
+                <!--###### MODAL BOX BODY Part Start######-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <table  class="slds-table slds-table_cell-buffer slds-table_bordered" style="width:100%">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                
+                                <th class="slds-text-title_caps" scope="col">
+                                    <div class="slds-truncate notallowed" >Name</div>
+                                </th>
+                                <th class="slds-text-title_caps" scope="col">
+                                    <div class="slds-truncate notallowed" >Open Cases</div>
+                                </th>
+                                <th class="slds-text-title_caps" scope="col">
+                                    <div class="slds-truncate notallowed" >Assign</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.ReporteeList}" var="cus" indexVar="key">
+                                <tr class="slds-hint-parent">
+                                    <td >{!cus.key}</td>
+                                    <td>{!cus.value}</td>
+                                    <td><img src="{!$Resource.SC_Akatec_LightningMigration  +'/SC_Akatec_Lightning_Resource/Images/assign.png'}" style="width: 18px;" id="{!cus.key}" onclick ="{!c.assignCasetoDirectReportee}" />
+                                    </td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </div>
+                <!--###### MODAL BOX FOOTER Part Start ######-->
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="destructive" 
+                                      label="Nope! I love my team"
+                                      title="Cancel"
+                                      onclick="{! c.closeModel }"/>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>            
+    </aura:if>
+    
+    <div class="slds-box slds-theme_default">
+        
+        <lightning:accordion allowMultipleSectionsOpen="true" activeSectionName="All Open Cases">
+            <lightning:accordionSection name="All Open Cases" label="{!v.TechnicalCount + ' Cases in Queue'}">
+                <aura:set attribute="body">                    
+                    <div class="slds-m-around_medium"  style=" margin-left: 0px;margin-right: 0px; margin-top: 5px;margin-bottom: 5px;border: 1px #39B4C0 solid;">
+                        <div >
+                            <aura:if isTrue="{!v.spinner}">
+                                <lightning:spinner variant="brand" size="large"/>
+                            </aura:if>
+                        </div>
+                        <div class="slds-form-element">  
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col slds-box" style="padding-left: 2px;padding-top: 0px;padding-bottom: 0px;padding-right: 0px;border-left-width: 1px;margin-left: 1rem;">
+                                    <lightning:checkboxGroup name="Checkbox"
+                                                         aura:id="CaseGeoCheckbox"                       
+                                                         label="Geography"
+                                                         options="{!v.optionsgeo}"
+                                                         value="{! v.valuegeo }"
+                                                         required="true" />
+                                </div>
+                                
+                                <div class="slds-col">
+                                    <button class="slds-button slds-button_success" id="savebtn" style="float: left;margin-top: 20px;" onclick="{!c.saveFilters}">Loading..</button>
+                                    <button class="slds-button slds-button_outline-brand" style="float: right;margin-top: 20px;margin-bottom: 5px;" onclick="{!c.openNewCase}">New Case</button>
+                                    
+                                </div>
+                                
+                                <div class="slds-col">
+                                    <lightning:select aura:id="queue" name="select1" label="" onchange="{! c.handleQueueChange }">
+                                        <option value="My Queues">My Queues</option>
+                                        <option value="All Queues">All Queues</option>
+                                    </lightning:select>
+                                </div>
+                                
+                                <div class="slds-col">
+                                    <input type="text" id="myInput" style="width:300px;float: right;margin-top: 20px;" onkeyup="{!c.search}" class="slds-input" placeholder="Search for Cases"/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div >
+                            <table id="AllOpenCases" class="slds-table slds-table_cell-buffer slds-table_bordered" style="width:100%">
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        
+                                        <th class="slds-text-title_caps" style="width:10.5%" scope="col">
+                                            <div class="slds-truncate pointer" onclick="{!c.sort}"  id="0">AKAM Case ID</div>
+                                        </th>
+                                        <th class="slds-text-title_caps" scope="col">
+                                            <div class="slds-truncate notallowed" >Assign</div>
+                                        </th>
+                                        <th class="slds-text-title_caps" style="width:12%;" scope="col">
+                                            <div onclick="{!c.sort}"  id="2" class="slds-truncate pointer" >Account</div>
+                                        </th>
+                                        <th class="slds-text-title_caps" scope="col" style="width:4%">
+                                            <div class="slds-truncate notallowed" >TSE</div>
+                                        </th>
+                                        <th class="slds-text-title_caps" style="width:11%;" scope="col">
+                                            <div onclick="{!c.sort}"  id="4" class="slds-truncate pointer" >Subject</div>
+                                        </th>
+                                        <th  class="slds-text-title_caps" scope="col">
+                                            <div class="slds-truncate notallowed" >Geography</div>
+                                        </th>
+                                        <th  class="slds-text-title_caps" scope="col">
+                                            <div class="slds-truncate notallowed" >Country</div>
+                                        </th>
+                                        <th  class="slds-text-title_caps" scope="col">
+                                            <div onclick="{!c.sort}"  id="7" class="slds-truncate pointer" >Work Type</div>
+                                        </th>
+                                        <th  class="slds-text-title_caps" style="width:5%;" scope="col">
+                                            <div class="slds-truncate notallowed">Age</div>
+                                        </th>
+                                        <th  class="slds-text-title_caps" style="width:5%;" scope="col">
+                                            <div onclick="{!c.sort}"  id="9"  class="slds-truncate pointer">Severity</div>
+                                        </th>
+                                        <th class="slds-text-title_caps" style="width:9%;" scope="col">
+                                            <div onclick="{!c.sort}"  id="10" class="slds-truncate pointer">Support Level</div>
+                                        </th>
+                                        <th class="slds-text-title_caps" style="width:10%;" scope="col">
+                                            <div onclick="{!c.sort}"  id="11" class="slds-truncate pointer" >Case Owner</div>
+                                        </th>
+                                        <th class="slds-text-title_caps" scope="col" style="display: none;">
+                                            <div class="slds-truncate" >SLA Mins</div>
+                                        </th>
+                                        <th class="slds-text-title_caps" scope="col">
+                                            <div class="slds-truncate pointer" onclick="{!c.sortnum}">SLA</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                
+                                <tbody>
+                                    <aura:iteration items="{!v.AllCaseList}" var="case1">
+                                        <tr class="slds-hint-parent">
+                                            <td style="width:10.5%"> <a id="{!case1.EachCaseRec.Id}" onclick="{!c.openNewTab}" tabindex="-1"> {!case1.EachCaseRec.AKAM_Case_ID__c}</a>
+                                                <aura:if isTrue="{!case1.EachCaseRec.has_active_transition__c==true}">
+                                                    <img src="{!$Resource.QM_Tool_StaticResource+'/QM_Resource/Images/transition.png'}" style="width: 20px;"/>                                
+                                                </aura:if>
+                                            </td>
+                                            <td>
+                                                <div class="slds-truncate">
+                                                    <img src="{!$Resource.SC_Akatec_LightningMigration  +'/SC_Akatec_Lightning_Resource/Images/assign.png'}" style="width: 18px;" id="{!case1.EachCaseRec.Id}" onclick ="{!c.openModal}" />
+                                                    
+                                                </div>
+                                            </td>
+                                            <td style="width:12%;">  {!case1.EachCaseRec.Account.Name}
+                                            </td>
+                                            <td style="width:4%">
+                                                <div class="slds-truncate">
+                                                    <aura:if isTrue="{!case1.TSE_Primary!=null}">
+                                                        <lightning:helptext content="{!case1.TSE_Primary}"/>
+                                                    </aura:if>
+                                                </div>
+                                            </td>
+                                            <td style="width:11%;">
+                                                {!case1.EachCaseRec.Subject}
+                                            </td>
+                                            <td Style="{! 'color:'+case1.GeoColor}">
+                                                {!case1.EachCaseRec.Support_Geography__c}
+                                            </td>
+                                            <!--<aura:if isTrue="{!case1.EachCaseRec.Support_Geography__c=='NORTHAM'}">
+                                                <td Style="color:Orange">
+                                                    <div class="">
+                                                        {!case1.EachCaseRec.Support_Geography__c}
+                                                    </div>
+                                                </td>
+                                            </aura:if>
+                                            <aura:if isTrue="{!case1.EachCaseRec.Support_Geography__c=='LATAM'}">
+                                                <td Style="color:Grey">
+                                                    <div class="">
+                                                        {!case1.EachCaseRec.Support_Geography__c}
+                                                    </div>
+                                                </td>
+                                            </aura:if>
+                                            <aura:if isTrue="{!case1.EachCaseRec.Support_Geography__c==null}">
+                                                <td Style="color:black">
+                                                    <div class="">
+                                                        None
+                                                    </div>
+                                                </td>
+                                            </aura:if>
+                                            <aura:if isTrue="{!case1.EachCaseRec.Support_Geography__c=='EMEA'}">
+                                                
+                                                <td Style="color:Green">
+                                                    <div class="">{!case1.EachCaseRec.Support_Geography__c}
+                                                    </div>
+                                                </td>                                    
+                                            </aura:if>
+                                            <aura:if isTrue="{!case1.EachCaseRec.Support_Geography__c=='APJ'}">
+                                                <td Style="color:Purple">
+                                                    <div class="">
+                                                        {!case1.EachCaseRec.Support_Geography__c}
+                                                    </div>
+                                                </td>
+                                            </aura:if>-->
+                                            <td> {!case1.EachCaseRec.Account.BillingCountry}
+                                            </td>
+                                            <td> {!case1.EachCaseRec.Work_Type__c}
+                                            </td>
+                                            <td style="width:5%;">
+                                                {!case1.EachCaseRec.Age_days__c}
+                                                
+                                            </td>
+                                            <td style="width:5%;">
+                                                {!case1.EachCaseRec.Severity__c}
+                                            </td>
+                                            <td style="width:9%;">
+                                                {!case1.EachCaseRec.Support_Level__c}
+                                            </td>
+                                            <td style="width:10%;">
+                                                {!case1.EachCaseRec.Case_Owner_Name__c}
+                                            </td>
+                                            <td style="display: none;">{!case1.SLAinminutes}</td>
+                                            
+                                            <td style="{!'color:'+case1.SLA_Color}">
+                                                <div class="slds-truncate">
+                                                    {!case1.SLA}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </aura:iteration>  
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </aura:set>
+            </lightning:accordionSection>
+        </lightning:accordion>
+    </div>
+    
+    
+</aura:component>

@@ -1,0 +1,72 @@
+.THIS .layer-fix{
+    z-index : 99;
+}
+
+
+.THIS .OPENED{
+    background-color: #0000b3;
+    font-weight:bold; 
+    color: #efefef;
+    font-size:12px
+}
+
+
+.THIS .PENDINGAPPROVAL{
+    background-color: #40367c;
+    font-weight:bold; 
+    color: #efefef;
+    font-size:12px
+}
+
+.THIS .AUTHORIZED{
+    background-color: #2db92d;
+    font-weight:bold; 
+    color: #efefef;
+    font-size:12px
+}
+
+
+
+.THIS .REJECTED{
+    background-color:#811818;
+    font-weight:bold; 
+    color: #efefef;
+    font-size:12px
+}
+
+.THIS .INPROGRESS{
+    background-color: #006DCC;
+    font-weight:bold; 
+    color: #efefef;
+    font-size:12px
+}
+
+
+.THIS .COMPLETED{
+    background-color: #4BCA81;
+    font-weight:bold; 
+    color: #efefef;
+    font-size:12px
+}
+
+
+.THIS .CHANGEFAILED{
+    background-color: #c23934;
+    font-weight:bold; 
+    color: #efefef;
+    font-size:12px
+}
+
+.THIS .CLOSED{
+    background-color: #2F4F4F;
+    font-weight:bold; 
+    color: #efefef;
+    font-size:12px
+}
+
+.THIS .CANCELLED{
+    background-color: #2F4F4F;
+    font-weight:bold; 
+    color: #efefef;
+    font-size:12px
+}

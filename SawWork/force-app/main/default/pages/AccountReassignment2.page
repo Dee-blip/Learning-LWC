@@ -1,0 +1,81 @@
+<apex:page controller="AccountReassignmentPageController" lightningStylesheets="true">
+    <style type="text/css">
+        .loader {
+        position: absolute;
+        top: 35%;
+        left: 45%;
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 80px;
+        height: 80px;
+        -webkit-animation: spin 2s linear infinite;
+        /* Safari */
+        animation: spin 2s linear infinite;
+        }
+
+        .hideDropdown select{
+        visibility: hidden !important;
+        margin-left: -150px;
+        }
+        
+        /* Safari */
+        @-webkit-keyframes spin {
+        0% {
+        -webkit-transform: rotate(0deg);
+        }
+        100% {
+        -webkit-transform: rotate(360deg);
+        }
+        }
+        @keyframes spin {
+        0% {
+        transform: rotate(0deg);
+        }
+        100% {
+        transform: rotate(360deg);
+        }
+        }
+    </style>
+    <script type="text/javascript">
+    function startSpinner(){
+        var element = document.getElementById("spinnerDiv");
+        element.classList.add("loader");
+    }
+    </script>
+    <apex:pageBlock title="Account Reassignment">
+        <apex:pageMessages />
+        <div id="spinnerDiv"></div>
+        <apex:form >
+            <apex:outputPanel rendered="{!IF(pendingAccountReassignmentId != '', true, false)}">
+                <apex:commandLink action="/{!pendingAccountReassignmentId}" value="View Pending Account Reassignment"/><br/><br/>                                      
+            </apex:outputPanel>
+            <apex:commandLink action="{!cancel}" value="<< Return to Account" rendered="{!isAccountIdPresent}"/><br/><br/>  
+        </apex:form>
+        <apex:pageBlockSection title="Account Details" rendered="{!initializedFlag}">
+                <apex:outputField value="{!account.Name}"/>
+                <apex:outputField value="{!account.Website}"/>                
+                <apex:outputField value="{!account.OwnerId}"/>
+                <apex:outputField value="{!account.Account_Status__c}"/>      
+                <apex:outputField value="{!account.Customer_Type__c}"/>       
+                <apex:outputField value="{!account.Pipeline_Status__c}"/>                                       
+                <apex:outputField value="{!account.TERR_HIER_1__c}"/>
+                <apex:outputField value="{!account.TERR_HIER_4__c}"/>                       
+                <apex:outputField value="{!account.TERR_HIER_2__c}"/>
+                <apex:outputField value="{!account.TERR_HIER_5__c}"/>                      
+                <apex:outputField value="{!account.TERR_HIER_3__c}"/>           
+        </apex:pageBlockSection>   
+        <apex:pageBlockSection title="Assign To" columns="1" rendered="{!initializedFlag && isNotInternalRevenueAccount}" >
+            <apex:form >
+               <apex:pageBlockSection columns="1">
+                   <apex:inputField required="true" value="{!accReassign.Assign_To__c}" />
+                   <apex:inputField required="true" value="{!accReassign.Reason_Code__c}" />
+                   <apex:inputField required="false" value="{!accReassign.Reason_for_Change__c}" />
+                   <apex:inputField value="{!accReassign.Reassign__c}"/>
+                   <apex:inputField styleClass="hideDropdown" value="{!accReassign.Revenue_Credit_Owner__c}"/>
+                   <apex:commandButton value="Request Reassignment" action="{!save}" onclick="startSpinner()"/>                    
+               </apex:pageBlockSection>
+            </apex:form>
+        </apex:pageBlockSection>       
+    </apex:pageBlock>    
+</apex:page>

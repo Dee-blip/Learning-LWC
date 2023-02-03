@@ -1,0 +1,49 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+	<aura:attribute name="oppLineItem" type="OpportunityLineItem"/>
+    <aura:attribute name="parent_oppty_id" type="Id"/>
+    <aura:attribute name="baseLineProd" type="String" default="false"/>
+    <aura:attribute name="baseLineProdValue" type="String" default="color:black"/>
+    <aura:attribute name="netMRR" type="String" default="black"/>
+    <aura:attribute name="netMRRValue" type="String"/>
+    <aura:attribute name="netMonthlyUsage" type="String" default="black"/>
+    <aura:attribute name="netMonthlyUsageValue" type="String"/>
+    <aura:attribute name="EMRI" type="String" default="black"/>
+    <aura:attribute name="EMRIValue" type="String"/>
+    <aura:attribute name="CurrencyProdValue" type="String"/>
+    
+    <aura:registerEvent name="productDetailViewEvent" type="c:goToProductDetail"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <div class="parentContainer" aura:id = "productViewId">
+       <div class="slds-media__body slds-box" onclick ="{!c.fireProductDetailViewEvent}">
+           <h3 class="slds-truncate" style = "{!if(v.baseLineProd == 'true',
+                                               'color:green','color:black')}" 
+               title="Product">{!v.oppLineItem.Product_Name__c}</h3>
+            <div class="slds-tile__detail slds-text-body--small">
+                <dl class="slds-list--horizontal slds-wrap ">
+					<dt class="slds-item--label slds-text-color--weak slds-truncate" 
+                        title="First Label">Net MRR:</dt>
+                    <dd class="slds-item--detail slds-truncate" 
+                        style = "{!if(v.netMRR == 'red',
+                                   'color:red',v.baseLineProdValue)}">
+                        <ui:outputText value="{!v.netMRRValue}"/>
+                    </dd>
+                    <dt class="slds-item--label slds-text-color--weak slds-truncate" 
+                        title="Second Label">Net Monthly Usage:</dt>
+                    <dd class="slds-item--detail slds-truncate" 
+                        style = "{!if(v.netMonthlyUsage == 'red',
+                                   'color:red',v.baseLineProdValue)}"> 
+                        <ui:outputText value="{!v.netMonthlyUsageValue}"/>
+                    </dd>
+                    <dt class="slds-item--label slds-text-color--weak slds-truncate" 
+                        title="Third Label">EMRI:</dt>
+                    <dd class="slds-item--detail slds-truncate " 
+                        style = "{!if(v.EMRI == 'red',
+                                   'color:red',v.baseLineProdValue)}">
+                        <ui:outputText value="{!v.EMRIValue}"/>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</aura:component>

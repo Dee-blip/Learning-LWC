@@ -1,0 +1,41 @@
+<apex:page controller="ContractExtensionClass" action="{!init}">
+    <script>
+    window.onload = function () {
+        var requestType = '{!pRequestType}'; 
+        var contractHeaderId = '{!contractId}'; 
+        var accId = '{!accountId}';
+        var extensionURL = '/apex/Contract_Extension?id='+ contractHeaderId +'&requestType=' + requestType;
+        var result = '{!result}'; 
+        var resultFlag; 
+        var resultMessage; 
+        var resultPopUpMsg; 
+        var resultMsgAction; 
+        var isEnabledUser = new Boolean(); 
+        
+        resultFlag = result.substr(0, result.indexOf(":")); 
+        resultMessage = result.substr(result.indexOf(":")+1, result.length); 
+        resultMsgAction = resultMessage.substr(0, resultMessage.indexOf(":")); 
+        resultPopUpMsg = resultMessage.substr(resultMessage.indexOf(":")+1, resultMessage.length); 
+        
+        if(resultFlag == "1") 
+            isEnabledUser = true; 
+        else 
+        { 
+            isEnabledUser = false; 
+            window.alert(resultMessage); 
+        } 
+        
+        if (isEnabledUser) 
+        { 
+            if (resultMsgAction=='POPUP') 
+            { 
+                var ans = confirm(resultPopUpMsg); 
+                if (ans) 
+                    location.href = extensionURL; 
+            } 
+            else 
+                location.href = extensionURL; 
+        }
+    }
+    </script>
+</apex:page>

@@ -1,0 +1,75 @@
+<template>
+    <div style={cssStyle}>
+        <template if:false={selectedRecord}>
+            <div class="slds-var-p-around_x-small">
+                <template if:true={fieldlabel}>
+                    <template if:true={flowrequired}><abbr title="required" class="slds-required">*</abbr>
+                    </template>
+                    <span style={fieldlabelcss}>{fieldlabel}</span>
+                </template>
+                <c-l2-qsearch-component place-holder-text={placeholderText} onchange={handleOnchange}>
+                </c-l2-qsearch-component>
+                <template if:true={loaderAllowed}>
+                    <p style="color: rgb(21, 137, 238);"><strong>Searching....</strong></p>
+                </template>
+                <template if:true={error}>
+                    <c-l2-qerror-panel errors={error}></c-l2-qerror-panel>
+                </template>
+                <template if:true={issearchblank}>
+                    <div class="warning-msg">
+                        <span>
+                            <lightning-icon icon-name="utility:warning" size="x-small"></lightning-icon>
+                            &nbsp; <strong>Warning:</strong> {parsedmessage.message}
+                            <lightning-button-icon icon-name="utility:close" variant="bare" alternative-text="Delete"
+                                class="slds-float_right slds-var-m-left_x-small" onclick={hidewarnMessage}
+                                title="hide message">
+                            </lightning-button-icon>
+                        </span>
+                    </div>
+                </template>
+            </div>
+        </template>
+        <div>
+            <template if:false={selectedRecord}>
+                <template if:true={records}>
+                    <template for:each={records} for:item="record">
+                        <c-l2-qrecord-list key={record.Id} record={record} onselect={handleSelect} iconname={iconname}
+                            searchfieldname={searchfield}>
+                        </c-l2-qrecord-list>
+                    </template>
+                </template>
+            </template>
+            <template if:false={selectedRecord}>
+            </template>
+        </div>
+        <div class="slds-var-p-around_x-small">
+            <template if:true={selectedRecord}>
+                <template if:true={fieldlabel}>
+                    <template if:true={flowrequired}><abbr title="required" class="slds-required">*</abbr>
+                    </template>
+                    <span style={fieldlabelcss}>{fieldlabel}</span>
+                </template>
+                <div class="slds-combobox__form-element slds-input-has-icon
+                            slds-input-has-icon_left-right" role="none">
+                    <span class="slds-icon_container
+                                slds-icon-standard-account
+                                slds-combobox__input-entity-icon" title="Account">
+                        <lightning-icon icon-name={iconname}></lightning-icon>
+                    </span>
+                    <input class="slds-input slds-combobox__input
+                           slds-combobox__input-value" id="combobox-id-5" aria-controls="listbox-id-5"
+                        autocomplete="off" role="textbox" type="text" placeholder="Select an Option" readonly=""
+                        value={selectedRecord.Name} disabled />
+                    <button class="sicon_container slds-button slds-button_icon
+                                   slds-input__icon slds-input__icon_right" title="Remove selected option"
+                        onclick={handleRemove}>
+                      
+                        <lightning-icon icon-name="utility:close" size="x-small" class="iconDisplay">
+                        </lightning-icon>
+                        <span class="slds-assistive-text">Remove selected option</span>
+                    </button>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>

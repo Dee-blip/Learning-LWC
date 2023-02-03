@@ -1,0 +1,60 @@
+<!--
+Author: Jayalakshmi
+Version: 1.0
+Created date: 04/18/2012
+CR 1636762: Functionality to clone survey questionnare.
+-->
+
+<apex:page standardController="CS_Questionnare__c" extensions="CS_CtrlSelectSurvey" standardStylesheets="true">
+<apex:pageMessages id="errorMessage">
+</apex:pageMessages>
+<apex:form >
+<table cellspacing="0px" cellpadding = "10px" align="top">
+
+          <tr>
+            <td>
+              <b>Current Survey Details:</b>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Survey Name:{!displaySurveyName}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Survey Status: {!displaySurveyStatus}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Survey Opened On: {!displaySurveyOpenedOn}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Survey Closed On: {!displaySurveyClosedOn}
+            </td>
+        </tr>
+    
+    <tr>
+    <td>
+      <b>Select the Survey from which Questionnare data needs to be cloned.</b>
+      <apex:inputField id="lookupSurvey" value="{!SurveyName.CS_Survey__c}" />
+    
+      <apex:commandButton id="attach" value="Clone" action="{!populateQuestionnare}" onclick="displayAlert()">     
+      </apex:commandButton>
+    </td>
+   
+    </tr>
+        
+</table>
+ 
+  <script type="text/javascript">
+      function displayAlert()
+      {
+          alert('The questionnare from the selected Survey will be cloned to the current Survey.');
+      }
+  </script>
+</apex:form>
+</apex:page>

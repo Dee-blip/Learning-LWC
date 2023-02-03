@@ -1,0 +1,30 @@
+<apex:page standardStylesheets="true" showHeader="false" sidebar="false" controller="HD_EscalationButtonController" cache="false"  language="{!$CurrentPage.parameters.lang}">
+  <head>
+      <script type="text/javascript">
+            function closeWin(){ 
+                var successElement = document.getElementById('{!$Component.form.success}');
+                if(successElement.value=='true') {
+                    window.close();   
+                }           
+            }
+    </script>
+  </head>
+  <body>
+        <apex:form id="form">
+            <apex:pageMessages id="msgQ"/>
+            <apex:inputHidden id="success" value="{!success}"/>
+            <apex:pageBlock >                
+                    <apex:pageblockSection columns="1" title="Create Transfer Note" collapsible="false">
+                         <apex:inputTextarea id="desc" style="width:50%;height: 30px;" value="{!currentNote.BMCServiceDesk__description__c}" required="true"/><p/>
+                         <br/>
+                         <apex:inputTextarea id="note" style="width:50%;height: 130px;" value="{!currentNote.BMCServiceDesk__note__c}" required="true"/><p/>
+                         <apex:inputText id="duration" value="{!currentNote.BMCServiceDesk__duration__c}" label="Time Spent (HH:MM)"  required="true"/><p/>
+                    </apex:pageblockSection>    
+            </apex:pageBlock>
+            <apex:panelGrid columns="2" style="margin-left:auto; margin-right:auto">
+                <apex:commandButton value="Save" action="{!save}" oncomplete="closeWin();" styleClass="btn btn-default" reRender="success,msgQ"/>
+                <apex:commandButton value="Cancel" onClick="window.close();" styleClass="btn btn-default" immediate="true"/>
+            </apex:panelGrid>
+        </apex:form>
+    </body>
+</apex:page>

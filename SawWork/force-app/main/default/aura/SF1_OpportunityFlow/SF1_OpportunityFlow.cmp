@@ -1,0 +1,142 @@
+<!-- SF1_OpportunityFlow
+SFDC-3903-->
+<aura:component
+    implements="lightning:actionOverride,force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,force:hasSObjectName"
+    access="global" controller="SF1_CreateNewOpportunityFlowController">
+    <!--SFDC-3903 -->
+    <aura:attribute name="defaultAccount" type="Account" default="{
+        'sobjectType': 'Account',
+                'Id': '',
+                'Name': ''
+    }" />
+    <!--SFDC-3903-->
+    <aura:attribute name="doneLoading" type="boolean" default="false" />
+    <aura:attribute name="noRecordsPresent" type="Boolean" default="true" />
+    <aura:attribute name="withoutBaseLine" type="Boolean" default="false" />
+    <aura:attribute name="fromAccount" type="String" />
+    <aura:attribute name="selectedContracts" type="String[]" />
+    <aura:attribute name="selectedContractProducts" type="String[]" />
+    <aura:attribute name="otherCurrency" type="String" default="none" />
+    <aura:attribute name="selectedOpptyType" type="String" />
+    <aura:attribute name="isContractCurrencyMismatch" type="Boolean" />
+    <aura:attribute name="newOppty" type="Opportunity" />
+    <aura:attribute name="acc" type="Account" />
+    <aura:attribute name="missingCurrencyOnCurrencyMisMatch" type="Boolean" default="false" />
+    <aura:attribute name="showNewOpptyBtn" type="Boolean" default="false" />
+    <aura:attribute name="notOwner" type="Boolean" />
+    <aura:attribute name="Spinner" type="boolean" default="false" /> <!-- Spinner attrib -->
+
+    <!-- SFDC-3550 -->
+    <aura:attribute name="showIntermediatePage" type="boolean" default="false" />
+    <aura:attribute name="opptyTypeMap" type="Map" />
+    <aura:attribute name="opptyTypes" type="List" />
+    <aura:attribute name="selectedOppType" type="String" default="" />
+    <aura:handler event="c:GSM_OpptyTypeChangeEvt" action="{!c.setOpptyType}" />
+    <aura:attribute name="contractChange" type="Boolean" default="false" />
+    <aura:attribute name="contractChangeType" type="String" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler event="c:SF1_OnCurrencySelectionChange" action="{!c.handleCurrencyChange}" />
+    <aura:handler event="c:onContractSelectionChange" action="{!c.handleContractChange}" />
+    <aura:handler event="c:opportunityTypeChangeEvent" action="{!c.handleOpptyTypeChange}" />
+    <!-- create 2 aura handler with waiting and donewaiting events-->
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}" />
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}" />
+    <aura:handler event="c:changeCreateOpportunityButtonVisibility" action="{!c.handleCreateOppButtonVisibility}" />
+    <aura:handler event="c:enableCreateOpportunityButton" action="{!c.handleEnableOppButton}" />
+    <!--aura:registerEvent name="opptyTypeChangeEvent" type="c:onContractSelectionChange"/-->
+
+    <aura:handler name="onSelectContractChange" event="c:onSelectContractChange" action="{!c.handleOpportunityType}" />
+
+    <!--loading spinner start... style=Brand Medium (blue dots)-->
+    <div style="padding-top:20px;padding-bottom:50px">
+        <aura:if isTrue="{!v.Spinner}">
+            <div aura:id="spinnerId" class="slds-spinner_container">
+                <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                    <span class="slds-assistive-text">Loading...</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </aura:if>
+        <!-- Loading spinner end-->
+
+        <aura:if isTrue="{!v.showIntermediatePage}">
+            <div aura:id="content-section">
+                <!--SFDC-3903 -->
+                <aura:if isTrue="{!v.doneLoading}">
+                    <c:SF1_AccountLookupCustom selectedRecordId="{!v.defaultAccount}" />
+                </aura:if>
+                <c:SF1_ContractBaselineSelection aura:id="baselineType" />
+
+                <div style="margin-left:24px">
+                    <aura:if isTrue="{!v.contractChange}">
+                        <div class="slds-form slds-form--inline">
+                            <fieldset class="slds-form-element">
+                                <h3 class="slds-section__title">Select Contract Change Type</h3>
+                                <div class="slds-form-element__control">
+                                    <span class="slds-radio">
+                                        <lightning:input aura:id="ExtendContract" type="radio" label="Extend Contract"
+                                            name="radio-contractChangeSelection"
+                                            onchange="{!c.contractChangeTypeSelection}" />
+                                        <lightning:input aura:id="BEDDeferment" type="radio" label="BED Deferment"
+                                            name="radio-contractChangeSelection"
+                                            onchange="{!c.contractChangeTypeSelection}" />
+                                        <lightning:input aura:id="Other" type="radio" label="Other"
+                                            name="radio-contractChangeSelection"
+                                            onchange="{!c.contractChangeTypeSelection}" />
+                                    </span>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </aura:if>
+                </div>
+
+                <!-- <c:SF1_ListContracts_SFDCMAY /> -->
+                <c:SF1_ListContracts />
+                <!--aura:if isTrue="{!v.showNewOpptyBtn}">
+                 <ui:message title="Error" severity="error" closable="false">
+                    Note: Please select ‘Other Currency’ option to choose the opportunity Currency, as you’ve selected multiple Contracts of different currencies
+                </ui:message>
+             </aura:if-->
+                <div class="slds-m-around_large">
+                    <c:GSM_OpptyTypeSelection opptyTypes="{!v.opptyTypes}" />
+                </div> <!-- SFDC-3550 -->
+                <c:SF1_CurrencySelection />
+
+                <!-- <c:SF1_ListOppty_17_8 />   -->
+                <aura:if isTrue="{!!v.contractChange}">
+                    <c:SF1_ListOppty />
+                </aura:if>
+
+                <div aura:id="createOppDivId">
+                    <aura:if isTrue="{!!v.noRecordsPresent &amp;&amp; !v.contractChange}">
+                        <!--aura:if isTrue="{!!v.showNewOpptyBtn}"-->
+                        <div class="slds-m-around--large slds-show" style="margin-top:1vh;margin-bottom:1vh;">
+                            <lightning:button aura:id="createRenewalOppty"
+                                class="loadingButton slds-p-horizontal--medium slds-size--1-of-6" variant="brand"
+                                label="Create Opportunity" type="submit" onclick="{!c.submitRequest}" />
+                        </div>
+                    </aura:if>
+                </div>
+                <aura:if isTrue="{!v.withoutBaseLine &amp;&amp; !v.contractChange}">
+                    <div class="slds-m-around--large" style="margin-top:1vh;margin-bottom:1vh;">
+                        <lightning:button aura:id="createOppty"
+                            class="loadingButton slds-p-horizontal--medium slds-size--1-of-6" variant="brand"
+                            label="Skip" type="submit" onclick="{!c.createOppty}" />
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!!v.noRecordsPresent &amp;&amp; v.contractChange}">
+                    <div class="slds-m-around--large" style="margin-top:1vh;margin-bottom:1vh;">
+                        <lightning:button aura:id="contractChange"
+                            class="loadingButton slds-p-horizontal--medium slds-size--1-of-6" variant="brand"
+                            label="Next" type="submit" onclick="{!c.nextScreen}" />
+                    </div>
+                </aura:if>
+            </div>
+            <aura:set attribute="else">
+                <lightning:button variant="neutral" label="Back" onclick="{!c.backToListView}" />
+            </aura:set>
+        </aura:if>
+    </div>
+</aura:component>

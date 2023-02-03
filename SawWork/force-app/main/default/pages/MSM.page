@@ -1,0 +1,300 @@
+<apex:page Controller="MSMController" title="Manual Step Manager" sideBar="false" showHeader="false" docType="html-5.0">
+   
+    <apex:includeLightning />
+    <style>
+        .assignedClass {
+            background-color: #ffbf80;
+        }
+        .newClass {
+            background-color: #d6d6c2;
+        }  
+        .centerAlign {
+            text-align:center;
+        }
+        .failedClass {
+            color: red;
+        }
+        .completedClass {
+            color: green;
+        }
+
+        #loaderoverlay{
+            display: none;
+            opacity: .8;
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            background: #FFF;
+            width: 100%;
+            z-index: 10;
+        }
+        #loaderbox{
+            display: none;
+            position: fixed;
+            background: #000;
+            border-radius:7px; 
+            width:300px;
+            z-index: 10;
+            align-self: center;
+        }
+        #loaderbox > div{ background:#F2F2F7; margin:3px; }
+        #loaderbox > div > #loaderoverlay{ background: #F2F2F7; font-size:19px; color:#000; }
+        .activeTab {font-weight: bold; font-size:12px;}
+        
+        #dialogoverlay{
+    display: none;
+    opacity: .8;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    background: #FFF;
+    width: 100%;
+    z-index: 10;
+ }
+#dialogbox{
+    display: none;
+    position: fixed;
+    background: #000;
+    border-radius:7px; 
+    width:550px;
+    z-index: 10;
+}
+#dialogbox > div{ background:#ADC2A3; margin:3px; }
+#dialogbox > div > #dialogboxhead{ background: #D0D0BC; font-size:19px; padding:10px; color:#000; }
+#dialogbox > div > #dialogboxbody{ background:#FFF; padding:20px; color:#000; text-align:center; }
+#dialogbox > div > #dialogboxfoot{ background: #D0D0BC; padding:10px; text-align:right; }
+
+.assignedClass {
+    background-color: #ffbf80;
+}
+.newClass {
+    background-color: #d6d6c2;
+}
+.centerAlign {
+    text-align:center;
+}
+    </style>
+
+    <script type="text/javascript">
+        function updateStatusJS( id, status, opsComments) {
+            updateStatus(id, status, opsComments); 
+        }
+              
+        function updateAssignedToJS(id, assignedTo, passOnComments) {
+            updateAssignedTo(id, assignedTo, passOnComments);
+        }
+
+        function customConfirm() {
+            this.render = function(dialog, requestType, id) {
+                var winW = window.innerWidth;
+                var winH = window.innerHeight;
+                var dialogoverlay = document.getElementById('dialogoverlay');
+                var dialogbox = document.getElementById('dialogbox');
+                dialogoverlay.style.display = "block";
+                dialogoverlay.style.height = winH+"px";
+                dialogbox.style.left = (winW/2) - (550 * .5)+"px";
+                dialogbox.style.top = "100px";
+                dialogbox.style.display = "block";
+            
+                document.getElementById('dialogboxhead').innerHTML = "Confirm that action";
+                document.getElementById('dialogboxbody').innerHTML = dialog;
+                document.getElementById('dialogboxfoot').innerHTML = '<button onclick="Confirm.yes(\''+requestType+'\',\''+id+'\')">Yes</button> <button onclick="Confirm.no()">No</button>';
+            }
+              
+            this.no = function() {
+                document.getElementById('dialogbox').style.display = "none";
+                document.getElementById('dialogoverlay').style.display = "none";
+            }
+              
+            this.yes = function(requestType, id) {
+                if(requestType == "complete_request") {
+                    updateStatusJS(id,"Completed","None");
+                }
+                else if(requestType == "cancel_request") {
+                    updateStatusJS(id,"Cancelled","Cancelled By Developer");
+                }
+                document.getElementById('dialogbox').style.display = "none";
+                document.getElementById('dialogoverlay').style.display = "none";
+            }
+          
+        }
+
+        function customPrompt() {
+
+            this.render = function(dialog, requestType, id) {
+                var winW = window.innerWidth;
+                var winH = window.innerHeight;
+                var dialogoverlay = document.getElementById('dialogoverlay');
+                var dialogbox = document.getElementById('dialogbox');
+                dialogoverlay.style.display = "block";
+                dialogoverlay.style.height = winH+"px";
+                dialogbox.style.left = (winW/2) - (550 * .5)+"px";
+                dialogbox.style.top = "100px";
+                dialogbox.style.display = "block";
+                document.getElementById('dialogboxhead').innerHTML = 'Confirm your Action';
+                document.getElementById('dialogboxbody').innerHTML = dialog;
+                if(requestType == "assign_request") {
+                    document.getElementById('dialogboxbody').innerHTML += '<p>';
+                    var userList = '{!uListJSON}';
+                    var parsed = JSON.parse(userList);
+                    var select = document.createElement("select");
+                    select.id = "assignedToVal";
+                    
+                    for(i=0;i<parsed.length;i++) {
+                        select.options.add( new Option( parsed[i].Name, parsed[i].Id) );
+                    }
+                    document.getElementById('dialogboxbody').appendChild(select) ;
+                    document.getElementById('dialogboxbody').innerHTML += '</p>';
+                    document.getElementById('dialogboxbody').innerHTML += '<p><b>Comments to the Assignee if any:</b></p>';
+                    document.getElementById('dialogboxbody').innerHTML += '<textarea rows="3" cols="70" id="prompt_value1"></textarea>';
+                }
+                else if(requestType == "fail_request"){
+                    document.getElementById('dialogboxbody').innerHTML += '<br/><textarea rows="3" cols="70" id="prompt_value1"></textarea>';
+                }
+                else if(requestType == "complete_request") {
+                    document.getElementById('dialogboxbody').innerHTML += '<br/><textarea rows="3" cols="70" id="prompt_value1"></textarea>';
+                }
+                document.getElementById('dialogboxfoot').innerHTML = '<button onclick="Prompt.ok(\''+requestType+'\',\''+id+'\')">OK</button> <button onclick="Prompt.cancel()">Cancel</button>';
+            }
+
+            this.cancel = function() {
+                document.getElementById('dialogbox').style.display = "none";
+                document.getElementById('dialogoverlay').style.display = "none";
+            }
+
+            this.ok = function(requestType, id) {
+                if(requestType == "fail_request") {
+                    var promptValue = document.getElementById('prompt_value1').value;
+                    if(promptValue == "") {
+                      promptValue = "None";
+                    }
+                    updateStatusJS(id, "Failed",promptValue);
+                }
+                else if(requestType == "complete_request") {
+                    var promptValue = document.getElementById('prompt_value1').value;
+                    if(promptValue == "") {
+                      promptValue = "None";
+                    }
+                    updateStatusJS(id, "Completed",promptValue);
+                }
+                else if(requestType == "assign_request") {
+                    var selectedValue = document.getElementById('assignedToVal').value;
+                    var promptValue = document.getElementById('prompt_value1').value;
+                    if(promptValue == "") {
+                      promptValue = "None";
+                    }
+                    updateAssignedToJS(id, selectedValue, promptValue);
+                }
+                document.getElementById('dialogbox').style.display = "none";
+                document.getElementById('dialogoverlay').style.display = "none";
+            }
+
+        }
+
+        function customLoader() {
+
+            this.render = function() {
+                var winW = window.innerWidth;
+                var winH = window.innerHeight;
+                var dialogoverlay = document.getElementById('loaderoverlay');
+                var dialogbox = document.getElementById('loaderbox');
+                dialogoverlay.style.display = "block";
+                dialogoverlay.style.height = winH+"px";
+                dialogbox.style.left = (winW/2) - (300 * .5)+"px";
+                dialogbox.style.top = "200px";
+                dialogbox.style.display = "block";
+                document.getElementById('loaderboxhead').innerHTML = '<br/><b style="font-size: 16px;"><center>Loading....</center></b><br/>';
+            }
+
+            this.cancel = function() {
+                document.getElementById('loaderbox').style.display = "none";
+                document.getElementById('loaderoverlay').style.display = "none";
+            }
+        }
+
+        var Confirm = new customConfirm();
+        var Prompt = new customPrompt();
+        var loader = new customLoader();
+        //window.onload = setProgressBar;
+    </script>
+    <div id="dialogoverlay"></div>
+    <div id="dialogbox">
+        <div>
+            <div id="dialogboxhead"></div>
+            <div id="dialogboxbody"></div>
+            <div id="dialogboxfoot"></div>
+        </div>
+    </div>
+    
+    <div id="loaderoverlay"></div>
+    <div id="loaderbox">
+        <div>
+            <div id="loaderboxhead"></div>
+        </div>
+    </div>
+    <apex:pageBlock id="pgb">      
+    
+        <div >
+        <apex:outputLink value="{!homePageUrl}">&#9194; Back to Home</apex:outputLink>
+       
+            <center>
+            <div>
+            <div>
+                <b id="header" style="font-size:18px;padding-top:15px;padding-bottom: 15px;">
+                    Manual Step Manager
+                </b>
+            </div>
+            <div style="width: 40%;float: right;">
+                <span style="float: left;padding-top:5px;background-color: #F2F2F7;padding-right:5px;padding-left: 5px;border-radius: 25px;" id="progressBarValues"></span>
+            </div>
+            </div>
+                <br/>
+                <apex:outputPanel id="healthMonitor">
+                <div style="width: 30%;padding-top:5px;padding-bottom: 25px;background-color: #F2F2F7;padding-right:5px;padding-left: 5px;border-radius: 25px;" onload="setProgressBar()">
+                    <div id="myProgress" style=" float: left;border-radius: 25px;background-color: red;" onmousemove="displayRequestValues()" onmouseout="clearValues()">
+                        <div id="progressBar" style=" float: left;border-radius: 25px;height: 10px; background-color: #4CAF50;" >
+                        </div>
+                        <script type="text/javascript">
+                            function setProgressBar() {
+                                document.getElementById("progressBar").style.width = '{!healthMonitorVal}%';
+                                document.getElementById("myProgress").style.width = '100%';
+                            }
+                            function displayRequestValues() {
+                                var newRequests = 100 - '{!healthMonitorVal}';
+                                document.getElementById("progressBarValues").innerHTML = '<b>Assigned Requests : {!healthMonitorVal}%&nbsp;&nbsp;New Requests : '+newRequests+'%</b>';
+                            }
+                            function clearValues() {
+                                document.getElementById("progressBarValues").innerHTML = '';
+                            }
+                            setProgressBar();
+                            document.title = "{!msmTitleDynamic}";
+                            
+
+                        </script>
+                    </div>
+                </div>
+                </apex:outputPanel>
+            </center>
+            <div style="float: right;">
+              <span id="header" style="font-size:14px;padding-top:15px;padding-bottom: 15px;background-color: #F2F2F7;padding-top: 10px;padding-right:20px;padding-left: 20px;border-radius: 5px;">
+                  <b>Releases</b>: {!displayReleases}
+              </span>
+            </div>
+            <br />
+        </div>
+        <div>
+            <apex:tabpanel style="top:-20px;position:relative" tabClass="activeTab">
+                <apex:tab name="deployment_queue" label="Deployment Step Queue" >
+                    <apex:include pageName="MSMDeploymentStepQueue"/>
+                </apex:tab>
+                <apex:tab name="completed_queue" label="Completed Requests" >
+                    <apex:include pageName="MSMCompletedQueue"/>       
+                </apex:tab>
+                <apex:tab label="Analyze Requests" oncomplete="trimAnalyzeRequestJS()">
+                    <apex:include pageName="MSMRequestAnalyzer"/>
+                </apex:tab>
+            </apex:tabpanel>
+        </div>
+   
+    </apex:pageBlock>
+</apex:page>

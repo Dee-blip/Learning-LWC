@@ -1,0 +1,27 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                access="global" controller="L2Q_PartnerFileSharingClass">
+    <aura:attribute name="contentVersionId" type="String" default=""/>
+    <aura:attribute name="retUrl" type="String" default=""/>
+    <aura:attribute name="themeDisplayed" type="String" default="Lightning"/>
+    <aura:attribute name="errorMessage" type="String" default="none" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:if isTrue="{! v.errorMessage == 'none' }">
+        <ui:message title="" severity="info" closable="false">
+            <strong>
+                NOTE:
+            </strong>
+            <br />
+            <ui:outputText class="slds-text-longform" value="Your file is being downloaded. This window will close automatically once the download is complete" />
+        </ui:message>
+        <aura:set attribute="else">
+            <ui:message title="" severity="error" closable="false">
+                <strong>
+                    ERROR:
+                </strong>
+                <br />
+                <ui:outputText class="slds-text-longform" value="{! v.errorMessage }" />
+            </ui:message>
+        </aura:set>
+    </aura:if>
+</aura:component>

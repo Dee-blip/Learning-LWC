@@ -1,0 +1,37 @@
+<!--=====================================================================================================+
+    Component name      :   SC_SOCC_HomePage_TasksbyGeoChart
+    Author              :   Sumukh SS
+    Created             :   8-Aug-19
+    Purpose             :   Component for lightning Home Page - Showing task trends by geo
+                            
+    Last Modified Developer           Purpose            
+    ============= ========================  =======
+    10-AUG-19     Sumukh SS Initial Development(JIRA #ESESP-2198)
+	07-March-20	   Sumukh SS Moving to a seperate tab	
++=====================================================================================================-->
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" controller="SC_SOCC_Case_LightningUtility" access="global" >
+    
+    <ltng:require  scripts="{!$Resource.SC_Akatec_LightningMigration  + '/SC_Akatec_Lightning_Resource/Chart.min.js'}" afterScriptsLoaded="{!c.scriptsLoaded}"/>
+    <aura:attribute name="loaded" type="boolean" default="false"/>    
+    
+    <div class="slds-box slds-theme_default">
+        <lightning:accordion allowMultipleSectionsOpen="true" activeSectionName="Task Metrics geo">
+            <lightning:accordionSection name="Task Metrics geo" label="Task Metrics By Geography">
+                <aura:set attribute="actions">
+                <lightning:buttonMenu aura:id="menu" alternativeText="Show menu" iconSize="x-small" menuAlignment="right" onselect="{! c.handleSelect }">
+                    <lightning:menuItem value="Refresh" label="Refresh" />
+                </lightning:buttonMenu>
+            </aura:set>
+                    <div class="slds-m-around_medium"  style=" margin-left: 0px;margin-right: 0px; margin-top: 5px;margin-bottom: 5px; border: 1.5px #39B4C0 solid;">
+                        <!--Lightning Spinner -->
+                        <aura:if isTrue="{! v.loaded }">
+                            <lightning:spinner alternativeText="Loading" />
+                        </aura:if>
+                        <!--================-->
+                        
+                        <canvas id="pie-geo-chart" width="850" height="200"></canvas>
+                    </div>
+            </lightning:accordionSection>
+        </lightning:accordion>
+    </div>
+</aura:component>

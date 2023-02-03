@@ -1,0 +1,28 @@
+<!--=====================================================================================================+
+    Component name      :   cpqGenericRecordForm.cmp 
+    Author              :   kimishra
+    Created             :   01-JUN-20
+    Purpose             :   For read-only layout of OM Approval type record of sbaa__Approval__c.
+                           
+    Last Modified Developer           		Purpose            
+    ============= ========================  ======= 
+    01-JUN-20     kimishra  				Initial Development(Jira Ticket# CPQ-249)
++=====================================================================================================-->
+
+<template>
+    <div class="c-container">
+
+        <div class="slds-p-top_medium">
+            <lightning-card>
+                <lightning-layout>
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+                        <lightning-record-form record-id={recordId} object-api-name={objectApiName}
+                            layout-type={layoutType} columns={columns} mode={mode} onload={handleLoad}
+                            density={density}>
+                        </lightning-record-form>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </lightning-card>
+        </div>
+    </div>
+</template>

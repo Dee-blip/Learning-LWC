@@ -1,0 +1,236 @@
+<aura:component controller="HD_IncidentRecord" implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
+    <aura:attribute name="renderCustomColumnsForm" type="Boolean" default="false"/>
+    <aura:handler event="c:hd_renderCustomizeFormEvent" action="{!c.hideOrShowCustomColumnsForm}" />
+    <aura:handler event="c:hd_setCustomColumns" action="{!c.handleCols}" />
+
+    <aura:handler event="c:getIncidentList" action="{!c.onChange}" />
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:attribute name="incidents" type="BMCServiceDesk__Incident__c[]" />
+    <aura:attribute name="colLabels" type="List" />
+    <aura:attribute name="customColumns" type="List"/>
+    <aura:attribute name="test" type="String" default="HD_Client_City__c"/>
+    <aura:attribute name="colApis" type="List"/>
+    <aura:registerEvent name="HD_SortEvent" type="c:HD_SortEvent"/>
+    <aura:registerEvent name="HD_noOfPagesEvent" type="c:HD_noOfPagesEvent"/>
+    <aura:attribute name="arrowDirection" type="string" default="arrowdown" />
+    <aura:attribute name="sortDirection" type="String" default="DESC"  /> 
+    <aura:attribute name="selectedTabsoft" type="String" default="Name"/>
+    <aura:attribute name="incIds" type="List" />
+    <aura:attribute name="warnings" type="String[]"/>
+    <aura:attribute name="noOfPages" type="String" />
+    <aura:attribute name="previewFlag" type="Boolean"/>
+    <aura:attribute name="selectedIncident" type="BMCServiceDesk__Incident__c"/>
+    <aura:attribute name="customHeight" type="String"/>
+    <aura:attribute name="mouseStart" type="String" />
+    <aura:attribute name="oldWidth" type="String" />
+    <aura:attribute name="AllColumns" type="Map" />
+    <aura:attribute name="SelectedColumns" type="Map" />
+    <aura:attribute name="selectedData" type="List" />
+    <aura:attribute name="componentName" type="String" />
+    <aura:attribute name="label" type="String" />
+    <aura:dependency resource="markup://c:HD_IncidentCell" type="COMPONENT" />
+    <aura:handler event="c:HD_RefreshEvent" action="{!c.clearSelection}" />
+	<aura:attribute name="selected" type="List"/>
+    <aura:attribute name="shown" type="Boolean" default="false"/>
+    
+
+		 <aura:if isTrue="{!v.renderCustomColumnsForm==true}">
+        <div id = "customizeformid" aura:id = "auracustomizeformid">	
+    <c:HD_CustomizeColumns colOptions="{!v.colLabels}" />
+        </div>
+        </aura:if>
+    
+        <c:HD_IncidentBulkUpdate aura:id="cComp" incidentIds="{!v.selected}" incidentData="{!v.selectedData}" componentName="{!v.componentName}" label="{!v.label}"/>
+    
+    
+    
+    <div id="ctxMenu" style="display:none">
+          <div aura:id="menulist2" class="slds-dropdown-trigger slds-dropdown-trigger--click slds-is-open slds-m-left--medium">
+  		
+          <div aura:id="ListViewOption" class="slds-dropdown slds-dropdown--left slds-nubbin--top-left dropDownNone" >
+              
+              <ul class="slds-dropdown__list" role="menu" >
+              <li class="slds-dropdown__item" role="presentation" data-cmp ="c:HD_IncidentBulkAssign" data-label ="Assign" onclick="{!c.openBulkUpdateCmp}">
+                    <a>
+                  <span class="slds-truncate">
+                          <lightning:icon iconName="utility:people" size="xx-small" alternativeText="Assign"/>                  
+                        Assign
+                        </span>
+							
+                    </a>
+              </li>
+
+                  <li class="slds-dropdown__item"  role="presentation">
+                  <a role="menuitem" tabindex="-1">
+                  <span class="slds-truncate" style = "color:rgb(221, 219, 218);">
+                          <lightning:icon iconName="utility:clear " size="xx-small" alternativeText="Close"/>                  
+                     Close
+                      </span>
+							
+                  </a>
+              </li>
+              
+                
+            </ul>
+          </div>
+        </div>
+    </div>
+    
+    
+        
+    <div class="slds-grid" id="outerDiv" onclick="{!c.adjust}" ondragend="{!c.adjust}" oncontextmenu="{!c.openContextMenu}" style = "/*margin-top: 136px;*/">
+
+        <!--<ui:scrollerWrapper class="scrollerSize custom-table" >-->
+        <!-- <ui:scrollerWrapper >  -->
+        <div class="listViewContent slds-table--header-fixed_container" data-aura-rendered-by="334:0">
+            <div class="slds-scrollable_y  slds-col slds-p-horizontal--medium slds-border--right margin-top " aura:id="tableid" id="qwerty"  data-aura-class="incidentRecords">
+                <!--slds-table_col-bordered-->
+                <table class="tableMargin slds-table slds-table--bordered slds-table--striped  slds-table_fixed-layout slds-table_col-bordered" role = "grid" style="height: 0;" >
+                    <div style=" position: absolute;">
+                        <div class="slds-popover slds-popover_tooltip slds-nubbin_bottom-left" role="tooltip" id="help" aura:id="auraHelp" style="z-index:7000;position: absolute;display:none;">
+                            <div class="slds-popover__body" >Right-click on the table to bulk update tickets.</div>
+                        </div>
+                    </div>
+    
+                    <thead >
+                        <tr class="slds-text-heading--label slds-line-height--reset custom-postion">
+                            
+                            
+                            
+                            <th  id="incNumColHead" style="width:2.25rem;" class="  staticHead slds-border--right"  scope="col" >
+                                <div class="fixHead slds-truncate" id="incNumColHeadValue">
+                                       <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset" >
+                                </a>
+                                </div>
+                            </th>
+
+
+                            
+                            
+                            <th  id="incNumColHead"  class="staticHead slds-is-sortable slds-is-resizable slds-text-title--caps slds-is-sorted slds-is-sorted--asc slds-border--right" aria-sort="ascending" scope="col" data-field = "-1" onclick="{!c.sortColumn}">
+                                
+                                <div class="fixHead slds-truncate" id="incNumColHeadValue">
+                                    
+                                       <a  class="slds-th__action slds-text-link--reset" tabindex="0">
+                                    	<span class="slds-truncate" title="Name">Number
+                                            <aura:if isTrue="{! and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'Name') }">&nbsp;  &#9660; </aura:if>  
+                                            <aura:if isTrue="{! and(v.arrowDirection != 'arrowdown', v.selectedTabsoft == 'Name') }"> &nbsp;  &#9650; </aura:if>           
+                                        </span>
+                                    </a>
+                                    <div class="slds-resizable">
+                                            <label for="cell-resize-handle-588" class="slds-assistive-text">Name column width</label>
+                                            <input type="range" min="50" max="100" class="slds-resizable__input slds-assistive-text"  tabindex="0" />
+                                            <span draggable = "true" class="slds-resizable__handle" onmousedown="{!c.calculateWidth}" ondrag="{!c.setNewWidth}">
+                                                <span class="slds-resizable__divider"></span>
+                                            </span>
+                                        </div>
+                                </div>
+                                
+                            </th>
+                            <aura:iteration items="{!v.colLabels}" var="colL" indexVar="indx" >
+                                <th aura:id = "thId" id ="{!'thid'+indx}" 
+                                    class="staticHead initialSortAsc sortable ascending slds-is-sortable slds-is-resizable slds-text-title--caps slds-border--right" 
+                                    scope="col" data-field = "{!indx}" onclick="{!c.sortColumn}" onresize="{!c.adjust}">
+                                    
+                                    <div class="fixHead slds-truncate slds-border--left" id ="{!'dvid'+indx}">
+                                        <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset" tabindex="0">
+                                            <span class="slds-truncate" title="{!colL}">{!colL}
+                                                <aura:if isTrue="{! and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == colL) }">&nbsp;  &#9660; </aura:if>  
+                                                <aura:if isTrue="{! and(v.arrowDirection != 'arrowdown', v.selectedTabsoft == colL) }"> &nbsp;  &#9650; </aura:if>                        
+                                                
+                                                <!--<lightning:icon iconName="utility:arrowup " size="xx-small" />  -->            
+                                            </span>
+                                        </a>
+                                        <div class="slds-resizable">
+                                            <label for="cell-resize-handle-588" class="slds-assistive-text">Name column width</label>
+                                            <input type="range" min="50" max="100" class="slds-resizable__input slds-assistive-text"  tabindex="0" />
+                                            <span draggable = "true" class="slds-resizable__handle" onmousedown="{!c.calculateWidth}" ondrag="{!c.setNewWidth}">
+                                                <span class="slds-resizable__divider"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                </th>
+                            </aura:iteration>
+                            
+                            
+                            
+                        </tr>
+                    </thead>    
+                    <tbody class=" ">
+                        
+                        <aura:iteration items="{!v.incidents}" var="incident" indexVar="idx">
+                            <tr  id= "{!incident.Id}" data-id="{!incident.Id}" onclick = "{!c.onSelect}" data-record="{!idx}" class = "{!incident.Response_Threshold_Crossed__c ? 'hd-custom-priority-ticket custom-cursor slds-hint-parent' : 'custom-cursor slds-hint-parent'}" >
+
+                                <!--<td><div class="slds-truncate" title="Launch Console"><ui:outputURL value="{!incident.BMCServiceDesk__Launch_console__c}" label="{!incident.Name}"/></div></td>-->
+                                <!--td><div class="slds-truncate" title="{!incident.Name}"><a class = "custom-anchor" data-id="{!incident.Id}"  target="_blank" onclick = "{!c.navToRecord}">{!incident.Name}</a></div></td-->
+  								
+                                <td role="gridcell"  style="width:2.25rem;"  data-id="{!incident.Id}">
+                                    <input type="checkbox" data-id="{!incident.Id}" onclick = "{!c.selectRecord}"/> 
+                                    
+                                </td>
+                                
+                                 
+                                <th scope="row">
+                                    <div class="slds-truncate" title="{!incident.Name}"><a class = "custom-anchor" data-id="{!incident.Id}"  target="_blank" href="{!'/lightning/r/BMCServiceDesk__Incident__c/'+ incident.Id + '/view'}" onclick = "{!c.onClick}">{!incident.Name}</a>
+                                    <aura:if isTrue="{!incident.VIP_Ticket__c == true}">
+                                        	<span class = "slds-badge--vip slds-m-up_none slds-m-left_medium ">VIP</span>
+                                   	</aura:if>
+                                    </div>
+                                    
+                                </th> 
+                                
+                                <aura:iteration items="{!v.colApis}" var="col" indexVar="idx">
+                                     <c:HD_IncidentCell incident="{!incident}" fieldName="{!col}" />
+               					</aura:iteration>
+                                <!--td><div class="slds-truncate" title="{!incident.Name}"><ui:outputURL target = "_blank" value="{!v." label="{!incident.Name}"/></div></td-->
+                                <!--td role="gridcell">
+                                    <div class="slds-truncate" title="Prioritization Score">
+                                        {!incident.Magic_Response_Prioritization_Score__c   }
+                                        <aura:if isTrue="{!incident.VIP_Ticket__c == true}">
+                                        	<span class="slds-badge slds-badge-vip">VIP</span>
+                                    	</aura:if>
+                                    </div>
+                                </td>
+                                <td role="gridcell"><div class="slds-truncate" title="{!incident.HD_Parent_Tree__c}">{!incident.HD_Parent_Tree__c}</div></td>
+                                <td role="gridcell"><div class="slds-truncate" title="{!incident.BMCServiceDesk__Category_ID__c }">{!incident.BMCServiceDesk__Category_ID__c }</div></td>
+                                <td role="gridcell"><div class="slds-truncate" title="{!incident.HD_Ticket_Priority__c  }">{!incident.BMCServiceDesk__Type__c == 'Incident'  ? incident.HD_Ticket_Priority__c : incident.SR_Priority__c}</div></td>                                
+                                <td role="gridcell"><div class="slds-truncate" title="{!incident.BMCServiceDesk__Status_ID__c }">{!incident.BMCServiceDesk__Status_ID__c }</div></td>
+                                <td role="gridcell"><div class="slds-truncate" title="{!incident.BMCServiceDesk__Client_Name__c   }">{!incident.BMCServiceDesk__Client_Name__c   }</div></td-->
+                                <!--td><div class="slds-truncate" title="{!incident.HD_Client_City__c  }">{!incident.HD_Client_City__c  }</div></td-->
+                                <!--<td role="gridcell"><div class="slds-truncate" title="{!incident.BMCServiceDesk__shortDescription__c }">{!incident.BMCServiceDesk__shortDescription__c }</div></td>
+                                <td role="gridcell"><div class="slds-truncate" title="{!incident.HD_Owner_user_queue__c  }">{!incident.HD_Owner_user_queue__c  }</div></td>-->
+                                    
+                            </tr>
+                        </aura:iteration>
+                        
+                    </tbody>
+                    
+                </table>
+                
+                
+            </div>
+    </div>    <!--</ui:scrollerWrapper>-->
+
+        <div class="" data-aura-class="IncidentPreview">
+            
+            <aura:if isTrue="{!v.previewFlag}">
+                <ui:scrollerWrapper >
+                    <div class="slds-grid custom-background-color" >
+                        <div class="slds-col slds-p-horizontal--xx-small slds-align-content-center">
+                            <span class="slds-icon_container" title="Click to hide preview" onclick="{!c.hidePreview}">
+                                <lightning:icon aura:id="icondown" iconName="utility:chevronright" size="xx-small" alternativeText="Click to hide form"/>
+                            </span>
+                        </div>             
+                        <c:HD_IncidentPreview newincident="{!v.selectedIncident}" />
+                    </div>
+                </ui:scrollerWrapper>
+            </aura:if>
+            
+        </div>
+        
+        <center><lightning:spinner variant="brand" size="large" aura:id="ltngSpinner" class="slds-hide" /></center>
+    </div>
+    
+    
+</aura:component>

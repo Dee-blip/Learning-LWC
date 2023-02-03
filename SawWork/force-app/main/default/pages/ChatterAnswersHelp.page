@@ -1,0 +1,7 @@
+<!--PLEASE READ: If you override the automatically generated CSS, your Chatter Answers community might not function correctly.-->
+<apex:page showHeader="true" sidebar="false">
+    <body>
+    <!-- <chatteranswers:help /> -->
+    <iframe width="100%" height="500" src="{!$Label.Communities_Help_Link}"></iframe>
+    </body>
+</apex:page>

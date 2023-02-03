@@ -1,0 +1,32 @@
+<template>
+    
+    <lightning-card title = {header} style ="border-style: hidden;">
+        <lightning-button  variant="brand"  label = {download} slot = "actions" onclick = {downloadFile}> </lightning-button>
+        <article class = "slds-card" style = "height:60px;">
+        
+            
+    <!--<lightning-record-form
+        record-id={recordId}
+        object-api-name={objectApiName}
+        fields={nameField}
+        columns="2"
+        mode="readonly">
+</lightning-record-form>-->
+
+
+    <div class="slds-page-header__col-details">
+      <ul class="slds-page-header__detail-row">
+        <template for:each={attachmentValues} for:item="attachmentValue">
+          <li class="slds-page-header__detail-block" key={attachmentValue.label}>
+            <div class="slds-text-title slds-truncate" title="Field 1">{attachmentValue.label}</div>
+            <div class="slds-truncate accountClass">{attachmentValue.value}
+            </div>
+          </li>
+        </template>
+
+      </ul>
+    </div>
+</article>
+</lightning-card>
+
+</template>

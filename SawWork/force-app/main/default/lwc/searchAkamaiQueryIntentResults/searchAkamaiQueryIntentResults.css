@@ -1,0 +1,45 @@
+.queryintent_featured{
+    font-style: normal;
+    font-weight: normal;
+    font-size: 10px;
+    line-height: 13px;
+    color: #000000;
+    padding: 2px 10px;
+}
+.queryintent_header_title{
+    position: absolute;
+    background: #CCCCCC;
+    border: 1px solid #CCCCCC;
+    border-radius: 0px 0px 10px 0px;
+}
+.custom_queryintent_article{
+    font-family: Roboto;
+    width: 100%;
+    margin: auto;
+    border-radius: 0;
+}
+.custom_card_body_div{
+    text-align: left;
+}
+.custom_card_body_header{
+    font-size: 10px;
+    line-height: 16px;
+    color: #006DCC;
+}
+.custom_card_body_footer{
+    font-style: italic;
+    color: #7B7B7B;
+}
+.custom_card_mainbody{
+    font-size: 16px;
+    line-height: 20px;
+    color: #006DCC;
+}
+.custom_queryintent_article_header{
+    padding: 0;
+    margin: 0;
+}
+.custom_queryintent_article_body{
+    margin: 0;
+    padding: 25px 10px 8px 10px;
+}

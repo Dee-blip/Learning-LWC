@@ -1,0 +1,71 @@
+<template>
+    <div>
+        <div class="slds-form-element__control">
+            <div class="slds-combobox_container slds-has-inline-listbox">
+                <div id="box" class={boxClass} aria-expanded="true" aria-haspopup="listbox" role="combobox">
+
+                    <div id="selected-recipients-cc" role="" aria-orientation="horizontal">
+                        <ul class="slds-listbox slds-listbox_inline" role="group" aria-label="Recipients:">
+
+                            <!-- Selected users will be displayed here!! -->
+                            <template for:each={selectedEmails} for:item="sEmail">
+                                <li key={sEmail.Id} role="presentation" class="slds-listbox__item slds-wrap">
+                                    <span class="slds-pill" role="option" aria-selected="true">
+                                        <span class="slds-avatar slds-avatar_x-small slds-pill__icon_container">
+                                            <lightning-avatar variant="circle" src={sEmail.Photo}></lightning-avatar>
+                                        </span>
+                                        <span class="slds-pill__label" title="">{sEmail.Email}</span>
+                                        <span class="slds-icon_container slds-pill__remove" title="Remove">
+                                            <lightning-button-icon icon-name="utility:close" variant="bare"
+                                                size="xx-small" alternative-text="Remove" title="Remove"
+                                                value={sEmail.Id} data-name={sEmail.Email} onclick={handleRemovePill}></lightning-button-icon>
+                                            <span class="slds-assistive-text">Press delete or backspace to remove</span>
+                                        </span>
+                                    </span>
+                                </li>
+                            </template>
+
+
+                            <!-- Input box to search users!! -->
+                            <li>
+                                <div class="slds-combobox" aria-expanded="false" aria-haspopup="listbox"
+                                    role="combobox">
+                                    <div class="slds-combobox__form-element">
+                                        <input type="text" class="slds-input slds-combobox__input handle-click_event" value={searchKey}
+                                            id="recipients123" aria-controls="listbox-unique-id" autocomplete="off"
+                                            role="textbox" placeholder="" oninput={handlOnChange} autofocus
+                                            onblur={onBlur}/>
+                                    </div>
+                                </div>
+                            </li>
+
+                        </ul>
+                    </div>
+
+                    <!-- dropdown of users based on search will be displayed here!! -->
+                    <div id="listbox-id-1" class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox">
+                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                            <template for:each={fetchedEmails} for:item="record">
+                                <li key={record.Id} onclick={onSelect} data-id={record.Id} role="presentation"
+                                data-name={record.Email} data-photo={record.SmallPhotoUrl} data-rec={record} class="slds-listbox__item">
+                                    <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                      <span class="slds-media__figure slds-listbox__option-icon">
+                                        <span class="slds-icon_container slds-icon-standard-account">
+                                            <lightning-avatar variant="square" src={record.SmallPhotoUrl} size="medium">
+                                            </lightning-avatar>
+                                        </span>
+                                      </span>
+                                      <span class="slds-media__body">
+                                        <span class="slds-listbox__option-text slds-listbox__option-text_entity slds-p-top_xxx-small slds-p-bottom_xxx-small">{record.Name}</span>
+                                        <span class="slds-listbox__option-meta slds-listbox__option-meta_entity">{record.Email}</span>
+                                      </span>
+                                    </div>
+                                  </li>
+                            </template>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

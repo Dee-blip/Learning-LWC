@@ -1,0 +1,301 @@
+<apex:page controller="RSSFormSearchController" id="myPage" sidebar="false">
+
+<script type="text/javascript" src="/resource/Jquery/js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="/resource/Jquery/js/jquery-ui-1.8.17.custom.min.js"/>
+  <link rel="stylesheet" type="text/css" href="/resource/Jquery/css/flick/jquery-ui-1.8.17.custom.css"></link>
+<script>
+toggleSwitch = false;
+//Below functions are for showing/hiding the search Bar.
+  function changebgColormouseover(obj)
+  {
+      obj.style.backgroundColor="#E9E8E8";
+  }
+   function changebgColormouseout(obj)
+  {
+      obj.style.backgroundColor="";
+  }
+  function toggleSearch()
+  {
+     //var x = document.getElementsByClassName('HideSearchBarClose');
+     //var y = document.getElementsByClassName('HideSearchBarOpen');
+     jQuickFilter$ = jQuery.noConflict();
+     var x =jQuickFilter$(".HideSearchBarClose");
+     var y=jQuickFilter$(".HideSearchBarOpen");
+     if(toggleSwitch)
+     {
+        for (i=0;i<x.length;i++)
+        {
+          x[i].style.display="none"; 
+        }
+        for (i=0;i<y.length;i++)
+        {
+          y[i].style.display=""; 
+        }
+     }
+     else
+     {
+       for (i=0;i<y.length;i++)
+        {
+          y[i].style.display="none"; 
+        }
+        for (i=0;i<x.length;i++)
+        {
+          x[i].style.display=""; 
+        }
+     }
+      toggleSwitch=!toggleSwitch;
+  }
+  </script>
+  <apex:outputPanel id="wholeForm">
+ <table  border="0">
+  <tr> 
+    
+    <td width="200" valign="top" class="HideSearchBarOpen" style="display:'';">
+    <!-- Search Component -->
+    <!-- Changes by shprasan: Changing the Default Order by Parameter: The value is set to sortField-->
+    <c:EB_Quick_Filter pageController="{!this}" SearchFieldset="{!searchFields}" Status="FilterLoading"  DefaultSortOrderDirection="Desc" DefaultOrderBy="{!FieldToSort}" inputQuery="{!InputQuery}" Title="Search" reRenderid="label" Limit="5000" id="component"  /> 
+    </td>
+    
+    <td id="HideSearchBar" onmouseover="changebgColormouseover(this);" onmouseout="changebgColormouseout(this);" onclick="toggleSearch();" valign="top" >   
+    <img class="HideSearchBarClose" src="/img/sidebar/LNav_twisty_closed.gif" style="display:none;"/>
+    <img class="HideSearchBarOpen" src="/img/sidebar/LNav_twisty_opened.gif" />
+    </td>
+    
+    <td valign="top" style="width:100%">
+    <apex:form style="width:100%">
+     <apex:PageMessages ></apex:PageMessages>
+     <apex:actionStatus id="FilterLoading">
+    <apex:facet name="start">
+    <c:enhancedActionStatus BackColor="#ffffff" borderColor="#ffffff" borderSize="2" height="50px" width="200px" ImageUrl="/changemgmt/img/spinner24.gif" Message="Applying filter..." messageStyle="color:darkred;font-size:11pt;font-weight:bold;"/>
+    </apex:facet>   
+    </apex:actionStatus>
+    <apex:pageBlock id="label" title="RSS Forms">
+        
+        <table cellspacing="5px" >
+        <tr>
+            <td align="left">
+                <table>
+                <tr>
+                <td>
+                 <apex:commandButton value="Upload Offline RSS Form" action="{!goToOUploadPage}" style="font-size:120%;background:#F8BB60" rendered="{!WriteAccessOfUser}"/>    
+                 </td>
+                 <td>
+                 <apex:commandButton value="Download Offline RSS Form" action="{!goToDownloadOfflinePage}" style="font-size:120%;background:#F8BB60" rendered="{!WriteAccessOfUser}"/>    
+                 </td>
+                 <td>
+                 <!-- Changes by Sharath: Displaying the create RSS Form button for Post Sales too-->
+                 <apex:commandButton value="Create New RSS Form" action="{!goToCreateNewRSSFormPage}" style="font-size:120%;background:#F8BB60" rendered="{!WriteAccessOfUser}"/>  
+                 </td>
+                 <td style="vertical-align: middle;"> 
+                 Select View :
+                 </td>
+                 <td style="vertical-align: middle;">                 
+                 <apex:selectList label="Views" title="Views" size="1" multiselect="false" value="{!SelectedView}">
+                 <apex:selectOption itemValue="All" itemLabel="All Forms" itemDescription="All" itemDisabled="{!!WriteAccessOfUser}" rendered="{! WriteAccessOfUser || !CCare}"></apex:selectOption>
+                 <!--Changes by shprasan: Rendering My Open Forms, My Submitted Forms only for Pre sales and My Published Forms and All Published Forms only for Post Sales -->
+                 <apex:selectOption itemValue="My Open Forms" itemLabel="My Open Forms" itemDescription="My Open Forms" itemDisabled="{!!WriteAccessOfUser}" rendered="{! WriteAccessOfUser}" ></apex:selectOption>
+                 <!--Start of changes by shprasan: Adding the two values: My Submitted Forms and All Submitted forms-->
+                 <apex:selectOption itemValue="My Submitted Forms" itemLabel="My Submitted Forms" itemDescription="My Submitted Forms" itemDisabled="{!!WriteAccessOfUser}" rendered="{!WriteAccessOfUser && PreSales}"></apex:selectOption>
+                 <apex:selectOption itemValue="Submitted Forms" itemLabel="All Submitted Forms" itemDescription="All Submitted Forms"  rendered="{! PostSales || PreSales || CCare}"></apex:selectOption>
+                 <!--End of changes by shprasan -->                 
+                 <apex:selectOption itemValue="My Published Forms" itemLabel="My Published Forms" itemDescription="My Published Forms" itemDisabled="{!!WriteAccessOfUser}" rendered="{!WriteAccessOfUser && PostSales}"></apex:selectOption>
+                 <apex:selectOption itemValue="Published Forms" itemLabel="All Published Forms" itemDescription="All Published Forms" 
+                  rendered="{!PostSales || PreSales || CCare}"></apex:selectOption>
+                 <!--Start of changes by shprasan: Adding All Published and Submitted forms for SuperUser -->
+                 <apex:selectOption itemValue="All Submitted Published Forms" itemLabel="Submitted and Published" itemDescription="All Submitted Published Forms" itemDisabled="{!!WriteAccessOfUser}" rendered="{!WriteAccessOfUser && SuperUser}"></apex:selectOption>                 
+                 <!-- Changes by Sharath: Adding 4 views for Post_Sales for Services Forms-->
+                 <apex:selectOption itemValue="All Services Forms" itemLabel="All Services Forms" itemDescription="All Services Forms" itemDisabled="{!!WriteAccessOfUser}" rendered="{!WriteAccessOfUser && PostSales}"></apex:selectOption>
+                 <apex:selectOption itemValue="My Saved Services Forms" itemLabel="Open Services Forms" itemDescription="My Saved Services Forms" itemDisabled="{!!WriteAccessOfUser}" rendered="{!WriteAccessOfUser && PostSales}"></apex:selectOption>
+                 <apex:selectOption itemValue="My Published Services Forms" itemLabel="My Published Services Forms" itemDescription="My Published Services Forms" itemDisabled="{!!WriteAccessOfUser}" rendered="{!WriteAccessOfUser && PostSales}"></apex:selectOption>
+                 <apex:selectOption itemValue="Published Services Forms" itemLabel="All Published Services Forms" itemDescription="All Published Services Forms" 
+                  rendered="{!WriteAccessOfUser && PostSales}"></apex:selectOption>
+
+                 <!--End of changes -->
+                 <!--
+                 <apex:selectOption itemValue="My Open Forms" itemLabel="My Open Forms" itemDescription="My Open Forms" itemDisabled="{!!WriteAccessOfUser}" ></apex:selectOption>
+                 <apex:selectOption itemValue="All" itemLabel="All" itemDescription="All" itemDisabled="{!!WriteAccessOfUser}"></apex:selectOption> -->
+                 <apex:actionSupport event="onchange" action="{!ChangeInputString}" status="FilterLoading" reRender="wholeForm">
+                    <apex:param name="sortField" value="{!FieldToSort}" assignTo="{!sortField}"/> 
+                 </apex:actionSupport>
+                 </apex:selectList>  
+                 </td>
+                 </tr>
+                 </table>
+                 
+            </td>
+            <td align="right">
+                  <apex:commandLink status="FilterLoading" action="{!first}" reRender="label" >First</apex:commandlink>&nbsp;&nbsp;
+            
+                  <apex:commandLink status="FilterLoading" action="{!previous}" rendered="{!hasPrevious}" reRender="label">Previous</apex:commandlink>&nbsp;&nbsp;
+           
+                  <apex:commandLink status="FilterLoading" action="{!next}" rendered="{!hasNext}" reRender="label">Next</apex:commandlink> &nbsp;&nbsp;
+           
+                  <apex:commandLink status="FilterLoading" action="{!last}" reRender="label" >Last</apex:commandlink> 
+            </td>
+           
+        </tr>
+        </table>
+       <center>  </center>
+
+        <apex:pageBlockTable value="{!RSSForms}" var="a" style="width:100%;" >
+            
+            <!-- Clone option on Published Forms and Submitted Forms for PreSales -->
+            <apex:column rendered="{!if((SelectedView = 'Published Forms' || SelectedView = 'My Submitted Forms' || SelectedView = 'Submitted Forms') && PreSales = true,true,false) && WriteAccessOfUser}">
+                <apex:facet name="header">Clone</apex:facet>
+                <a href="/apex/RSSClone?id={!a.Id}" target="_top">Clone</a>
+            </apex:column> 
+            
+            <!-- Rendering Delete on My Open Forms for PreSales and SuperUser-->
+            <apex:column rendered="{!if(SelectedView = 'My Open Forms',if(PostSales = false,true,false),false) && WriteAccessOfUser}" >
+            <!-- <apex:column > -->
+                <apex:commandLink value="Delete" onclick="return confirm('Do you want to delete this RSS Form?');" action="{!deleteRSSForm}">
+                <apex:param value="{!a.id}" assignTo="{!DeleteFormId}" name="abcd"/>
+            </apex:commandLink>
+            </apex:column> 
+            <apex:column >
+            <apex:facet name="header">
+                    <apex:commandLink status="FilterLoading" value="Name" action="{!toggleSortOrder}"  rerender="label">
+                        <apex:param name="sortField" value="Name" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <a href="/apex/RSSForm?id={!a.Id}" target="_top"> <apex:outputField value="{!a.Name}"/></a>                
+               
+            </apex:column>
+             <apex:column >
+             
+                <apex:facet name="header">
+                <apex:commandLink status="FilterLoading" value="Products" action="{!toggleSortOrder}"  rerender="label">
+                        <apex:param name="sortField" value="Products__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                   
+                </apex:facet>
+                
+                <apex:outputField value="{!a.Products__c}"/>
+            </apex:column>    
+            <apex:column >
+                <apex:facet name="header">
+                <apex:commandLink status="FilterLoading" value="Customer Name" action="{!toggleSortOrder}"  rerender="label">
+                        <apex:param name="sortField" value="Account__r.Name" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                    
+                </apex:facet>
+                <apex:outputField value="{!a.Account__r.Name}"/>
+            </apex:column>
+
+            <!--Commenting the Owner field as the Submitted By and Published By fields are to be shown
+            <apex:column >
+                <apex:facet name="header">
+                <apex:commandLink status="FilterLoading" value="Author" action="{!toggleSortOrder}"  rerender="label">
+                        <apex:param name="sortField" value="Owner.Name" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                   
+                </apex:facet>
+                <apex:outputField value="{!a.Owner.Name}"/>
+            </apex:column>
+            -->
+            
+            <!--Start of changes by shprasan: Adding Submitted By, Published By, Submitted Date and Submitted?-->
+                        
+            <apex:column >
+                <apex:facet name="header">
+                 <apex:commandLink status="FilterLoading" value="Submitted" action="{!toggleSortOrder}"  rerender="label">
+                        <apex:param name="sortField" value="Submitted__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                    
+                </apex:facet>
+                <apex:outputField value="{!a.Submitted__c}"/>
+            </apex:column>
+
+           <apex:column rendered="{!if(SelectedView = 'My Open Forms',false,true)}" >
+                <apex:facet name="header">
+                 <apex:commandLink status="FilterLoading" value="Submit Version" action="{!toggleSortOrder}"  rerender="label">
+                        <apex:param name="sortField" value="Submit_Version__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                  
+                </apex:facet>
+                <apex:outputField value="{!a.Submit_Version__c}"/>
+            </apex:column>
+
+            <apex:column >
+                <apex:facet name="header">
+                <apex:commandLink status="FilterLoading" value="Submitted By" action="{!toggleSortOrder}"  rerender="label">
+                        <apex:param name="sortField" value="Submitted_By__r.Name" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                   
+                </apex:facet>
+                <apex:outputField value="{!a.Submitted_By__r.Name}" rendered="{! a.Submit_Locked__c}"/>
+            </apex:column>
+            
+             <apex:column >
+                <apex:facet name="header">
+                 <apex:commandLink status="FilterLoading" value="Submitted Date" action="{!toggleSortOrder}"  rerender="label">
+                        <apex:param name="sortField" value="Submittal_Date__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                    
+                </apex:facet>
+                <apex:outputField value="{!a.Submittal_Date__c}"/>
+            </apex:column>
+
+            <apex:column >
+                <apex:facet name="header">
+                 <apex:commandLink status="FilterLoading" value="Published" action="{!toggleSortOrder}"  rerender="label">
+                        <apex:param name="sortField" value="Published__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                    
+                </apex:facet>
+                <apex:outputField value="{!a.Published__c}"/>
+            </apex:column>
+            <!--End of changes by shprasan -->
+            
+           <apex:column rendered="{!if(SelectedView = 'My Open Forms',false,true)}" >
+                <apex:facet name="header">
+                 <apex:commandLink status="FilterLoading" value="Publish Version" action="{!toggleSortOrder}"  rerender="label">
+                        <apex:param name="sortField" value="Version__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                  
+                </apex:facet>
+                <apex:outputField value="{!a.Version__c}"/>
+            </apex:column>
+
+            <apex:column >
+                <apex:facet name="header">
+                <apex:commandLink status="FilterLoading" value="Published By" action="{!toggleSortOrder}"  rerender="label">
+                        <apex:param name="sortField" value="LastModifiedBy.Name" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                   
+                </apex:facet>
+                <apex:outputField value="{!a.LastModifiedBy.Name}" rendered="{! a.Locked__c}"/>
+            </apex:column>
+
+             <apex:column >
+                <apex:facet name="header">
+                 <apex:commandLink status="FilterLoading" value="Published Date" action="{!toggleSortOrder}"  rerender="label">
+                        <apex:param name="sortField" value="Published_Date__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                    
+                </apex:facet>
+                <apex:outputField value="{!a.Published_Date__c}"/>
+            </apex:column>
+            <!--
+            <! apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink status="FilterLoading" value="Incident #" action="{!toggleSortOrder}"  rerender="label">
+                        <apex:param name="sortField" value="name" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!a.SI_Incident_Link__c}"/>
+            </apex:column> -->               
+        </apex:pageBlockTable>
+
+    <apex:outputPanel id="debug"  rendered="{!DebugRender}">
+    <apex:outputLabel value="{!myComponentController.outputQuery}" style="width:1000px"/>
+   </apex:outputPanel>    
+    </apex:pageBlock>
+    
+  
+  </apex:form>
+    </td>
+  </tr>
+  </table>
+  </apex:outputPanel>
+</apex:page>

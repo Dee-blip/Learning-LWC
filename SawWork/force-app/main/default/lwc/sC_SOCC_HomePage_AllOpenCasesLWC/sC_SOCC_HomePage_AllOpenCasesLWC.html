@@ -1,0 +1,245 @@
+<!--
+* @Date		    :	April 5 2020
+* @Author		: 	Sumukh SS 
+* @Description	:	Orginal ESESP-2198 : 
+Migrating SOCCDash from Aura to LWC. Rebuilding the entire codebase to make JS calculation time <5ms across the board.
+* WARNING: Please consult author / related team members before comitting any changes. SOCCDash LWC is heavily customized since it is shown using Lightning Out
+Standard LWC styles do not work in lightning out such as toast,lightning message etc.
+VF Page : SC_SOCC_HomePage_LCOut_VF
+Aura Dependency : SC_SOCC_LightningApp
+* -->
+<template>
+  <template if:true={showspinner}>
+    <lightning-spinner size="large"></lightning-spinner>
+  </template>
+
+  <div class="sidenav">
+    <div class="slds-panel__header">
+      <h2 class="slds-panel__header-title slds-text-heading_small slds-truncate" style="color:#005fb2"><b>Notification
+          Centre</b></h2>
+      <a class="closebtn" onclick={closeNav}>&times;</a>
+    </div>
+    <div class="slds-panel__body">
+      <template for:each={notificationlist} for:item="sla">
+        <lightning-card variant="Narrow" title={sla.AkamCaseID} key={sla.AkamCaseIDURL} icon-name="standard:case">
+
+          <p class="slds-p-horizontal_small">
+            {sla.Body}
+          </p>
+          <p slot="footer">
+            <button class="slds-button slds-button_outline-brand" value={sla.AkamCaseIDURL} onclick={openNewTab}>Take me
+              there!</button>
+
+          </p>
+        </lightning-card>
+        <br key={sla.AkamCaseIDURL}>
+      </template>
+
+    </div>
+  </div>
+
+  <div class="snackbar">{ToastMessage}</div>
+  <div class="errorbar">{ToastMessage}</div>
+
+  <!-- Detail view modal -->
+  <template if:true={bShowModal}>
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+      aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+      <div class="slds-modal__container">
+        <!-- modal header -->
+        <header class="slds-modal__header">
+          <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close"
+            onclick={closeModal}>
+            <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small">
+            </lightning-icon>
+          </button>
+          <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">Update Record
+            Values</h2>
+        </header>
+        <!-- modal body -->
+        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+          <!-- showing record edit form -->
+          <lightning-record-edit-form record-id={currentRecordId} object-api-name="Case" onsubmit={handleSubmit}
+            onsuccess={handleSuccess} onerror={handleError} record-type-id={recTypeIdSOCC}>
+            <lightning-messages></lightning-messages>
+            <lightning-input-field field-name="Status"></lightning-input-field>
+            <lightning-input-field field-name="Is_SOCC_Priority__c"></lightning-input-field>
+            <lightning-input-field field-name="Priority_Expiry_Date__c"></lightning-input-field>
+            <lightning-input-field field-name="Priority_Type__c"></lightning-input-field>
+            <lightning-input-field field-name="Subject"></lightning-input-field>
+            <lightning-input-field field-name="Description"></lightning-input-field><br />
+            <lightning-input-field field-name="Living_Summary_Next_Steps__c"></lightning-input-field>
+
+            <div style="text-align:center;">
+              <lightning-button class="slds-m-top_small" variant="brand" type="submit" name="update"
+                label="Update Record"></lightning-button>
+            </div>
+          </lightning-record-edit-form><br />
+          <div></div>
+        </div>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+  </template>
+  <!-- Mini Dashboard styling -->
+  <div class="panel-info">
+    <div class="panel-heading">
+      <h5>
+        <table id="summary_table" style="width:100% ">
+          <thead>
+            <tr>
+              <td class="Paneldata slds-text-title_caps"><b><u>Total : {TotalCount}</u></b></td>
+              <td class="Paneldata slds-text-title_caps">White : <button value="white" onclick={getNavRecords}
+                  style=" background: transparent;color: white !important;background: transparent;border-top-width: 0px;border-left-width: 0px;border-bottom-width: 0px;border-right-width: 0px;">{WhiteTasksCount}</button>
+              </td>
+              <td class="Paneldata slds-text-title_caps">Purple : <button value="purple" onclick={getNavRecords}
+                  style=" background: transparent;color: white !important;background: transparent;border-top-width: 0px;border-left-width: 0px;border-bottom-width: 0px;border-right-width: 0px;">{PurpleTasksCount}</button>
+              </td>
+              <td class="Paneldata slds-text-title_caps">Yellow : <button value="yellow" onclick={getNavRecords}
+                  style=" background: transparent;color: white !important;background: transparent;border-top-width: 0px;border-left-width: 0px;border-bottom-width: 0px;border-right-width: 0px;">{YellowTasksCount}</button>
+              </td>
+              <td class="Paneldata slds-text-title_caps">Overdue : <button value="overdue" onclick={getNavRecords}
+                  style=" background: transparent;color: white !important;background: transparent;border-top-width: 0px;border-left-width: 0px;border-bottom-width: 0px;border-right-width: 0px;">{OverdueCount}</button>
+              </td>
+              <td class="Paneldata slds-text-title_caps">Runbook Approvals : <button value="runbook"
+                  onclick={getNavRecords}
+                  style=" background: transparent;color: white !important;background: transparent;border-top-width: 0px;border-left-width: 0px;border-bottom-width: 0px;border-right-width: 0px;">{ApprovalCount}</button>
+              </td>
+            </tr>
+          </thead>
+
+        </table>
+      </h5>
+    </div>
+  </div>
+
+  <div class="slds-form-element">
+    <div class="slds-grid slds-gutters slds-p-around_x-small">
+      <div class="slds-col slds-size_2-of-12">
+        <fieldset class="slds-form-element">
+          <legend class="slds-form-element__legend slds-form-element__label">Geography</legend>
+          <div class="slds-form-element__control">
+            <div class="slds-checkbox">
+              <input type="checkbox" name="options" class="geo" id="Americas" onchange={GeoAdd} value="Americas" checked={Americas} />
+              <label class="slds-checkbox__label" for="Americas">
+                <span class="slds-checkbox_faux"></span>
+                <span class="slds-form-element__label">Americas</span>
+              </label>
+            </div>
+            <div class="slds-checkbox">
+              <input type="checkbox" name="options" class="geo" id="AP" onchange={GeoAdd} value="AP" checked={AP} />
+              <label class="slds-checkbox__label" for="AP">
+                <span class="slds-checkbox_faux"></span>
+                <span class="slds-form-element__label">AP</span>
+              </label>
+            </div>
+            <div class="slds-checkbox">
+              <input type="checkbox" name="options" class="geo" id="Japan" onchange={GeoAdd} value="Japan" checked={Japan} />
+              <label class="slds-checkbox__label" for="Japan">
+                <span class="slds-checkbox_faux"></span>
+                <span class="slds-form-element__label">Japan</span>
+              </label>
+            </div>
+            <div class="slds-checkbox">
+              <input type="checkbox" name="options" class="geo" id="EMEA"  onchange={GeoAdd} value="EMEA" checked={EMEA} />
+              <label class="slds-checkbox__label" for="EMEA">
+                <span class="slds-checkbox_faux"></span>
+                <span class="slds-form-element__label">EMEA</span>
+              </label>
+            </div>
+            <div class="slds-checkbox">
+              <input type="checkbox" name="options" class="geo" id="Others" onchange={GeoAdd} value="Others" checked={Others} />
+              <label class="slds-checkbox__label" for="Others">
+                <span class="slds-checkbox_faux"></span>
+                <span class="slds-form-element__label">Others</span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+<!--        <lightning-checkbox-group variant="label-inline" label="Geography" options={geographyOptions} name="geography" value={geography}></lightning-checkbox-group>-->
+      </div>
+      <div class="slds-col slds-size_2-of-12 align-self-center">
+<!--        <lightning-checkbox-group variant="label-inline" label="Account Type" options={accountTypeOptions} name="accountType" value={accountType}></lightning-checkbox-group>-->
+        <fieldset class="slds-form-element">
+<!--          <legend class="slds-form-element__legend slds-form-element__label">Account Type</legend>-->
+          <div class="slds-form-element__control">
+            <template for:each={accountTypeOptions} for:item="accountType">
+              <div class="slds-checkbox" key={accountType.value}>
+                <input data-elem-type="account-type" type="checkbox" name={accountType.value} id={accountType.value} onchange={onAccountTypeSelect} checked={accountType.checked}/>
+                <label class="slds-checkbox__label" for={accountType.value}>
+                  <span class="slds-checkbox_faux"></span>
+                  <span class="slds-form-element__label">{accountType.label}</span>
+                </label>
+              </div>
+            </template>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="slds-col slds-size_4-of-12 align-self-center">
+        <lightning-button variant="brand" label="Save!" disabled={isOpen} onclick={saveFilters}></lightning-button>
+        <lightning-button-stateful class="slds-m-left_xx-small" label-when-off="View Filters" variant="destructive" label-when-on="Hide Filters" icon-name-when-off="utility:preview" icon-name-when-on="utility:hide" selected={isOpen} onclick={handleClick}></lightning-button-stateful>
+      </div>
+      <div class="slds-col slds-size_4-of-12 align-self-center">
+        <lightning-button class="slds-m-left_xx-small slds-float_right" variant="brand" onclick={openNewCase} title="New Case" label="New Case"></lightning-button>
+        <lightning-button-icon class="slds-float_right" icon-name="action:refresh" tooltip="Refresh Table" onclick={ClearPollerAndRefreshTable} variant="brand"></lightning-button-icon>
+      </div>
+    </div>
+  </div>
+
+  <template if:true={isOpen}>
+
+    <lightning-card>
+      <div class="slds-grid slds-gutters slds-box">
+        <div class="slds-col">
+          <lightning-combobox name="Premium" label="SOCC Premium Customer" value={SOCCPremiumvalue}
+            options={SOCCPremiumoptions} onchange={handleSOCCChange}></lightning-combobox>
+        </div>
+
+        <div class="slds-col">
+          <lightning-checkbox-group name="Checkbox Group" label="Severity" options={Checkboxoptions}
+            onchange={handlecheckboxChange} value={checkboxvalue} required></lightning-checkbox-group>
+        </div>
+        <div class="slds-col">
+          <lightning-combobox name="Premium" label="Priority Customer" value={Priorityvalue} options={Priorityoptions}
+            onchange={handlepriorityChange}></lightning-combobox>
+        </div>
+        <div class="slds-col">
+          <lightning-combobox name="CaseOwner" label="Case Owner" value={CaseOwnervalue} options={CaseOwneroptions}
+            onchange={handleCaseOwnerChange}></lightning-combobox>
+        </div>
+        <div class="slds-col slds-size_1.5-of-12">
+          <lightning-combobox name="SearchType" label="Search Type" value={SearchTypevalue} options={SearchTypeoptions}
+            onchange={handleSearchChange}></lightning-combobox>
+        </div>
+        <div class="slds-col">
+          <lightning-input type="search" class="inputCmp" label="Enter search criteria"></lightning-input>
+        </div>
+        <div class="slds-col">
+          <button class="slds-button slds-button_brand" style="margin-top: 1.5rem;" id="applyButton"
+            onclick={ClearPollerAndRefreshTable}>Apply</button>
+          <button class="slds-button slds-button_destructive" style="margin-top: 1.5rem;"
+            onclick={resetallfilters}>Reset</button>
+        </div>
+      </div>
+    </lightning-card>
+  </template>
+
+  <div class="tableheight">
+
+    <!-- LWC Datatable Styling -->
+    <lightning-datatable class="ninty-percent" data={SlicedDatalist} columns={columns} hide-checkbox-column=false
+      key-field=id onrowaction={handleRowActions}></lightning-datatable>
+  </div>
+
+
+  <div class="slds-align_absolute-center customPagination">
+
+    <lightning-button variant="brand" label={currentpage}></lightning-button>
+
+    <template for:each={paginationRange} for:item="var1">
+      <lightning-button variant="brand-outline" data-item={var1} label={var1} key={var1}
+        onclick={handlePaginationClick}></lightning-button>
+    </template>
+  </div>
+</template>

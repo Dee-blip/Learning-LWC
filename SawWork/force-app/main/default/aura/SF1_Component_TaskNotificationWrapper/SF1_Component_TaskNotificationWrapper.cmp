@@ -1,0 +1,10 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+		<!-- Attributes-->  
+		<!-- START Required Attribute --> 
+   <aura:attribute name="taskId" type="String" required="true" default="null"/> 
+   		<!-- END Required Attribute --> 
+   		<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+   		<aura:handler event="c:SF1_NavigationBetweenComponentsEvent" action="{!c.navigateToAllTask}" />
+   		{!v.body}
+   		<c:SF1_CustomLoader />
+</aura:component>

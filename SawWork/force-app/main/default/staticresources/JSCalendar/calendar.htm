@@ -1,0 +1,111 @@
+<HTML>
+<HEAD><TITLE>Simple Calendar</TITLE>
+
+<style>
+
+input
+{
+	font-family: verdana;
+	font-size: 11px;
+	border: #B1B1B1 1px solid;
+	background-color: #EEEEEE;
+}
+
+.txtSmall
+{
+	font-family: verdana;
+	font-size: 9px;
+	font-weight: normal;
+	color: #000000;
+}
+
+</style>
+
+
+<link rel='stylesheet' href='./calendar.css' title='calendar'>
+<script language="javascript" src="calendar.js"></script>
+
+<script language="javascript">
+
+//***** Function formating the Date for inputbox *****
+
+function fnSetDateFormat(oDateFormat)
+{
+	oDateFormat['FullYear'];		//Example = 2007
+	oDateFormat['Year'];			//Example = 07
+	oDateFormat['FullMonthName'];	//Example = January
+	oDateFormat['MonthName'];		//Example = Jan
+	oDateFormat['Month'];			//Example = 01
+	oDateFormat['Date'];			//Example = 01
+	oDateFormat['FullDay'];			//Example = Sunday
+	oDateFormat['Day'];				//Example = Sun
+	oDateFormat['Hours'];			//Example = 01
+	oDateFormat['Minutes'];			//Example = 01
+	oDateFormat['Seconds'];			//Example = 01
+
+	var sDateString;
+	
+	//Example = 01/01/00  dd/mm/yy
+	//sDateString = oDateFormat['Date'] +"/"+ oDateFormat['Month'] +"/"+ oDateFormat['Year'];		
+	
+	//Example = 01/01/0000  dd/mm/yyyy
+	//sDateString = oDateFormat['Date'] +"/"+ oDateFormat['Month'] +"/"+ oDateFormat['FullYear'];	
+	
+	//Example = 0000-01-01 yyyy/mm/dd
+	//sDateString = oDateFormat['FullYear'] +"-"+ oDateFormat['Month'] +"-"+ oDateFormat['Date'];
+	
+	//Example = Jan-01-0000 Mmm/dd/yyyy
+	//sDateString = oDateFormat['MonthName'] +"-"+ oDateFormat['Date'] +"-"+ oDateFormat['FullYear'];
+	
+	return sDateString;
+}
+
+</script>
+
+</HEAD>
+
+<BODY style="MARGIN: 10px" class='txtSmall'>
+
+	<p style='font-weight:bold'>Example #1</p>
+
+	<input name='txtFirst' id='txtCalendarFirst' class='inputBoxStyle' readonly>
+	<img src='cal.gif' align='absmiddle' onmouseover="fnInitCalendar(this, 'txtCalendarFirst', 'style=calendar.css,close=true')"> fnInitCalendar(this, 'txtCalendarFirst', 'close=true')
+	
+	<p style='font-weight:bold'>Example #2</p>
+	
+	<input name='txtSecond' id='txtCalendarSecond' class='inputBoxStyle' readonly>
+	<img src='cal.gif' align='absmiddle' onmouseover="fnInitCalendar(this, 'txtCalendarSecond', 'style=calendar.css,year=1900,month=1')"> fnInitCalendar(this, 'txtCalendarSecond', 'year=1900,month=1')
+	
+	<p style='font-weight:bold'>Example #3</p>
+	
+	<input name='txtThird' id='txtCalendarThird' class='inputBoxStyle' readonly>
+	<img src='cal.gif' align='absmiddle' onmouseover="fnInitCalendar(this, 'txtCalendarThird', 'style=calendar.css,top=20,left=20,drag=false')"> fnInitCalendar(this, 'txtCalendarThird', 'top=20,left=20,drag=false')
+	
+	<p style='font-weight:bold'>Example #4</p>
+	
+	<input name='txtFourth' id='txtCalendarFourth' class='inputBoxStyle' readonly>
+	<img src='cal.gif' align='absmiddle' onmouseover="fnInitCalendar(this, 'txtCalendarFourth', 'style=calendar_blue.css,instance=single')"> fnInitCalendar(this, 'txtCalendarFourth', 'style=calendar_blue.css,instance=single')
+	
+	<p style='font-weight:bold'>Example #5</p>
+	
+	<input name='txtFifth' id='txtCalendarFifth' class='inputBoxStyle' readonly>
+	<img src='cal.gif' align='absmiddle' onmouseover="fnInitCalendar(this, 'txtCalendarFifth', 'style=calendar_green.css,instance=single')"> fnInitCalendar(this, 'txtCalendarFifth', 'style=calendar_green.css,instance=single')
+	
+	<p style='font-weight:bold'>Example #6</p>
+	
+	<input name='txtSixth' id='txtCalendarSixth' class='inputBoxStyle' readonly>
+	<img src='cal.gif' align='absmiddle' onmouseover="fnInitCalendar(this, 'txtCalendarSixth', 'style=calendar.css,expiry=true,instance=single,close=true')"> fnInitCalendar(this, 'txtCalendarSixth', 'expiry=true,close=true')
+	
+	<p style='font-weight:bold'>Example #7</p>
+	
+	<input name='txtSeventh' id='txtCalendarSeventh' class='inputBoxStyle' readonly>
+	<img src='cal.gif' align='absmiddle' onmouseover="fnInitCalendar(this, 'txtCalendarSeventh', 'style=calendar.css,restrict=true,instance=single,close=true')"> fnInitCalendar(this, 'txtCalendarSeventh', 'restrict=true,close=true')
+	
+	<p style='font-weight:bold'>Example #8</p>
+	
+	<input name='txtEighth' id='txtCalendarEighth' class='inputBoxStyle' readonly>
+	<img src='cal.gif' align='absmiddle' onmouseover="fnInitCalendar(this, 'txtCalendarEighth', 'style=calendar.css,expiry=true,elapse=-2,restrict=true,limit=2,instance=single,close=true')"> fnInitCalendar(this, 'txtCalendarEighth', 'expiry=true,elapse=-2,restrict=true,limit=2,close=true')
+
+	<br><br><br><br><br><br><br><br><br><br><br><br><br>
+</BODY>
+</HTML>

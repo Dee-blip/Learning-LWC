@@ -1,0 +1,52 @@
+<!--
+  @description       : 
+  @author            : apyati
+  @team              : GSM
+  @last modified on  : 11-29-2021
+  @last modified by  : apyati
+  Modifications Log
+  Ver   Date         Author   Modification
+  1.0   11-29-2021   apyati   Initial Version
+-->
+<template>
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+        aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open slds-modal_large">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close"
+                    onclick={handleClose}>
+                    <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small">
+                    </lightning-icon>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">
+                    <strong>
+                        <lightning-formatted-rich-text value='CHIME Form History'>
+                        </lightning-formatted-rich-text>
+                    </strong>
+                </h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                <template if:true={chimeId}>
+                    <c-chime-form-audit-trail-Component formid={chimeId}>
+                    </c-chime-form-audit-trail-Component>
+                </template>
+            </div>
+            <footer class="slds-modal__footer">
+                <div class="slds-float_left" style="padding-top:5px;">
+                    <span>*&nbsp;
+                        <lightning-icon icon-name="standard:customers" alternative-text="close" variant="inverse"
+                            size="xx-small"></lightning-icon>
+                        &nbsp;<strong>Customer</strong>&nbsp;&nbsp;
+                        <lightning-icon icon-name="standard:user" alternative-text="close" variant="inverse"
+                            size="xx-small"></lightning-icon>
+                        &nbsp;<strong>Internal User</strong>
+                    </span>
+                </div>
+                <button class="slds-button slds-button_neutral" onclick={handleClose}
+                    title="Cancel">Close</button>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>

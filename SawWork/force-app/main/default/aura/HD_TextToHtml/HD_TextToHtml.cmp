@@ -1,0 +1,8 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+    <aura:attribute name="content" type="String" default=""/> 
+    <aura:handler name="init" value="{!this}" action="{!c.parserInit}" />
+    <aura:attribute name="parsecontent" type="String" default="" access="PRIVATE"/>
+    <!--Printing the parsed links -->
+    <!--aura:unescapedhtml value="{!v.parsecontent}" /-->
+    <ui:outputRichText value="{!v.parsecontent}" />
+</aura:component>

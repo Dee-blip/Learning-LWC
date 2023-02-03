@@ -1,0 +1,460 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId"
+                access="global" controller="HD_SLA_GAUGE_apcls">
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="Response_Percentage" type="Integer" default="0" />
+    <aura:attribute name="Resolution_percentage" type="Integer" default="0" />
+    <aura:attribute name="isEmbedded" type="Boolean"/>
+    
+    <aura:attribute name="Active_Response_SLA" type="BMCServiceDesk__Incident_Service_Target__c" default="{'sobject':'BMCServiceDesk__Incident_Service_Target__c',
+                                                                                                          'BMCServiceDesk__Status__c':'Not Applicable',
+                                                                                                          'BMCServiceDesk__StateValue__c':'Not Applicable',
+                                                                                                          'BMCServiceDesk__TargetType__c':'Not Applicable',
+                                                                                                          'BMCServiceDesk__TimeRemaining__c':'Not Applicable',
+                                                                                                          'BMCServiceDesk__TargetEndDate__c':'Not Applicable',
+                                                                                                          'BMCServiceDesk__SLAName__c':'Not Applicable'
+                                                                                                          
+                                                                                                          }"/>
+    <aura:attribute name="Active_Resolution_SLA" type="BMCServiceDesk__Incident_Service_Target__c" default="{'sobject':'BMCServiceDesk__Incident_Service_Target__c',
+                                                                                                            'BMCServiceDesk__Status__c':'Not Applicable',
+                                                                                                            'BMCServiceDesk__StateValue__c':'Not Applicable',
+                                                                                                            'BMCServiceDesk__TargetType__c':'Not Applicable',
+                                                                                                            'BMCServiceDesk__TimeRemaining__c':'Not Applicable',
+                                                                                                            'BMCServiceDesk__TargetEndDate__c':'Not Applicable',
+                                                                                                            'BMCServiceDesk__SLAName__c':'Not Applicable'
+                                                                                                            
+                                                                                                            }"/>
+    <aura:attribute name="Active_Response_SLA_Result" type="String" default="OK"/>
+    <aura:attribute name="Active_Resolution_SLA_Result" type="String" default="OK"/>
+    
+    <aura:attribute name="Active_Response_SLA_TimeRemaining" type="String" default="0 Days 0 Hours 0 Minutes"/>
+    <aura:attribute name="Active_Resolution_SLA_TimeRemaining" type="String" default="0 Days 0 Hours 0 Minutes"/>
+    
+    <aura:attribute name="Active_Response_SLA_TimeRemaining_Gauge" type="String" default="0 Hours left"/>
+    <aura:attribute name="Active_Resolution_SLA_TimeRemaining_Gauge" type="String" default="0 Hours left"/>
+    
+    <aura:attribute name="SLA_GAUGE_RESPONSE_THRESHOLD" type="String" default="0"/>
+    <aura:attribute name="SLA_GAUGE_RESOLUTION_THRESHOLD" type="String" default="0"/>
+    
+    <aura:attribute name="Cancelled_SLAs" type="BMCServiceDesk__Incident_Service_Target__c[]"/>
+    <aura:attribute name="Cancelled_SLAs_size" type="Integer"/>
+    <aura:attribute name="ShowSLAinfo" type="boolean" default="false"/>
+    <ltng:require scripts="{!join(',',
+                           $Resource.justgauge +'/moment_2_1_8.js',
+                           $Resource.justgauge +'/raphael-2.1.4.min.js',
+                           $Resource.justgauge +'/justgage.js'
+                           )}" afterScriptsLoaded="{!c.generateGauge}"/>
+    
+    <aura:handler event="force:refreshView" action="{!c.generateGauge}" />
+    <div class="{! v.isEmbedded ? 'slds-grid gauge slds-p-bottom_medium' : 'slds-grid gauge slds-panel slds-p-bottom_medium' }" style="margin-bottom:4px;" onclick="{!c.showHide}" aura:id="gauge">
+        <lightning:layout class="slds-size_12-of-12">
+            <lightning:layoutItem padding="around-small" size="5">
+                <div class=" slds-float_right">
+                    <div class="slds-text-body_small above" id="response_title"></div>
+                    
+                    <!-- snippet for  rendering SLA Result ICON -->
+                    <aura:if isTrue="{!v.Active_Response_SLA_Result == 'OK'}">
+                    <div id="response" class="slds-text-body_small" style="width:70px; height:58px;display: inline-block;margin: auto;" ></div>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.Active_Response_SLA_Result == 'Missed'}">
+                    <div id="missedicon" class="slds-text-body_small" style="width:70px; height:58px;display: inline-block;margin: auto;line-height: 74px;" >
+                        <lightning:icon iconName="action:close" size="small" alternativeText="Response Time"/>
+                    </div>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.Active_Response_SLA_Result == 'Met'}">
+                    <div id="missedicon" class="slds-text-body_small" style="width:70px; height:58px;display: inline-block;margin: auto;line-height: 74px;" >
+                        <lightning:icon iconName="action:approval" size="small" alternativeText="Response Time"/>
+                    </div>
+                    </aura:if>
+                    <!-- END snippet for  rendering SLA Result ICON -->
+                    
+                    <aura:if isTrue="{!v.Response_Percentage > v.SLA_GAUGE_RESPONSE_THRESHOLD}">
+                        <div class="slds-text-body_small below">
+                            <!-- snippet for rendering SLA RESULT Met,Missed-->
+                            <aura:if isTrue="{!v.Active_Response_SLA_Result == 'OK' }">
+                                <span class="slds-badge slds-badge_lightest">
+                                    <span class="slds-icon_container slds-icon-utility-moneybag slds-m-right_xx-small" title="Repsonse time left in available Matric days">
+                                        <lightning:icon iconName="utility:clock" size="xx-small" alternativeText="Response Time"/>
+                                    </span>{!v.Active_Response_SLA_TimeRemaining_Gauge}</span>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!v.Active_Response_SLA_Result == 'Missed' }">
+                                <span class="slds-badge slds-badge_lightest">
+                                    <span class="slds-icon_container slds-icon-utility-moneybag slds-m-right_xx-small" title="Repsonse time left in available Matric days">
+                                        <lightning:icon iconName="utility:deprecate" size="xx-small" alternativeText="Response Time"/>
+                                    </span>Missed</span>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!v.Active_Response_SLA_Result == 'Met' }">
+                                <span class="slds-badge slds-badge_lightest">
+                                    <span class="slds-icon_container slds-icon-utility-moneybag slds-m-right_xx-small" title="Repsonse time left in available Matric days">
+                                        <lightning:icon iconName="utility:success" size="xx-small" alternativeText="Response Time"/>
+                                    </span>Met</span>
+                            </aura:if>
+                            <!--END snippet for rendering SLA RESULT Met,Missed-->
+                        </div>
+                    </aura:if>
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="around-small" size="2">
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="around-small" size="5">
+                <div class=" slds-float_left">
+                    <div class="slds-text-body_small above" id="resolution_title"></div>
+                    
+                    <!-- snippet for  rendering SLA Result ICON -->
+                    <aura:if isTrue="{!v.Active_Resolution_SLA_Result == 'OK'}">
+                    <div id="resolution" class="slds-text-body_small" style="width:70px; height:58px;display: inline-block;margin: auto;" ></div>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.Active_Resolution_SLA_Result == 'Missed'}">
+                    <div id="missedicon" class="slds-text-body_small" style="width:70px; height:58px;display: inline-block;margin: auto;line-height: 74px;" >
+                        <lightning:icon iconName="action:close" size="small" alternativeText="Response Time"/>
+                    </div>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.Active_Resolution_SLA_Result == 'Met'}">
+                    <div id="missedicon" class="slds-text-body_small" style="width:70px; height:58px;display: inline-block;margin: auto;line-height: 74px;" >
+                        <lightning:icon iconName="action:approval" size="small" alternativeText="Response Time"/>
+                    </div>
+                    </aura:if>
+                    <!-- END snippet for  rendering SLA Result ICON -->
+                
+                    
+                    <aura:if isTrue="{!v.Resolution_percentage > v.SLA_GAUGE_RESOLUTION_THRESHOLD}">
+                        <div class="slds-text-body_small below">
+                            
+                            <aura:if isTrue="{!v.Active_Resolution_SLA_Result == 'OK' }">
+                                <span class="slds-badge slds-badge_lightest">
+                                    <span class="slds-icon_container slds-icon-utility-moneybag slds-m-right_xx-small" title="Repsonse time left in available Matric days">
+                                        <lightning:icon iconName="utility:clock" size="xx-small" alternativeText="Response Time"/>
+                                    </span>{!v.Active_Resolution_SLA_TimeRemaining_Gauge}</span>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!v.Active_Resolution_SLA_Result == 'Missed' }">
+                                <span class="slds-badge slds-badge_lightest">
+                                    <span class="slds-icon_container slds-icon-utility-moneybag slds-m-right_xx-small" title="Repsonse time left in available Matric days">
+                                        <lightning:icon iconName="utility:deprecate" size="xx-small" alternativeText="Response Time"/>
+                                    </span>Missed</span>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!v.Active_Resolution_SLA_Result == 'Met' }">
+                                <span class="slds-badge slds-badge_lightest">
+                                    <span class="slds-icon_container slds-icon-utility-moneybag slds-m-right_xx-small" title="Repsonse time left in available Matric days">
+                                        <lightning:icon iconName="utility:success" size="xx-small" alternativeText="Response Time"/>
+                                    </span>Met</span>
+                            </aura:if>
+                            
+                        </div>
+                    </aura:if>
+                </div>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+    <!-- popover -->
+    <section aura:id="slapopover" class="slds-hide slds-popover slds-nubbin_top-right popover-pos" role="dialog" aria-labelledby="dialog-heading-id-610" aria-describedby="dialog-body-id-611">
+        <button class="slds-button slds-button_icon slds-button_icon-small slds-float_right slds-popover__close slds-button_icon" title="Close dialog" onclick="{!c.closepopover}">
+            <lightning:icon iconName="utility:close" size="x-small" alternativeText="close" />
+            <span class="slds-assistive-text">Close dialog</span>
+        </button>
+        <header class="slds-popover__header">
+            <h2 id="dialog-heading-id-610" class="slds-text-heading_small">SLA Information{!v.Active_Response_SLA_Result}</h2>
+        </header>
+        <div class="slds-popover__body" id="dialog-body-id-611">
+            <aura:if isTrue="{!v.ShowSLAinfo}">
+                <div class="slds-grid">
+                    <div class="slds-col">
+                        <!-- tABLE 0 -->
+                        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                            <thead>
+                                <tr class="slds-text-title_caps">
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Legends">Legends</div>
+                                    </th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row" data-label="responseRes">
+                                        <div class="slds-truncate" title="Status">
+                                            <lightning:icon iconName="utility:record" size="x-small" alternativeText="Status"/>  Status
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" data-label="responseRes">
+                                        <div class="slds-truncate" title="State">
+                                            <lightning:icon iconName="utility:record" size="x-small" alternativeText="State"/>  State
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" data-label="responseRes">
+                                        <div class="slds-truncate" title="Start Date">
+                                            <lightning:icon iconName="utility:record" size="x-small" alternativeText="Target Type"/> Start Date
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" data-label="responseRes">
+                                        <div class="slds-truncate" title="Agreement">
+                                            <lightning:icon iconName="utility:record" size="x-small" alternativeText="Due Date"/>  Due Date  
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" data-label="responseRes">
+                                        <div class="slds-truncate" title="Target End Date">
+                                            <lightning:icon iconName="utility:record" size="x-small" alternativeText="Agreement"/>  Agreement   
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" data-label="responseRes">
+                                        <div class="slds-truncate" title="Time Remaining">
+                                            <lightning:icon iconName="utility:record" size="x-small" alternativeText="Time Remaining"/>  Time Remaining
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" data-label="responseRes">
+                                        <div class="slds-truncate" title="Clock State">
+                                            <lightning:icon iconName="utility:record" size="x-small" alternativeText="Time Remaining"/>  Clock State
+                                        </div>
+                                    </th>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                        <!-- END tABLE0 -->
+                    </div>
+                    <div class="slds-col">
+                        <!-- tABLE 1 -->
+                        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                            <thead>
+                                <tr class="slds-text-title_caps">
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Response">Response</div>
+                                    </th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row" data-label="response">
+                                        <div class="slds-truncate" title="Status">
+                                            <a href="javascript:void(0);">{!v.Active_Response_SLA.BMCServiceDesk__Status__c}&nbsp;</a>
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" data-label="response">
+                                        <div class="slds-truncate" title="State">
+                                            <a href="javascript:void(0);">{!v.Active_Response_SLA.BMCServiceDesk__StateValue__c}&nbsp;</a>
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" data-label="response">
+                                        <div class="slds-truncate" title="Start Date">
+                                            <a href="javascript:void(0);"><ui:outputDateTime value="{!v.Active_Response_SLA.BMCServiceDesk__StartDate__c}"/>&nbsp;</a>
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" data-label="response">
+                                        <div class="slds-truncate" title="Target End Date">
+                                            <a href="javascript:void(0);"><ui:outputDateTime value="{!v.Active_Response_SLA.BMCServiceDesk__TargetEndDate__c}"/>&nbsp;</a>
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" data-label="response">
+                                        <div class="slds-truncate" title="Agreement">
+                                            <a href="javascript:void(0);">{!v.Active_Response_SLA.BMCServiceDesk__SLAName__c }&nbsp;</a>
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" data-label="response">
+                                        <div class="slds-truncate" title="Time Remaining">
+                                            <a href="javascript:void(0);">{!v.Active_Response_SLA_TimeRemaining}&nbsp;</a>
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" data-label="response">
+                                        <div class="slds-truncate" title="Clock State">
+                                            <a href="javascript:void(0);">{!v.Active_Response_SLA.BMCServiceDesk__ClockState__c}&nbsp;</a>
+                                        </div>
+                                    </th>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                        <!-- END tABLE1 -->
+                    </div>
+                    <div class="slds-col">
+                        <!-- tABLE 2 -->
+                        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                            <thead>
+                                <tr class="slds-text-title_caps">
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Resolution">Resolution</div>
+                                    </th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row" data-label="Resolution">
+                                        <div class="slds-truncate" title="Status">
+                                            <a href="javascript:void(0);">{!v.Active_Resolution_SLA.BMCServiceDesk__Status__c}&nbsp;</a>
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" data-label="Resolution">
+                                        <div class="slds-truncate" title="State">
+                                            <a href="javascript:void(0);">
+                                                {!v.Active_Resolution_SLA.BMCServiceDesk__StateValue__c}&nbsp;</a>
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" data-label="Resolution">
+                                        <div class="slds-truncate" title="Target Type">
+                                            <a href="javascript:void(0);"><ui:outputDateTime value="{!v.Active_Resolution_SLA.BMCServiceDesk__StartDate__c}"/>&nbsp;</a>
+                                        </div>
+                                    </th>
+                                </tr>
+                                
+                                <tr>
+                                    <th scope="row" data-label="Resolution">
+                                        <div class="slds-truncate" title="Target End Date">
+                                            <a href="javascript:void(0);"><ui:outputDateTime value="{!v.Active_Resolution_SLA.BMCServiceDesk__TargetEndDate__c}"/>&nbsp;</a>
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" data-label="Resolution">
+                                        <div class="slds-truncate" title="Agreement">
+                                            <a href="javascript:void(0);">{!v.Active_Resolution_SLA.BMCServiceDesk__SLAName__c }&nbsp;</a>
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" data-label="Resolution">
+                                        <div class="slds-truncate" title="Time Remaining">
+                                            <a href="javascript:void(0);">{!v.Active_Resolution_SLA_TimeRemaining}&nbsp;</a>
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row" data-label="Resolution">
+                                        <div class="slds-truncate" title="Clock State">
+                                            <a href="javascript:void(0);">{!v.Active_Resolution_SLA.BMCServiceDesk__ClockState__c}&nbsp;</a>
+                                        </div>
+                                    </th>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                        <!-- END tABLE2 -->
+                    </div>
+                </div>
+                <!-- AURA ELSE CONDITION -->    
+                <aura:set attribute="else">
+                    <div class="slds-text-heading_small slds-text-align_center">SLA is not applicable for this ticket</div>     
+                </aura:set>
+                <!-- END AURA ELSE CONDITION -->   
+            </aura:if> 
+            <br></br>
+            <!-- previous SLA Table -->
+            <aura:if isTrue="{!v.Cancelled_SLAs_size > 0}">
+                <div class="slds-text-heading_small">Previously Applied SLA's</div>
+                <!-- Table for Previously applie SLA's -->
+                <br></br>
+                <table class="slds-table slds-table_bordered slds-table_resizable-cols slds-table_fixed-layout" role="grid">
+                    <thead>
+                        <tr class="slds-text-title_caps">
+                            <th scope="col" class="slds-cell-wrap">
+                                <div class="slds-truncate" title="Status">Status</div>
+                            </th>
+                            <th scope="col" class="slds-cell-wrap">
+                                <div class="slds-truncate" title="State">State</div>
+                            </th>
+                            <th scope="col" class="slds-cell-wrap">
+                                <div class="slds-truncate" title="Clock">Clock</div>
+                            </th>
+                            <th scope="col" class="slds-cell-wrap">
+                                <div class="slds-truncate" title="Target Type">Target Type</div>
+                            </th>
+                            <th scope="col" class="slds-cell-wrap">
+                                <div class="slds-truncate" title="Target End Date">Target End Date</div>
+                            </th>
+                            <th scope="col" class="slds-cell-wrap">
+                                <div class="slds-truncate" title="Agreement">Agreement</div>
+                            </th>
+                            <th scope="col" class="slds-cell-wrap">
+                                <div class="slds-truncate" title="Target Title">Target Title</div>
+                            </th>
+                            <th scope="col" class="slds-cell-wrap">
+                                <div class="slds-truncate" title="Start Date">Start Date</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.Cancelled_SLAs}" var="canSla">
+                            <tr>
+                                <th scope="row" data-label="Status" class="slds-cell-wrap">
+                                    <div class="slds-truncate" title="{!canSla.BMCServiceDesk__Status__c}">
+                                        <a href="javascript:void(0);">{!canSla.BMCServiceDesk__Status__c}</a>
+                                    </div>
+                                </th>
+                                <td data-label="state" class="slds-cell-wrap">
+                                    <div class="slds-truncate" title="{!canSla.BMCServiceDesk__StateValue__c}">{!canSla.BMCServiceDesk__StateValue__c}</div>
+                                </td>
+                                <td data-label="clock" class="slds-cell-wrap">
+                                    <div class="slds-truncate" title="{!canSla.BMCServiceDesk__ClockState__c }">{!canSla.BMCServiceDesk__ClockState__c }</div>
+                                </td>
+                                <td data-label="clock" class="slds-cell-wrap">
+                                    <div class="slds-truncate" title="{!canSla.BMCServiceDesk__TargetType__c }">{!canSla.BMCServiceDesk__TargetType__c }</div>
+                                </td>
+                                <td data-label="Confidence" class="slds-cell-wrap">
+                                    <div class="slds-truncate" title="{!canSla.BMCServiceDesk__TargetEndDate__c}"><ui:outputDateTime value="{!canSla.BMCServiceDesk__TargetEndDate__c}"/></div>
+                                </td>
+                                <td data-label="Amount" class="slds-cell-wrap">
+                                    <div class="slds-truncate" title="{!canSla.BMCServiceDesk__SLAName__c}">{!canSla.BMCServiceDesk__SLAName__c}</div>
+                                </td>
+                                <td data-label="Contact" class="slds-cell-wrap">
+                                    <div class="slds-truncate" title="{!canSla.BMCServiceDesk__ServiceTargetName__c}">
+                                        <a href="javascript:void(0);">{!canSla.BMCServiceDesk__ServiceTargetName__c}</a>
+                                    </div>
+                                </td>
+                                <td data-label="Amount" class="slds-cell-wrap">
+                                    <div class="slds-truncate" title="{!canSla.BMCServiceDesk__StartDate__c}"><ui:outputDateTime value="{!canSla.BMCServiceDesk__StartDate__c}"/></div>
+                                </td>
+                            </tr>
+                        </aura:iteration>    
+                    </tbody>
+                </table>   
+                
+                
+                <!-- END Table for Previously applie SLA's -->                
+            </aura:if>    
+            <!-- END previous SLA Table --> 
+            
+            
+            
+        </div>
+    </section>
+    <!-- END -->
+    
+    
+    
+    
+    
+</aura:component>

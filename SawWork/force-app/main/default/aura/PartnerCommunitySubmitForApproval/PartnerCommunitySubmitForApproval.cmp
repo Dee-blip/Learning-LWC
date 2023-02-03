@@ -1,0 +1,27 @@
+<aura:component controller="PartnerCommSubmitForApprovalController" 
+                extends="c:PartnerCommunityParentComponent" 
+                implements="flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" 
+                access="global" >
+    
+    <aura:attribute name="recordId" type="String" />
+    <!-- Progress bar for Showing Submission progress -->
+    <aura:attribute name="progress" type="Integer" default="0"/>
+    <aura:attribute name="isProgressing" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+        
+    <aura:if isTrue="{!v.isProgressing}" >
+        <div>
+            <div class="slds-grid">
+                <div class="slds-col"> <lightning:icon iconName="action:approval" size="medium" alternativeText="Indicates approval"/></div>
+                <div class="slds-col"> <div class="slds-text-heading_medium">Submitting the record for approval -</div> </div>
+            </div>
+        </div>        
+        <div class="slds-m-top_xx-large">
+            <lightning:progressBar value="{!v.progress}" size="large"/>
+        </div>
+        
+    </aura:if>
+    
+</aura:component>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+
+    <apiVersion>51.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+        <target>lightning__AppPage</target>
+        <target>lightning__RecordPage</target>
+    </targets>
+
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default">
+            <property name="surveyDevName" type="String" label="Survey" description="Survey Developer Name"  />
+            <property name="feedbackCategory" type="String" label="Feedback Category" description="Used in reporting, for grouping survey data"/>
+            <property name="pageName" type="String" label="Page Name" description="Current page name. If empty, it'll get auto-populated from URL"/>
+            <property name="height" type="String"  label="Survey Height" default="800" description="in pixels"/>
+            <property name="width" type="Integer"  label="Survey Width" default="800" description="in pixels"/>
+            <property name="modalBgColor" type="Color"  label="Modal Background Color" default="#262A2E"/>
+            <property name="buttonLabel" type="String"  label="Button Label" />
+            <property name="buttonPosition" type="String"  label="Position" default="left" datasource="left,right,normal"/>
+            <property name="buttonHeight" type="String"  label="Button Height" default="60px"/>
+            <property name="buttonWidth" type="String"  label="Button Width" default="100px"/>
+            <property name="buttonBorderRadius" type="String"  label="Button Border Radius" default="5px"/>
+            <property name="buttonAlignment" type="String"  label="Text Alignment" default="center" datasource="left,right,center"/>
+            <property name="buttonTextColor" type="Color"  label="Text Color" default="#FFFFFF"/>
+            <property name="butttonBgColor" type="Color"  label="Button Background Color" default="#10a0f0"/>
+            <property name="buttonMargin" type="String"  label="Margin" description="Applies only for normal position. Format: top right bottom left( ex: 10px 10px 10px 10px) or auto" default="auto"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

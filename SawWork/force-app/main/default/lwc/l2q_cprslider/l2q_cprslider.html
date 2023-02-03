@@ -1,0 +1,86 @@
+<template>
+    <div data-id="mySidebar" class="sidebar">
+        <span class="closebtn" style="cursor:pointer" onclick={closeNav}>
+            <lightning-icon icon-name="utility:close" alternative-text="Closed Filter" title="Close Sidebar">
+            </lightning-icon>
+            &nbsp;
+        </span>
+        <span>
+            <span style="padding-left:10px;">
+                <lightning-badge label="FILTERS" class="slds-badge_inverse"></lightning-badge>
+            </span>
+            <span style="float:right;cursor:pointer;padding-right:10px;font-weight:bold;" onclick={clearAll}>
+                <lightning-badge label="CLEAR ALL" icon-name="utility:clear" style="color:#0070D2;"></lightning-badge>
+            </span>
+        </span>
+
+
+        <div style="border-bottom:0.5px solid #dddddd;margin-top:5px"></div>
+        <div style="margin-top:20px;">
+            <div style="padding-left:6px;padding-right:6px;">
+                <span class="txtColor" title="TestData">
+                    <span>
+                        Matching Event Name :
+                    </span>
+                </span>
+                <lightning-input type="text" name="name" label="EVENT NAME LIKE" placeholder="Min 2 characters..."
+                    class='select' variant='label-hidden' data-id="name">
+                </lightning-input>
+                <br />
+                <span class="txtColor">Status : </span>
+                <lightning-combobox name="status__c" label="STATUS = " value="" class='select' variant='label-hidden'>
+                </lightning-combobox>
+                <br />
+                <span class="txtColor">Event Type : </span>
+                <lightning-combobox name="event_type__c" label="EVENT TYPE = " value="" class='select'
+                    variant='label-hidden'>
+                </lightning-combobox>
+                <br />
+                <span class="txtColor"> Delivery Product :</span>
+                <lightning-combobox name="delivery_product__c" label="DELIVERY PRODUCT = " value=""
+                    placeholder="--Select Product--" class='select' variant='label-hidden'>
+                </lightning-combobox>
+                <br />
+
+                <span class="txtColor"> Event Start Date (>=)</span>
+                <lightning-input type="date" label='' name='event_start_date_time__c' class='select'
+                    variant='label-hidden' placeholder="">
+                </lightning-input>
+                <br />
+
+                <span class="txtColor"> {eventLabel}</span>
+                <lightning-input type="date" label='' name='eventstartdatetime' class='select' variant='label-hidden'
+                    placeholder="">
+                </lightning-input>
+                <br />
+
+                <lightning-button-group class="slds-align_absolute-center">
+                    <button class="slds-button slds-button_brand"
+                        style="background-color:#0070D2;color:white;border:1px solid #0070D2" onclick={applyFilter}>
+                        APPLY FILTER
+                    </button>
+                    &nbsp;
+                </lightning-button-group>
+                <br />
+            </div>
+            <!-- <div style="border-bottom:2px solid rgba(0, 153, 204, 1)    ;margin-top:5px"></div> -->
+        </div>
+
+    </div>
+    <lightning-button-group>
+        <span onclick={openNav}>
+            <lightning-icon style="cursor:pointer" icon-name="utility:filterList" alternative-text="Apply Filter"
+                title="Apply Filter">
+            </lightning-icon>
+            &nbsp;
+        </span>
+        <div class="onoffswitch">
+            <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch"
+                onchange={historyCheck}>
+            <label class="onoffswitch-label" for="myonoffswitch">
+                <span class="onoffswitch-inner"></span>
+                <span class="onoffswitch-switch"></span>
+            </label>
+        </div>
+    </lightning-button-group>
+</template>

@@ -1,0 +1,567 @@
+<apex:page standardcontroller="Survey__c" extensions="RSSEditTemplateController"  sidebar="false" id="Page1"  >
+<script type="text/javascript" src="/resource/jquery119/jquery-ui-1.10.2.custom/js/jquery-1.9.1.js" ></script>
+<script type="text/javascript" src="/resource/jquery119/jquery-ui-1.10.2.custom/js/jquery-ui-1.10.2.custom.js" ></script>
+<script src="/soap/ajax/18.0/connection.js" type="text/javascript"></script>
+<script src="/soap/ajax/18.0/apex.js" type="text/javascript"></script>
+<script>sforce.connection.sessionId = '{!$Api.Session_ID}'; </script>
+<link rel="stylesheet" type="text/css" href="/resource/jquery119/jquery-ui-1.10.2.custom/css/ui-lightness/jquery-ui-1.10.2.custom.css"></link>
+<link rel="stylesheet" type="text/css" href="/resource/PIE/PIE/PIE.htc"></link>
+
+<!-- -------------------------------------- JAVASCRIPT ----------------------------------- -->
+
+<script type="text/javascript">
+    jSurvey$  = jQuery.noConflict();
+    window.onload=AllowSortingInGroup();
+    var Count = {!SizeOfQuestionWrapper} ;
+    var AllowSortingOnlyOnce = true; 
+
+    //Adding Scroll event for the top navigation bar
+    window.onload = function()
+    {
+        //adding the event listerner for Mozilla
+        if(window.addEventListener)
+            document.addEventListener('DOMMouseScroll', SetNavBar, false);
+     
+        //for IE/OPERA etc
+        document.onmousewheel = SetNavBar;
+    }
+
+    function stopRKey(evt) {
+       var evt = (evt) ? evt : ((event) ? event : null);
+       var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null);
+       if ((evt.keyCode == 13) && (node.type=="text")) {return false;}
+    }
+
+    document.onkeypress = stopRKey; 
+
+    function AllowSortingInGroup()
+    {
+        Count = {!SizeOfQuestionWrapper} ; 
+        AllowSortingOnlyOnce = true;
+     
+    }
+
+    function limitChars(textArea)
+    {
+        if(jSurvey$(textArea).val().length > 255)
+        {
+            jSurvey$(textArea).val(jSurvey$(textArea).val().substr(0, 255));
+        }
+    }
+    
+    //Make the sections and questions sortable
+    function allowSorting()
+    {
+        if(AllowSortingOnlyOnce)
+        {
+            AllowSortingOnlyOnce =false;
+            for(i=0;i<=Count;i++)
+            {   
+                jSurvey$("#justQuestionList"+i).sortable(
+                { 
+                    axis: 'y', opacity: .6, tolerance: 'pointer', revert: true
+                });
+                jSurvey$("#QuestionGroup").sortable(
+                {
+                    axis: 'y', opacity: .6, tolerance: 'pointer', revert: true
+                });
+           }        
+        }    
+    }
+
+    //clear the fields in add/edit questions/questionGroup(sections) popup
+    function clearFields()
+    {
+        jSurvey$("textarea[id*='qQuestion']").val("");
+        jSurvey$("textarea[id*='qChoices']").val("");
+    }
+
+    function resetQuestion()
+    {
+        var choice = document.getElementById("{!$Component.Page1.mainForm.questionSelect}");
+        choice.selectedIndex=0;
+        var addEditQuestion = document.getElementById('addEditQuestionBlock');
+        addEditQuestion.style.display="none";
+        clearFields();
+    }
+
+    //show the Add/edit question dialogbox
+    function showQuestion(choice)
+    {
+        var choicesdiv = document.getElementById('AddQuestionChoices');
+        var addEditQuestion = document.getElementById('addEditQuestionBlock');
+        try
+        {
+            switch(choice.children[choice.selectedIndex].innerHTML)
+            {
+                case 'Free Text':
+                choicesdiv.style.display="none";
+                addEditQuestion.style.display="";
+                break;
+                case '--SELECT--':    
+                addEditQuestion.style.display="none";
+                break;   
+                default:
+                choicesdiv.style.display=""; 
+                addEditQuestion.style.display="";
+                break;
+            }
+        }
+        catch(excep)
+        {}
+    }
+
+    var temp;
+
+    var formElement;
+    //Show dialog based on button Pressed.
+    function showDialog(buttonPressed)
+    {
+        formElement =  document.getElementById('Page1:mainForm');
+        var divCreateQuestionGroupBackground = document.getElementById('CreateQuestionGroupDivBackground');
+        var divCreateQuestionGroupmodal = document.getElementById('CreateQuestionGroupDiv');
+        var divCreateRSSFormBackground = document.getElementById('CreateRSSFormDivBackground');
+        var divAddQuestionBackground = document.getElementById('AddEditQuestiondivBackground');
+        var divADDQuestionmodal = document.getElementById('AddEditQuestiondiv');
+        switch(buttonPressed.id)
+        {
+            case 'AddQuestion':
+                    divAddQuestionBackground.style.display='';
+                    divADDQuestionmodal.style.display='';
+                    divADDQuestionmodal.style.top = (jSurvey$(window).height()/2 -472/2 - jSurvey$('#AppBodyHeader').height()) + jSurvey$('#AppBodyHeader').height() + 'px';
+                    divADDQuestionmodal.style.left =(jSurvey$(formElement).width()/2 -884/2) +'px';
+                    jSurvey$('html, body').animate({
+                             scrollTop: jSurvey$(divADDQuestionmodal).offset().top -50
+                         });
+                    break;
+            
+            case 'AddQuestionGroup':
+                    divCreateQuestionGroupBackground.style.display='';
+                    divCreateQuestionGroupmodal.style.display='';
+                    divCreateQuestionGroupmodal.style.top = (jSurvey$(window).height()/2 -472/2 - jSurvey$('#AppBodyHeader').height()) + jSurvey$('#AppBodyHeader').height() + 'px';
+                    divCreateQuestionGroupmodal.style.left = (jSurvey$(formElement).width()/2 -884/2) +'px';
+                    jSurvey$('html, body').animate({
+                             scrollTop: jSurvey$(divCreateQuestionGroupmodal).offset().top -50
+                         });
+                    break;
+            
+            case 'CreateRSSbutton':
+                    divCreateRSSFormBackground.style.display='';
+                    divCreateRSSFormmodal.style.display='';
+                    divCreateRSSFormmodal.style.top =(jSurvey$(window).height()/2 -472/2 - jSurvey$('#AppBodyHeader').height()) + jSurvey$('#AppBodyHeader').height() + 'px';
+                    divCreateRSSFormmodal.style.left= (jSurvey$(formElement).width()/2 -884/2) +'px';
+                    jSurvey$('html, body').animate({
+                             scrollTop: jSurvey$(divCreateRSSFormmodal).offset().top -50
+                         });
+                    break;
+        }
+        return false;
+    }
+
+    //close all dialogs.
+    function closeDialog()
+    {
+        var divCreateQuestionGroupBackground = document.getElementById('CreateQuestionGroupDivBackground');
+        var divCreateQuestionGroupmodal = document.getElementById('CreateQuestionGroupDiv');
+        var divAddQuestionBackground = document.getElementById('AddEditQuestiondivBackground');
+        var divADDQuestionmodal = document.getElementById('AddEditQuestiondiv');
+        divCreateQuestionGroupBackground.style.display='none';
+        divCreateQuestionGroupmodal.style.display='none';
+
+        divAddQuestionBackground.style.display='none';
+        divADDQuestionmodal.style.display='none';
+        return false;
+    }
+
+    //show Edit/Add Question Dialog.
+    function showEditQuestionDialog()
+    {
+        showDialog(document.getElementById('AddQuestion'));
+    }
+
+    //show Edit/Add Question Group (Section) Dialog.
+    function showEditQuestionGroupDialog()
+    {
+        showDialog(document.getElementById('AddQuestionGroup'));
+    }
+
+    //Set the Navigation bar on top when scrolled and back to initial position when at starting of page.
+    function SetNavBar()
+    {
+        var x23 = document.getElementById('topNavigationBar');
+        if(jSurvey$(window).scrollTop()<113){
+            x23.style.position='';
+        }
+        else
+        {
+            x23.style.position = 'fixed';
+        }
+    }
+
+    //Show Saved Div 
+    function showSavedDiv()
+    { }
+
+    //Reposition the Quick link section(for sections)
+    function RepositionSection(obj)
+    {
+        var section = document.getElementById('SectionQuickLink');
+        section.style.left = jSurvey$(obj).position().left + obj.clientWidth + 'px';
+        section.style.top = jSurvey$(obj).position().top + obj.clientHeight + 'px';
+    }
+
+    //Show the quick links for the sections.
+    function showSections(obj)
+    {
+        var section = document.getElementById('SectionQuickLink');
+        section.style.left = jSurvey$(obj).position().left + obj.clientWidth + 'px';
+        section.style.top = jSurvey$(obj).position().top + obj.clientHeight + 'px';
+        if(section.style.display=='')
+        {
+            section.style.display='none';
+        }
+        else
+        {
+            section.style.display='';
+        }
+    }
+
+    //Hide the quick links for the sections
+    function hideSections()
+    {
+        document.getElementById('SectionQuickLink').style.display='none';
+    }
+     
+    function ShowSavedBar()
+    {
+        AllowSortingOnlyOnce=true; allowSorting();
+        var d = new Date(); // for now
+        var sec;
+        if(d.getSeconds()<10) { sec = 0 +d.getSeconds();} else {  sec = d.getSeconds(); }
+        document.getElementById('SavedBar').innerHTML = 'Last Saved at ' + d.getHours() + ':' + d.getMinutes() + ':' + sec;
+    } 
+
+    jSurvey$(document).keyup(function(e) 
+    {
+      if (e.keyCode == 27) 
+      { closeDialog(); }   // esc
+    });
+    
+    function OnCompleteSave()
+    {
+        reOrderTheQuestions();
+        AllowSortingOnlyOnce=true; allowSorting();
+    //setTimeout(function() {  JavaScriptSave(); AllowSortingOnlyOnce=true; allowSorting(); ShowSavedBar();},1000);
+    }
+</script>
+
+
+<!-- -------------------------------------- VISUAL FORCE ----------------------------------- -->
+
+<apex:form id="mainForm" onmousemove="{!if(!Disabled,'allowSorting()','')};SetNavBar();">
+    <div id="SavedBar" style="position:fixed; top:10px; right:30px;color:red;z-index:999" >
+    </div>
+ 
+    <apex:outputPanel id="actionPoller">
+        <!--apex:actionPoller action="{!AutoSave}" timeout="1000" onsubmit="reOrderTheQuestions()"  interval="15" enabled="{!KeepSaving && !Disabled}" oncomplete="ShowSavedBar();AllowSortingOnlyOnce=true;allowSorting();" reRender="actionPoller" />
+        <apex:actionPoller action="{!AutoSave}" timeout="10000" onsubmit="reOrderTheQuestions()"  interval="12" enabled="{!KeepSaving && !Disabled}" oncomplete="ShowSavedBar();AllowSortingOnlyOnce=true;allowSorting();" reRender="avasd" /-->
+    </apex:outputPanel>
+        <!--apex:actionFunction name="StopSaving" action="{!StopSaving}" rerender="actionPoller"/>
+        <apex:actionFunction name="StartSaving" action="{!StartSaving}" rerender="actionPoller"/-->
+    <apex:actionFunction name="JavaScriptSave"  action="{!AutoSave}" rerender="actionPoller"/>
+    <apex:outputPanel id="mainPanel" >
+    
+    <script>
+    //After the drag and drop is done, this function sets the order number of the questions and question groups by setting the hidden input field.          
+    function reOrderTheQuestions()
+    {
+        var justquestions = document.getElementById('QuestionGroup');
+        var inputs = justquestions.getElementsByTagName('input');
+        temp= new Array();  
+        var s=0;  
+        for(count =0;count<inputs.length;count++)  
+        {  
+            if(inputs[count].type=='hidden' && (inputs[count].id.search('QuestionGroupOrderNumber')!=-1))
+            {
+                inputs[count].value=s++;
+                temp[s-1]=inputs[count]; 
+            }  
+        }
+        Count = 2 ; 
+        var i=0;
+        var k=0;
+        while(k<count && i <100)
+        {  
+            var divElement = document.getElementById('justQuestionList'+i);
+            if(divElement == null)
+            {
+                i++;
+                continue;
+            }
+            inputs = divElement.getElementsByTagName('input');
+            temp= new Array();  
+            s=0;
+            for(j=0;j<inputs.length;j++)
+            {
+                if(inputs[j].type=='hidden' && (inputs[j].id.search('OrderNumber')!=-1))
+                {
+                    inputs[j].value=s++;
+                    temp[s-1]=inputs[j]; 
+                }  
+            }
+            i++;k++;
+        }
+    }
+    </script>
+    
+    <apex:actionStatus id="savingLoading">
+        <apex:facet name="start">
+        <c:P2RenhancedActionStatus BackColor="#ffffff" borderColor="#ffffff" borderSize="2" height="50px" width="150px" ImageUrl="/changemgmt/img/spinner24.gif" Message="Loading..." messageStyle="color:darkred;font-size:11pt;font-weight:bold;"/>
+        </apex:facet>   
+    </apex:actionStatus>
+    
+    <apex:pageMessages id="PageMessages"></apex:pageMessages>
+
+    <!--NavigationBar Div -->
+    <div id="topNavigationBar" style="top:0px;left:0px;right:0px;">
+        <table  style="width:100%;background-color:grey;top:0px;left:0px;right:0px;" >
+        <tr>
+            <td>
+                <div>
+                    <apex:outputPanel rendered="{!!Disabled && WriteAccessOfUser}">
+                        <button id="AddQuestion"   onclick="resetQuestion(); return showDialog(this);OnCompleteSave();" tabindex="10" Class="Custbtn" style="{!if(QuestionGroupSize>0,'display:;','display:none;')}" >Add Question</button> 
+                        <button id="AddQuestionGroup" onclick="return showDialog(this);OnCompleteSave();"  Class="Custbtn" >Add Section</button>    
+                        <apex:commandButton id="SaveQuestions" value="Save" onclick="reOrderTheQuestions()" oncomplete="ShowSavedBar()" action="{!SaveTemplate}" styleClass="Custbtn" status="savingLoading" />
+                        <apex:commandButton id="PublishTemplate" value="Publish" action="{!PublishTemplate}" rendered="{!if(QuestionSize>0,'true','false')}" styleClass="Custbtn" />
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!Disabled && WriteAccessOfUser}">
+                        <apex:commandButton id="CloneTemplate" value="Revise" action="{!CreateNewVersion}" styleClass="Custbtn" />
+                    </apex:outputPanel>
+                    <button id="showSectionsButton" onclick="showSections(this);return false;" class="Custbtn">Sections</button>
+                    <button onclick="jSurvey$('html, body').animate({scrollTop: 0});return false;" class="Custbtn"> Return to Top </button>  
+               </div>
+            </td>
+        </tr>
+        </table>
+  
+        <!-- Below is the div for the SectionQuick Link-->
+        <div id="SectionQuickLink" style="position:absolute;display:none;background-color:white;" class="ui-widget ui-tooltip ui-corner-all">
+        <apex:repeat value="{!questionGroupWrappers}" var="g" >
+            <div style="padding:2px 2px 2px 2px;">
+            <a href="#QuestionGroup{!g.UniqueName}" onclick="hideSections()" >{!g.questionGroup.Name}</a> <br/>
+            </div>
+        </apex:repeat>
+        </div>
+    </div>
+ 
+
+    <!-- Below are the div's for showing the add/edit QuestionGroup popup, I got the class from jQuery UI -->
+    <div id="CreateQuestionGroupDivBackground" style="display:none;" class="ui-widget-overlay ui-front" onclick="closeDialog();"/>
+        <div id="CreateQuestionGroupDiv" class="ui-widget-content ui-corner-all ui-front" style="display:none;position:absolute;">
+            <apex:outputPanel id="CreateQuestionGroupPanel"   >
+                Section Name : <apex:inputText value="{!NewGroupname}" />
+                <apex:commandButton id="CreateQuestionGroup" onclick="reOrderTheQuestions()" action="{!controllerSavQuestionGroup}" value="Save Question Group" oncomplete="closeDialog();OnCompleteSave();" reRender="mainPanel" status="savingLoading"/> 
+            </apex:outputPanel>
+        </div>
+ 
+    <!-- Below are the div's for showing the add/edit QuestionGroup popup, I got the class from jQuery UI -->
+    <div id="AddEditQuestiondivBackground" style="display:none;" class="ui-widget-overlay ui-front" onclick="closeDialog();"/>
+        <div id="AddEditQuestiondiv" class="ui-widget-content ui-corner-all ui-front" style="display:none;position:absolute;">
+    
+    <apex:outputPanel id="selectQuestionType"   >
+        <span class="prompt">Select Question Type
+            <div id="topPickList">
+              <apex:selectList size="1" value="{!questionType}" id="questionSelect" onchange="showQuestion(this)" >
+                <apex:selectOptions value="{!questionTypeOptions}" />
+              </apex:selectList>
+            </div>
+        </span>
+    </apex:outputPanel>
+    
+    <apex:outputPanel id="questionPanel"  >
+ 
+      <!----------------------------------------- QUESTION ----------------------------------------- -->
+        <div id="addEditQuestionBlock" >
+        <apex:pageBlock >
+            Question :<br/>
+            <apex:inputTextArea onKeyUp="limitChars(this)" style="width:858px;"  id="qQuestion" value="{!qQuestion.Question__c}"   title="The question you would like asked"/>
+            <br/>
+            <apex:outputText >Required Question?&nbsp;</apex:outputText>
+            <apex:inputCheckbox value="{!qQuestion.Required__c}"/><br/>
+            <apex:outputText >Type :&nbsp;</apex:outputText>
+            <apex:inputField value="{!qQuestion.Category__c}" /><br />
+            <apex:outputText styleClass="TemplateName">Select Section :</apex:outputText>
+            <br/>
+
+            <apex:selectList size="1" value="{!questionGroupName}" id="questionGroupName" multiselect="false"  >
+                    <apex:selectOptions value="{!questionGroupChoices}" />
+            </apex:selectList>
+            <br/>
+            
+            Question Description : <br/>
+            <apex:inputTextarea value="{!qQuestion.QuestionDescription__c}"  style="width:858px;height:100px;"/>
+            <br/>
+            
+            <div id="AddQuestionChoices">
+                <span>Please enter the list of answers/responses in the field below. Each value should be separated by a new line.</span><br/>
+                <apex:inputTextArea style="width:50%;height:200px;" id="qChoices" value="{!qQuestion.Choices__c}" onKeyUp="limitChars(this)" title="Answers to question..."/>
+            </div>
+
+            <br style="clear:both;"/>
+            <apex:commandButton action="{!controllerSavQuestion}" value="Save" onclick="reOrderTheQuestions()" reRender="mainPanel" status="savingLoading" oncomplete="closeDialog();OnCompleteSave();" />
+            <!-- <apex:commandButton action="{!previewQuestion}" value="Preview Question" reRender="singleSelectPreview" /> -->
+        </apex:pageBlock>
+      </div>
+   
+ <!-- End addQuestion -->
+ </apex:outputPanel>
+    </div >
+
+<!-- ------------------------------------------------------------------------------------- -->
+
+    <apex:pageBlock rendered="true">
+        <apex:pageBlockSection columns="1" id="block1">
+            <apex:pageBlockSectionItem rendered="{!!Disabled}">
+                <apex:outputLabel value="RSS Template Name" />
+                <apex:inputField value="{!RSSTemplate.Name}" id="fileName"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem rendered="{!Disabled}">
+                <apex:outputLabel value="RSS Template Name" />
+                <apex:outputField value="{!RSSTemplate.Name}" id="fileName"/>
+            </apex:pageBlockSectionItem>
+            <apex:outputField value="{!RSSTemplate.Version__c}"/>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+
+   <!-- The Sections with the questions and question groups -->  
+    <div id="QuestionGroup" >
+        <apex:repeat id="MainRepeat" value="{!questionGroupWrappers}" var="g">
+        <div id="QuestionGroup{!g.UniqueName}" class="question questionGroup" title="{!g.QuestionGroup.Name}">
+        <apex:outputPanel rendered="{!!Disabled}">
+            <apex:commandLink styleclass="btn nounderline" onclick="reOrderTheQuestions()" value="Edit" action="{!editQuestionGroup}" oncomplete="showEditQuestionGroupDialog();" status="savingLoading"  reRender="CreateQuestionGroupPanel">
+                <apex:param name="q" value="{!g.questionGroup.Name}" assignTo="{!UpdateQuestionGroupName}"/>
+                <apex:param name="p" value="{!g.UniqueName}" assignTo="{!EditQuestionGroupUniqueName}"/>
+            </apex:commandLink>
+       
+            <!-- Deleting Question Group -->
+            <apex:commandLink styleclass="btn nounderline" onclick="reOrderTheQuestions()" value="Delete" oncomplete="OnCompleteSave();" action="{!deleteQuestionGroup}" status="savingLoading" reRender="mainPanel"  >
+                <apex:param name="q" value="{!g.questionGroup.Name}" assignTo="{!UpdateQuestionGroupName}"/>
+                <apex:param name="abcd" value="{!g.UniqueName}" assignTo="{!DeleteQuestionUniqueGroupName}"/>
+            </apex:commandLink>
+      </apex:outputPanel>
+
+        <apex:outputLabel value="{!g.questionGroup.Name}"></apex:outputLabel>
+        <apex:inputHidden value="{!g.questionGroup.Order_Number__c}" id="QuestionGroupOrderNumber"/>
+        <br/>
+        <table width="100%" >
+            <tbody id="justQuestionList{!g.questionGroup.Order_Number__c}"  class="connectedSortable">
+            <apex:repeat value="{!g.surveyQuestions}" var="q" id="qRepeat">
+        <tr class="question">
+        <td>
+        <apex:inputHidden value="{!q.question.OrderNumber__c}" id="OrderNumber"/>
+        <div id ="{!q.question.id}"  title="Drag and Drop to Reorder" class="question">
+        <table>
+        <tr>
+        <td>
+            <div class="question_menu">
+                <apex:outputPanel rendered="{!!Disabled}">
+                    <apex:image value="{!URLFOR($Resource.SurveyForce, 'survey_upDown.png')}" />
+                    <apex:commandLink styleclass="btn nounderline" value="Edit" action="{!editQuestion}" onclick="reOrderTheQuestions()" oncomplete="showEditQuestionDialog();" status="savingLoading" reRender="selectQuestionType,scriptEditQuestion,questionPanel" >
+                        <apex:param name="q1" value="{!q.question.Question__c}" assignTo="{!questionReference}"/>
+                        <apex:param name="abc" value="{!g.UniqueName}" assignTo="{!EditQuestionUniqueGroupName}"/>
+                        <apex:param name="abcd" value="{!q.UniqueName}" assignTo="{!EditQuestionUniqueName}"/>
+                    </apex:commandLink>
+                     
+                    <apex:commandLink styleclass="btn nounderline" value="Delete" onclick="reOrderTheQuestions()" action="{!deleteQuestion}" oncomplete="OnCompleteSave();"  status="savingLoading" reRender="mainPanel" >
+                        <apex:param name="q2" value="{!q.question.Question__c}" assignTo="{!questionReference}"/>
+                        <apex:param name="abc" value="{!g.UniqueName}" assignTo="{!EditQuestionUniqueGroupName}"/>
+                        <apex:param name="abcd" value="{!q.UniqueName}" assignTo="{!EditQuestionUniqueName}"/>
+                    </apex:commandLink>
+                </apex:outputPanel>
+           </div>
+       </td>
+
+       <td valign="middle">
+            <table>
+            <tr>
+                <td>
+                    <h1>{!q.question.Question__c}
+                    <apex:outputPanel rendered="{!q.question.Required__c}">*</apex:outputPanel>
+                    </h1>
+                </td>
+            </tr>
+            
+            <tr>
+                <td>
+                    <apex:selectRadio layout="pageDirection" rendered="{!if(q.question.Type__c = 'Single Select--Vertical',true,false)}">
+                        <apex:selectOptions value="{!q.Choices}"/>
+                    </apex:selectRadio>
+                    <apex:selectCheckboxes layout="pageDirection" rendered="{!if(q.question.Type__c = 'Multi-Select--Vertical',true,false)}">
+                        <apex:selectOptions value="{!q.Choices}"/>
+                    </apex:selectCheckboxes>
+                    <apex:inputTextArea cols="50" rows="10" rendered="{!if(q.question.Type__c = 'Free Text',true,false)}"/>  
+                    <apex:selectRadio rendered="{!if(q.question.Type__c = 'Single Select--Horizontal',true,false)}">
+                        <apex:selectOptions value="{!q.Choices}"/>
+                    </apex:selectRadio>
+                    <apex:selectList multiselect="false" size="1" rendered="{!if(q.question.Type__c = 'Picklist',true,false)}">
+                        <apex:selectOptions value="{!q.Choices}"/>
+                    </apex:selectList>
+                </td>
+            </tr>
+        </table>
+        </td>
+        </tr>   
+        </table>
+        </div>
+        </td>
+        </tr>
+    </apex:repeat> 
+    
+     </tbody>
+     </table>
+     </div>
+     </apex:repeat>
+     </div>
+
+    <apex:outputPanel id="scriptEditQuestion">            
+        <script>
+        showQuestion(document.getElementById("{!$Component.Page1.mainForm.questionSelect}"));
+        </script>
+    </apex:outputPanel>
+    </apex:outputPanel> 
+    </apex:form> 
+
+<!-- -------------------------------------- CSS ----------------------------------- -->
+<style>
+    .Custbtn
+    {
+        height:22px;   
+    }
+    
+    .question
+    {
+        margin:auto;
+        padding-top:10px;
+        padding-left:10px;
+        padding-right:10px;
+        padding-bottom:10px;
+        box-shadow:0px 0px 14px #CCCCCC;
+        border-style:solid;
+        border-width:1px;
+    }
+    
+    .TemplateName
+    {
+        font-size:150%;
+    }
+    .nounderline
+    {
+        text-decoration:none;
+    }
+    .nounderline:hover
+    {
+        text-decoration:none;
+    }
+</style>
+
+</apex:page>

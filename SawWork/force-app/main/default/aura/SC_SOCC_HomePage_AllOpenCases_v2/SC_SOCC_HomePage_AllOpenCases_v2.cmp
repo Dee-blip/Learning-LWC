@@ -1,0 +1,420 @@
+<!--=====================================================================================================+
+    Component name      :   SC_SOCC_HomePage_AllOpenCases_v2
+    Author              :   Sumukh SS
+    Created             :   26-feb-20
+    Purpose             :   SOCCDASH COMPONENT USED FOR LIGHTNING OUT / VF PAGE FULL SCREEN.
+
+WARNING : THIS COMPONENT IS A CLONE OF SC_SOCC_HomePage_AllOpenCases. PLEASE CONSULT AUTHOR/RELATED TEAM MEMBERS BEFORE MAKING CHANGES.
+                            
+    Last Modified Developer           Purpose            
+    ============= ========================  =======
+ 23 Sep 2019    		Sumukh SS 	ESESP-2198		Initial Development
+ 01 Jan 2020			Sumukh SS	ESESP-2922		Adjust SOCCDash View
+ 26 Feb 2020			Sumukh SS	ESESP-3267		Remove height setter on SOCCDash and use for Lightning Out
+ 16 March 2020			Sumukh SS	ESESP-3244		Add Runbook features and furthur performance fixes
++=====================================================================================================-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" controller="SC_SOCC_Case_LightningUtility" access="global" >
+    
+    <ltng:require scripts="{!join(',', 
+                           $Resource.SC_Akatec_LightningMigration  + '/SC_Akatec_Lightning_Resource/jquery-2.2.4.min.js')
+                           }" afterScriptsLoaded="{!c.scriptsLoaded}"/>
+    
+    <!-- Aura attribute for filter accordian-->
+    <aura:attribute name="isOpen" type="Boolean" default="false" />
+    
+    <!--Attribute for severity values-->
+    <aura:attribute name="options" type="List" default="[
+                                                        {'label': '1', 'value': '1'},
+                                                        {'label': '2', 'value': '2'},
+                                                        {'label': '3', 'value': '3'}
+                                                        ]"/>
+    <!--Attribute for severity values to be checked-->
+    <aura:attribute name="value" type="List" default="1,2,3"/>
+    
+    <aura:attribute name="optionsgeo" type="List" default="[
+                                                           {'label': 'Americas', 'value': 'Americas'},
+                                                           {'label': 'AP', 'value': 'AP'},
+                                                           {'label': 'EMEA', 'value': 'EMEA'},                                                           
+                                                           {'label': 'Japan', 'value': 'Japan'},
+                                                           {'label': 'Others', 'value': 'Others'}
+                                                           ]"/>
+    <aura:attribute name="valuegeo" type="List" default=""/>
+    
+    <aura:attribute type="Integer"      name="pageNumber"		default="1" />
+    <aura:attribute type="Integer"      name="maxPage"			default="1" />
+    
+    <aura:handler name="change"	value="{!v.pageNumber}"	action="{!c.renderPage}"/>
+    
+    <!--Attribute for all tasks/cases which is returned from the class-->
+    <aura:attribute name="AllTaskList" type="List"/>    
+    <aura:attribute name="AllTaskListCount" type="string"/>
+    <aura:attribute type="list" name="currentList" />
+    
+    <aura:attribute name="AllTaskOverdueList" type="List"/>
+    <aura:attribute name="NotificationType" type="string"/>
+    
+    <!-- Attributes to store the summary dashboard count -->
+    <aura:attribute name="OverdueCount" type="string"/>
+    <aura:attribute name="YellowTasksCount" type="string"/>
+    <aura:attribute name="PurpleTasksCount" type="string"/>
+    <aura:attribute name="WhiteTasksCount" type="string"/>
+    <aura:attribute name="ApprovalCount" type="string"/>
+        
+    <!-- Attribute for spinner -->
+    <aura:attribute name="loaded" type="boolean" default="false"/>
+      <!-- Attribute for storing case id -->
+    <aura:attribute name="CaseRecordID" type="string"/>
+    <!-- Attribute for inline edit modal -->
+    <aura:attribute name="EditCaseModal" type="boolean" default="false"/>
+    <!--Attribute for storing poll id-->
+    <aura:attribute name="PollID" type="string"/>      
+    
+    <lightning:workspaceAPI aura:id="workspace"/>
+        
+    <!--Modal for opening case inline edit-->
+    <aura:if isTrue="{!v.EditCaseModal}">
+        
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open ">
+            <div class="slds-modal__container">
+                <!-- ###### MODAL BOX HEADER Start ######-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{!c.CloseModal}"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Inline Edit Case</h2>
+                </header>
+                <!--###### MODAL BOX BODY Part Start######-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <!-- Lightning Record Edit Form-->
+                    <lightning:recordEditForm	aura:id="editForm"
+                                              onsubmit="{!c.handleSubmit}"
+                                              onerror="{!c.handleOnError}"
+                                              onsuccess="{!c.closeEditModal}"
+                                              recordId="{!v.CaseRecordID}"
+                                              objectApiName="Case">
+                        <!-- the messages component is for error messages -->
+                        <lightning:messages />
+                        <lightning:inputField fieldName="Status" />
+                        <lightning:inputField fieldName="Is_SOCC_Priority__c" />
+                        <lightning:inputField fieldName="Priority_Expiry_Date__c" />
+                        <lightning:inputField fieldName="Priority_Type__c" />                    
+                        <lightning:inputField fieldName="Subject" />                    
+                        <lightning:inputField fieldName="Description" />
+                        <lightning:inputField fieldName="Living_Summary_Next_Steps__c" />
+                        
+                        <div class="slds-m-top_medium">
+                            <lightning:button variant="brand" type="submit" name="save" label="Save" />
+                        </div>
+                    </lightning:recordEditForm>
+                    
+                </div>
+                
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>            
+        
+    </aura:if>
+    
+    <div class="slds-box slds-theme_default" style="padding-right: 0px;padding-left: 0px;padding-top: 10px;padding-bottom: 0px;">
+        
+        <div class="panel-info"> 
+            <div class="panel-heading" >
+                <h5>
+                    <table id="summary_table" style="width:100% ">
+                        <thead>
+                            <tr>
+                                <td class="Paneldata slds-text-title_caps"><b><u>Total : {!v.AllTaskListCount}</u></b></td>
+                                <td class="Paneldata slds-text-title_caps"><b>White : <button class="slds-button" id="white" onclick="{!c.getNavRecords}" style="color: white !important;">{!v.WhiteTasksCount}</button></b></td>
+                                <td class="Paneldata slds-text-title_caps"><b>Purple : <button class="slds-button" id="#f78bf7" onclick="{!c.getNavRecords}" style="color: white !important;">{!v.PurpleTasksCount}</button></b></td>
+                                <td class="Paneldata slds-text-title_caps"><b>Yellow : <button class="slds-button" id="#ffd400" onclick="{!c.getNavRecords}" style="color: white !important;">{!v.YellowTasksCount}</button></b></td>
+                                <td class="Paneldata slds-text-title_caps"><b>Overdue : <button class="slds-button" id="overdue" onclick="{!c.getNavRecords}" style="color: white !important;">{!v.OverdueCount}</button></b></td>
+                                <td class="Paneldata slds-text-title_caps"><b>Runbook Approvals : <button class="slds-button" id="PendingApproval" onclick="{!c.getNavRecords}" style="color: white !important;">{!v.ApprovalCount}</button></b></td>
+                            </tr>
+                        </thead>
+                        
+                    </table>
+                </h5>
+            </div>
+        </div>
+        
+        <div class="slds-m-around_medium"  style=" margin-left: 0px;margin-right: 0px; margin-top: 2px;margin-bottom: 5px; border: 1.5px #39B4C0 solid;">
+            
+            <!--Lightning Spinner -->
+            <aura:if isTrue="{! v.loaded }">
+                <lightning:spinner alternativeText="Loading" />
+            </aura:if>
+            <!--================-->
+            
+            <div id="mySidenav" class="sidenav">
+                <div class="slds-panel__header">
+                    <h2 class="slds-panel__header-title slds-text-heading_small slds-truncate" style="color:#005fb2"><b>Notification Centre</b></h2>
+                    <a class="closebtn" onclick="{!c.closeNav}">&times;</a>
+                </div>
+                <div class="slds-panel__body">
+                    <aura:iteration items="{!v.AllTaskOverdueList}" var="sla">
+                        <lightning:card variant="Narrow" title="{!sla.EachCaseRec.AKAM_Case_ID__c}" iconName="standard:case">
+                            <aura:if isTrue="{!v.NotificationType=='white'}">
+                                <p class="slds-p-horizontal_small">
+                                    Case {!sla.EachCaseRec.AKAM_Case_ID__c} is unassigned!
+                                </p>
+                            </aura:if>
+                            <aura:if isTrue="{!v.NotificationType=='overdue'}">
+                                <p class="slds-p-horizontal_small">
+                                    Task {!sla.EachTaskRec.Subject} of {!sla.EachCaseRec.AKAM_Case_ID__c} has missed its due date since {!sla.TaskDueDateinMinutes}
+                                </p>
+                            </aura:if>
+                            <aura:if isTrue="{!v.NotificationType=='#ffd400'}">
+                                <p class="slds-p-horizontal_small">
+                                    Case {!sla.EachCaseRec.AKAM_Case_ID__c} has an email update! 
+                                </p>
+                            </aura:if>
+                            <aura:if isTrue="{!v.NotificationType=='#f78bf7'}">
+                                <p class="slds-p-horizontal_small">
+                                    {!sla.EachCaseRec.AKAM_Case_ID__c} has no / only completed tasks! 
+                                </p>
+                            </aura:if>
+                            <aura:if isTrue="{!v.NotificationType=='PendingApproval'}">
+                                <p class="slds-p-horizontal_small">
+                                    {!sla.EachCaseRec.AKAM_Case_ID__c} has pending runbook approvals! 
+                                </p>
+                            </aura:if>
+                            <aura:set attribute="footer">
+                                <aura:if isTrue="{!v.NotificationType=='overdue'}">
+                                    <button class="slds-button slds-button_outline-brand" id="{!sla.EachTaskRec.Id}" onclick="{!c.openNewTab}">Oh no! Take me there!</button>          
+                                    <aura:set attribute="else">
+                                        <button class="slds-button slds-button_outline-brand" id="{!sla.EachCaseRec.Id}" onclick="{!c.openNewTab}">Take me there!</button>          
+                                    </aura:set>
+                                </aura:if> 
+                            </aura:set>
+                        </lightning:card>
+                    </aura:iteration>
+                    
+                </div>
+            </div>
+            
+            <div class="slds-form-element">  
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col slds-box" style="padding-left: 2px;padding-top: 0px;padding-bottom: 0px;padding-right: 0px;border-left-width: 1px;margin-left: 1rem;">
+                        
+                        <lightning:checkboxGroup name="Checkbox"
+                                                 aura:id="CaseGeoCheckbox"                       
+                                                 label="Geography"
+                                                 options="{!v.optionsgeo}"
+                                                 value="{! v.valuegeo }"
+                                                 required="true" />
+                    </div>
+                    
+                    <div class="slds-col" style="padding-right: 10rem;">
+                        <lightning:button class="slds-button slds-button_brand Viewallfilters" aura:id="savebtn" onclick="{!c.saveFilters}">Save!</lightning:button>
+                        <aura:if isTrue="{!v.isOpen}">
+                            <button class="slds-button slds-button_destructive Viewallfilters" onclick="{!c.handleClick}">Hide filters</button>                                
+                            <aura:set attribute="else">
+                                <lightning:button class="slds-button slds-button_destructive Viewallfilters" aura:id="Viewallfiltersbtn" onclick="{!c.handleClick}">View all filters</lightning:button>                                
+                            </aura:set>
+                        </aura:if>
+                        <lightning:helptext content="1. This page can be bookmarked and is SSO enabled!
+                                                     2. Links will open the record in a new browser tab. Links opened from subject will open the record in classic console."/>
+                    </div>
+                    <div class="slds-col">
+                        <button class="slds-button" id="refreshbtn" onclick="{!c.refreshTable}" style="float: right;margin-top: 9px;margin-right: 1rem;"><lightning:icon iconName="action:refresh" size="xx-small" alternativeText="Refresh Data"/></button>
+                        <button class="slds-button slds-button_brand" style="float: right;margin-top: 9px;margin-right: 1px;" onclick="{!c.openNewCase}">New Case</button>
+
+                    </div>
+                    
+                </div>
+            </div>
+            <!--Filter accordian -->
+            <div class="{!'slds-accordion__list-item '+ if(v.isOpen, 'slds-is-expanded', 'slds-is-collapsed')}">
+                <section class="{!'slds-accordion__section '+ if(v.isOpen, 'slds-is-open', '')}">
+                    <div class="slds-accordion__summary_inner">
+                        <h2 class="slds-accordion__summary-heading slds-text-heading_small" style="padding-left: 5px;">
+                            Un-Savable filters and Search
+                        </h2>
+                    </div>
+                    <div class="{!'slds-accordion__content_inner '+ if(v.isOpen, 'slds-visible', 'slds-hidden')}">
+                        <div class="slds-m-around_medium"  style=" margin-left: 0px;margin-right: 0px; margin-top: 5px;margin-bottom: 5px; border: 1.0px #556270 solid;">
+                            
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col" style="padding-left: 16px;padding-bottom: 4px;">
+                                    <lightning:select aura:id="premium" name="select1" label="SOCC Premium Customer">
+                                        <option value="All">All</option>
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </lightning:select>
+                                </div>
+                                
+                                <div class="slds-col">
+                                    <lightning:checkboxGroup name="Checkbox Group"
+                                                             aura:id="CaseSeverityCheckbox"                       
+                                                             label="Severity"
+                                                             required="true" 
+                                                             options="{! v.options }"
+                                                             value="{! v.value }" />
+                                </div>
+                                <div class="slds-col">
+                                    <lightning:select aura:id="priority" name="" label="Priority Customer">
+                                        <option value="All">All</option>
+                                        <option value="Hot Customer">Hot Customer</option>
+                                        <option value="White Glove Treatment">White Glove Treatment</option>
+                                        <option value="High Alert Customer">High Alert Customer</option>
+                                        <option value="General/Others">General/Others</option>
+                                    </lightning:select>
+                                </div>
+                                
+                                <div class="slds-col">
+                                    <lightning:select aura:id="CaseOwner" name="" label="Case Owners">
+                                        <option value="All">All</option>
+                                        <option value="SOC Technicians Queue">SOC Technicians Queue</option>
+                                        <option value="SOC Specialists Queue">SOC Specialists Queue</option>
+                                        <option value="SOC Managers Queue">SOC Managers Queue</option>
+                                        <option value="SOC Netops Queue">SOC NetOps Queue</option>
+                                    </lightning:select>
+                                </div>
+                                
+                                
+                                <div class="slds-col slds-size_1.5-of-12">
+                                    <lightning:select aura:id="SearchType" class="SearchTypeDropdown" label="Search Field">
+                                        <option value="AKAM_Case_ID__c">AKAM Case ID</option>
+                                        <option value="Account.Name">Account</option>
+                                        <option value="Problem__c">Problem</option>
+                                    </lightning:select>
+                                </div>
+                                <div class="slds-col">
+                                    <ui:inputText placeholder ="Type in search criteria" aura:id='searchInput' class="field"/>
+                                </div>
+                                <div class="slds-col">
+                                    <button class="slds-button slds-button_brand" style="margin-top: 1.5rem;" id="applyButton" onclick="{!c.refreshTable}">Apply</button>
+                                    <button class="slds-button slds-button_destructive" style="margin-top: 1.5rem;" onclick="{!c.resetallfilters}">Reset</button>                                 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <div class="">
+                
+                <table id="AllSoccTasks" class="slds-table slds-table--bordered slds-table--fixed-layout slds-box slds-max-medium-table--stacked-horizontal" role="grid" style="width: 100%; padding-left: 0px; padding-right: 4px;padding-bottom: 0px;padding-top:0px;">
+                    <thead>
+                        <th class="slds-is-resizable slds-text-title--caps" scope="col" style="width:12.5%">
+                            <span class="slds-truncate" title="AKAM Case ID">AKAM Case ID</span>
+                            
+                        </th>
+                        
+                        <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col">
+                            <span class="slds-truncate" title="Account">Account</span>
+                            
+                        </th>
+                        <th class="slds-is-sortable slds-is-resizable slds-text-title--caps"  style="width:8%" scope="col">
+                            <span class="slds-truncate" title="Policy Domain">Policy Domain</span>
+                        </th>
+                        <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" style="width:3%" scope="col">
+                            <span class="slds-truncate" title="Severity">Sev</span>
+                            
+                        </th>
+                        <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" style="width:6%"  scope="col">
+                            <span class="slds-truncate" title="Geography">Geography</span>
+                            
+                        </th>
+                        <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" style="width:16%" scope="col">
+                            <span class="slds-truncate" title="Subject">Subject</span>
+                            
+                        </th>       
+                        <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" style="width:6%" scope="col">
+                            <span class="slds-truncate" title="Problem">Problem</span>
+                            
+                        </th>
+                        
+                        <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" style="width:6%" scope="col">
+                            <span class="slds-truncate" title="Task Owner">Task Owner</span>
+                            
+                        </th>
+                        <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" style="width:5.5%" scope="col">
+                            <span class="slds-truncate" title="Due in">Due in</span>
+                            
+                        </th>
+                        <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" style="width:6%" scope="col">
+                            <span class="slds-truncate" title="Task Type">Task Type</span>
+                            
+                        </th>
+                        <th class="slds-is-sortable slds-is-resizable slds-text-title--caps"  style="width:7%" scope="col">
+                            <span class="slds-truncate" title="Task Status">Task Status</span>
+                            
+                        </th>
+                        <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" style="width:6%" scope="col">
+                            <span class="slds-truncate" title="Updated By">Updated By</span>
+                            
+                        </th>
+                        <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" style="width:8%" scope="col">
+                            <span class="slds-truncate" title="Last Update">Last Update</span>
+                            
+                        </th>
+                    </thead>
+                    
+                    <tbody>
+                        <aura:iteration items="{!v.currentList}" var="case1">
+                            
+                            <tr class="slds-hint-parent">
+                                <td Style="{!'background:'+case1.CaseColor+';width:12.5%'}">
+                                    <div class="slds-truncate">
+                                        <lightning:buttonIcon aura:id="CCbutton" iconName="utility:copy_to_clipboard" variant="bare" onclick="{!c.copy}" alternativeText="Copy URL" value="{!case1.EachCaseRec.Id}"/>
+                                        <img src="{!$Resource.SC_Akatec_LightningMigration  +'/SC_Akatec_Lightning_Resource/Images/pencil.png'}" style="width: 16px;" id="{!case1.EachCaseRec.Id}" onclick ="{!c.openCaseEditModal}"/>
+                                        <a id="{!case1.EachCaseRec.Id}" onclick="{!c.openNewTab}">{!case1.EachCaseRec.AKAM_Case_ID__c}</a>
+                                        <aura:if isTrue="{!case1.EachCaseRec.Priority_Type__c=='High Alert Customer'}">&#10071;</aura:if>
+                                        <aura:if isTrue="{!case1.EachCaseRec.Priority_Type__c=='Hot Customer'}">&#128293;</aura:if>
+                                        <aura:if isTrue="{!case1.EachCaseRec.Priority_Type__c=='White Glove Treatment'}">&#9995;&#127995;</aura:if>
+                                    </div>
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate" title="{!case1.EachCaseRec.Account.Name}"><aura:if isTrue="{!case1.EachCaseRec.Account.Is_SOCC_Premium_Customer__c==true}">&#11088;</aura:if>
+                                        <aura:if isTrue="{!case1.EachCaseRec.Account.Service_Country_Affinity__c==true}"><img src="{!$Resource.QM_Tool_StaticResource+'/QM_Resource/Images/transition.png'}" title="Service Country Affinity" style="width: 16px;" id="{!case1.EachCaseRec.Id}"/></aura:if>
+                                        {!case1.EachCaseRec.Account.Name}</div>
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate"><a id="{!case1.EachCaseRec.Policy_Domain__r.Id}" onclick="{!c.openNewTab}"> {!case1.EachCaseRec.Policy_Domain__r.Name}</a></div>
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate">{!case1.EachCaseRec.Severity__c}</div>
+                                </td>
+                                <td role="gridcell" Style="{! 'color:'+case1.GeoColor}">
+                                    <div class="slds-truncate" >{!case1.EachCaseRec.Geography__c}</div>
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate" title="{!case1.EachCaseRec.Subject}"><a id="{!case1.EachCaseRec.Id}" onclick="{!c.openClassicTab}">{!case1.EachCaseRec.Subject}</a></div>
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate">{!case1.EachCaseRec.Problem__c}</div>
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate"><a id="{!case1.EachTaskRec.Id}" onclick="{!c.openNewTab}">{!case1.EachTaskRec.Owner.Alias}</a></div>
+                                </td>
+                                <td role="gridcell" Style="{!'color:'+case1.TimeColor}">
+                                    <div class="slds-truncate"> {!case1.TaskDueDateinMinutes}</div>
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate">{!case1.EachTaskRec.Type__c}</div>
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate">{!case1.EachTaskRec.Status}</div>
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate"> {!case1.CaseLastUpdateBy}</div>
+                                </td>
+                                <td role="gridcell" style="width:8%;color:#035b79">
+                                    <div class="slds-truncate">{!case1.LastUpdateTimeinMinutes}</div>
+                                </td>
+                            </tr>
+                            
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+        <!--Aura component for handling pagination logic-->
+        <c:SC_SOCC_HomePage_Pagination currentPageNumber="{!v.pageNumber}" 
+                                       maxPageNumber="{!v.maxPage}" />
+        
+    </div>
+</aura:component>

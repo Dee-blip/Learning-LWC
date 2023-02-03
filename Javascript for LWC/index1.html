@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SHADOW DOM</title>
+    </head>
+    <body>
+        <div>
+            <p>Thanks for chossing Zero to Hero Course</p>
+        </div>
+        <div id="host"></div>
+        <button  onclick="fetchtag()">Buttons</button>
+
+        <script>
+            const ele=document.querySelector('#host')
+            const shadowRoot=ele.attachShadow({mode:'open'})
+            shadowRoot.innerHTML='<p> I am shadow DOM</p>'
+
+            function fetchtag(){
+                let tags=document.querySelectorAll('p')
+                console.log(tags)
+            }
+        </script>
+    </body>

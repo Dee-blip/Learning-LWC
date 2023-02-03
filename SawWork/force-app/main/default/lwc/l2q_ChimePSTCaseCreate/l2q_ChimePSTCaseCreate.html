@@ -1,0 +1,178 @@
+<template>
+  
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open ">
+      <template if:true={showSpinner}>
+        <lightning-spinner variant="brand" alternative-text="Creating PST cases, please wait..."
+              size="large">
+          </lightning-spinner>
+          </template>  
+        <div class="slds-modal__container customFont">
+          <header class="slds-modal__header">
+            <h2 id="modal-heading-01" class="slds-modal__title salesforcefontfam slds-hyphenate">Create PST Case</h2>
+          </header>
+        <div class="slds-modal__content aroundpadding" id="modal-content-id-1" style="height:400px;">
+            <template if:false={showError}>
+              <div class="slds-m-bottom_xx-small salesforcefontfam">
+                <p style="height: 30px;font-style: normal;font-weight: normal;font-size: 13px;line-height: 30px;" >Select products from below for which you want to create PST cases</p>
+              </div>
+              <div style="color: #808080; " class=" salesforcefontfam slds-m-top_small slds-p-bottom_none slds-p-left_none slds-p-right_none " >
+                <p style=" font-style: italic; font-size: 10px; ">Note: Disabled row indicates that given product is not supported by PST Team.</p>
+              </div>
+              <table class="slds-table slds-table_cell-buffer slds-no-row-hover slds-size_1-of-1 slds-m-top_xx-small">
+                <thead>
+                  <tr class="slds-border_bottom" >
+                    <th scope="col" class="slds-p-left_small">
+                      <div>
+                        <!-- <lightning-input variant="label-hidden"  type="checkbox"></lightning-input> -->
+                      </div>
+                    </th>
+                    <th scope="col" class="slds-size_2-of-7 slds-p-around_none">
+                      <a class="slds-th__action salesforcefontfam slds-p-left_none slds-p-right_none slds-text-link_reset" >
+                        DSR Product Name
+                      </a>
+                    </th>
+                    <th scope="col" class="slds-size_5-of-7 slds-p-around_none">
+                      <a class="slds-th__action salesforcefontfam slds-text-link_reset slds-p-left_none" >
+                        Justification for No Approval
+                      </a>
+                    </th> 
+                  </tr>
+                </thead>
+                <tbody class="slds-size_1-of-1">
+                  <!-- {productMasterList} Added by Ashin so that we can select the products for which we need to create PST case-->
+                  <template for:each={productMasterList} for:item="iteratedProd">
+                    <template if:false={iteratedProd.eitherDisabled}>
+                      <tr class="slds-p-left_small" key={iteratedProd.product.ProdName}>
+                        <!-- below Added by Ashin :- individual checkbox for each product -->
+                        <td scope="row" class="slds-p-bottom_none salesforcefontfam">
+                          <div>
+                              <lightning-input type="checkbox" value={iteratedProd.product.prodName} data-key="SelectedPrds"  ></lightning-input>
+                          </div>
+                        </td>
+                        <!-- above Added by Ashin :- individual checkbox for each product -->
+                        <td scope="row" style="color: #808080; " class=" salesforcefontfam slds-m-right_small slds-p-bottom_none slds-p-left_none slds-p-right_none " >
+                          {iteratedProd.product.prodName}</td>
+                        <td scope="row" style="color: #808080; " class=" salesforcefontfam  slds-p-bottom_none slds-p-left_none slds-p-right_none slds-form-element" >
+                          <!-- <lightning-input  onchange={handleSelectedProductChange} type="checkbox" label="" ></lightning-input> -->
+                          <lightning-input class="slds-size_1-of-1" variant="label-hidden" disabled={iteratedProd.product.justificationNeeded} data-key="justification" maxlength="255" type="text" placeholder={iteratedProd.product.justificationStr} onkeyup={showWarningToast} name={iteratedProd.product.prodName} ></lightning-input>
+                        </td>
+                      </tr>
+                    </template>
+                    <template if:true={iteratedProd.eitherDisabled}>
+                      <template if:true={iteratedProd.isDisabledforDSR}>
+                        <template  if:false={iteratedProd.isDisabled}>
+                          <tr class="slds-p-right_xx-small" key={iteratedProd.product.ProdName}>
+                            <td scope="row" class="slds-p-bottom_none salesforcefontfam">
+                              <div>
+                                  <lightning-input disabled type="checkbox" value={iteratedProd.product.prodName} data-key="SelectedPrds"  ></lightning-input>
+                              </div>
+                            </td>
+                            <td scope="row" style="color: #808080; " class="salesforcefontfam slds-m-right_small slds-p-bottom_none slds-p-left_none slds-p-right_none " >
+                              {iteratedProd.product.prodName}
+                              <div class="legendsclass strikethrough" style=" margin-bottom: 22px; vertical-align: 2px; margin-left: 5px; padding-bottom: 2px; " >
+                                <span class=" slds-p-around_xx-small slds-badge innerlg badgespan slds-badge_lightest"> DSR </span>
+                              </div>
+                            </td>
+                            <td scope="row" style="color: #808080; " class=" salesforcefontfam  slds-p-bottom_none slds-p-left_none slds-p-right_none slds-form-element" >
+                              <lightning-input class="slds-size_1-of-1" variant="label-hidden" disabled data-key="justification" maxlength="255" type="text"  onkeyup={showWarningToast} name={iteratedProd.product.prodName} ></lightning-input>
+                            </td>
+                          </tr>
+                        </template>
+                      </template>
+                      <template if:true={iteratedProd.isDisabled}>
+                        <template  if:false={iteratedProd.isDisabledforDSR}>
+                          <tr class="slds-p-right_xx-small" key={iteratedProd.product.ProdName}>
+                            <td scope="row" class="slds-p-bottom_none salesforcefontfam">
+                              <div>
+                                  <lightning-input disabled type="checkbox" value={iteratedProd.product.prodName} data-key="SelectedPrds"  ></lightning-input>
+                              </div>
+                            </td>
+                            <td scope="row" style="color: #808080; " class="salesforcefontfam slds-m-right_small slds-p-bottom_none slds-p-left_none slds-p-right_none " >
+                              {iteratedProd.product.prodName}
+                              <div class="legendsclass strikethrough" style=" margin-bottom: 22px; vertical-align: 2px; margin-left: 5px; padding-bottom: 2px; border-color: grey;" >
+                                <span style=" color: grey; border-color: grey; " class=" slds-p-around_xx-small slds-badge innerlg badgespan slds-badge_lightest"> PST </span>
+                              </div>
+                            </td>
+                            <td scope="row" style="color: #808080; " class=" salesforcefontfam  slds-p-bottom_none slds-p-left_none slds-p-right_none slds-form-element" >
+                              <lightning-input class="slds-size_1-of-1" variant="label-hidden" disabled data-key="justification" maxlength="255" type="text"  onkeyup={showWarningToast} name={iteratedProd.product.prodName} ></lightning-input>
+                            </td>
+                          </tr>
+                        </template>
+                      </template>
+                      <template  if:true={iteratedProd.isDisabledforPSTnDSR}>
+                        <tr class="slds-p-right_xx-small" key={iteratedProd.product.ProdName}>
+                          <td scope="row" class="slds-p-bottom_none salesforcefontfam">
+                            <div>
+                                <lightning-input disabled type="checkbox" value={iteratedProd.product.prodName} data-key="SelectedPrds"  ></lightning-input>
+                            </div>
+                          </td>
+                          <td scope="row" style="color: #808080; " class="salesforcefontfam slds-m-right_small slds-p-bottom_none slds-p-left_none slds-p-right_none " >
+                            {iteratedProd.product.prodName}
+                            <div class="legendsclass strikethrough" style=" margin-bottom: 22px; vertical-align: 2px; margin-left: 5px; padding-bottom: 2px; border-color: grey; " >
+                              <span style=" color: grey; border-color: grey;" class=" slds-p-around_xx-small slds-badge innerlg badgespan slds-badge_lightest"> PST </span>
+                            </div>
+                            <div class="legendsclass strikethrough" style=" margin-bottom: 22px; vertical-align: 2px; margin-left: 5px; padding-bottom: 2px; " >
+                              <span class=" slds-p-around_xx-small slds-badge innerlg badgespan slds-badge_lightest"> DSR </span>
+                            </div>
+                          </td>
+                          <td scope="row" style="color: #808080; " class=" salesforcefontfam  slds-p-bottom_none slds-p-left_none slds-p-right_none slds-form-element" >
+                            <lightning-input class="slds-size_1-of-1" variant="label-hidden" disabled data-key="justification" maxlength="255" type="text"  onkeyup={showWarningToast} name={iteratedProd.product.prodName} ></lightning-input>
+                          </td>
+                        </tr>
+                      </template>
+                    </template>
+                  </template>
+                </tbody>
+            </table>  
+              <!--<lightning-datatable
+              key-field="id"
+              data={prodOptionsList}
+              columns={columns}>
+              </lightning-datatable>-->  
+              <template if:true={showWarning}>
+                <div class=" salesforcefontfam slds-text-align_left slds-grid hideshow slds-m-top_small slds-border_around slds-box slds-box_xx-small " style="border-color: rgb(255, 154, 60);font-style: italic;font-weight: lighter; border-radius: 0px;" >
+                  <div class="slds-col slds-p-left_x-small" >
+                    <lightning-icon size="xx-small" icon-name="utility:warning" alternative-text="Warning!" variant="warning"></lightning-icon>
+                  </div>
+                  <div class="slds-col slds-p-left_x-small" style=" font-size: 10px; line-height: 14px; " >
+                    <p>
+                      Justification for unapproved DSR will be reviewed by the implementation team before assigning a resource. Best practice for faster resource assignment is to have approved DSR before raising a case.
+                    </p>
+                  </div>
+                </div>
+              </template>
+              <div class="slds-col slds-m-top_x-small slds-grid">
+                <div class="legendsclass strikethrough " style="  vertical-align: 2px; margin-left: 5px; padding-bottom: 2px; border-color: grey; " >
+                  <span style=" color: grey; border-color: grey;" class=" slds-p-around_xx-small slds-badge innerlg badgespan slds-badge_lightest"> PST </span>
+                </div>
+                <div class="slds-p-left_x-small salesforcefontfam slds-m-top_x-small" style=" font-size: 7px; margin-top: 5px; font-weight: bold; color: black; ">Product is not supported by PST team</div>
+                <div class="legendsclass strikethrough slds-m-left_medium" style=" vertical-align: 2px; padding-bottom: 2px; " >
+                  <span class=" slds-p-around_xx-small slds-badge innerlg badgespan slds-badge_lightest"> DSR </span>
+                </div>
+                <div class="slds-p-left_x-small salesforcefontfam" style=" font-size: 7px; margin-top: 5px; font-weight: bold; color: black;">DSR needs to be associated to create a PST case</div>
+              </div>
+              <div class="slds-col">
+                <lightning-textarea class="slds-m-top_small" data-key="casenotes" maxlength="200"  label="POC description/Context" placeholder="Kindly provide PoC description/Context here"></lightning-textarea> 
+              </div>
+              
+              </template>
+              <template if:true={showError}>
+                <div style="font-weight:800;font-size:12px" class="slds-align_absolute-center">Below is a complete list of what needs to be in place before POC integration cases can be created.  Please review this list to assess what is left to complete.  Some of these may already be complete on your POC CHIME form.</div>
+                <div class="slds-m-top_medium">
+                1) POC Chime form is in Scoping stage or Gating stage<br/>
+                2) All POC mandatory questions are answered <br/>
+                3) Opportunity should be on POC Chime Form <br/>
+                </div>
+              </template>
+              
+          </div>
+          <footer class="slds-modal__footer">
+            <button class="slds-button slds-button_neutral" onclick={handleCancel}>Cancel</button>
+            <template if:false={showError}>
+            <button class="slds-button slds-button_brand" disabled={submitdisable} onclick={handleSubmit}>Submit</button>
+            </template>
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div> 
+</template>

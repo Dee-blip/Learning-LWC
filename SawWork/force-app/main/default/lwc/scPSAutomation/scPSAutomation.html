@@ -1,0 +1,241 @@
+<template>
+ <template if:true={showSpinner}>
+    <!--<div class="slds-is-relative" style="height:1200px;">-->
+    <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+   <!-- </div>-->
+  </template>
+  <div class="slds-card slds-page-header" style="height: 60px;padding-top: 10px;padding-bottom: 4px;">
+    <div class="slds-grid slds-gutters">
+      <header class="slds-media slds-media_center slds-has-flexi-truncate">
+        <div class="slds-media__figure slds-col slds-size_1-of-4">
+          <ul class="slds-list_horizontal slds-media_center">
+            <li style="margin-right: 5px;">
+              <lightning-icon icon-name="standard:list_email" size="medium" alternative-text="case" title="case"></lightning-icon>
+            </li>
+            <li>
+              <div class="slds-media__body">
+                <div class="slds-page-header__name">
+                  <div class="slds-page-header__name-title">
+                    <h3>
+                      <span class="slds-text-heading_small slds-truncate">
+                        <b>New Customer Mailer</b>
+                      </span>
+                    </h3>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </header>
+    </div>
+  </div>
+  <div style="background-color:white;padding-left:100px;padding-right:100px;padding-bottom:100px;">
+    <div class="slds-grid">
+    <div class="slds-col">  
+    <lightning-input class="slds-p-top_large" type="text" label="Mailer Name" onchange={handleMailerNameChange} max-length="255" required></lightning-input>
+    <lightning-combobox name="recordType" label="Record Type" value={recordTypeValue} class="slds-p-top_large" options={recordTypeOptions} required></lightning-combobox>
+      </div>
+      <div class="slds-col"> </div>
+  </div>
+    <lightning-textarea name="instructions" class="slds-p-top_large" label="Instructions" onchange={handleInstructionsChange} max-length="10000"></lightning-textarea>
+    <div class="slds-grid">
+      <div class="slds-col slds-size_3-of-4">
+        <lightning-dual-listbox name="products" value={selectedProducts} label="Product/s" source-label="Available Security Products" selected-label="Selected Security Products" class="slds-p-top_large" options={productOptions} onchange={handleProductChange}></lightning-dual-listbox>
+      </div>
+      <div class="slds-col slds-size_1-of-4" style="margin-top:100px;">
+        <template if:false={selectedProductsBlank}>
+         <!-- <lightning-button class="slds-m-left_medium" variant="brand" label="Applicable Accounts" onclick={handleApplicableAccountsShow}></lightning-button>-->
+        
+    <a style="font-size:15px;margin-left:50px;" onclick={handleApplicableAccountsShow}>Applicable Accounts</a>
+    <template if:true={isAnyAccountMissingTeamMember}>
+      <span class="tooltipIdentifier" onmouseout={handleHideTooltip} onmouseover={handleShowTooltip} style="padding-left:1rem;padding-top:5rem;position:relative">
+        
+          <lightning-icon icon-name="standard:account" size="small" title="There are account/s having no SSP Team Member"></lightning-icon>
+        <template if:true={showTooltip}>
+        <div class="slds-popover slds-popover_tooltip slds-nubbin_bottom-right" role="tooltip" id="help" style="top:-70px;left:-60px">
+          <div class="slds-popover__body">There are account/s having no SSP Team Member</div>
+        </div>
+      </template>
+    </span>
+     
+      <!--<br/><p style="color:red"><i>(There are account/s having no SSP Team Member)</i></p>-->
+    </template>
+        </template>
+      </div>
+    </div>
+    <lightning-textarea
+    value={teamMemberEmail}
+    label="To"
+    class="slds-p-vertical_large" 
+    disabled=true required
+>
+</lightning-textarea>
+<div class="slds-float_right">
+  <a style="font-size:13px;margin-right:20px;"  onclick={handleManageRecipients}>Manage Recipients</a>
+  <span style="margin-left:5px;margin-bottom:5px;margin-right:20px;">
+    <lightning-helptext content="Configure Admin Recipients"></lightning-helptext>
+    </span>
+</div> 
+<label class="slds-text-title">Admin Recipients</label>
+<span style="margin-left:5px;margin-bottom:5px;">
+<lightning-helptext content="Akamai Internal DLs and User's Email ID for visibility)"></lightning-helptext>
+</span>
+<div class="slds-pill_container">
+  <template for:each={dlList} for:item="itrDL">
+  <span key={itrDL} class="slds-pill">
+    <a href="#" class="" title="Full pill label verbiage mirrored here">
+      <span class="slds-pill__label">{itrDL}</span>
+    </a>
+    <button class="slds-button slds-button_icon slds-button_icon slds-pill__remove" title="Remove">
+      <svg class="slds-button__icon" aria-hidden="true">
+        <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+      </svg>
+      <span class="slds-assistive-text">Remove</span>
+    </button>
+  </span>
+  </template>
+  
+  
+</div>
+   
+    
+      <!--<lightning-pill label="Vishnu Sharma"></lightning-pill>
+      <lightning-pill label="Poulomi Das"></lightning-pill>-->
+    
+
+   <!-- <div style="margin-top:30px;" class="slds-p-top_large  slds-form-element slds-form-element_horizontal slds-form-element_1-col">
+      <label style="font-size:12px;color:#444444;" for="cc">Other Recipients</label><br/>
+      <div class="slds-form-element__control">
+          <c-email-input onselection={handleCcAddressChange}></c-email-input>
+      </div>
+  </div>-->
+  
+
+    <!--<lightning-input class="slds-p-top_large" type="text" label="Other Recipients" disabled={selectedProductsBlank}></lightning-input>-->
+    <lightning-input class="slds-p-top_large" type="text" label="Subject" required disabled={selectedProductsBlank} value={subject} onchange={handleSubjectChange} max-length="255"></lightning-input>
+    <!--<lightning-input class="slds-p-top_large" type="File" label="Attachments" disabled={selectedProductsBlank} multiple></lightning-input>-->
+    <lightning-input type="file" class="slds-p-top_large"
+            accept=".xlsx, .xls, .csv, .doc, .docx, .pdf,.pptx,.txt,.zip"
+            label="Attachment (Max. size 7 MB)" onchange={openfileUpload} disabled={selectedProductsBlank} multiple></lightning-input>
+    <template if:true={fileData}>
+      <template for:each={fileData} for:item="itrFile">
+             
+              <span key={itrFile.fileName} class="slds-pill">
+               <!-- <a href="#" class="" title="Full pill label verbiage mirrored here">-->
+                  <span class="slds-pill__label">{itrFile.fileName}</span>
+                <!--</a>-->
+                <lightning-button-icon icon-name="utility:close" name={itrFile.fileName} onclick={handleFileRemove} variant="bare" alternative-text="remove" title="remove"></lightning-button-icon>
+                
+              </span>
+              </template>
+    </template>
+  <lightning-input-rich-text
+     value={body} onchange={handleBodyChange}
+    class="slds-p-top_large" label-visible="true"
+    label = "Content" required
+    disabled={selectedProductsBlank}
+    ></lightning-input-rich-text>
+    <span class="slds-m-top_medium slds-align_absolute-center">
+      <lightning-button disabled={selectedProductsBlank}  variant="brand" label="Send Test Email to me" onclick={handleTestEmail}></lightning-button>
+      <lightning-button disabled={selectedProductsBlank}  class="slds-m-left_small" variant="brand" label="Save Draft" onclick={handleSaveDraft}></lightning-button>
+      <lightning-button disabled={selectedProductsBlank}  class="slds-m-left_small" variant="brand" label="Publish and send emails" onclick={handlePublish}></lightning-button>
+      <lightning-button disabled={selectedProductsBlank}  class="slds-m-left_small" variant="neutral" label="Discard" onclick={handleDiscard}></lightning-button>
+      <!--<button disabled={selectedProductsBlank} class="slds-button slds-button_brand" onclick={handleTestEmail}>Send Test Email to me</button>
+      <button disabled={selectedProductsBlank} class="slds-button slds-button_brand" onclick={handleSaveDraft}>Save Draft</button>
+      <button disabled={selectedProductsBlank} class="slds-m-left_medium slds-button slds-button_brand" onclick={handlePublish}>Publish and send emails</button>
+      
+      <button disabled={selectedProductsBlank} class="slds-button slds-button_brand" onclick={handleDiscard}>Discard</button>-->
+    </span>  
+    
+  </div>
+  <template if:true={showApplicableAccountsList}>
+    <template if:true={showSpinner}>
+      <!--<div class="slds-is-relative" style="height:1100px;">-->
+      <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+     <!-- </div>-->
+    </template>
+    
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" class="slds-modal slds-fade-in-open">
+      <div class="customModal">
+        <div class="slds-modal__container">
+          <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse">
+            <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+              <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+            </svg>
+            <span class="slds-assistive-text">Cancel and close</span>
+          </button>
+          <div class="slds-modal__header">
+            <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Affiliated Accounts ({accountCount})</h1>
+          </div>
+          <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+            <div class="slds-grid">
+              <div class="slds-col"> <p class="slds-m-vertical_medium slds-m-left_large" style="color:red"><i>* Accounts with no Security Services Primary team member are highlighted.</i></p></div>
+              <div class="slds-col"> 
+                <template if:true={isToggleChecked}>
+                  <lightning-input data-id="status" type="toggle" label="Show Missing SSP member accounts " onchange={handleToggleChange} checked></lightning-input> 
+                 </template>
+                 <template if:false={isToggleChecked}>
+                    <lightning-input data-id="status" type="toggle" label="Show Missing SSP member accounts " onchange={handleToggleChange} ></lightning-input> 
+                  </template>
+              </div>
+              <div class="slds-col" style="margin-bottom:10px;">
+               
+                <div onkeypress={keycheck} >
+                  <lightning-input type="text" placeholder="Type Account Name and Press Enter..." name="searchAccount" onblur={handleSearch} value={searchKey} class="slds-float__right"></lightning-input>
+                  
+                </div>
+              </div>
+            </div>
+
+           
+              <div style="height:500px;">
+                <lightning-datatable key-field="id" data={applicableAccountsData} hide-checkbox-column columns={dataTableColumns} ></lightning-datatable>
+              </div>
+          </div>
+          <div class="slds-modal__footer">
+            <span>
+              <lightning-helptext content="Notify Account Owners for Accounts not having any team member with Security Services - Primary team role."></lightning-helptext>
+              <lightning-button class="slds-m-right_small" variant="brand" label="Notify Account Owner" title="Primary action" onclick={sendEmailForMissingMember}></lightning-button>
+              
+           
+              
+              <!--<button style="background-color:green" onclick={sendEmailForMissingMember} class="slds-button slds-button_brand">Notify Account Owner for no security services primary team role member</button>-->
+              <lightning-button variant="neutral" label="Close" onclick={handleClosePopUp}></lightning-button>
+          <!-- <button onclick={handleClosePopUp} class="slds-button  slds-button_brand">Close</button>-->
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+  </template>
+
+  <template if:true={showAuthorizationError}>
+    
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" class="slds-modal slds-fade-in-open">
+      <div class="customModal">
+        <div class="slds-modal__container">
+          <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse">
+            <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+              <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+            </svg>
+            <span class="slds-assistive-text">Cancel and close</span>
+          </button>
+          
+          <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+            <p class="slds-align__absolute-center slds-m-vertical_medium slds-m-left_large" style="color:red;"><i>You do not have required access to create Customer Mailer records.</i></p>
+            
+          </div>
+          <div class="slds-modal__footer">
+            <span>
+             
+              <button onclick={handleDiscard} class="slds-button  slds-button_brand">Back</button>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+  </template>
+</template>

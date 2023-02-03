@@ -1,0 +1,64 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId"
+	access="global" controller="HD_IncidentBulkUpdate">
+	<aura:attribute name="searchQuery" type="String" default="" />
+	<aura:attribute name="results" type="List" />
+	<aura:attribute name="incidentIds" type="List" />
+	<aura:attribute name="incidentData" type="List" />
+    <aura:attribute name="selectedId" type="String" default=""/>
+    <aura:attribute name="userinfo" type="String" default=""/>
+    <aura:attribute name="warnings" type="String[]" />
+    <aura:attribute name="selectedStaff" type="String"/>	
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+	<aura:attribute name="allStaffs" type="Map" />
+    <aura:registerEvent name="HD_ShowBulkUpdateResultsEvt" type="c:HD_ShowBulkUpdateResultsEvt"/>
+
+	
+   	
+	<div aura:id="Accspinner" class="slds-spinner_container slds-hide">
+		<div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+			<span class="slds-assistive-text">Processing</span>
+			<div class="slds-spinner__dot-a"></div>
+			<div class="slds-spinner__dot-b"></div>
+		</div>
+	</div>
+
+		<!--<label class="slds-form-element__label " for="30" >Staff Search</label> -->
+		<!-- <input id="3011" aura:id="25" type="text" value="{!v.searchQuery}" 
+			onkeyup="{!c.performSearch}"/> -->
+
+    <!--<input class="slds-lookup__search-input slds-input" id="staffInput" placeholder="Search Staff" type="search"
+                      value="{!v.searchQuery}" onkeyup="{!c.performSearch}" >{!v.searchQuery}</input>-->
+    <div class="slds-form-element">	
+    <ui:inputText value="{!v.searchQuery}" keyup="{!c.performSearch}" updateOn="keyup" 
+                  class="slds-lookup__search-input slds-input"
+                  placeholder="Search Staff"
+                  errors="{!v.warnings}"/>
+	<ui:inputDefaultError aura:id="warn" value="{!v.warnings}" />
+    <p>Selected Staff : {!v.selectedStaff}</p>
+    
+    <ul >
+			<aura:iteration items="{!v.results}" var="result">
+				<li role="presentation" onclick="{!c.selectStaff}" data-id="{!result.id}"
+					data-name="{!result.name}">
+					<span class="slds-lookup__item-action slds-media" id="lookup-option-475"
+						role="option">
+						<div class="slds-media__body">
+							<div class="slds-lookup__result-text">{!result.name}</div>
+							<span class="slds-lookup__result-meta slds-text-body--small">{!result.name} | {!result.email}</span>
+						</div>
+					</span>
+				</li>
+			</aura:iteration>
+		</ul>
+    <br/>
+    
+    
+	<ui:button aura:id="Assign" label="Assign" press="{!c.assignOwner}"  /> 
+        <ui:button aura:id="Assign to me" label="Assign to me" 
+		press="{!c.assignOwner}"/> 
+    </div>
+        
+
+	  
+         
+</aura:component>

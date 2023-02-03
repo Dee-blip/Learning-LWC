@@ -1,0 +1,48 @@
+.slds-scope .slds-cell-fixed{
+    background-color: lightgrey;
+    background: lightgrey;
+}
+.testTable thead th{
+    background-color: #16325c;
+    color: white;
+}
+.SameCaseBg{
+    background : #ffb3b3;
+}
+.HasParentAlready{
+    background : #ffffb6;
+}
+.AlreadyClosed{
+    background : #d9d9ff;
+}
+/*.dot {
+    height: 25px;
+    width: 25px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+}*/
+.dotSameCaseBg{
+    height: 25px;
+    width: 25px;
+    background : #ffb3b3;
+    border-radius: 50%;
+    display: inline-block;
+}
+.dotHasParentAlready{
+    height: 25px;
+    width: 25px;
+    background-color : #ffffb6;
+    border-radius: 50%;
+    display: inline-block;
+}
+.dotAlreadyClosed{
+    height: 25px;
+    width: 25px;
+    background-color : #d9d9ff;
+    border-radius: 50%;
+    display: inline-block;
+}
+.dt-outer-container{
+    border: 1px solid #dddbda;
+}

@@ -1,0 +1,3 @@
+<apex:page controller="GsmLite_AccountButtonPageController" action="{!init}">
+<apex:pageMessages />
+</apex:page>

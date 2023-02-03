@@ -1,0 +1,514 @@
+<apex:page id="Accpage" StandardController="Account" sidebar="false" extensions="SF1_AdvAccExtension,AdvAccAndConSearchController">
+
+
+  <apex:includeLightning />
+  <script type="text/javascript" src="/resource/Jquery/js/jquery-1.7.1.min.js"></script>
+  <script type="text/javascript" src="/resource/Jquery/js/jquery-ui-1.8.17.custom.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="/resource/Jquery/css/flick/jquery-ui-1.8.17.custom.css"></link>
+  <!--link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" /-->
+  <!--script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script-->
+  <link href="{!URLFOR($Resource.bootstrap3, 'dist/css/bootstrap.min.css')}" rel="stylesheet" />
+  <apex:includeScript value="{!URLFOR($Resource.bootstrap3, 'dist/js/bootstrap.min.js')}" />
+
+  <style>
+    *[role="form"] {
+      max-width: 530px;
+      padding: 15px;
+      margin: 0 auto;
+      background-color: #fff;
+      border-radius: 0.3em;
+    }
+
+    *[role="form"] h2 {
+      margin-left: 5em;
+      margin-bottom: 1em;
+    }
+
+
+    div.horizontal {
+      width: 100%;
+      overflow: auto;
+    }
+  </style>
+
+  <div id="dialog2">
+    <div id="dialogContent2" style="height: 100%;"></div>
+  </div>
+
+  <script>
+    function disableButtons() {
+      var searchButton = document.getElementById("Accpage:frm:pgblk:mobileSearchBtn");
+      searchButton.disabled = true;
+      var createButton = document.getElementById("Accpage:frm:SearchResultPgBlk:mobileCreateBtn");
+      createButton.disabled = true;
+    }
+
+    function enableButtons() {
+      var searchButton = document.getElementById("Accpage:frm:pgblk:mobileSearchBtn");
+      searchButton.disabled = false;
+      var createButton = document.getElementById("Accpage:frm:SearchResultPgBlk:mobileCreateBtn");
+      createButton.disabled = false;
+    }
+  </script>
+  <script type="text/javascript">
+    function createAccount() {
+      window.scrollTo(0, 0);
+    }
+  </script>
+  <script type="text/javascript">
+    function selectAllCheckboxes(obj, receivedInputID) {
+      var inputCheckBox = document.getElementsByTagName("input");
+      for (var i = 0; i < inputCheckBox.length; i++) {
+        if (inputCheckBox[i].id.indexOf(receivedInputID) != -1) {
+          inputCheckBox[i].checked = obj.checked;
+        }
+      }
+    }
+
+
+    function CountChecked() {
+      var myform = document.getElementById('Accpage:frm');
+      var inputTags = myform.getElementsByTagName('input');
+      var checkboxCount = 0;
+      for (var i = 0, length = inputTags.length; i < length; i++) {
+        if (inputTags[i].type == 'checkbox') {
+          if (inputTags[i].checked) {
+            checkboxCount++;
+          }
+        }
+      }
+      if (checkboxCount == 0) {
+        OpenDialogAkamaiFixedWidth('0.2', '400', 'The checkboxes should be selected before importing any account using Data.com', 'Error');
+        return false;
+      } else {
+        //alert('hi2');
+        OpenDialogAkamaiFixedWidth('0.6', '920', '<iframe src =\"/apex/AdvAccSearchPopup\" height=\"90%\" width=\"900\" frameborder=\"0\" style=\"border:none; width:900px; margin-left:0; margin-right: auto; height:90%;overflow-x:hidden;\">',
+          'Confirm');
+        // window.location.href = "https://akamai--sfdcjuly.cs11.my.salesforce.com";
+        return false;
+
+      }
+    }
+
+    //Jquery Popup
+    $j3 = jQuery.noConflict();
+    $j3(document).ready(function() {
+      $j3("#dialog2").dialog({
+        autoOpen: false,
+        modal: true,
+        position: 'center'
+      });
+
+
+    });
+    //Function to open the dialog 
+    function OpenDialogAkamaiFixedWidth(height, width, body, subject) {
+
+      $j3("#dialogContent2").html(body);
+      var wWidth = $j3(window).width();
+      var dWidth = width;
+      var wHeight = $j3(window).height();
+      var dHeight = wHeight * height;
+
+      $j3('#dialog2').dialog('option', 'position', [wWidth / 2 - dWidth / 2, wHeight / 2 - dHeight / 2]);
+      $j3("#dialog2").dialog("open");
+      $j3('#dialog2').dialog("option", "title", subject);
+
+
+
+      $j3('#dialog2').dialog("option", "height", dHeight);
+      $j3('#dialog2').dialog("option", "width", dWidth);
+      $j3('.ui-widget-overlay').css({
+        'background-color': '#000'
+      });
+      $j3('#dialog2').parent().css({
+        'position': 'fixed'
+      });
+
+      var position = $j3('#dialog2').dialog('option', 'position');
+      $j3('#dialog2').dialog('option', 'position', 'center');
+
+
+      $j3("#dialog2").dialog({
+        modal: true,
+        dialogClass: 'no-close',
+        buttons: [
+
+          {
+            text: "Close",
+            click: function() {
+              $j3(this).dialog("close");
+              // $j3("#dialog2").dialog().parent('.ui-dialog').find('.ui-dialog-titlebar-close').hide(); 
+            },
+            text: "Ok",
+            click: function() {
+              window.location.href = "/001/o";
+            }
+          }
+        ]
+      });
+
+
+
+      $j3("#dialog2").dialog().parent('.ui-dialog').find('.ui-dialog-titlebar-close').hide();
+
+      return false;
+    }
+  </script>
+
+  <script type="text/javascript">
+    function navigateToSObject(accId) {
+      if ((typeof sforce != 'undefined') && (sforce != null)) {
+        console.log('accId :', accId);
+        sforce.one.navigateToSObject(accId, 'detail');
+      }
+      return false;
+    }
+  </script>
+  <apex:outputPanel id="Form1">
+    <apex:form id="frm" rendered="{!NOT(SF1CreateAcc)}">
+      <apex:actionStatus id="pagestatus">
+        <apex:facet name="start">
+          <c:enhancedActionStatus BackColor="#ffffff" borderColor="#ffffff" borderSize="2" height="50px" width="150px" ImageUrl="/changemgmt/img/spinner24.gif" Message="Loading..." messageStyle="color:green;font-size:11pt;font-weight:bold;" />
+        </apex:facet>
+      </apex:actionStatus>
+      <!-- <apex:panelGrid width="70%" bgcolor="#f2f3f3"  style="borderSize:2">-->
+      <apex:pageBlock id="pgblk">
+        <div style="margin-left:7px; margin-right:7px; margin-top:7px; color:#CB2D0D; background:#F9E475">
+          <apex:pageMessages id="topPageErr"></apex:pageMessages>
+        </div>
+        <br/>
+
+
+
+        <div style="margin-left:7px; margin-right:7px">
+          <apex:outputPanel rendered="{! $User.UIThemeDisplayed == 'Theme4t' }">
+            <br/>
+            <h2>Search for the Account</h2>
+            <div class="form-group">
+              <apex:outputLabel styleClass="col-sm-3 control-label" value="Account Name / Website" />
+              <div class="col-sm-9">
+                <apex:inputText value="{!AccName}" styleClass="form-control" />
+                <span class="help-block">Please enter the Account Name or Website to search in existing records.</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+
+              <apex:outputLabel styleClass="col-sm-3 control-label" value="Exact Match" />&nbsp;
+              <label>
+                                <apex:inputCheckbox label="Exact Match" value="{!exactSearch}" />
+                            </label>
+
+            </div>
+
+            <div class="form-group">
+              <apex:outputLabel styleClass="col-sm-3 control-label" value="Account Country" />
+              <div class="col-sm-9">
+                <apex:selectList value="{!selectedCountry}" styleClass="form-control" multiselect="false" size="1">
+                  <apex:selectOptions value="{!countryList}" />
+                </apex:selectList>
+              </div>
+            </div>
+            <!-- /.form-group -->
+
+            <div class="form-group">
+              <div class="col-sm-9 col-sm-offset-3">
+                <apex:commandButton id="mobileSearchBtn" styleClass="btn btn-primary btn-block" value="Search" Action="{!searchAccount}" reRender="topPageErr,pgblock2,pgblock3,frm,SearchResultPgBlk,dataComPagination,sfResultsMobile,DataResultsMobile" status="mobilePageStatus1"
+                />
+              </div>
+            </div>
+            <div align="center">
+              <apex:actionStatus id="mobilePageStatus1" onstart="disableButtons();" onstop="enableButtons();">
+                <apex:facet name="start">
+                  <apex:image url="{!$Resource.SF1LoadingIndicator}" width="100" height="100" style="align-self: center;" />
+                </apex:facet>
+              </apex:actionStatus>
+            </div>
+          </apex:outputPanel>
+        </div>
+      </apex:pageBlock>
+
+
+
+
+
+      <apex:pageBlock id="SearchResultPgBlk" rendered="{!SearchresultFlag}">
+        <apex:outputPanel id="pgblock2" rendered="{!AccountData}">
+          <br/>
+          <div align="center">
+            <apex:actionStatus id="onclickAccountSpinner">
+              <apex:facet name="start">
+                <apex:image url="{!$Resource.SF1LoadingIndicator}" width="35%" height="35%" style="align-self: center;" />
+              </apex:facet>
+            </apex:actionStatus>
+          </div>
+          <br/>
+
+
+          <div style="margin-left:7px; margin-right:7px">
+            <apex:outputPanel rendered="{! $User.UIThemeDisplayed == 'Theme4t' }" id="sfResultsMobile">
+              <h2>Account in Salesforce.com</h2>
+              <div class="horizontal">
+              <apex:dataTable value="{!SortedAcclst}" var="Acc" id="pgblkDataTable1" styleClass="table table-bordered table-striped table-responsive" style="overflow-x: scroll;" >
+                <apex:column id="chkBox">
+                  <apex:facet name="header">Account Name</apex:facet>
+                  <!-- <p style="color:rgb(66, 139, 202);" onclick="navigateToSObject('{!Acc.Id}')">{!Acc.name}</p> -->
+                  <div onclick="navigateToSObject('{!Acc.Id}')">
+                    <apex:commandLink value="{!Acc.name}" status="onclickAccountSpinner" rerender="pgblock2" />
+                  </div>
+
+                </apex:column>
+                <apex:column value="{!Acc.AKAM_Account_ID__c }" headerValue="AKAM Account ID" />
+                <apex:column headerValue="Owner">
+                  <apex:outputText value="{!Acc.Owner.Name}"></apex:outputText>
+                </apex:column>
+                <apex:column value="{!Acc.Account_Status__c}" headerValue="Account Status" />
+              </apex:dataTable>
+      </div>
+            </apex:outputPanel>
+          </div>
+
+
+
+          <div class="col-sm-9">
+            <apex:outputPanel styleClass="btn-group" layout="block" rendered="{! $User.UIThemeDisplayed == 'Theme4t' }">
+              <apex:commandButton action="{!BeginningSFDC}" title="Beginning" value="<<" disabled="{!disablePreviousSFDC}" reRender="pgblock2" styleClass="btn btn-primary btn-lg" />
+              <apex:commandButton action="{!offPreviousSFDC}" title="Previous" value="<" disabled="{!disablePreviousSFDC}" reRender="pgblock2" styleClass="btn btn-primary btn-lg" />
+              <apex:commandButton action="{!offNextSFDC}" title="Next" value=">" disabled="{!disableNextSFDC}" reRender="pgblock2" styleClass="btn btn-primary btn-lg" />
+              <apex:commandButton action="{!EndSFDC}" title="End" value=">>" disabled="{!disableNextSFDC}" reRender="pgblock2" styleClass="btn btn-primary btn-lg" /> &nbsp;&nbsp;
+              <apex:outputText >Showing page: {!CurrentPageNumberSfdc} of {!TotalPagessfdc} </apex:outputText>
+            </apex:outputPanel>
+          </div>
+
+        </apex:outputPanel>
+
+        <!--<apex:outputPanel id="panel7" rendered="{!IF(AccountData,false,AccountDataCom)}">
+
+          <apex:outputPanel rendered="{! $User.UIThemeDisplayed == 'Theme4t' }">
+            <div style="margin-left:12px; margin-right:12px; margin-top: 15px; color:#488AF5;">
+              <h4>No match found in Salesforce.com. Import accounts from Possible Matches or refine your search criteria.</h4>&nbsp;&nbsp;
+            </div>
+          </apex:outputPanel>
+        </apex:outputPanel> -->
+
+      <!--  <apex:actionRegion id="acRegion">
+          <apex:outputPanel id="pgblock3" rendered="{!AccountDatacom}">
+            <br/>
+
+
+            <div style="margin-left:7px; margin-right:7px">
+              <apex:outputPanel rendered="{! $User.UIThemeDisplayed == 'Theme4t' }" id="DataResultsMobile">
+                <h3>Possible Matches from Data.com not in Salesforce</h3>
+
+                <div class="horizontal">
+                  <apex:dataTable value="{!DataWrapper}" var="DataAcc" id="pgblkDataTable2" styleClass="table table-bordered table-striped table-responsive" style="overflow-x: scroll;">
+                    <apex:column headerValue="Select">
+                      <apex:facet name="header">
+                        <apex:inputCheckbox onclick="selectAllCheckboxes(this,'inputId')" />
+                      </apex:facet>
+                      <apex:inputCheckbox value="{!DataAcc.checkbox}" id="inputId" rendered="{!!DataAcc.ImageFlag}">
+
+                        
+                      </apex:inputCheckbox>
+                      <apex:image url="{!$Resource.AdvanceSearchCheck}" width="18" height="18" rendered="{!DataAcc.ImageFlag}" />
+                    </apex:column>
+                    <apex:column value="{!DataAcc.dcc.name}" headerValue="Company Name" />
+                    <apex:column value="{!DataAcc.dcc.Industry}" headerValue="Industry" />
+                    <apex:column value="{!DataAcc.dcc.Country}" headerValue="Country" />
+                  </apex:dataTable>
+                </div>
+              </apex:outputPanel>
+            </div>
+            <div style="margin-left:7px; margin-right:7px; margin-top:7px; color:#CB2D0D; background:#F9E475">
+              <apex:pageMessages id="BottomPageErr"></apex:pageMessages>
+            </div>
+            <br/>
+
+            <div class="col-sm-9">
+              <apex:outputPanel styleClass="btn-group" layout="block" rendered="{! $User.UIThemeDisplayed == 'Theme4t' }">
+                <apex:commandButton action="{!Beginning}" title="Beginning" value="<<" disabled="{!disablePrevious}" reRender="pgblock3" styleClass="btn btn-primary btn-lg" />
+                <apex:commandButton action="{!offPrevious}" title="Previous" value="<" disabled="{!disablePrevious}" reRender="pgblock3" styleClass="btn btn-primary btn-lg" />
+                <apex:commandButton action="{!offNext}" title="Next" value=">" disabled="{!disableNext}" reRender="pgblock3" styleClass="btn btn-primary btn-lg" />
+                <apex:commandButton action="{!End}" title="End" value=">>" disabled="{!disableNext}" reRender="pgblock3" styleClass="btn btn-primary btn-lg" /> &nbsp;&nbsp;
+                <apex:outputText >Showing page: {!CurrentPageNumber} of {!TotalPages} </apex:outputText>
+              </apex:outputPanel>
+            </div>
+          </apex:outputPanel>
+          <br/>
+        </apex:actionRegion> -->
+
+
+        <apex:outputPanel id="panel5" rendered="{!!AccountData}">
+
+
+          <apex:outputPanel rendered="{! $User.UIThemeDisplayed == 'Theme4t' }">
+            <div class="form-group">
+              <apex:outputLabel styleClass="col-sm-3 control-label" value="No records meet your search criteria. Please refine your search or click on the “Account Not Found? Create Account Manually”" />
+            </div>
+          </apex:outputPanel>
+
+        </apex:outputPanel>
+
+
+
+     <!--   <apex:outputPanel id="panel4" rendered="{!AccountDataCom}">
+
+          <div align="center">
+            <apex:actionStatus id="mobilePageStatus2" onstart="disableButtons();" onstop="enableButtons();">
+              <apex:facet name="start">
+                <apex:image url="{!$Resource.SF1LoadingIndicator}" width="100" height="100" style="align-self: center;" />
+              </apex:facet>
+            </apex:actionStatus>
+          </div>
+
+         <!-- <apex:outputPanel rendered="{! $User.UIThemeDisplayed == 'Theme4t' }">
+            <br/>
+            <div class="col-sm-9 col-sm-offset-3">
+              <apex:commandButton id="mobileImportBtn" styleClass="btn btn-primary btn-block" value="Account Found? Select Account and Click Here" action="{!AddAccountToSalesforce}" reRender="frm,pgblk,pgblock2,pgblock3,pgblock4,topPageErr" status="mobilePageStatus2"
+              />
+            </div>
+          </apex:outputPanel>-->
+
+        <!--  &nbsp;&nbsp;
+        </apex:outputPanel>
+
+
+        <apex:outputPanel id="notFound" rendered="{! $User.UIThemeDisplayed == 'Theme4t' }">
+          <div align="center">
+            <apex:actionStatus id="CreateAccSpinner">
+              <apex:facet name="start">
+                <apex:image url="{!$Resource.SF1LoadingIndicator}" width="30%" height="30%" style="align-self: center;" />
+              </apex:facet>
+            </apex:actionStatus>
+          </div>
+          <div class="col-sm-9 col-sm-offset-3">
+            <apex:commandButton oncomplete="createAccount();" id="mobileCreateBtn" styleClass="btn btn-primary btn-block" value="Account Not Found? Create Account Manually" reRender="Form1" action="{!showCreateAccForSF1}" status="CreateAccSpinner" />
+          </div>
+        </apex:outputPanel>
+
+      </apex:pageBlock>
+      <br/>
+
+      <!--Apex Page for confirmation-->
+   <!--   <apex:pageBlock id="confirmedpage" rendered="{!confirmedFlag}">
+
+        <div style="margin-left:7px; margin-right:7px">
+          <apex:outputPanel rendered="{! $User.UIThemeDisplayed == 'Theme4t' }">
+            <h3>Successfully Imported the Account</h3>
+            <apex:dataTable value="{!accListNew}" var="Acc" id="pgblkDataTable3" styleClass="table table-bordered table-striped">
+              <apex:column id="chkBox">
+                <apex:facet name="header">Account Name</apex:facet>
+                <apex:outputLink value="/{!Acc.Id}" target="_blank" title="Account Name">{!Acc.name}</apex:outputLink>
+              </apex:column>
+              <apex:column value="{!Acc.OwnerId}" headerValue="Account Owner" />
+              <apex:column value="{!Acc.Account_Status__c}" headerValue="Account Status" />
+            </apex:dataTable>
+          </apex:outputPanel>
+        </div>
+      </apex:pageBlock> -->
+    </apex:form>
+    <apex:pageBlock id="createAccount" rendered="{!SF1CreateAcc}">
+
+      <apex:form id="Form2" rendered="{!SF1CreateAcc}">
+        <div class="form-group">
+          <br/>
+          <div class="col-sm-9 col-sm-offset-3">
+            <apex:commandButton id="BackSearch" styleClass="btn btn-primary btn-block" reRender="Form1" value="Back To Search" action="{!hideCreateAccForSF1}" status="backToSearchSpinner" />
+          </div>
+        </div>
+
+        <div align="center">
+          <apex:actionStatus id="backToSearchSpinner">
+            <apex:facet name="start">
+              <apex:image url="{!$Resource.SF1LoadingIndicator}" width="30%" height="30%" style="align-self: center;" />
+            </apex:facet>
+          </apex:actionStatus>
+        </div>
+      </apex:form>
+      <apex:form id="createAccfrm" rendered="{!SF1CreateAcc}">
+        <apex:pageBlock id="pgblk" rendered="{!SF1CreateAcc}">
+
+          <div style="margin-left:7px; margin-right:7px">
+            <apex:outputPanel rendered="{! $User.UIThemeDisplayed == 'Theme4t' }" style="overflow:auto;">
+
+
+              <h3 align="center">
+                Create Account
+                </h3>
+              <div class="form-group">
+                <apex:outputLabel styleClass="col-sm-3 control-label" value="Account Name *" />
+                <div class="col-sm-9">
+                  <apex:inputField value="{!Account.Name}" styleClass="form-control" />
+                </div>
+              </div>
+              <div class="form-group">
+                <apex:outputLabel styleClass="col-sm-3 control-label" value="Website *" />
+                <div class="col-sm-9">
+                  <apex:inputText value="{!Account.Website}" styleClass="form-control" required="true" />
+                </div>
+              </div>
+              <div class="form-group">
+                <apex:outputLabel styleClass="col-sm-3 control-label" value="Primary Street" />
+                <div class="col-sm-9">
+                  <apex:inputText value="{!Account.BillingStreet}" styleClass="form-control" />
+                </div>
+              </div>
+              <div class="form-group">
+                <apex:outputLabel styleClass="col-sm-3 control-label" value="Primary City" />
+                <div class="col-sm-9">
+                  <apex:inputText value="{!Account.BillingCity}" styleClass="form-control" />
+                </div>
+              </div>
+              <div class="form-group">
+                <apex:outputLabel styleClass="col-sm-3 control-label" value="Primary State/Province" />
+                <div class="col-sm-9">
+                  <apex:inputText value="{!Account.BillingState}" styleClass="form-control" />
+                </div>
+              </div>
+              <div class="form-group">
+                <apex:outputLabel styleClass="col-sm-3 control-label" value="Primary Zip/Postal Code" />
+                <div class="col-sm-9">
+                  <apex:inputText value="{!Account.BillingPostalCode}" styleClass="form-control" />
+                </div>
+              </div>
+              <div class="form-group">
+                <apex:outputLabel styleClass="col-sm-3 control-label" value="Primary Country *" />
+                <div class="col-sm-9">
+                  <apex:inputText value="{!Account.BillingCountry}" styleClass="form-control" required="true" />
+                </div>
+              </div>
+              <div align="center">
+                <apex:actionStatus id="mobileSpinnerStatus">
+                  <apex:facet name="start">
+                    <apex:image url="{!$Resource.SF1LoadingIndicator}" width="100" height="100" style="align-self: center;" />
+                  </apex:facet>
+                </apex:actionStatus>
+              </div>
+              <div style="margin-left:7px; margin-right:7px; margin-top:7px; color:#CB2D0D; background:#F9E475">
+                <apex:pageMessages id="CreatePageErr"></apex:pageMessages>
+              </div>
+              <br/>
+              <div class="form-group">
+                <div class="col-sm-9 col-sm-offset-3">
+                  <apex:commandButton id="CreatAcc" styleClass="btn btn-primary btn-block" value="Create Account" Action="{!save}" reRender="pgblk" status="mobileSpinnerStatus" />
+                </div>
+              </div>
+
+            </apex:outputPanel>
+          </div>
+        </apex:pageBlock>
+
+      </apex:form>
+    </apex:pageBlock>
+  </apex:outputPanel>
+
+  <script>
+    var a = navigator.userAgent;
+    if ((a.indexOf('Salesforce') != -1) && (a.indexOf('iPhone') != -1 || a.indexOf('iPad') != -1) && (a.indexOf('Safari') == -1)) {
+      var s = document.createElement('style');
+      s.innerHTML = "html,html body{overflow:scroll;-webkit-overflow-scrolling:touch;zindex:0;}body{position:absolute;left:0;right:0;top:0;bottom:0;}";
+      document.getElementsByTagName('head')[0].appendChild(s);
+    }
+  </script>
+</apex:page>

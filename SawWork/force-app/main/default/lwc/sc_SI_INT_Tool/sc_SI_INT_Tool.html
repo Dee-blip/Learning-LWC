@@ -1,0 +1,694 @@
+<!--
+Author          : Sheena Bhan
+Description     : Impacted Products Web Component
+
+Date                Developer             JIRA #                      		Description                                                       
+============================================================================================
+22 Dec 2020    	 Sheena      		 ESESP-3818     		              INT Funtionality 
+-->
+
+
+<template>
+    <!-- Spinner -->
+
+
+    <!-- Header -->
+    <div class="slds-box slds-theme_default">
+
+        <template if:true={showSpinner}>
+            <div class="spinner-height">
+                <lightning-spinner alternative-text="Loading" size="medium" variant="brand" position='relative'>
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <div class="slds-page-header" style=" background-color: #63a4c5;color: white;">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <lightning-icon icon-name="standard:drafts" alternative-text="Content" title="Content">
+                            </lightning-icon>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+
+                                    <h2>
+                                        <span class="slds-page-header__title slds-truncate"
+                                            title="Notification Content">Notification Content</span>
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+
+        <br>
+
+        <!-- Lightning Edit Form -->
+        <lightning-record-edit-form object-api-name="EB_AkaMailer__c" onsubmit={handleReset}>
+            <lightning-messages> </lightning-messages>
+            <div class="demo-only demo-only--sizing slds-grid slds-wrap no-padding">
+
+                <div class="slds-col slds-size_3-of-7">
+                    <lightning-input-field field-name="CMC_IRAPT_SI_Number__c" data-id="siNumber"
+                        variant="label-stacked">
+                    </lightning-input-field>
+                </div>
+
+                <div class="slds-col slds-size_1-of-7">
+                </div>
+
+                <div class="slds-col slds-size_3-of-7">
+                    <lightning-combobox name="templateType" value={templateTypeValue} placeholder="Select Template"
+                        options={templateTypeOptions} onchange={handleTemplateChange} data-id="Template"
+                        label="Select Template" variant="label-stacked">
+                    </lightning-combobox>
+                </div>
+
+            </div>
+
+            <br>
+
+            <lightning-input type="text" value={subjectValue} label="Subject" data-id="Subject"
+                required={subjectRequired}></lightning-input>
+
+            <lightning-input-rich-text value={contentData} label="Content" label-visible required={contentRequired}
+                data-id="content">
+            </lightning-input-rich-text>
+
+        </lightning-record-edit-form>
+
+        <br>
+
+        <!-- Header -->
+
+        <div class="slds-page-header" style=" background-color: #63a4c5;color: white;">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <lightning-icon icon-name="standard:announcement" alternative-text="Content"
+                                title="Content"></lightning-icon>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h2>
+                                        <span class="slds-page-header__title slds-truncate"
+                                            title="Notification Recipients">Notification Recipients</span>
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+
+        <br>
+
+        <div class="inline">
+            <!-- Contact Type Radio Group -->
+            <lightning-radio-group name="radioGroup" options={radioOptions} value={contactTypeValue} type="button"
+                onchange={handleContactTypeChange} data-id="contactType"></lightning-radio-group>
+
+            <br>
+            <!-- Customer Groups for Notification for 24x7 Contacts -->
+            <template if:true={showCustomerGroups}>
+                <div style="font-weight: bold;padding-left: 1rem;">Send Notification To<span
+                        style="font-weight: bold;padding-left: 21rem;">Customer Groups</span></div><br>
+                <div class="demo-only demo-only--sizing slds-grid slds-wrap">
+                    <!-- Account Types -->
+                    <div class="slds-col slds-size_2-of-6">
+                        <lightning-checkbox-group name="Checkbox Group" options={checkboxOptions}
+                            value={accountTypeValue} onchange={handleAccountTypeChange} class="inlinecheckbox"
+                            data-id="accountTypeValue">
+                        </lightning-checkbox-group>
+
+                    </div>
+
+
+                    <!-- Customer Groups -->
+                    <div class="slds-col slds-size_1-of-6">
+
+                        <lightning-combobox name="radioGroup" value={customerGroupValue}
+                            placeholder="Select Customer Group" options={customerGroupOptions}
+                            onchange={handleGroupChange} data-id="customerGroupValue">
+                        </lightning-combobox>
+                    </div>
+                </div>
+            </template>
+
+
+
+
+            <!-- Cutsomer Groups and Notification Section for Authorized Contacts -->
+            <template if:true={showNotificationRecipient}>
+
+                <div style="font-weight: bold;padding-left: 1rem;">Send Notification To<span
+                        style="font-weight: bold;padding-left: 21rem;">Customer Groups</span></div><br>
+
+                <div class="demo-only demo-only--sizing slds-grid slds-wrap">
+                    <div class="slds-col slds-size_2-of-6">
+                        <!-- Notification Recipients -->
+                        <lightning-radio-group name="radioGroupRecipient" options={RecipientOptions}
+                            value={RecipientTypeValue} type="radio" onchange={handleRecipientChange}
+                            data-id="RecipientTypeValue">
+                        </lightning-radio-group>
+                    </div>
+
+                    <!-- Auth Customer Groups -->
+
+                    <div class="slds-col slds-size_1-of-6">
+
+                        <lightning-combobox name="authRadioGroup" value={authCustomerGroupValue}
+                            placeholder="Select Customer Group" options={customerGroupOptions}
+                            onchange={handleAuthGroupChange} data-id="customerAuthGroupValue">
+                        </lightning-combobox>
+                    </div>
+
+                </div>
+
+
+            </template>
+
+
+
+
+
+
+
+            <!-- Type of Email Addresses Input -->
+            <template if:true={showEmailInputTypes}>
+
+                <div class="demo-only demo-only--sizing slds-grid slds-wrap">
+                    <!-- Account Types -->
+                    <div class="slds-col slds-size_1-of-6">
+                        <lightning-combobox name="radioGroupEmailInput" value={EmailInputValue}
+                            placeholder="Select Email Input Type" options={EmailInputOptions}
+                            onchange={handleEmailInputChange} data-id="EmailInputValue">
+                        </lightning-combobox>
+                    </div>
+                    <!-- Warning Message -->
+                    <div class="slds-col slds-size_3-of-6">
+                        <p style="color: #9c3921;width: 82%;"><span style="font-weight: bold">Warning:
+                            </span> Manually Entered Email Addresses will not be Validated Against Account or Contact
+                        </p>
+                    </div>
+                </div>
+                <br>
+                <!-- Email Text Area -->
+                <template if:true={showEmailTextArea}>
+                    <lightning-textarea name="emailInput" label="Copy and Paste List of Email Addresses to Notify:"
+                        placeholder="Enter comma separated email addresses" variant="label-stacked"
+                        value={manualEmaliAddresses} data-id="Manual" onchange={handleManualEmailChange}>
+                    </lightning-textarea>
+                </template>
+                <br>
+                <template if:false={showEmailTextArea}>
+
+                    <template if:true={showManualImport}>
+                        <!-- Import File Option -->
+                        <lightning-input type="file" label="Import File" value={fileValue}
+                            onchange={handleManualFileChange} accept=".csv" data-id="manualImport">
+                        </lightning-input>
+
+                        <!-- Display the file name on change of file -->
+                        <lightning-formatted-text name="importedFileName" data-id="manualFileName"
+                            value={manualFileName}></lightning-formatted-text>
+                    </template>
+
+                    <template if:false={showManualImport}>
+                        <div class="demo-only demo-only--sizing slds-grid slds-wrap">
+                            <div class="slds-col slds-size_1-of-5">
+                                <!-- Display the downloadable link -->
+                                <p>Imported File: </p>
+                                <lightning-formatted-url tooltip="Download the File" target="_top"
+                                    name="importedFileDownload" data-id="manualFileDownload"
+                                    value={manualDownloadableLink} label={manualDownloadablFileName}>
+                                </lightning-formatted-url>
+
+                            </div>
+                            <!-- Remove File Button -->
+                            <div class="slds-col slds-size_1-of-5">
+                                <lightning-button onclick={removeManualImportedFile} variant="destructive"
+                                    label="Remove File" data-id="removeManualFileButton"></lightning-button>
+                            </div>
+                        </div>
+                    </template>
+
+
+                </template>
+            </template>
+            <br>
+            <br>
+
+
+            <!-- 24x7 Filters -->
+            <template if:true={showFilters}>
+                <div style="font-weight: bold">Field
+                    <span style="padding-left: 16rem;">Condition</span>
+                    <span style="padding-left: 13rem;">Value</span>
+                    <span style="padding-left: 15rem;">File</span>
+
+                </div>
+            </template>
+            <br>
+
+            <template for:each={filters} for:item="rec" for:index="index">
+                <div key={rec} class="slds-box" style="padding: 0px;border: none">
+                    <div class="demo-only demo-only--sizing slds-grid slds-wrap">
+                        <div class="slds-col slds-size_1-of-5">
+                            <!-- Different field options for Contact Types -->
+                            <lightning-combobox name="field" value={fieldValue} placeholder="Select Field"
+                                options={fieldOptions} data-id={rec} label={index} variant="label-hidden">
+                            </lightning-combobox>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-5" style="padding-left: 8px">
+                            <!-- Different condition options for Contact Types -->
+                            <lightning-combobox name="condition" value={conditionValue} placeholder="Select Operator"
+                                options={conditionOptions} onchange={handleAddedConditionChange} data-id={rec}
+                                label={index} variant="label-hidden">
+                            </lightning-combobox>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-5" style="padding-left: 4px">
+                            <lightning-input name="filterValue" type="text" value={filterValue} data-id={rec}
+                                class="align-Value" max-length="255">
+                            </lightning-input>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-10">
+                            <lightning-button-icon icon-name="action:edit" alternative-text="Value Modal" data-id={rec}
+                                title={index} onclick={handleValueModal} class="inputicon" name="valueIcon"
+                                disabled=true tooltip="Edit the Value field upto 255 Characters">
+                            </lightning-button-icon>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-5" style="padding-left: 12px ">
+                            <lightning-input name="filterAttachment" onchange={handleAddedFilterFileChange} type="file"
+                                data-id={rec} accept=".csv" class="align-Upload" disabled=true label={index}
+                                variant="label-hidden"></lightning-input>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-8" style="padding-top: 10px;">
+                            <lightning-formatted-url tooltip="Download the File" target="_top" name="downloadLink"
+                                data-id={rec}></lightning-formatted-url>
+                            <lightning-formatted-text name="fileName" data-id={rec}></lightning-formatted-text>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-9 removeButton">
+                            <lightning-button label="Remove" onclick={removeFilter} variant="destructive" value={index}
+                                name="removeButton" data-id={rec}>
+                            </lightning-button>
+                        </div>
+
+                    </div>
+                </div>
+            </template>
+
+
+            <template if:true={showFilters}>
+
+                <br>
+                <div class="demo-only demo-only--sizing slds-grid slds-wrap">
+                    <div class="slds-col slds-size_1-of-6 add-filter">
+                        <div>
+                            <!-- Add Filter Button -->
+                            <lightning-button class="slds-m-top_small abcd" label="Add Filter" onclick={addFilter}
+                                data-id="addFilterButton">
+                            </lightning-button>
+                        </div>
+                    </div>
+                    <br>
+
+                    <!-- Filter Logic -->
+                    <div class="slds-col">
+                        <template if:true={showFilterLogic}>
+                            <div style="font-weight: bold;padding-left: 1rem;font-size: 13px;"> Filter Logic </div>
+                            <lightning-input type="text" placeholder="EXAMPLE: 1 AND (2 OR 3)" value={filterLogic}
+                                data-id="filterLogic" onchange={handleFilterLogic}></lightning-input>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+
+
+
+            <!-- Authorized Contact Filters -->
+            <template if:true={showAuthFilters}>
+                <div style="font-weight: bold">Field
+                    <span style="padding-left: 16rem;">Condition</span>
+                    <span style="padding-left: 13rem;">Value</span>
+                    <span style="padding-left: 15rem;">File</span>
+
+                </div>
+            </template>
+            <br>
+
+            <template for:each={authFilters} for:item="rec" for:index="index">
+                <div key={rec} class="slds-box" style="padding: 0px;border: none">
+                    <div class="demo-only demo-only--sizing slds-grid slds-wrap">
+                        <div class="slds-col slds-size_1-of-5">
+                            <!-- Different field options for Contact Types -->
+                            <lightning-combobox name="field" value={fieldValue} placeholder="Select Field"
+                                options={soccFieldOptions} onchange={handleAuthFieldChange} data-auth={rec}
+                                label={index} variant="label-hidden">
+                            </lightning-combobox>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-5" style="padding-left: 8px">
+                            <!-- Different condition options for Contact Types -->
+                            <lightning-combobox name="condition" value={conditionValue} placeholder="Select Operator"
+                                options={conditionOptions} onchange={handleAddedConditionChange} data-auth={rec}
+                                label={index} variant="label-hidden">
+                            </lightning-combobox>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-5" style="padding-left: 4px">
+                            <lightning-input name="filterValue" type="text" value={filterValue} data-auth={rec}
+                                class="align-Value" max-length="255">
+                            </lightning-input>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-10">
+                            <lightning-button-icon icon-name="action:edit" alternative-text="Value Modal"
+                                data-auth={rec} title={index} onclick={handleValueModal} class="inputicon"
+                                name="valueIcon" disabled=true tooltip="Edit the Value field upto 255 Characters">
+                            </lightning-button-icon>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-5" style="padding-left: 12px ">
+                            <lightning-input name="filterAttachment" onchange={handleAddedFilterFileChange} type="file"
+                                data-auth={rec} accept=".csv" class="align-Upload" disabled=true label={index}
+                                variant="label-hidden"></lightning-input>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-8" style="padding-top: 10px;">
+                            <lightning-formatted-url tooltip="Download the File" target="_top" name="downloadLink"
+                                data-auth={rec}></lightning-formatted-url>
+                            <lightning-formatted-text name="fileName" data-auth={rec}></lightning-formatted-text>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-9 removeButton">
+                            <lightning-button label="Remove" onclick={removeFilter} variant="destructive" value={index}
+                                name="removeButton" data-auth={rec}>
+                            </lightning-button>
+                        </div>
+
+                    </div>
+                </div>
+            </template>
+
+            <template if:true={showAuthFilters}>
+                <br>
+                <div class="demo-only demo-only--sizing slds-grid slds-wrap">
+                    <div class="slds-col slds-size_1-of-6 add-filter">
+                        <div>
+                            <!-- Add Filter Button -->
+                            <lightning-button class="slds-m-top_small abcd" label="Add Filter" onclick={addFilter}
+                                data-id="addFilterButton">
+                            </lightning-button>
+
+                        </div>
+                    </div>
+                    <br>
+
+                    <!-- Filter Logic -->
+
+                    <template if:true={showAuthFilterLogic}>
+                        <div class="slds-col">
+                            <div style="font-weight: bold;padding-left: 1rem;font-size: 13px;"> Filter Logic </div>
+                            <lightning-input type="text" placeholder="EXAMPLE: 1 AND (2 OR 3)" value={authFilterLogic}
+                                data-id="authFilterLogic" onchange={handleAuthFilterLogic}></lightning-input>
+                        </div>
+                    </template>
+
+                </div>
+
+            </template>
+
+            <br><br>
+
+            <!-- Value Modal for IN operator -->
+            <template if:true={enableValueModal}>
+                <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small"
+                    aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                title="Close" onclick={closePreviewModal}>
+                                <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                    <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                                </svg>
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                            <h2 id="modal-heading-03" class="slds-modal__title slds-hyphenate">Input Value</h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2"
+                            style="background-color: #f1eded;">
+                            <lightning-textarea name="inputValue" class="inputValue" value={inputValue}
+                                data-id="inputValue" max-length="255" onchange={handleInputValueChange}>
+                            </lightning-textarea>
+
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning-button label="Cancel" onclick={closeInputModal}></lightning-button>
+                            <lightning-button label="Submit" onclick={handleInputSubmit} variant="brand">
+                            </lightning-button>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+            <template if:true={showDownload}>
+                <p><b>{totalAccountCount}</b> Customers Selected. <lightning-button label="Click here to see the list"
+                        onclick={handleDownload} variant="neutral"></lightning-button>
+                </p>
+                <br><br>
+            </template>
+            <template if:true={showManualDownload}>
+                <p><b>{totalEmailCount}</b> addresses have been uploaded, of which &nbsp;
+                    <b>
+                        <lightning-button label={validEmailCount} name="validEmails" onclick={handleDownload}
+                            variant="neutral"></lightning-button>
+                    </b>
+                    &nbsp; are valid and &nbsp;
+                    <b>
+                        <lightning-button label={invalidEmailCount} name="inavalidEmails" onclick={handleDownload}
+                            variant="neutral"></lightning-button>
+                    </b>
+                    &nbsp; are invalid contacts.
+                </p>
+                <br><br>
+            </template>
+            <template if:true={showPolicyDownload}>
+                <p><b>{totalPolicyDomainCount}</b> Policy Domains Selected. <lightning-button
+                        label="Click here to see the list" onclick={handleDownload} variant="neutral">
+                    </lightning-button>
+                </p>
+                <br><br>
+            </template>
+
+            <template if:true={showNotificationRecipient}>
+                <p>
+                    <lightning-input type="datetime" name="reminder" label="Set Reminder"
+                        onchange={handleReminderChange} value={reminderValue} variant="label-stacked"></lightning-input>
+                </p>
+                <br><br>
+            </template>
+
+
+            <!-- Peer Review Section -->
+            <template if:true={showPeerSection}>
+
+                <div class="slds-page-header" style=" background-color: #63a4c5;color: white;">
+                    <div class="slds-page-header__row">
+                        <div class="slds-page-header__col-title">
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                    <lightning-icon icon-name="standard:approval" alternative-text="Peer Review"
+                                        title="Peer Review">
+                                    </lightning-icon>
+                                </div>
+                                <div class="slds-media__body">
+                                    <div class="slds-page-header__name">
+                                        <div class="slds-page-header__name-title">
+
+                                            <h2>
+                                                <span class="slds-page-header__title slds-truncate"
+                                                    title="Notification Content">Peer Review</span>
+                                            </h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <br><br>
+
+                <div class="demo-only demo-only--sizing slds-grid slds-wrap no-padding">
+                    <!-- Reviewer -->
+                    <div class="slds-col">
+                        <lightning-record-edit-form object-api-name="EB_AkaMailer__c">
+                            <lightning-messages> </lightning-messages>
+
+                            <lightning-input-field field-name="CMC_Peer_Reviewer__c" data-id="peerReviewer"
+                                onchange={handleReviewerChange}>
+                            </lightning-input-field>
+
+                        </lightning-record-edit-form>
+                    </div>
+
+                    <div class="slds-col">
+                        <lightning-combobox name="approvalStatus" value={approvalStatusValue}
+                            options={approvalStatusOptions} data-id="approvalStatus" label="Approval Status"
+                            variant="label-stacked">
+                        </lightning-combobox>
+
+                    </div>
+
+
+                    <div class="slds-col">
+                        <lightning-textarea name="approvalComments" label="Comments" variant="label-stacked"
+                            value={approvalCommentValue} data-id="approvalComments">
+                        </lightning-textarea>
+                    </div>
+                </div>
+
+                <br><br>
+
+            </template>
+
+
+
+            <!-- Preview Mailer Section -->
+            <template if:true={showMailerPreview}>
+
+                <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small"
+                    aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                title="Close" onclick={closePreviewModal}>
+                                <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                    <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                                </svg>
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                            <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Mailer Preview</h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1"
+                            style="background-color: #f1eded;">
+                            <div
+                                style="font-weight: bold;font-size: 18px;background-color: #65a0c3;padding-bottom: 6px; color:white">
+                                Subject</div>
+                            <div style="background-color: white; margin-top: 8px">{subjectEmail}</div>
+                            <br> <br> <br>
+                            <div
+                                style="font-weight: bold;font-size: 18px;background-color: #65a0c3;padding-bottom: 6px; color:white">
+                                Body</div>
+                            <div style="background-color: white">
+                                <lightning-input-rich-text value={contentEmail} formats="none" disabled=true>
+                                </lightning-input-rich-text>
+                            </div>
+
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning-button label="Cancel" onclick={closePreviewModal}></lightning-button>
+                            <lightning-button label="Send Mailer" onclick={handleSendEmail} variant="brand">
+                            </lightning-button>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+
+            </template>
+
+            <!-- Progress Bar -->
+            <template if:true={showProgressBar}>
+                <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small"
+                    aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                title="Close">
+                                <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                    <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                                </svg>
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                            <h4 id="modal-heading-02" class="slds-modal__title slds-hyphenate" style="color: #293e8c;
+                    font-weight: bold;">Email Progress</h4>
+                            <br>
+                            <div class="demo-only demo-only--sizing slds-grid slds-wrap no-padding"
+                                style="font-weight: bold; font-size:18px; margin-right: 150px;">
+                                <!-- Reviewer -->
+                                <div class="slds-col">
+                                    Total Contacts Selected : <span style="color: #007eff;">{totalCount}</span>
+                                </div>
+                                <div class="slds-col">
+                                    Success : <span style="color: green;"> {successCount} </span>
+                                </div>
+                                <div class="slds-col">
+                                    Failed : <span style="color: red;">{failedCount} </span>
+                                </div>
+                            </div>
+                        </header>
+
+                        <div class="meter">
+                            <span style="width:0%" class="progressBar"></span>
+                        </div>
+
+                        <footer class="slds-modal__footer">
+                            <p style="text-align: center;font-size:19px"> <span style="font-weight: bold">Status :
+                                </span>{mailerStatus}</p>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+
+
+            <!-- Buttons Section -->
+            <div class="slds-align_absolute-center">
+                <lightning-button-group>
+                    <lightning-button label="Save" variant="brand" onclick={handleSave} name="saveButton">
+                    </lightning-button>
+                    <lightning-button label="Error Report" onclick={handleErrorReport} data-id="errorReportButton"
+                        disabled></lightning-button>
+                    <lightning-button label="Send Test E-Mail to Me" variant="brand" onclick={handleSendTestEmail}
+                        data-id="testEmailButton" disabled>
+                    </lightning-button>
+                    <lightning-button label="Peer Review" onclick={handlePeerReview} data-id="peerReviewButton"
+                        disabled></lightning-button>
+                    <lightning-button label="Preview and Send Mailer" variant="brand"
+                        onclick={handlePreviewAndSendEmail} data-id="previewAndSendButton" disabled></lightning-button>
+                </lightning-button-group>
+            </div>
+            <br><br><br><br>
+
+        </div>
+
+    </div>
+
+</template>

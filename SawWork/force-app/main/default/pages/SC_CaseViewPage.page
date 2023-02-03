@@ -1,0 +1,792 @@
+<!------------------------------------------------------------------------------
+Author          : Vandhana Krishnamurthy
+Description     : Dynamic page for case view with inline edit enabled 
+
+Date                        Developer            	JIRA #                      Description                                                       
+------------------------------------------------------------------------------------------------------------------
+20 September 2017      Vandhana Krishnamurthy      	ESESP-354      Entitled Services on PS Service Cloud Cases
+16 October 2017      Vandhana Krishnamurthy      	ESESP-787      Removed loading delays for Request Type/Sub type/Close Code/Alert Type/Root Cause
+20 October 2017      Vandhana Krishnamurthy      	ESESP-793      Set Case Tab title to Case Number
+20 October 2017      Vandhana Krishnamurthy      	ESESP-792      Control + S console shortcut for saving the case
+30 Oct 2017				Aditya Sonam				ESESP-786		Custom Case Feed View with Realted List Count
+-------------------------------------------------------------------------------->
+
+<!--<apex:page StandardController="Case" extensions="SC_EditCaseController,SpecialInstructionsListController" tabStyle="Case" standardStylesheets="true" sidebar="false" showHeader="true"> -->
+<apex:page StandardController="Case" extensions="SC_EditCaseController,SpecialInstructionsListController" tabStyle="Case" standardStylesheets="true" sidebar="false" showHeader="true">
+    
+    <apex:includeScript value="/support/console/41.0/integration.js" />
+    <apex:includeScript value="{!$Resource.JQuery_New}" />
+    <apex:includeScript value="{!$Resource.BootstrapMinJS }"/>
+    <apex:includeScript value="{!URLFOR($Resource.AkapediaStaticResource,'/jquery.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.AkapediaStaticResource,'/typeahead.bundle.min.js')}" />
+    <apex:stylesheet value="{!$Resource.bootstrapISOcss}"/>
+    
+    <style type="text/css">
+        #fade{
+        display: none;
+        position:absolute;
+        top: 0%;
+        left: 0%;
+        width: 100%;
+        height: 100%;
+        background-color: #ababab;
+        z-index: 1001;
+        -moz-opacity: 0.7;
+        opacity: .70;
+        filter: alpha(opacity=70);
+        }
+        
+        .noselect 
+        {
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+        }
+        
+        /* css for search bar and date range section*/        
+        .form-inline .form-control {
+            height:30px;
+            margin-right: -15px;
+            height: 33.5px !important;
+            border: 1px solid #b0b5b6;
+            vertical-align: middle !important;
+            padding-bottom: 7px !important;
+        }
+        
+        .selectOptionStyle
+         {
+            position:absolute;
+            left:160px;
+            top:-5px;
+            width:25%;
+            height:27px;
+            box-shadow: 5px 5px 4px #888888;
+        }
+        
+        .consolecls 
+        {
+            color : #54698d;
+            font-weight: normal;
+        }
+        
+        .detailCls
+        {
+            color : #454A4D;
+            font-weight: bold;
+        } 
+        
+        .sectionHeaderStyle
+        {
+        	border-width: 2px 0 0; !important
+        	border-color: #c0be72; !important
+        	background-color: inherit; !important
+        	color: black; !important
+        }
+        
+        .sidebarCls{
+            padding: 5px 0px;
+    		width: auto;
+    		margin-bottom: 5px;
+        }
+        
+        .sidebarList{
+            padding: 7px;
+            border-radius: 4px;
+            border: 1px solid #cfcfcf;
+        }
+
+        .menuItem{
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .sidebarList:hover{
+   			background-color:#EDEDED;
+		}
+        
+        .casePublisher{
+            position: relative !important;
+            z-index: 2 !important;
+            width: 900px !important;            
+            margin-left: 4% !important;
+        }
+        .loadingClass{
+        display: none;
+        position: absolute;
+        top: 30%;
+        left: 40%;
+        width: 74px;
+        height: 45px;
+        padding: 4px 5px 0px;
+        border: 3px solid #c5cdc5;
+        box-shadow: 1px 1px 10px #ababab;
+        border-radius: 8px;
+        background-color: #0070d2;
+        text-align: center;
+        overflow: auto;
+        }
+       
+        
+    </style>
+    
+    <apex:sectionHeader title="Case View" subtitle="{!objCase.CaseNumber}"/>
+    
+    
+    <!--Aditya's Changes--->
+        <!-- Custom Publisher Action -->
+        <div id="sidebarId" class="sidebarCls">
+                <!-- Repositions publisher tabs to a horizontal arrangement on top of the page -->
+            <ul class="demoNav" style="list-style: none; overflow:hidden">
+                <li style="float:left" class="sidebarList" onclick="getDemoSidebarMenu().selectMenuItem('custom_email_tab');">
+                    <apex:image id="answerCustImgId" url="{!$Resource.SC_AnswerCustomerIcon}" width="20px" height="20px" alt="Answer Customer" style="vertical-align: middle;"/>
+                    <a id="custom_email_tab" class="sidebarLink" href="javascript:void(0);" style="color:#67676c;text-decoration: none !important;">
+                        <span class="menuItem">Answer Customer</span>
+                    </a>
+                </li>
+                <li style="float:left" class="sidebarList" onclick="getDemoSidebarMenu().selectMenuItem('custom_log_call_tab');">
+                    <apex:image id="logCallImgId" url="{!$Resource.SC_LogCall}" width="20px" height="20px" alt="Log a Call" style="vertical-align: middle;"/>
+                    <a id="custom_log_call_tab" href="javascript:void(0);" class="sidebarLink" style="color: #67676c;text-decoration: none !important;">
+                        <span class="menuItem">Log Call</span>
+                    </a>
+                </li>
+                <li style="float:left" class="sidebarList" onclick="getDemoSidebarMenu().selectMenuItem('custom_comment_tab');" >
+                    <apex:image id="caseNoteImgId" url="{!$Resource.SC_AddCaseNoteIcon}" width="20px" height="20px" alt="Add Case Note" style="vertical-align: middle;"/>
+                    <a id="custom_comment_tab" href="javascript:void(0);" class="sidebarLink" style="color: #67676c;text-decoration: none !important;">
+                        <span class="menuItem">Add Case Note</span>
+                    </a>
+                </li>
+                <li style="float:left" class="sidebarList" onclick="getDemoSidebarMenu().selectMenuItem('special_Instruction_tab');">
+                    <apex:image id="specialInstrImgId" url="{!$Resource.SC_SpecialIntstructionIcon}" width="20px" height="20px" alt="Answer Customer" style="vertical-align: middle;"/>
+                    <a id="special_Instruction_tab" href="javascript:void(0);" class="sidebarLink" style="color: #67676c;text-decoration: none !important;">
+                        <span class="menuItem">Special Instruction</span>
+                    </a>
+                </li>
+                <li style="float:left" class="sidebarList" onclick="getDemoSidebarMenu().selectMenuItem('case_detail_tab');">
+                    <apex:image id="caseDetailImgId" url="{!$Resource.SC_ViewCaseDetailIcon}" width="20px" height="20px" alt="Answer Customer" style="vertical-align: middle;"/>
+                    <a id="case_detail_tab" href="javascript:void(0);" class="sidebarLink" style="color: #67676c;text-decoration: none !important;">
+                        <span class="menuItem">View Case Details</span>
+                    </a>
+                </li>
+            </ul>
+                    
+                <!-- Email action -->
+            <div id="custom_email_pub_vf" style="display:none;margin:1%;overflow:hidden;margin-left: 4%;">
+                <apex:iframe src="AnswerCustomerPS?id={!case.id}" id="SC_CaseViewPageId" title="Answer Customer" height="300px" scrolling="true" width="80%"/>
+            </div>
+                    
+                <!-- Log call action -->
+            <div id="custom_log_call_vf" style="display:none">
+                <apex:logCallPublisher entityId="{!case.id}"
+                                       width="80%"
+                                       logCallBodyHeight="10em"
+                                       reRender="customFeed"
+                                       onSubmitSuccess="refreshFeed();" />
+            </div>
+                
+            <!--Add Case Comment--->
+            <br/><div id="custom_comment_vf" style="display:none; width: 80%;min-width:400px;overflow:auto;margin-left:4%">
+                <b>Feed Filters :</b>&nbsp;&nbsp;
+            	<input type="radio" onclick="filterSelection('AllUpdates')" name="feedfilter" checked="true" data-filterName = "AllUpdates"/> All Updates
+               &nbsp; <input type="radio" onclick="filterSelection('EmailMessageEvent')" name="feedfilter" data-filterName = "EmailMessageEvent"/> All Emails
+               &nbsp; <input type="radio" onclick="filterSelection('CallLogPost')" name="feedfilter" data-filterName = "CallLogPost"/> Call Logs
+               &nbsp; <input type="radio" onclick="filterSelection('TextPost')" name="feedfilter" data-filterName = "TextPost"/> Case Notes
+               &nbsp; <input type="radio" onclick="filterSelection('ChangeStatusPost')" name="feedfilter" data-filterName = "ChangeStatusPost"/> Status Changes
+               &nbsp; <input type="radio" onclick="filterSelection('CreateRecordEvent')" name="feedfilter" data-filterName = "CreateRecordEvent"/> Tasks and Events<br/><br/><br/>
+            	<apex:outputPanel id="filterPanelStatus" layout="block" style="display:none;margin-bottom:2%;">
+                 <b style="color:#505f69;">Loading</b> <img id="LoadingBarId" src="{!$Resource.SC_LoadingBarGif}" width="20%" height="12px" style="display:inline;vertical-align: middle;"/>
+            	</apex:outputPanel>
+            	<apex:outputPanel id="chatterFeedPanel" layout="block">
+            		<chatter:feed entityId="{!case.id}" showPublisher="true" id="customFeed1" feedItemType="{!feedCustFilterItem}" />
+            	</apex:outputPanel>
+             	<br/>
+            </div>
+            
+            <div id="specialInstr_pub_vf" style="display:none;width:80%;min-width:400px;margin-left:3%; overflow:auto;">
+                <apex:iframe src="Special_Instructions?id={!case.id}" id="specialInstruction" title="Answer Customer" height="300px" scrolling="true"/>
+            </div>
+            
+            <div id="casedetail_pub_vf" style="display:none;width:1%;min-width:1px;margin: 1%;"> 
+            </div>
+            
+    </div>
+    
+    <!-- Related List Count and Hyperlink -->
+    <div class="listHoverLinks" style="visibility: visible;" id="listHoverLinkId">
+        <a class="linklet" id="RelatedCasesId" href="#Related_Cases">
+            <span class="listTitle">Related Cases
+                <span class="count">[{!relatedCaseCount}]</span>
+            </span>
+        </a>
+        <span class="pipe"> | </span>
+        <a class="linklet" href="#Open_Activities" id="OpenActivityId" data-uidsfdc="29">
+            <span class="listTitle">Open Activities
+                <span class="count">[{!openActivityCount}]</span>
+            </span>
+        </a>
+        <span class="pipe"> | </span>
+        <a class="linklet" href="#Activity_History" id="ActivityHistoryId" data-uidsfdc="30">
+            <span class="listTitle">Activity History
+                <span class="count">[{!activityHistoryCount}]</span>
+            </span>
+        </a>
+        <span class="pipe"> | </span>
+        <a class="linklet" href="#Attachments" id="AttachmentId" data-uidsfdc="31">
+            <span class="listTitle">Attachments
+                <span class="count">[{!attachmentCount}]</span>
+            </span>
+        </a>
+        <span class="pipe"> | </span>
+        <a class="linklet" href="#Project_Case_Association" id="ProjectCaseId" data-uidsfdc="33">
+            <span class="listTitle">Project Case Association
+                <span class="count">[{!ProjectCaseAssoCount}]</span>
+            </span>
+        </a>    
+        <span class="pipe"> | </span>
+        <a class="linklet" href="#CaseHistory" id="CaseHistoryId" data-uidsfdc="33">
+            <span class="listTitle">Case History
+                <span class="count">[{!caseHistoryCount}]</span>
+            </span>
+        </a>
+    </div>
+    <!--------------------------------------------------------------------------------->
+	<apex:form >
+    
+        <apex:actionFunction id="refreshChatterFilter" name="refreshChatterFilter" reRender="chatterFeedPanel" action="{!refreshChatterFilter}" oncomplete="closeLoader(); return false;">
+        	<apex:param name="filterValue" value="" assignTo="{!filterValue}"/>
+        </apex:actionFunction>
+
+        <apex:actionFunction id="refreshChatterFeed" name="refreshChatterFeed" rerender="custom_comment_vf"/>   
+
+        
+        <div id="fade"></div>
+        
+        <apex:pageBlock title="{!$ObjectType.Case.label} Detail">
+            
+            <apex:pageBlockButtons location="top"> 
+                <apex:actionStatus id="mySaveStatus">
+                   
+                    <!-- ----------------------------- BUTTONS ------------------------------- -->
+                    
+                    <apex:facet name="stop">
+                        <apex:outputPanel >
+                            <apex:commandButton value="Edit" action="{!editCaseRedirect}" rerender="msg" id="editButton" immediate="true"/>
+                            <apex:commandButton value="Save" onClick="callSave();return false;" style="display: none;" id="saveButton" rerender="msg" status="mySaveStatus"/>
+                            <!--<apex:commandButton value="Save" action="{!save}" id="saveButton" rerender="msg" status="mySaveStatus"/>-->
+                            <apex:commandButton value="Cancel" action="{!cancel}" style="display: none;" id="cancelButton" status="mySaveStatus" immediate="true"/>
+                            <!--<apex:commandButton onclick="resetInlineEdit()" id="cancelButton" reRender="msg" style="display: none;" value="Cancel"/> -->
+                            <apex:commandButton value="Delete" id="deleteButton" action="{!delete}" rerender="msg" status="mySaveStatus" immediate="true"/>
+                            <apex:commandButton value="Clone" id="cloneButton" action="{!URLFOR($Action.Case.Clone,Id)}" immediate="true"/>
+                            <apex:commandButton value="Re-open" id="reopenButton" action="{!reopenCase}" immediate="true"/>
+                            <apex:commandButton value="Close Case" id="closeCaseButton" action="{!CloseRedirect}" immediate="true"/>
+                            <apex:commandButton value="Select Indirect Customer" id="indCustButton" onClick="selectIndCust();return false;"/>
+                        </apex:outputPanel> 
+                    </apex:facet>
+                    
+                    <!-- ----------------------------- SPINNER ------------------------------- -->
+                    
+                    <apex:facet name="start">
+                        <apex:outputPanel >
+                            <img src="/img/loading.gif" width="25" height="25" />
+                        </apex:outputPanel>
+                    </apex:facet>
+                </apex:actionStatus>
+                
+            </apex:pageBlockButtons>
+            
+            <!-- ----------------------------- PAGE MESSAGES ------------------------------- -->
+            
+            <apex:pageMessages id="msg"/>
+            
+            <!-- ----------------------------- HIDDEN FIELDS ------------------------------- -->
+            
+            <apex:outputPanel style="display: none">
+                <apex:inputField value="{!objCase.Service__c}" id="stdServIn" />
+            </apex:outputPanel>
+            
+            <apex:outputPanel style="display: none">
+                <apex:outputField value="{!objCase.Service__c}" id="stdServ">
+                    <apex:inlineEditSupport event="ondblclick" />
+                </apex:outputField>
+            </apex:outputPanel>
+            
+           	<!--
+           	<apex:outputPanel style="display: none">
+               	<apex:inputField value="{!objCase.Request_Type__c}" id="stdReqTypIn" />
+           	</apex:outputPanel>
+           
+           	<apex:outputPanel style="display: none">
+               	<apex:inputField value="{!objCase.Close_Code__c}" id="stdCloCodIn" />
+           	</apex:outputPanel>
+           
+           	<apex:outputPanel style="display: none">
+               	<apex:outputField value="{!objCase.Request_Type__c}" id="stdReqTyp" />
+           	</apex:outputPanel>
+           
+           	<apex:outputPanel style="display: none">
+               	<apex:outputField value="{!objCase.Close_Code__c}" id="stdCloCod" />
+           	</apex:outputPanel>
+			-->            
+
+            <!-- ----------------------------- MODAL DIALOG ------------------------------- -->
+            
+            <div class="bootstrap-iso">  
+                <apex:outputPanel id="myModalPanel">
+                    <div class="modal" style="width:70%;left:20%;top:20%;" id="myModal" role="dialog">
+                        <div class="modal-dialog" >
+                            <div class="modal-content" style="width:70%">
+                                
+                                <div class="modal-header">
+                                    <h4>
+                                        Dependent Fields
+                                    </h4>
+                                    
+                                    <div id="actionStatusDiv" style="text-align:center">
+                                        <apex:actionStatus id="mySaveStatus1">
+                                            <apex:facet name="start">
+                                                <apex:outputPanel >
+                                                    <br/><img src="/img/loading.gif" width="15" height="15" />
+                                                </apex:outputPanel>
+                                            </apex:facet>
+                                        </apex:actionStatus>    
+                                    </div>
+                                    
+                                </div>
+                                
+                                <div class="modal-body">
+                                    <table>
+                                        
+                                        <tr>
+                                            <apex:actionRegion immediate="false">
+                                                <td style="padding-bottom: 5px;">
+                                                    <apex:outputLabel style="text-align: left" for="Account">Account &nbsp;&nbsp;</apex:outputLabel>
+                                                </td>
+                                                <td style="padding-bottom: 5px;">
+                                                    <apex:outputPanel styleClass="requiredInput" layout="block">
+                                                        <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                                                        <apex:actionRegion immediate="false">
+                                                            <apex:inputField id="Account" label="Account Name" value="{!objCase.AccountId}">
+                                                                <apex:actionSupport event="onchange" status="mySaveStatus1" reRender="stdServIn,Service,RequestType,CloseCode,AlertType,PSRootCause">
+                                                                </apex:actionSupport>
+                                                            </apex:inputField>
+                                                        </apex:actionRegion>
+                                                    </apex:outputPanel>
+                                                </td>    
+                                            </apex:actionRegion>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <apex:actionRegion immediate="false">
+                                                <td style="padding-bottom: 5px;">
+                                                    <apex:outputLabel style="text-align: left" for="Service">Service &nbsp;&nbsp;</apex:outputLabel>
+                                                </td>
+                                                <td style="padding-bottom: 5px;">
+                                                    <apex:outputPanel styleClass="requiredInput" layout="block">
+                                                        <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                                                        <apex:selectList title="Service" multiselect="false" size="1" value="{!objCase.Service__c}" required="true" id="Service">
+                                                            <apex:selectOptions value="{!Services}"></apex:selectOptions>
+                                                            <apex:actionSupport event="onchange" status="mySaveStatus1" reRender="stdServIn,RequestType,CloseCode,AlertType,PSRootCause">
+                                                            </apex:actionSupport>
+                                                        </apex:selectList>
+                                                    </apex:outputPanel>
+                                                </td>    
+                                            </apex:actionRegion>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td style="padding-bottom: 5px;">
+                                                <apex:outputLabel style="text-align: left" for="RequestType">Request Type &nbsp;&nbsp;</apex:outputLabel>
+                                            </td>
+                                            <td style="padding-bottom: 5px;">
+                                                <apex:outputPanel styleClass="requiredInput" layout="block">
+                                                    <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                                                    <apex:inputField id="RequestType" label="Request Type" value="{!objCase.Request_Type__c}"/>
+                                                </apex:outputPanel>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td style="padding-bottom: 5px;">
+                                                <apex:outputLabel style="text-align: left" for="CloseCode">Close Code &nbsp;&nbsp;</apex:outputLabel>
+                                            </td>
+                                            <td  style="padding-bottom: 5px;">
+                                                <apex:inputField id="CloseCode" label="Close Code" value="{!objCase.Close_Code__c}"/>
+                                            </td>
+                                        </tr>
+                                        
+                                        <apex:outputPanel rendered="{!AND($ObjectType.Case.fields.Alert_Type__c.Accessible,$ObjectType.Case.fields.PS_Root_Cause__c.Accessible)}">
+                                        	<tr>
+                                                <td style="padding-bottom: 5px;">
+                                                    <apex:outputLabel style="text-align: left" for="PSRootCause">PS Root Cause &nbsp;&nbsp;</apex:outputLabel>
+                                                </td>
+                                                <td style="padding-bottom: 5px;">
+                                                    <apex:inputField id="PSRootCause" label="PS Root Cause" value="{!objCase.PS_Root_Cause__c}"/>
+                                                </td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td>
+                                                    <apex:outputLabel title="Depends on Request Type" style="text-align: left" for="AlertType">Alert Type &nbsp;&nbsp;</apex:outputLabel>
+                                                </td>
+                                                <td>
+                                                    <apex:inputField id="AlertType" label="Alert Type" value="{!objCase.Alert_Type__c}"/>
+                                                </td>
+                                            </tr>
+                                            
+                                        </apex:outputPanel>
+                                        
+                                    </table>
+                                    
+                                </div>
+                                
+                                <div class="modal-footer" style="padding: 5px">
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="updateFields();" data-dismiss="modal" id="saveModal" >Ok</button>
+                                    <button type="button" class="btn btn-default btn-sm" onclick="resetModal();hideModal();" data-dismiss="modal">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </apex:outputPanel>
+            </div>
+            
+            <!-- ----------------------------- DYNAMIC COMPONENT ------------------------------- -->
+            
+            <apex:pageBlockSection columns="1" id="section" rendered="{!if(instCount > 0, true,false)}">
+                <apex:pageBlockSectionItem id="item">
+                    <img src="{!$Resource.SpecialInstruction}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <div>
+                <apex:dynamicComponent componentValue="{!ViewDynamicForm}"/>
+            </div>
+
+            <!-- ----------------------------- ACTION FUNCTIONS ------------------------------- -->
+            
+            <apex:actionFunction action="{!Save}" name="saveFunction" reRender="msg" status="mySaveStatus" oncomplete="showSaveCancel();"/>
+            	<input type="text" id="hiddenField" style="display:none" />
+            
+            <apex:actionFunction name="updateTextFields" status="mySaveStatus" reRender="msg,AccountNametext,Servicetext,RequestTypetext,CloseCodetext,AlertTypetext,PSRootCausetext" oncomplete="applyHoverStyle();applyBoldStyle();lockAccLookup();greyOut();"/>
+            
+            <apex:actionFunction name="resetMyModal" status="mySaveStatus" immediate="false" action="{!resetModal}" reRender="Account,Service,RequestType,CloseCode,PSRootCause,AlertType" oncomplete="lockAccLookup();greyOut();">
+                <apex:param value="" assignTo="{!accValue}" name="accValue"/>
+                <apex:param value="" assignTo="{!serValue}" name="serValue"/>
+                <apex:param value="" assignTo="{!reqTypValue}" name="reqTypValue"/>
+                <apex:param value="" assignTo="{!cloCodValue}" name="cloCodValue"/>
+                <apex:param value="" assignTo="{!psRootCauseValue}" name="psRootCauseValue"/>
+                <apex:param value="" assignTo="{!alertTypeValue}" name="alertTypeValue"/>
+            </apex:actionFunction>
+            
+        </apex:pageBlock>
+        
+    </apex:form> 
+    
+        
+    <!-- ----------------------------- RELATED LISTS ------------------------------- -->
+    
+    <apex:outputText >
+        <h3 style="font-size: 1.2em;">Account Services and Support Products</h3>
+    </apex:outputText>
+    <br/>
+    <apex:include pageName="SC_showContractDetOnCase"/>
+    
+	<div id="OpenActivitiesId"><apex:relatedList list="OpenActivities" rendered="{!$ObjectType.OpenActivity.accessible}"/></div>
+    <div id="ActivityHistoriesId"><apex:relatedList list="ActivityHistories" rendered="{!$ObjectType.ActivityHistory.accessible}"/></div>
+    <div id="CombinedAttachmentId"><apex:relatedList list="CombinedAttachments" rendered="{!$ObjectType.CombinedAttachment.accessible}"/></div>
+    <div id="ProjectCaseAssoId"><apex:relatedList list="Project_Case_Associations__r" title="Project Case Associations" rendered="{!$ObjectType.Project_Case_Association__c.accessible}"/></div>
+	<div id="CaseAssociationsId"><apex:relatedList list="Cases"/></div>
+    
+    <apex:pageBlock title="Case History">
+        <div style="height: 170px; overflow: auto;" id="caseHistoryId">
+            <apex:pageBlockTable value="{!myCaseHistoryValid}" var="casHistory">
+                <apex:column headerValue="Date" value="{!casHistory.createddate}"/>
+                <apex:column headerValue="User" value="{!casHistory.createdBy.name}"/>
+                <apex:column headerValue="Action">
+                    <apex:outputText rendered="{!casHistory.field != 'created'}" value="Changed "/>
+                    <span style="font-weight:bold;">
+                        <apex:outputField value="{!casHistory.field}"/>
+                    </span>
+                    <apex:outputText rendered="{!casHistory.oldvalue == null && casHistory.newvalue == null}" value="" />
+                    <apex:outputText rendered="{!casHistory.oldvalue == null && casHistory.newvalue != null}" value=" to {!casHistory.newvalue}." />
+                    <apex:outputText rendered="{!casHistory.oldvalue != null}" value=" from {!casHistory.oldvalue} to {!casHistory.newvalue}." />
+                </apex:column> 
+            </apex:pageBlockTable>
+        </div>
+    </apex:pageBlock>
+    
+    <!-- ----------------------------- JAVASCRIPT ------------------------------- -->
+    
+    <script type="text/javascript">
+    	var $j = jQuery.noConflict();
+    
+       $j(document).ready(function()
+                          {
+                              chatter.getFeed().applyDropDownFilter({'requestType':'filter','filterType':'all','keyprefix':'','shouldPoll':false, 'label':'All Updates','itemVisibilityFilter':''});
+                          });
+    	
+    	var accId;
+    	var ser;var reqtyp;var clocod;var altyp;var psrtcs;
+    	//var accId;var serv;var reqType;var closeCode;var rootCause;var alertType;
+
+        $j(function()
+          {
+              setTabTitleFun();
+              lockAccLookup();
+              applyHoverStyle();
+              applySectionHeaderStyle();
+              applyLockOnHoverStyle();
+          });
+        
+        function setTabTitleFun()
+        {
+            var caseNumb = '{!objCase.CaseNumber}';
+            sforce.console.setTabTitle(caseNumb);
+        }
+        
+        function lockAccLookup()
+        {
+            $j("[id$='AccountLookup']").attr("readonly","readonly");
+        }
+        
+        function applyHoverStyle()
+        {
+            $j("[id*='SecItem']").parent().hover(
+                function(){$j(this).toggleClass("inlineEditWriteOn");}
+            );
+        }
+        
+        function applyLockOnHoverStyle()
+        {
+            $j("[id$='lockedField']").parent().hover(
+                function(){$j(this).toggleClass("inlineEditLockOn");}
+            );
+        }
+        
+    	function applySectionHeaderStyle()
+    	{
+            //$j("[id$='sectionHeaderID']").children().addClass("sectionHeaderStyle");
+            $j("[class*='pbSubheader']").css({"border-width" : "1px 0 0",
+                                              "border-color" : "#c0be72;",
+                                              "background-color" : "inherit",
+                                              "color" : "black",
+                                              "border-top" : "solid",
+                                              "border-top-color" : "#c0be72"})
+    	}
+    
+        function applyBoldStyle()
+        {
+            $j("[id*='SecItem']").addClass("inlineEditModified");
+        }
+        
+        function openDialogBox() 
+        {
+            accId = '{!objCase.AccountId}';
+            
+            //serv = '{!objCase.Service__c}';
+            //reqType = '{!objCase.Request_Type__c}';
+            //reqType = $j("[id*='RequestTypetext']").text();
+            //closeCode = '{!objCase.Close_Code__c}';
+            //rootCause = '{!objCase.PS_Root_Cause__c}';
+            //alertType = '{!objCase.Alert_Type__c}';
+            //console.log(accId,serv,reqType,closeCode,rootCause,alertType);
+            
+            ser = $j("[id*='Servicetext']").text();
+            reqtyp = $j("[id*='RequestTypetext']").text();
+            clocod = $j("[id*='CloseCodetext']").text();
+            psrtcs = $j("[id*='PSRootCausetext']").text();
+            //altyp = $j("[id*='AlertTypetext']").text().trim();
+            altyp = '{!objCase.Alert_Type__c}';
+            
+            //$('#myModal').modal({backdrop: 'static', keyboard: false});
+            greyIn();
+            //$('#myModal').modal('show');
+            //$j('#myModal').show();
+        }
+    
+    	function showModal()
+    	{
+            $j('#myModal').show();
+        }
+    
+    	function hideModal()
+    	{
+            $j('#myModal').hide();
+        }
+    
+    	function callSave()
+        {
+            document.getElementById('hiddenField').click();
+            //$j("[id*='saveButton']").css('display', 'none');
+            //$j("[id*='cancelButton']").css('display', 'none');
+            saveFunction();
+        }
+    
+    	function buttonHideShow()
+    	{
+            $j("[id*='saveButton']").css('display', 'inline');
+            $j("[id*='cancelButton']").css('display', 'inline');
+            
+            $j("[id*='editButton']").css('display', 'none');
+            $j("[id*='deleteButton']").css('display', 'none');
+            $j("[id*='cloneButton']").css('display', 'none');
+            $j("[id*='reopenButton']").css('display', 'none');
+            $j("[id*='closeCaseButton']").css('display', 'none');
+            $j("[id*='indCustButton']").css('display', 'none');
+        }
+    
+    	function showSaveCancel()
+    	{
+        	if('{!error}' == true)
+            {
+                buttonHideShow();
+            }
+        }
+        
+        function updateFields()
+        {
+            buttonHideShow();
+            hideModal();
+            updateTextFields();
+        }
+    
+        function resetModal()
+        {
+            resetMyModal(accId,ser,reqtyp,clocod,psrtcs,altyp);
+            //resetMyModal(accId,serv,reqType,closeCode,rootCause,alertType);
+        }
+            
+        function greyIn()
+        {
+            var windHeight = $j(document).height();
+            $j("[id*='fade']")[0].style.height = windHeight+"px";
+            document.getElementById('fade').style.display = 'block';
+            showModal();
+        }
+        
+        function greyOut()
+        {
+            document.getElementById('fade').style.display = 'none';
+        }
+        
+        function selectIndCust()
+        {
+            if (sforce.console.isInConsole()) 
+            {   
+                srcSelf("/apex/IndirectCustomerPopup?id={!Case.Id}&isdtp=vw");
+            }   
+            else
+            {
+                location.href = "/apex/IndirectCustomerPopup?id={!Case.Id}&isdtp=vw";
+                //document.getElementById('page:form:block:section:item:label').className = 'detailCls'; 
+            }
+        }
+    
+    //Aditya's Changes : Publisher Action Controls
+    function DemoSidebarMenu() {
+        
+    var menus = {	"custom_email_tab" : "custom_email_pub_vf",
+    				"custom_log_call_tab" : "custom_log_call_vf",
+    				"custom_comment_tab" :"custom_comment_vf",
+                    "special_Instruction_tab" :"specialInstr_pub_vf",
+                 	"case_detail_tab":"casedetail_pub_vf"
+                };
+	this.selectMenuItem = function(tabId) {
+	for (var index in menus) {
+        var tabEl = document.getElementById(index);
+        var vfEl = document.getElementById(menus[index]);
+        if (index == tabId) {
+            tabEl.className = "selected";
+            vfEl.style.display = "block";
+            document.getElementsByClassName("selected")[0].parentNode.style.backgroundColor="#F5F5F5";
+            document.getElementsByClassName("selected")[0].style.color='black';
+        } 
+        else {
+        	tabEl.className = "notSelected";
+        	vfEl.style.display = "none";
+            var elementsOfNonSelectedIcon = document.getElementsByClassName("notSelected");
+                for (var i = 0; i < elementsOfNonSelectedIcon.length; i ++) {
+                    var parentElement = elementsOfNonSelectedIcon[i].parentNode
+                    parentElement.style.backgroundColor="white";
+                    elementsOfNonSelectedIcon[i].style.color='grey';
+                }
+        	}
+        }
+	};
+        refreshChatterFeed();
+}
+    
+        var demoSidebarMenu;
+        var getDemoSidebarMenu = function() {
+            if (!demoSidebarMenu) {
+                demoSidebarMenu = new DemoSidebarMenu();
+            }
+            return demoSidebarMenu;
+        };
+
+    //Related List Count Scroller    
+// Add smooth scrolling to all links
+  $j("#listHoverLinkId a").on('click', function(event) {
+
+    // Make sure this.hash has a value before overriding default behavior
+    if (this.hash !== "") {
+      // Prevent default anchor click behavior
+      event.preventDefault();
+
+      // Store hash
+      var hash = this.hash;
+		
+      var relatedListDiv;
+      if(hash == "#Related_Cases"){
+      	relatedListDiv = 'CaseAssociationsId';
+      }
+      else if(hash == "#Open_Activities"){
+          relatedListDiv = 'OpenActivitiesId';
+      }
+      else if(hash == "#Activity_History"){
+          relatedListDiv = 'ActivityHistoriesId';
+      }
+      else if(hash == "#Attachments"){
+          relatedListDiv = 'CombinedAttachmentId';
+      }
+      else if(hash == "#CaseHistory"){
+          relatedListDiv = 'caseHistoryId';
+      }
+      else if(hash == "#Project_Case_Association"){
+          relatedListDiv = 'ProjectCaseAssoId';
+      }  
+
+      // Using jQuery's animate() method to add smooth page scroll
+      // The optional number (800) specifies the number of milliseconds it takes to scroll to the specified area
+      $j('html, body').animate({
+        scrollTop: $j("#"+relatedListDiv).offset().top
+      }, 500, function(){
+   
+        // Add hash (#) to URL when done scrolling (default click behavior)
+        window.location.hash = hash;
+      });
+    } // End if
+  });
+    
+    
+    function filterSelection(filterValue){
+         var filterValue = $j("input[type='radio']:checked").attr("data-filterName");
+        $j("[id*='chatterFeedPanel']").hide();
+        $j("[id*='filterPanelStatus']").show();
+        if(filterValue == "AllUpdates"){
+            chatter.getFeed().applyDropDownFilter({'requestType':'filter','filterType':'all','keyprefix':'','shouldPoll':false, 'label':'All Updates','itemVisibilityFilter':''});       
+			setTimeout(function(){closeLoader();}, 800);	
+        }
+        else{
+         	refreshChatterFilter(filterValue);
+            }
+    }
+    
+    function closeLoader(){
+        $j("[id*='filterPanelStatus']").hide();
+        $j("[id*='chatterFeedPanel']").show();
+    }
+    
+    </script>  
+</apex:page>

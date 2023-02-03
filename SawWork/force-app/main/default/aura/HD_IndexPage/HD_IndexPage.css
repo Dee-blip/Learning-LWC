@@ -1,0 +1,25 @@
+.THIS .hideForm{
+    display:none;
+}
+.THIS .showForm{
+    display:block;
+}
+.THIS .boxWidth{
+    width:410px;
+    margin:auto;
+    
+}
+
+.THIS .sWrap {
+    height:500px;
+    width:100%;
+}
+
+.THIS .height90{
+    height:90vh;
+}
+
+.THIS .height75{
+    
+    height:75vh;
+}

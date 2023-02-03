@@ -1,0 +1,13 @@
+<aura:component >
+    <aura:attribute name="value" type="String"/>
+    <aura:attribute name="title" type="String"/>
+    <aura:attribute name="options" type="List" default="[{'label':'Yes','value':'1'},{'label':'No','value':'0'}]"/>
+    <div class="slds-form-element"><label class="slds-form-element__label slds-form-element__legend" for="input-id-02">{!v.title} </label>
+        <lightning:select aura:id="" name="select" label="" required="false" value="{!v.value}">
+            <option text="choose one..."></option>
+            <aura:iteration items="{!v.options}" var="option">
+                <option text="{!option.label}" value="{!option.value}" selected="{!option.selected}"></option>
+            </aura:iteration>
+        </lightning:select>
+    </div>
+</aura:component>

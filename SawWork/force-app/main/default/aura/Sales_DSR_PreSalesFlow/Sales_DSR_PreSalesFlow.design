@@ -1,0 +1,8 @@
+<design:component label="PresalesFlow Attributes">
+   <design:attribute name="dsrRecordTypeId" label="dsrRecordTypeId" />
+   <design:attribute name="accountId" label="accountId" />
+   <design:attribute name="opportunityId" label="opportunityId" />
+   <design:attribute name="newDSRId" label="newDSRId" />
+   <design:attribute name="requesterId" label="requesterId" />
+    
+</design:component>

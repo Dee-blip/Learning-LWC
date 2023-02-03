@@ -1,0 +1,243 @@
+<!--=====================================================================================================+
+    Component name      : SC_QualityCoaching_RCA
+    Author              :   Bhavesh
+    Created             :   
+    JIRA                :   
+    Purpose             :  Quality Coaching Create/Edit button
+             
+    Last Modified         Developer                 Purpose            
+    ============= ========================         ==========
+
++=====================================================================================================-->
+<aura:component implements="lightning:actionOverride,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:utilityItem" controller="SC_QualityCoaching_RCA_Handler" access="global">
+    <!-- attributes coming from the parent utility bar component -->
+    <aura:attribute name="sourceId" type="String"/>
+    <aura:attribute name="sourceType" type="String"/>
+    <aura:attribute name="parentType" type="String"/>
+    
+    <!-- attributes -->
+    <!--1. To store the Quality Coaching object.-->
+    <aura:attribute name="qualityCoaching" type="Object" default="[]"/>
+    
+    <!--2. To store the table data which contains Quality Coaching Criteria.--> 
+    <aura:attribute name="tableData" type="List"/>
+    
+    <!--3. To check if user has access to create QC record -->
+    <aura:attribute name="isIraptAdmin" type="Boolean" default="false"/>
+    <aura:attribute name="isIraptUser" type="Boolean" default="false"/>
+    <aura:attribute name="isWrongUser" type="Boolean" default="false"/>
+
+    <!--4. To store the  label of the save button. Label changes dynamically during action call.-->
+    <aura:attribute name="dynamicButtonLabel" type="String" default="Save"/>
+    
+    <!--5. Error Message -->
+    <aura:attribute name="errorMessage" type="String" default="Loading...!"/>
+
+    <!--total Score-->
+    <aura:attribute name="totalScore" type="Integer" default="0"/>
+    <aura:attribute name="maxScore" type="Integer" default="0"/>
+    <aura:attribute name="percScore" type="Integer" default="0"/>
+
+    <!--Criteria Met-->
+    <aura:attribute name="criteriaMet" type="Integer" default="0"/>
+
+    <aura:attribute name="disableSave" type="Boolean" default="true"/>
+    <!-- Loading spinner -->
+    <aura:attribute name="showSpinner" type="Boolean" default="false"/>
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner alternativeText="Loading, Please Wait..." title="Loading, Please Wait..." variant="brand" size="large"/>
+    </aura:if>
+    <!-- for utility functions -->
+    <lightning:utilityBarAPI aura:id="utilitybar" />
+    
+    <!-- Method to get and populate the data. Called from the Utility Component -->
+    <aura:method name="getData" description="Method to populate the data">
+        <aura:attribute name="sourceId" type="String" />
+        <aura:attribute name="sourceType" type="String" />
+        <aura:attribute name="parentType" type="String" />
+    </aura:method>
+    
+    <!-- If user IRAPT admin -->
+    <aura:if isTrue="{!v.isIraptAdmin}">
+        <div class="slds-p-around_small">
+            <!-- Table -->
+            <table class="slds-table slds-table--bordered slds-table_cell-buffer">
+                    <thead>
+                      <tr class="slds-text-heading--label">
+                        
+                        <th scope="col"> 
+                          <span class="slds-truncate">Criteria Name</span>
+                        </th>
+                        <th scope="col" style="text-align: center">
+                          <span class="slds-truncate">Max Score</span>
+                        </th>
+                        <th scope="col" >
+                          <span class="slds-truncate">Score</span>
+                        </th>
+                        
+                      </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.tableData}" var="qcc">
+                            <tr class="slds-hint-parent">
+                            
+                                <td data-label="Criteria Name">
+                                    <span class="slds-truncate">{!qcc.qualityCoachingCriteria.Criteria_Name__c}</span>
+                                </td>
+                                <td data-label="Max Score" style="text-align: center">
+                                    <span class="slds-truncate"><lightning:formattedNumber value="{!qcc.qualityCoachingCriteria.Max_Score_RCA__c}" maximumFractionDigits="2"/></span>
+                                </td>
+                                <td data-label="Score" >
+                                    <span class="slds-truncate">
+                                            <lightning:input aura:id="response" variant = "label-hidden" type="number" name="input1"  value="{!qcc.qualityCoachingCriteria.Score_Rca__c}" min="0" max="{!qcc.qualityCoachingCriteria.Max_Score_RCA__c}" messageWhenRangeOverflow="Invalid Score"
+                                            style="width:60px" class="lghtng-input" onchange="{! c.countScoreValue }" messageWhenStepMismatch="Enter a number with one(1) decimal point only" required="true" messageWhenValueMissing="Please enter a value." step=".1"/>
+                                    </span>
+                                </td>
+                            
+                            </tr>
+                        </aura:iteration>
+                        <tr class="slds-hint-parent" style="height: 30px">
+                            <td data-label="Maximum score (for all parameters apply)">
+                                <span class="slds-truncate slds-text slds-text-title_bold">Maximum score (for all parameters apply)</span>
+                            </td>
+                            <td data-label="Sum"  style="text-align: center">
+                                    <span class="slds-truncate slds-text slds-text-title_bold">{!v.maxScore}</span>
+                            </td>
+                            <td data-label="Sum"  style="text-align: center">
+                            </td>
+                        </tr>
+                        <tr class="slds-hint-parent" style="height: 30px">
+                            <td data-label="Total Score">
+                                <span class="slds-truncate slds-text slds-text-title_bold">Total Score</span>
+                            </td>
+                            <td data-label="Sum"  style="text-align: center" >
+                                    <span class="slds-truncate slds-text slds-text-title_bold">{!v.totalScore}</span>
+                            </td>
+                            <td data-label="Sum"  style="text-align: center">
+                                </td>
+                        </tr>
+                        <tr class="slds-hint-parent" style="height: 30px"> 
+                            <td data-label="Percentage Score">
+                                <span class="slds-truncate slds-text slds-text-title_bold">Percentage Score</span>
+                            </td>
+                            <td data-label="Sum"  style="text-align: center">
+                                    <span class="slds-truncate slds-text slds-text-title_bold">{!v.percScore}%</span>
+                            </td>
+                            <td data-label="Sum"  style="text-align: center">
+                                </td>
+                        </tr>     
+                    </tbody>
+                  </table>
+                    <!--<lightning:input aura:id="response" variant = "label-hidden" type="number" name="input1"  value="{!qcc.qualityCoachingCriteria.Points__c}" min="0" max="{!qcc.maxScore}" messageWhenRangeOverflow="{!'Value should be between 0-'+qcc.maxScore}"
+                                    style="width:60px"  />
+                                   onchange="{! c.countScoreValue }"
+                                -->
+           
+            <!-- End of table. -->
+            <br/>
+            
+            <!-- Input text area for notes-->
+            <div class="slds-p-around_small">
+                <h6 style="font-size: 15px !important;"> <b>Notes</b></h6>
+                <lightning:textarea name="input3" aura:id ="notesValue" placeholder="type your notes here..."  value="{!v.qualityCoaching.Notes__c}" required="true" 
+                messageWhenValueMissing="Please fill Notes. It is mandatory."/>
+            </div>
+            <br/>
+           
+           <!-- Save button-->
+            <div align="center">  
+                <lightning:button variant="brand" label="{!v.dynamicButtonLabel}" onclick="{!c.saveRecord}" disabled="{!v.disableSave}"/>
+            </div> 
+        
+        </div>
+        
+        
+    </aura:if>
+
+    <!-- If user IRAPT user -->
+    <aura:if isTrue="{!v.isIraptUser}">
+        <div class="slds-p-around_small">
+            <!-- Table -->
+            <table class="slds-table slds-table--bordered slds-table_cell-buffer">
+                    <thead>
+                      <tr class="slds-text-heading--label">
+                        <th scope="col"> 
+                          <span class="slds-truncate">Criteria Name</span>
+                        </th>
+                        <th scope="col" style="text-align: center">
+                          <span class="slds-truncate">Max Score</span>
+                        </th>
+                        <th scope="col" >
+                                <span class="slds-truncate">Score</span>
+                              </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.tableData}" var="qcc">
+                            <tr class="slds-hint-parent">
+                                <td data-label="Criteria Name">
+                                    <span class="slds-truncate">{!qcc.qualityCoachingCriteria.Criteria_Name__c}</span>
+                                </td>
+                                <td data-label="Max Score" style="text-align: center">
+                                    <span class="slds-truncate">{!qcc.qualityCoachingCriteria.Max_Score_RCA__c}</span>
+                                </td>
+                                <td data-label="Score" >
+                                        <span class="slds-truncate">
+                                                {!qcc.qualityCoachingCriteria.Score_Rca__c}
+                                                
+                                        </span>
+                                    </td>
+                            </tr>
+                        </aura:iteration>
+                        <tr class="slds-hint-parent" style="height: 30px">
+                                <td data-label="Maximum score (for all parameters apply)">
+                                    <span class="slds-truncate slds-text slds-text-title_bold">Maximum score (for all parameters apply)</span>
+                                </td>
+                                <td data-label="Sum"  style="text-align: center">
+                                        <span class="slds-truncate slds-text slds-text-title_bold">{!v.maxScore}</span>
+                                </td>
+                                <td data-label="Sum"  style="text-align: center">
+                                </td>
+                            </tr>
+                            <tr class="slds-hint-parent" style="height: 30px">
+                                <td data-label="Total Score">
+                                    <span class="slds-truncate slds-text slds-text-title_bold">Total Score</span>
+                                </td>
+                                <td data-label="Sum"  style="text-align: center" >
+                                        <span class="slds-truncate slds-text slds-text-title_bold">{!v.totalScore}</span>
+                                </td>
+                                <td data-label="Sum"  style="text-align: center">
+                                    </td>
+                            </tr>
+                            <tr class="slds-hint-parent" style="height: 30px"> 
+                                <td data-label="Percentage Score">
+                                    <span class="slds-truncate slds-text slds-text-title_bold">Percentage Score</span>
+                                </td>
+                                <td data-label="Sum"  style="text-align: center">
+                                        <span class="slds-truncate slds-text slds-text-title_bold">{!v.percScore}%</span>
+                                </td>
+                                <td data-label="Sum"  style="text-align: center">
+                                    </td>
+                            </tr>    
+                    </tbody>
+                  </table>
+            <br/>
+        </div>
+        
+        
+    </aura:if>
+    <!-- If unauhtorized, display error message-->
+    <aura:if isTrue="{!v.isWrongUser}">
+        <div class="slds-p-around_small">
+            <lightning:card>
+                <aura:set attribute="title">
+                    <lightning:icon class="icn" iconName="utility:error" variant="error" size="large"/>
+                    <span style="padding:1rem; font-size:larger; white-space:pre-wrap;">
+                        {!v.errorMessage}
+                    </span>
+                </aura:set>
+            </lightning:card>
+        </div>
+    </aura:if>
+    
+</aura:component>

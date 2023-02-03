@@ -1,0 +1,70 @@
+<template>
+        <template if:true={isIraptUser}>
+            <lightning-layout class="padding20">
+                <lightning-layout-item padding="around-small" size="4">
+                    <div class="header-column">
+                        <p  title="Current Shift:">Current Shift:</p>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item padding="around-small" size="8">
+                        {currentShift}
+                </lightning-layout-item>
+                
+            </lightning-layout>
+            
+            <lightning-layout class="padding20">
+                <lightning-layout-item padding="around-small" size="4">
+                    <div class="header-column">
+                        <p  title="Current Shift:">Target Shift:</p>
+                        <p >
+                            </p>
+                    </div>
+                </lightning-layout-item>
+                
+                <lightning-layout-item padding="around-small" size="8">
+                        <lightning-combobox
+                        name="targetShift"
+                        value={targetShift}
+                        options={options}
+                        style="margin-bottom:4px"
+                        onchange={updateWakeupTime} 
+                        variant = "label-hidden" required></lightning-combobox>
+                </lightning-layout-item>
+                
+            </lightning-layout>
+            <lightning-layout class="padding20">
+                    <lightning-layout-item padding="around-small" size="4">
+                        <div class="header-column">
+                            <p title="Current Shift:">Wakeup Time:</p>
+                        </div>
+                    </lightning-layout-item>
+                    <lightning-layout-item padding="around-small" size="8">
+                        {wakeupTime}
+                    </lightning-layout-item>
+            </lightning-layout>
+            <lightning-layout class="padding20">
+                    
+                    <lightning-layout-item padding="around-small" size="4">
+                        <div class="header-column">
+                                <p  title="Notes">Notes:</p>
+                        </div>
+                    </lightning-layout-item>
+                    <lightning-layout-item padding="around-small" size="8">
+                            <lightning-textarea value={notes} name="notes" variant = "label-hidden" required onchange={notesUpdate} ></lightning-textarea>
+                    </lightning-layout-item>
+                
+                    
+            </lightning-layout>
+        </template>
+        <template if:false={isIraptUser}>
+                <p title="Error" style="color:red;text-align:center">{errorMsg}</p>
+        </template>
+                
+        <footer class="slds-modal__footer" style="margin: 5px -16px -16px -16px;">
+            <button title="Cancel" class="slds-button slds-button_neutral" onclick={closeModal}  >Cancel</button>
+            <template if:true={isIraptUser}>
+                <button title="Submit" class="slds-button slds-button_brand" onclick={createTransition}>Submit</button>
+            </template>
+            
+        </footer>
+    </template>

@@ -1,0 +1,13 @@
+<aura:component controller="L2Q_CapacityRequestController" implements="force:hasRecordId,force:lightningQuickAction"
+    access="global">
+    <aura:html tag="style">
+        .slds-modal {
+        visibility: hidden;
+        display: none;
+        }
+        .slds-backdrop{
+        display: none;
+        }
+    </aura:html>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+</aura:component>

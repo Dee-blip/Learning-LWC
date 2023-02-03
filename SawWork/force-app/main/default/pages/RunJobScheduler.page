@@ -1,0 +1,6 @@
+<apex:page standardController="Job_Scheduler__c" extensions="RunJobSchedulerExtension" recordSetVar="jobs" action="{!scheduleEngine}">
+  <apex:form >
+  <apex:pageMessages ></apex:pageMessages>
+  <apex:commandButton action="{!Cancel}" value="Cancel"/>
+  </apex:form>
+</apex:page>

@@ -1,0 +1,128 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="HD_Intro_Starter_Config_Puller">
+    <!-- aura:handler event="aura:waiting" action="{!c.toggleAppSpinner}"/ -->  
+    <!-- aura:handler event="aura:doneWaiting" action="{!c.toggleAppSpinner}"/ -->
+    <ltng:require styles="{!join(',',
+                          $Resource.HD_IntroJs + '/introjs-rtl.css',
+                          $Resource.HD_IntroJs + '/animate.css',
+                          $Resource.HD_IntroJs + '/introjs.css')}"
+                  scripts="{!$Resource.HD_IntroJs + '/intro.js'}"
+                  />
+    
+    <aura:attribute name="iconName" type="String"/>
+    <aura:attribute name="introStartedFlag" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.hideHeader}"/>
+    
+    
+    <div class="slds-grid">
+        <div></div>
+        <div class="slds-align--absolute-center"></div> 
+        <div class="slds-align--absolute-center">
+            
+            <span class="slds-icon_container slds-badge" title="Click to Hide Header" onclick="{!c.showHeader}">
+                <lightning:icon aura:id="icondown" iconName="utility:chevrondown" size="xx-small" alternativeText="Help"/>
+                <lightning:icon aura:id="iconup" class="hideHeader" iconName="utility:chevronup" size="xx-small" alternativeText="Help"/>
+            </span>
+            
+        </div> 
+        <div class="slds-align--absolute-center"></div> 
+        <div class="slds-col_bump-left"></div>
+        <div data-aura-class="hdHelpMenu">
+            
+            <aura:renderIf isTrue="{!v.introStartedFlag}">       
+            <!-- Slds Dropdwn Menu -->
+  <div aura:id="helpmenu" class="slds-dropdown-trigger slds-dropdown-trigger_click">
+  <button class="slds-button slds-button_icon slds-button_icon-border-filled" aria-haspopup="true" title="Help" onclick="{!c.toggleMenu}">
+      <lightning:icon aura:id="Help" iconName="utility:help" size="xx-small" alternativeText="Help"/>
+    <span class="slds-assistive-text">Show More</span>
+  </button>
+  <div class="slds-dropdown slds-dropdown_right slds-dropdown_inverse">
+    <ul class="slds-dropdown__list" role="menu">
+      <li class="slds-dropdown__item slds-is-selected" role="presentation">
+        <a href="javascript:void(0);" onclick="{!c.startWalkThrought}" role="menuitem" tabindex="0">
+          <span class="slds-truncate" title="Menu Item One">Take Tour</span>
+        </a>
+      </li>
+      
+    </ul>
+  </div>
+</div>
+            <!-- Slds Dropdwn Menu END -->  
+</aura:renderIf>            
+            
+        </div>
+    </div>
+    
+    <lightning:spinner class="slds-hide" aura:id="applevelspinner" variant="brand" size="large"/>
+    
+    <!-- Modal Commenting this out in order to debug incident detail page -->
+    <div class="slds-hide" id="welcome">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.hideWalkthroughtIntro}">
+                        <lightning:icon aura:id="closeIcon" iconName="utility:close" size="xx-small" alternativeText="Help"/>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Welcome To New Helpdesk Experience</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    
+                    
+                    <div id="mountainset">
+                        <h2  onclick="{!c.startWalkThrought}" class="h2-alt animated bounceInUp h2-delay">Akamai Helpdesk</h2>
+                        <div class="absolute-wrapper">
+                            <div id="sun" class="animated infinite bounceInDown"></div>
+                            <div class="x1 cloudheight">
+                                <div class="cloud"></div>
+                            </div>
+                            <div id="mountain1"></div>
+                            <div id="mountain2"></div>
+                            <div id="mountain3"></div>
+                        </div>
+                        
+                        <div class="tree-align">
+                            <div id="tree_001" style="float: left; margin-top:1em;">
+                                <div style="height:3em; width:3em; background-color:green; border-radius:1em;"></div>
+                                <div style="margin-left: 1.25em; height:2em; width:0.5em; background-color:brown;">
+                                </div>
+                            </div>
+                            
+                            <div id="tree_002" style="float: left; margin-left: 1em; margin-top: 1em;">
+                                <div style="height:4em; width:5em; background-color:green; border-radius:0.5em;"></div>
+                                <div style="margin-left: 2em; height:1em; width:1em; background-color:#660000;"></div>
+                            </div>
+                            
+                            <div id="shrub_001" style="float: left; margin-top:4.8em;">
+                                <div style="height:1em; width:1.4em; background-color:green; border-radius:0.15em;"></div>
+                                <div style="margin-left: 0.5em; height:0.2em; width:0.4em; background-color:brown;"></div>
+                            </div>
+                            
+                            <div id="tree_003" style="float: left;">
+                                <div style="margin-left: 2em; height:1em; width:1em; background-color:green; border-radius:0.1em; border-bottom-right-radius:0em; border-bottom-left-radius:0em;"></div>
+                                <div style="margin-left: 1em; height:1em; width:3em; background-color:green; border-radius:0.25em;"></div>
+                                <div style="height:2em; width:5em; background-color:green; border-radius:0.5em;"></div>
+                                <div style="margin-left: 2em; height:2em; width:1em; background-color:brown;"></div>
+                            </div>
+                            
+                            <div id="shrub_002" style="float: left; margin-top:4.8em;">
+                                <div style="height:1em; width:1.2em; background-color:green; border-radius:0.35em;"></div>
+                                <div style="margin-left: 0.5em; height:0.2em; width:0.2em; background-color:#660000;"></div>
+                            </div>
+                            
+                            <div id="tree_004" style="float: left; margin-left: 4em; margin-top: 1em;">
+                                <div style="height:4em; width:5em; background-color:green; border-radius:1.5em;"></div>
+                                <div style="margin-left: 2em; height:1em; width:1em; background-color:#660000;"></div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+    <!-- END Modal -->
+</aura:component>

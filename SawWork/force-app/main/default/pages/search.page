@@ -1,0 +1,7 @@
+<apex:page showheader="true" sidebar="true">
+    <apex:outputPanel id="SalesDashboard">
+     <script>
+         window.open('https://search.akamai.com?source=salesforce&text=');
+     </script>
+    </apex:outputPanel>
+</apex:page>

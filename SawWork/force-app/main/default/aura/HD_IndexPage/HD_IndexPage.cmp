@@ -1,0 +1,28 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<aura:handler name="init" value="{!this}" action="{!c.hideForm}" />
+    <div onresize="{!c.reszie}">
+
+<div class="slds" style="overflow: hidden !important">
+    	<!--c:HD_Hide_Header /--> <!-- @Amogh as part of PRTORES-1868 -->
+    	<c:HD_IncidentListHeader />
+  
+        <!--<ui:scrollerWrapper class="sWrap">-->
+    <div  aura:id="rlist" id="ilist">
+            <c:HD_IncidentRecords /> 
+            <c:HD_PageAudit pageName="Home Page"/> 
+    </div>              
+        
+        <!--</ui:scrollerWrapper>
+        
+        
+        <div id = "incformid" aura:id = "auraincformid">
+                <c:incidentForm />
+        </div>
+         --> 
+        
+</div>
+
+    </div>
+    
+</aura:component>

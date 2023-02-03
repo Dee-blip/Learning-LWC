@@ -1,0 +1,9 @@
+<aura:component implements="flexipage:availableForAllPageTypes">
+	<aura:attribute name="message" type="String" default="You are not authorized to edit this record..😐" />
+	<div class="slds-theme_error slds-theme_alert-texture slds-align_absolute-center" style="font-size:18px;height:40px">
+		<div class="slds-align_absolute-center">
+            {!v.message}
+        </div>
+	</div>
+
+</aura:component>

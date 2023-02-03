@@ -1,0 +1,150 @@
+<apex:page showHeader="false" Controller="PostChatController">
+    <apex:stylesheet value="{!URLFOR($Resource.EBMailerStatusUI, '/bootstrap-3.3.2-dist/css/bootstrap.min.css')}"/>
+    <div>
+    <center><apex:image url="{!$Resource.AkamaiLogo}"/></center>
+    </div>
+    <script type='text/javascript'>
+    var controlingId = "ctrl";
+    (function() {
+        function handlePageLoad() {
+            buildPicklistValues("feedbackOverAllExpId",'{!feedbackOverallExperience}','{!thisFeedback.Feedback_Overall_Experience__c}');
+            buildPicklistValues("feedbackIssueResolvedId",'{!feedbackIssueResolved}','{!thisFeedback.Feedback_Issue_Resolved__c}');
+            buildPicklistValues("feedbackOtherId",'{!feedbackOtherMedium}','{!thisFeedback.Feedback_Other_Medium__c}');
+            document.getElementById("errorId").style.display = 'none';
+            var akamCaseIdValue = '{!akamCaseIdValue}';
+            if(akamCaseIdValue == '' || akamCaseIdValue == null){
+                document.getElementById("errorId").style.display = 'block';
+                document.getElementById("postChatForm").style.display = 'none';
+            }
+        }
+        if (window.addEventListener) {
+            window.addEventListener('load', handlePageLoad, false);
+        } 
+        else { 
+            window.attachEvent('onload', handlePageLoad, false);
+        }
+    })();
+    function buildPicklistValues(fieldId,fieldValues,fieldAPI) {
+        var list = JSON.parse(fieldValues);
+        var myDiv = document.getElementById(fieldId);
+        appendPickList(myDiv, list, controlingId,fieldAPI);
+    }
+    function appendPickList(myDiv, list, cId, name) {
+        selectList = document.createElement("select");
+        selectList.id = cId;
+        selectList.name = name;
+        selectList.required = "true";
+        selectList.style.width = "100%";
+        selectList.style.backgroundColor = "white";
+        selectList.style.borderStyle = "none";
+        myDiv.appendChild(selectList);
+        
+        var option = document.createElement("option");
+        option.value = "";
+        option.text = "--None--";
+        selectList.appendChild(option);
+        for (var item in list){
+            if (list[item]["active"]) {
+                var option = document.createElement("option");
+                option.value = list[item]["label"];
+                option.text = list[item]["label"];
+                if (list[item]["defaultValue"]) {
+                    option.selected="selected";
+                }
+                selectList.appendChild(option);
+            }
+        }
+    };
+    </script>
+    <div id="errorId" style="position: relative;width: 33%;margin: 0 auto;padding: 1px 14px;line-height: 15px;margin-top: 10%;">
+        <div>
+            <p>Your chat request has been canceled because no agents are available.</p>
+            <center><button style="margin-top: 4%;margin-right: 4%;" onclick="window.close();">Close</button></center>
+        </div>
+    </div>
+        
+    <apex:form id="formId">
+        <apex:actionFunction name="submitForm" action="{!saveRecord}" oncomplete="window.self.close();" reRender="postChatForm,formId">
+            <apex:param name="overAllValueSelected" assignTo="{!feedbackOverAllExpSel}" value="" />
+            <apex:param name="additionalEntered" assignTo="{!feedbackAdditionalAdded}" value="" />
+            <apex:param name="issueResolvedSelected" assignTo="{!feedbackIssueResolvedSel}" value="" />
+            <apex:param name="otherMediumSelected" assignTo="{!feedbackOtherMediumSel}" value="" />
+        </apex:actionFunction>
+    </apex:form>
+    <form id='postChatForm' class="form-horizontal" style="width: 100%;padding: 10px;">
+        <div class="form-group">
+            <label for="oId" class="col-sm-2 control-label">Please rate your overall experience with your recent Akamai chat session &nbsp;<span style="color:red;">*</span> </label>
+            <div class="col-sm-10">
+                <div class="form-control" id="feedbackOverAllExpId"> </div>
+                <div id="oErrorId"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="aId" class="col-sm-2 control-label">Any additional comments</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" rows="3" id="feedbackAdditionId"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="rId" class="col-sm-2 control-label">Do you consider your issue resolved? &nbsp;&nbsp; <span style="color:red;">*</span></label>
+            <div class="col-sm-10">
+                <div class="form-control" id="feedbackIssueResolvedId"> </div>
+                <div id="rErrorId"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mId" class="col-sm-2 control-label">If you didn’t utilize the Chat feature, how would you have contacted us today? &nbsp;&nbsp;&nbsp;<span style="color:red;">*</span></label>
+            <div class="col-sm-10">
+                <div class="form-control" id="feedbackOtherId"> </div>
+                <div id="mErrorId"/>
+            </div>
+        </div>
+        
+        <input type="hidden" value='{!akamCaseIdValue}'/>
+        
+        <div class="form-group">
+            <center><input type='button' value='Submit' id='prechat_submit' onclick="submitFeedback()" class="btn btn-default"/></center>
+        </div>
+    </form>
+        
+    <script type="text/javascript">
+    function submitFeedback() {  
+        var overAllIndex = document.getElementById('feedbackOverAllExpId').childNodes[1].options.selectedIndex;
+        var overAllValue = document.getElementById('feedbackOverAllExpId').childNodes[1].options[overAllIndex].text;
+        var issueResIndex = document.getElementById('feedbackIssueResolvedId').childNodes[1].options.selectedIndex;
+        var issueResValue = document.getElementById('feedbackIssueResolvedId').childNodes[1].options[issueResIndex].text;
+        var otherMediumIndex = document.getElementById('feedbackOtherId').childNodes[1].options.selectedIndex;
+        var otherMediumValue = document.getElementById('feedbackOtherId').childNodes[1].options[otherMediumIndex].text;
+        var additionalComments = document.getElementById('feedbackAdditionId').value;
+        document.getElementById('oErrorId').style.display = 'none';
+        document.getElementById('rErrorId').style.display = 'none';
+        document.getElementById('mErrorId').style.display = 'none';
+        document.getElementById('feedbackOverAllExpId').style.borderColor = 'rgb(204, 204, 204)';
+        document.getElementById('feedbackIssueResolvedId').style.borderColor = 'rgb(204, 204, 204)';
+        document.getElementById('feedbackOtherId').style.borderColor = 'rgb(204, 204, 204)';
+        if(overAllValue == '--None--'){
+            document.getElementById('oErrorId').style.display = 'block';
+            document.getElementById('oErrorId').style.color = 'red';
+            document.getElementById('oErrorId').innerHTML = 'Please select a value from the list';
+            document.getElementById('feedbackOverAllExpId').style.borderColor = 'red';
+            return false;
+        }
+        if(issueResValue == '--None--'){
+            document.getElementById('rErrorId').style.display = 'block';
+            document.getElementById('rErrorId').style.color = 'red';
+            document.getElementById('rErrorId').innerHTML = 'Please select a value from the list';
+            document.getElementById('feedbackIssueResolvedId').style.borderColor = 'red';
+            return false;
+        }
+        if(otherMediumValue == '--None--'){
+            document.getElementById('mErrorId').style.display = 'block';
+            document.getElementById('mErrorId').style.color = 'red';
+            document.getElementById('mErrorId').innerHTML = 'Please select a value from the list';
+            document.getElementById('feedbackOtherId').style.borderColor = 'red';
+            return false;
+        }
+        submitForm(overAllValue,additionalComments,issueResValue,otherMediumValue);
+        return false;
+    }
+    </script>
+</apex:page>

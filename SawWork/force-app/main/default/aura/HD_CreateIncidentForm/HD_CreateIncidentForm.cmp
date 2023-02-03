@@ -1,0 +1,352 @@
+<!--Please do not upgrade the component version! This is being used in ACD for Helpdesk Screenpop-->
+
+<aura:component controller="HD_IncidentRecord" implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+    <aura:registerEvent name="HDLogger" type="c:HDLogger"/>
+	<ltng:require scripts="{!$Resource.HD_Error_Logger}" /> 
+     <aura:attribute name="searchQuery" type="String" />
+    <aura:attribute name="results" type="List"/>
+    <aura:attribute name="selectedCategoryId" type="String"/>
+    <aura:attribute name="searchQueryUsr" type="String" />
+    <aura:attribute name="resultsUsr" type="List"/>
+    <aura:attribute name="initialResultUsr" type="Map"/>
+    <aura:attribute name="selectedUserId" type="String"/>
+    <aura:attribute name="warnings" type="String[]"/>
+    <aura:attribute name="sbi" type="Boolean" default="false"/>
+    <aura:attribute name="ntfy" type="Boolean" default="false"/> 
+    <aura:attribute name="pageSupport" type="Boolean" default="false"/> 
+    <aura:attribute name="attachMsg" type="String"/>
+    <aura:attribute name="incidentId" type="Id"/>
+    <aura:handler event="c:HD_SelectCategory" action="{!c.onSelectCategory}"/>
+    <aura:attribute name="modalFlag" type="Boolean" default="false"/>
+    <aura:attribute name="initResults" type="BMCServiceDesk__Category__c[]"/>
+
+    <!-- Start of Changes for ACD-->
+	<aura:attribute name="isScreenPop" type="Boolean" default="false"/>
+	<aura:registerEvent name="vfEvent" type="c:SendDataToVFPage"/>    
+    <!-- End of Changes for ACD-->
+
+    <aura:handler name="init" action="{!c.doinit}" value="{!this}" />
+    <aura:registerEvent name="renderForm" type="c:hd_renderCreateFormEvent"/>
+    <div>
+    <div aura:id="Accspinner" class="slds-spinner_container slds-hide">
+		<div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+			<span class="slds-assistive-text">Processing</span>
+			<div class="slds-spinner__dot-a"></div>
+			<div class="slds-spinner__dot-b"></div>
+		</div>
+	</div>
+   		
+	    <div aria-hidden="false"  role="dialog" class="slds-backdrop slds-modal slds-fade-in-open custom-hide-modal" aura:id="createformid" id="formid">
+            
+                <div class="slds-modal__container custom-modal-body" aura:id="createformid2">
+                    <div class="slds-modal__header">
+                        <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.hideCreateForm}">
+                            <lightning:icon iconName="utility:close" />
+                        </button>
+                        <h2 id="createheader" class="slds-text-heading--medium">
+                            Create Incident
+                        </h2>
+                    </div>
+                    <div class="modal-body scrollable slds-modal__content slds-p-around--medium">
+                        
+                        <ui:inputDefaultError aura:id="warn" value="{!v.warnings}" />
+                    <!--form-->
+                        <form class="slds-clearfix">                          
+                            <h2 class="slds-section-title--divider">
+                                Incident Details
+                            </h2>
+                            <br/>
+                            <div class="slds-grid slds-grid--pull-padded-medium">
+                                <div class="slds-col slds-p-horizontal--medium">
+                                    
+                                    <div class="slds-grid slds-form-element__control slds-input-has-icon slds-input-has-icon_right slds-picklist__input form-input">
+                                                                            <lightning:input name="cat" label="Category" required="true" aura:id="categoryid" class="form-input" value="{!v.searchQuery}" onchange="{!c.performSearch}" placeholder="Search Category"/>
+
+                                        <lightning:buttonIcon class="slds-button slds-input__icon slds-input__icon_right slds-icon_x-small slds-text-color--default custom-search" 
+ 															  iconName="utility:search" variant="bare" onclick="{!c.showModal}" 
+    														  alternativeText="Category Tree"/>
+                                        
+                                    </div>
+                                    
+
+
+                                    <p>Selected Category : {!v.searchQuery}</p>
+                                    <ul class ="">
+                                        <aura:iteration items="{!v.results}" var="result">
+                                            <li role="presentation" onclick="{!c.categorySelected}" data-category="{!result.name}" data-cName="{!result.value}" data-categoryid="{!result.id}">
+                                                <span class="slds-lookup__item-action slds-media" id="categoryLookupOption" role="option">
+                                                    <div class="slds-media__body">
+                                                        <div class="slds-lookup__result-text">{!result.name}</div>
+                                                        <span class="slds-lookup__result-meta slds-text-body--small">{!result.parent}</span>
+                                                    </div>
+                                                </span>
+          										</li>
+        									</aura:iteration>
+    										</ul>
+  									</div>
+  									<div class="slds-col slds-p-horizontal--medium">
+										<lightning:select name="priority" label="Priority" required="true" aura:id="priorityid" class="form-input" onchange="{!c.priorityChange}">
+                                            <option value="">--None--</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                        </lightning:select>
+                                   </div>
+							</div>
+                            <br/>
+                            <aura:if isTrue="{!v.pageSupport}">
+                                 <div class="slds-grid slds-grid--pull-padded-medium">   
+                      				<div class="slds-col slds-p-horizontal--medium">
+  									<lightning:input type="checkbox" name="Page Support" label="Page Support" aura:id="pagesupportid" checked="false"/>
+                                </div>
+                                </div>
+                                <br/>     
+                             </aura:if>
+                            <div class="slds-grid slds-grid--pull-padded-medium">
+                                
+                                    <!--<lightning:textarea name="shortdesc" label="Short Description" required="true" aura:id="shortdescid" class="form-input"/-->
+                          
+                                <div class="slds-col slds-p-horizontal--medium">
+                               		<lightning:textarea name="desc" label="Description" aura:id="descid" class="form-input" required="true"/>
+                            	</div>
+                                
+                            </div>                            
+                            <br/>
+                            <!--Incident Details-->
+                            <br/>
+                            <h2 class="slds-section-title--divider">
+                                Other Details
+                            </h2>
+                            
+                            <br/>
+                            <div class="slds-grid slds-grid--pull-padded-medium">
+                                <div class="slds-col slds-p-horizontal--medium ">
+                                    <div class="slds-grid slds-form-element__control slds-input-has-icon slds-input-has-icon_right slds-picklist__input form-input">
+                                        <lightning:input label="Client ID" name="client" aura:id="clientidx" class="form-input" 
+                                                         value="{!v.searchQueryUsr}" onchange="{!c.performUserSearch}" placeholder="Search User - Type atleast 3 characters"/>                                    
+                                        <lightning:buttonIcon class="slds-button slds-input__icon slds-input__icon_right slds-icon_x-small slds-text-color--default custom-search" 
+ 															  iconName="utility:search" variant="bare" onclick="{!c.openClientSearch}" 
+    														  alternativeText="Search Client"/>
+                                        
+                                    </div>
+                                        
+ 									 </div>
+                                
+                                
+  									
+                                
+    									<!--<lightning:input label="Owner" name="owner" aura:id="ownerid"/-->
+                               
+							</div>
+                            <br/>
+                            <div class="slds-grid slds-grid--pull-padded-medium">
+  									<div class="slds-col slds-p-horizontal--medium">
+    									<lightning:input label="CC" name="cc" aura:id="ccid" class="form-input"/>
+ 									 </div>
+  								<div class="slds-col slds-p-horizontal--medium">
+  								
+                                <lightning:select name="source" label="Source"  aura:id="sourceid" class="form-input">
+                                            <option value="">--None--</option>
+                                            <option value="Self Service">Self Service</option>
+                                            <option value="Chatter ">Chatter </option>
+                                            <option value="Email Other">Email Other</option>
+                                            <option value="Mail Listen">Mail Listen</option>
+                                    		<option value="Phone ">Phone</option>
+                                    		<option value="Walkup ">Walkup </option>
+                                 </lightning:select>
+                                    </div>
+							</div>
+      
+                            <br/>
+                            
+                                           <!--Fields-->     
+                            <br/>
+                            <h2 class="slds-section-title--divider">
+                                Flags
+                            </h2>
+                            
+                            <br/>
+                            <div class="slds-grid slds-grid--pull-padded-medium">
+                         
+  									<div class="slds-col slds-p-horizontal--medium">
+                                        <lightning:input type="checkbox" name="VIP Ticket" label="VIP Ticket" aura:id="clientvipid"/>
+            
+ 									 </div>
+                                	<div class="slds-col slds-p-horizontal--medium">
+                                        <lightning:input type="checkbox" name="Exclude Client Notifications" label="Exclude Client Notifications"  aura:id="clientnotificationid" checked="false"/>
+                                        <!--<ui:inputCheckbox label="Exclude Client Notifications"  aura:id="clientnotificationid"/-->
+ 									 </div>
+  								
+							</div>
+                            <br/>
+                            <div class="slds-grid slds-grid--pull-padded-medium">
+  									
+  								<div class="slds-col slds-p-horizontal--medium">
+  									<lightning:input type="checkbox" name="Service Based Incident" label="Service Based Incident" onchange="{!c.changeSbi}" aura:id="uiSbi" checked="false"/>
+                                    <!--<ui:inputCheckbox label="Service Based Incident"  aura:id="uiSbi" click="{!c.changeSbi}"/-->
+                                </div>
+                             </div>
+                            
+                                <aura:if isTrue="{!v.sbi}">
+                                    <br/>
+                                   <div class="slds-grid slds-grid--pull-padded-medium slds-m-left--medium"> 
+                                       		
+                                       		<div class = "slds-m-left--x-large">
+												<lightning:input type="checkbox" name="Notify DL-EIS" label="Notify DL-EIS"  aura:id="dlEIS" onchange="{!c.changeNtfy}" checked="false"/>
+                                                <!--<ui:inputCheckbox label="Notify DL-EIS"  aura:id="dlEIS" click="{!c.changeNtfy}"/-->
+
+                                       		</div>
+                                       		
+                                       		<div class = "slds-m-left--xx-large">
+                                                 <lightning:input type="checkbox" name="White-hat Incident" label="White-hat Incident"  aura:id="whitehatincid" checked="false"/>                                       		
+
+                                       		</div>
+                                       		
+                                       		
+ 
+                                    </div>
+                                    
+                                </aura:if>
+							
+                            <aura:if isTrue="{!v.ntfy}">
+                                <br/>
+                                <div class="slds-grid slds-grid--pull-padded-small slds-m-left--xx-large">
+                                    
+                                        <div class="slds-m-left--x-large">
+                                            <lightning:input type="checkbox" name="Notify DL-EIS during Creation" label="Notify DL-EIS during Creation" aura:id="ntfyCreation" checked="false"/>
+                                        </div>
+                                        <div class="slds-m-left--medium">
+                                            <lightning:input type="checkbox" name="Notify DL-EIS on Status Change" label="Notify DL-EIS on Status Change"  aura:id="ntfyStatus" checked="false"/>
+                                        </div>
+                                        <div class="slds-m-left--medium">
+                                            <lightning:input type="checkbox" name="Notify DL-EIS on Notes Update" label="Notify DL-EIS on Notes Update" aura:id="ntfyNotes" checked="false"/>
+                                        </div>
+                                    
+                                </div>
+                            </aura:if>
+                            <br/>
+                            <!--  Changes for ACD -->
+                            <aura:if isTrue="{! !v.isScreenPop}">
+									<h2 class="slds-section-title--divider">
+                                        Attachments
+                                    </h2>
+                                    
+                                    <br/>
+                                    <div class="slds-grid slds-grid--pull-padded-medium">
+                                 
+                                            <div class="slds-col slds-p-horizontal--medium">
+                                               <input type="file" class="file" aura:id="file" multiple="true"/>
+                                                <br/>
+                                                
+                                                 <div aura:id="messages" class="notUploading customMessage">
+                                                    <ui:outputText value="{!v.attachMsg}"></ui:outputText>
+                                                 </div>
+                                             </div>
+                                    </div>
+
+                            </aura:if> 
+                           <!--  End of changes for ACD --> 
+                                                                 
+                       </form>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <div class="slds-button-group" role="group">
+                            <ui:button class="slds-button slds-button--neutral" label="Save" aura:id="Save" press="{!c.saveIncident}"></ui:button>
+                            <!-- Changes for ACD -->
+                            <aura:if isTrue="{! !v.isScreenPop}">
+                                <ui:button class="slds-button slds-button--neutral" label="Save And New" aura:id="SaveAndNew" press="{!c.saveIncident}"></ui:button>
+                            </aura:if>                            
+                            <!-- End of Changes for ACD -->
+                            <button class="slds-button slds-button--neutral" aura:id = "Cancel" onclick = "{!c.hideCreateForm}">Cancel</button>
+                        </div>
+                    </div>
+            </div>
+        </div>
+        <!--End of Create Incident Form -->
+        
+        <!--Client ID Modal window -->
+        <!-- Changes for ACD Setting the class to slds-show-->    
+        <div id="clientsearch" aura:id="auraclientsearch" class="slds-show">
+        	<div aria-hidden="false"  role="dialog" class="slds-backdrop slds-modal slds-fade-in-open custom-hide-modal" aura:id="selectclientform" id="clientformid">
+                <div class="slds-modal__container custom-modal-body" aura:id="auraclientmodal">
+                    <div class="slds-modal__header">
+                         <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.hideClientForm}">
+                            <lightning:icon iconName="utility:close" />
+                        </button>
+                        <h2 id="clientheader" class="slds-text-heading--medium">
+                            Client ID
+                        </h2>
+                    </div>
+                    <div class="modal-body scrollable slds-modal__content slds-p-around--medium">
+						<lightning:input label="Client ID" name="client" required="true" aura:id="clientid" class="form-input" 
+                                                         value="{!v.searchQueryUsr}" onchange="{!c.performUserSearch}" placeholder="Search User - Type atleast 3 characters"/>   
+                        
+                        <p>Selected User : {!v.searchQueryUsr}</p>
+                        
+                        <table class="slds-table slds-table--bordered slds-table--striped slds-table--cell-buffer slds-table--fixed-layout">
+    					<thead>
+      						<tr class="slds-text-heading--label slds-line-height--reset">
+                        		<th class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col">
+                  				<a href="javascript:void(0);" class="slds-th__action slds-text-link--reset" tabindex="0">
+                                    <span class="slds-truncate" title="Full Name">Full Name</span>
+                       			</a>
+                                </th>
+                                <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col">
+                  				<a href="javascript:void(0);" class="slds-th__action slds-text-link--reset" tabindex="0">
+                                    <span class="slds-truncate" title="Title">Title</span>
+                       			</a>
+                                </th>
+                                <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col">
+                  				<a href="javascript:void(0);" class="slds-th__action slds-text-link--reset" tabindex="0">
+                                    <span class="slds-truncate" title="Phone">Phone</span>
+                       			</a>
+                                </th>
+                                <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col">
+                  				<a href="javascript:void(0);" class="slds-th__action slds-text-link--reset" tabindex="0">
+                                    <span class="slds-truncate" title="Email">Email</span>
+                       			</a>
+                                </th>
+                            </tr>
+                            </thead>
+                        <tbody >
+        				<aura:iteration items="{!v.resultsUsr}" var="result">
+                            
+         					<tr role="presentation" class = "custom-cursor" onclick="{!c.userSelected}" data-user="{!result.name}" data-uName="{!result.value}" data-userid="{!result.id}" data-uEmail="{result.email}" data-uTitle="{!result.title}" data-uPhone="{!result.phone}" data-uRole="{!result.role}" data-uProfile="{!result.profile}">
+                                    <td><div class="slds-truncate">{!result.name}</div></td>
+                                	<td><div class="slds-truncate">{!result.title}</div></td>
+                                	<td><div class="slds-truncate">{!result.phone}</div></td>
+                                    <td><div class="slds-truncate">{!result.email}</div></td>
+                                </tr>
+                            
+                            </aura:iteration>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="slds-modal__footer">
+                    </div>
+            </div>
+        </div>
+        </div>
+        
+        <aura:if isTrue="{!v.modalFlag}" >
+                <div aria-hidden="false"  role="dialog" class="slds-backdrop slds-modal slds-fade-in-open " aura:id="resolutionId">
+                    <div class="slds-modal__container custom-modal-body">
+                        <div class="slds-modal__header">
+                            <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.hideModal}">
+                                <lightning:icon iconName="utility:close" />
+                            </button>
+                        </div>
+                        <div class="slds-modal__content slds-p-around--medium" >
+                            <div>
+                                <c:HD_CategoryTreeCmp />
+                                
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div> 
+      </aura:if>
+            </div>
+       
+    </aura:component>

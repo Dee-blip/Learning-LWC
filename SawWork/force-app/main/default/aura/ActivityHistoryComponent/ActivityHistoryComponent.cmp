@@ -1,0 +1,33 @@
+<!-- SFDC-2407 Added by Mayank Bansal 13th March 2018 -->
+<aura:component controller="ActivityHistoryController"
+                implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" 
+                access="global" >
+    <aura:attribute name="recordId" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="activityData" type="object"/>
+    <aura:attribute name="userLocaleCountry" type="string" default="{!$Locale.userLocaleCountry}" />
+    <aura:attribute name="userLocaleLang" type="string" default="{!$Locale.userLocaleLang}" />
+    <aura:attribute name="activityColumns" type="object"/>
+    <aura:attribute name="sortedBy" type="string" default="Name"/>
+    <aura:attribute name="sortedDirection" type="string" default="asc"/>
+    <div aura:id="activitySelectionId" class="slds-show">
+     <div class="slds-show" aura:id="losingActivitySearchId">
+                <aura:if isTrue="{! v.activityData.length != 0 }">
+                    <div class="slds-scrollable_x" style="width: 100rem;">
+                        <div style='width:2000px;'>
+                <lightning:datatable data="{! v.activityData }"
+                    columns="{! v.activityColumns }"
+                    keyField="Id"
+                    onsort="{!c.updateColumnSorting}"
+                    sortedBy="{!v.sortedBy}"
+                    sortedDirection="{!v.sortedDirection}"
+                    hideCheckboxColumn="true"/>
+                </div>
+            </div>
+                <aura:set attribute="else">
+                    No Activities to display
+                </aura:set>
+                </aura:if>
+            </div>
+    </div>
+</aura:component>

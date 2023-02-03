@@ -1,0 +1,17 @@
+<apex:page standardController="PACE_Review_Calendar__c" extensions="PACE_CalendarDocLink_Controller" tabStyle="Launch_Item_Approval__c" >
+  <apex:form >
+  <apex:outputText rendered="{!isPkgDesListNull}">No links have been added to the "Package Design" steps yet </apex:outputText>
+      <apex:pageBlock rendered="{!!isPkgDesListNull}">
+      
+      <apex:pageblockSection columns="1">
+         
+                     <apex:pageBlockTable value="{!packageDesignDocRecordList}" var="pdlink" rendered="{!!isPkgDesListNull}">
+                        <apex:column style="width:20%" headerValue="Package Design Link Name"  value="{!pdlink.Name}"/>
+                       <!-- <apex:column style="width:80%" headerValue="Link"  value="{!pdlink.Document_Address__c}"/>-->
+                       <apex:column style="width:80%" headerValue="Link"  value="{!pdlink.Document_URL__c}"/>
+                     </apex:pageBlockTable>
+      </apex:pageblockSection>
+      
+      </apex:pageBlock> 
+  </apex:form> 
+</apex:page>

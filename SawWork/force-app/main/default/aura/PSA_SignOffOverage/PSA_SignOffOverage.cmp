@@ -1,0 +1,73 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader,lightning:actionOverride" access="global" controller="PSA_OverageController">
+
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:attribute name="recordId" type="String" access="Global"/>
+    <aura:attribute name="recordError" type="String"/>
+    <aura:attribute name="message" type="String" access="Global"/>
+    <aura:attribute name="messageToast" type="String" access="Global"/>
+    <aura:attribute name="notMatchingCLI" type="boolean" default="false"/>
+    
+    <aura:attribute name="manualProfiles" type="String" default=""/>
+    <aura:attribute name="automatedProfiles" type="String" default=""/>
+    
+    <aura:attribute name="psOverageRec" type="PS_Overage_Hours__c" />
+    <aura:attribute name="psOverageFields" type="PS_Overage_Hours__c" />
+    <aura:attribute name="currentUser" type="User" />
+    
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container" style="z-index: 10000 !important;">
+          <lightning:spinner alternativeText="Loading" size="large" />
+        </div>       
+    </aura:if>    
+    
+    <div>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" aura:id="Modalbox" class="slds-modal">
+            <div class="slds-modal__container" style="height: 100% !important; width: 100% !important">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button__icon--x-small slds-modal__close slds-button_icon-inverse" title="Close" onclick="{! c.closeModal}">
+            <lightning:icon iconName="utility:close" size="x-small" />
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_small slds-hyphenate">Confirm</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_large"  id="modal-content-id-1">
+                  <aura:if isTrue="{!v.notMatchingCLI}">
+                        <p class="slds-text-body_regular"><b>Warning:</b> The Overage Contract Detail does not Match with the Project any more.</p>
+                  </aura:if>
+                    <p class="slds-text-body_regular">{! v.message}</p>
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick="{! c.closeModal}">Cancel</button>
+                    <button class="slds-button slds-button_brand" onclick="{! c.signOffSubmit}">Ok</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop " aura:id="Modalbackdrop"></div>
+    </div>
+
+    <!--<force:recordData
+                      fields="Id, Profile.Id"
+                      recordId="{!$SObjectType.CurrentUser.Id}"
+                      targetFields="{!v.currentUser}"
+                      mode="VIEW"
+                      targetError="{!v.recordError}"
+                      recordUpdated="{!c.onRecordUpdatedUser}"
+                      />    
+    -->
+  <force:recordData aura:id="forceRecord"
+                      recordId="{!v.recordId}"
+                      targetFields="{!v.psOverageFields}"
+                      targetError="{!v.recordError}"
+                      targetRecord="{!v.psOverageRec}"
+                      fields="Project_ID__c,Original_Contract_ID__c,Manual_Overage__c,GSS_Approver__c,Finance_Approver__c,Overage_Action__c,Overage_Hours__c,Overage_Stage__c,To_be_Billed_Hours__c,RecordType.Name,Automated_Overage__c,CLI_Start_Date__c,CLI_End_Date__c,Marketing_Product_Id__c,Original_Detail_ID__r.Record_Type__c,CLI_Unit_of_Measure__c,Overage_Filters__c" 
+                      recordUpdated="{!c.onRecordUpdated}"
+                       />
+    
+    <lightning:recordEditForm aura:id="editRecord" recordId="{!v.recordId}" objectApiName="PS_Overage_Hours__c" 
+                              onsuccess="{!c.onRecordSuccess}" onerror="{!c.onRecordError}">
+          <lightning:inputField fieldName="Trigger_Sign_Off__c" aura:id="triggerField" style="display: none;"/>
+    </lightning:recordEditForm>
+    
+</aura:component>

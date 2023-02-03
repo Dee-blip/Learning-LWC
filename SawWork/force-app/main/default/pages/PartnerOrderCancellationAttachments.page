@@ -1,0 +1,3 @@
+<apex:page standardController="Partner_Order_Cancellation_Details__c">
+    <c:NotesAndAttachmentVfComp parentSobjectId="{!Partner_Order_Cancellation_Details__c.Id}"/>
+</apex:page>

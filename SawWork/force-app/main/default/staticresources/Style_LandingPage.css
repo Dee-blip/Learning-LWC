@@ -1,0 +1,60 @@
+.black_content
+{ 
+    display: block; 
+    position: absolute; 
+    top: 0%; 
+    left: 0%; 
+    width: 100%; 
+    height: 100%; 
+    background-color: black; 
+    z-index:1001; 
+    -moz-opacity: 0.8; 
+    opacity:.80; 
+	filter: alpha(opacity=80);
+	overflow: auto; 
+}
+.white_content {
+    background-color: white;
+    border: 12px solid orange;
+    display: block;
+    height: auto;
+    margin: 15px auto;
+    max-width: 80%;
+    overflow: visible;
+    padding-bottom: 25px;
+    padding-right: 15px;
+    position: relative;
+    z-index: 1002;
+}
+.iframe_content
+{
+        display: block; 
+        position: absolute; 
+        top: 2%; 
+        left: 20%;
+        width: 60%; 
+        height: 90%; 
+        padding: 16px; 
+        border: 16px solid orange; 
+        background-color: white; 
+        z-index:1003; 
+        overflow: auto;
+}
+.jpeg_content 
+{
+        display: block; 
+        position: absolute; 
+        top: 5%; 
+        left: 25%;	 
+        width: auto; 
+        height: auto; 
+        padding: 16px; 
+        border: 16px solid orange; 
+        background-color: white; 
+        z-index:1004; 
+        overflow: auto;
+}
+.alert_link
+{
+    float:right; color:blue; font-size:20px;
+}

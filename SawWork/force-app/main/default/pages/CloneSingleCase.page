@@ -1,0 +1,2 @@
+<apex:page extensions="CloneCaseExtension" standardcontroller="Case"  sidebar="false" action="{!cloneSingleCase}">
+</apex:page>

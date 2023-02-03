@@ -1,0 +1,23 @@
+<apex:page lightningStylesheets="true" StandardController="Opportunity" extensions="CreateAndViewClosePlanController" >
+    <apex:includeScript value="/lightning/lightning.out.js" />
+    <script>
+    window.onload = function(){
+        if(("{! $User.UIThemeDisplayed }" == "Theme4d" || "{! $User.UIThemeDisplayed }" == "Theme4t") && "{!cpList.size}" == 0){
+            var fieldValues = {Opportunity__c : "{!oppty.Id}"};
+            $Lightning.use("c:GSM_CreateNewRecordGenericApp", function () {
+                $Lightning.createComponent("c:GSM_CreateNewRecordGeneric", {sObjectName: "Close_Plan__c", defaultFieldValues: fieldValues}, "lightning", function (cmp) {
+                });
+            });
+        }
+        else{
+            navigateToCreateAndViewClosePlan();
+        }
+    }
+    </script>
+    <div id="lightning"/>
+    <apex:form >
+        <apex:actionFunction name="navigateToCreateAndViewClosePlan" action="{!navigateToCreateAndViewClosePlan}"/>
+        <apex:outputText value="{!Opportunity.Name}" rendered="false"/>
+        <apex:outputLink value="/{!oppty.Id}" style="font-size:13px"> Back to Opportunity </apex:outputLink>
+    </apex:form>
+</apex:page>

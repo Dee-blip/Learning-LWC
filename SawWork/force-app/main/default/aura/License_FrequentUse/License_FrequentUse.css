@@ -1,0 +1,14 @@
+.THIS.slds-spinner_container {  
+  z-index: 10000;
+  position: fixed;   
+}
+
+.THIS.slds-spinner_container::after {
+  z-index: 10000;
+  position: fixed;
+  content: 'Please wait for a few seconds while loading';
+  width: 100%;
+  text-align: center;
+  top: calc(50% + 3em);
+  font-weight: bold;  
+}

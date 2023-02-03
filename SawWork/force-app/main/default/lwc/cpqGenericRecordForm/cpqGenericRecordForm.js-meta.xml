@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+	<apiVersion>
+		48.0
+	</apiVersion>
+	<isExposed>
+		true
+	</isExposed>
+	<targets>
+		<target>
+			lightning__RecordPage
+		</target>
+	</targets>
+	<targetConfigs>
+		<targetConfig targets="lightning__RecordPage">
+			<property name="columns" type="String" datasource="1,2" description="Specify the number of columns for the form." />
+			<property name="density" type="String" datasource="compact,comfy,auto" default="" description="Sets the arrangement style of fields and labels in the form." />
+			<property name="layoutType" type="String" datasource="Full,Compact" description="The type of layout to use to display the form fields." />
+			<property name="mode" type="String" datasource=" view,edit,readonly" default="readonly" description="Specifies the interaction and display style for the form." />
+			<property name="objectApiName" type="String" default="sbaa__Approval__c" description="The API name of the object." />
+		</targetConfig>
+	</targetConfigs>
+</LightningComponentBundle>

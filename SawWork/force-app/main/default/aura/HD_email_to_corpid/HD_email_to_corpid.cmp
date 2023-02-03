@@ -1,0 +1,8 @@
+<aura:component >
+    
+	<aura:attribute name="email" type="String" default=""/>
+    <aura:attribute name="trimmedemail" type="String" default=""/>
+    <aura:handler name="init" value="{!this}" action="{!c.TrimmedEmail}" />
+    
+    <img alt="Person name" src="{!'https://contacts.akamai.com/photos/'+v.trimmedemail+'.jpg'}" title="User avatar"/>
+</aura:component>

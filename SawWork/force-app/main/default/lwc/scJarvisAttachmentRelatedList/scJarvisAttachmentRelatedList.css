@@ -1,0 +1,10 @@
+.tableStyle
+{
+    max-height:80vh; 
+    border-top: 1px solid #d4d4d4; 
+}
+
+.scrollClass
+{
+    overflow-y: scroll ; 
+}

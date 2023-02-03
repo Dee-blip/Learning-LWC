@@ -1,0 +1,54 @@
+<!-- SFDC-1556 -->
+<apex:page controller="AccountButtonPageController" action="{!init}" lightningStylesheets="true">
+	<apex:pageMessages />
+
+	<apex:form rendered="{!disableAsPartnerFunctionality}">
+		<apex:pageBlock >
+			<apex:outputText value="{!disableConfirmationMsg}" style="text-align:center;font-weight:bold;font-size: 120%; " />
+			<apex:pageBlockButtons location="bottom">
+				<apex:commandButton action="{!disableAsPartner}" value="Ok"/>		
+				<apex:commandButton action="{!backToAccount}" value="Cancel"/>		
+			</apex:pageBlockButtons>
+		</apex:pageBlock>
+	</apex:form>
+
+	<apex:form rendered="{!partnerFunctionalityConfirmed}">
+		<apex:pageBlock >
+			<apex:outputText value="{!disableConfirmationMsg}" style="font-weight:bold;font-size: 120%;text-align:center" />
+			<apex:pageBlockButtons location="bottom">
+				<apex:commandButton action="{!backToAccount}" value="Back"/>		
+			</apex:pageBlockButtons>
+		</apex:pageBlock>
+	</apex:form>
+
+	<!-- SFDC-8783 -->
+	<apex:form rendered="{!enableAsPartnerFunctionality}">
+		<apex:pageBlock >
+			<apex:outputText value="{!enableConfirmationMsg}" style="font-weight:bold;font-size: 120%;text-align:center" />
+			<apex:pageBlockButtons location="bottom">
+				<apex:commandButton action="{!enableAsPartner}" value="Ok"/>		
+				<apex:commandButton action="{!backToAccount}" value="Cancel"/>		
+			</apex:pageBlockButtons>
+		</apex:pageBlock>
+	</apex:form>
+
+	<apex:form rendered="{!partnerFunctionalityConfirmedEnabled}">
+		<apex:pageBlock >
+			<apex:outputText value="{!enableConfirmationMsg}" style="font-weight:bold;font-size: 120%;text-align:center" />
+			<apex:pageBlockButtons location="bottom">
+				<apex:commandButton action="{!backToAccount}" value="Back"/>		
+			</apex:pageBlockButtons>
+		</apex:pageBlock>
+	</apex:form>
+
+	
+	
+	<apex:form rendered="{!errorFunction}">
+		<apex:pageBlock >
+			<apex:pageBlockButtons location="bottom">
+				<apex:commandButton action="{!backToAccount}" value="Back" />		
+			</apex:pageBlockButtons>	
+		</apex:pageBlock>	
+	</apex:form>
+</apex:page>
+<!-- End of SFDC-1556 -->

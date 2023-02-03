@@ -1,0 +1,20 @@
+<aura:component access="global">
+	<!-- ChannelName, which needs to subscribed -->
+    <aura:attribute name="channelName" type="String" required="true"/>
+    <!-- Save the reference of current subscription, which can be unsubscribe later on -->
+    <aura:attribute name="subscription" type="Object"/>
+     
+    
+    <!-- This event is fired when a component is destroyed. 
+		Handle this event if you need to do custom cleanup when a component is destroyed.-->
+    <aura:handler name="destroy" value="{!this}" action="{!c.unsubscribe}"/>
+	<!-- init event -->
+    <aura:handler name="init" value="{!this}" action="{!c.subscribe}"/>
+    
+    <!-- empApi component which will be used to subscribe/unsubscribe to a channel -->
+    <lightning:empApi aura:id="empApi"/>
+    
+    <!-- Component event, which will be fired once the message is received
+         This event will be handled by parent component to perform needful action on stream event -->
+    <aura:registerEvent name="onEmpEvent" type="c:EmpEvent"/>
+</aura:component>

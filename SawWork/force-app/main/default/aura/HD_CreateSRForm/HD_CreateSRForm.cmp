@@ -1,0 +1,65 @@
+<aura:component controller="HD_IncidentRecord" implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+   <aura:attribute name="searchQuery" type="String" />
+    <aura:attribute name="results" type="List"/>
+    <aura:attribute name="initialResultRD" type="Map"/>
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="success" type="String"/>
+    <aura:attribute name="warnings" type="String[]"/>
+    <aura:attribute name="selectedReqDefId" type="String"/>
+    <aura:attribute name="showButton" type="Boolean" default="true"/>
+
+	<!-- Start of changes for ACD -->
+    <aura:attribute name="isScreenPop" type="Boolean" default="false"/>
+    <aura:registerEvent name="vfEvent" type="c:SendDataToVFPage"/>
+    <!-- End of changes for ACD -->  
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <div>
+    
+     <div aura:id="Accspinner" class="slds-spinner_container slds-hide">
+		<div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+			<span class="slds-assistive-text">Processing</span>
+			<div class="slds-spinner__dot-a"></div>
+			<div class="slds-spinner__dot-b"></div>
+		</div>
+	</div>
+    <div aria-hidden="false"  role="dialog" class="slds-backdrop slds-modal slds-fade-in-open custom-hide-modal" aura:id="createsrformid" id="srformid">
+    <div class="slds-modal__container custom-modal-body" aura:id="createformid2">
+                    <div class="slds-modal__header">
+                        <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.hideCreateSRForm}">
+                            <lightning:icon iconName="utility:close" />
+                        </button>
+                        <h2 id="createheader" class="slds-text-heading--medium">
+                            Create Service Request
+                        </h2>
+                    </div>
+                    <div class="modal-body scrollable slds-modal__content slds-p-around--medium">
+                         <input id="reqDefInput" aura:id="auraReqDefInput" class="slds-lookup__search-input slds-input custom-input" aria-owns="lookup-63" role="combobox" aria-activedescendant=""
+			aria-expanded="false" aria-autocomplete="list" type="text" value="{!v.searchQuery}" onkeyup="{!c.performSearch}"/>
+   <input id="hiddenReqDefId" aura:id="aurahiddenReqDefId" type="hidden"/>
+
+        <p>Selected Request Definition : {!v.searchQuery}</p>
+    <ul class ="">
+        <aura:iteration items="{!v.results}" var="result">
+         <li role="presentation" onclick="{!c.reqDefSelected}" data-name="{!result.name}" data-id="{!result.id}">
+            <span class="slds-lookup__item-action slds-media" id="reqDefLookupOption" role="option">
+              <div class="slds-media__body">
+                <div class="slds-lookup__result-text">{!result.name}</div>
+              </div>
+            </span>
+          </li>
+        </aura:iteration>
+    </ul>
+                        
+                        
+        </div>
+        <div class="slds-modal__footer">
+                        <div class="slds-button-group" role="group">
+    <button class="slds-button slds-button--neutral" onclick="{!c.onReqDefSelect}">Create Service Request</button>
+                            <button class="slds-button slds-button--neutral" aura:id = "Cancel" onclick = "{!c.hideCreateSRForm}">Cancel</button>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+</aura:component>

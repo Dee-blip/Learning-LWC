@@ -1,0 +1,8 @@
+<!--PLEASE READ: If you override the automatically generated CSS, your Chatter Answers community might not function correctly.-->
+<apex:page showHeader="true" sidebar="false" docType="html-5.0" applyHtmlTag="true" applyBodyTag="false">
+    
+    <body class="akamai">
+            <chatteranswers:allfeeds communityId="{!$Label.Akamai_Community_Id}"/>
+    </body>
+       
+</apex:page>

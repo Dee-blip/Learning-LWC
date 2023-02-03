@@ -1,0 +1,140 @@
+<apex:page id="caseUpdateNotificationPage" Controller="SC_HomePageCaseNotificationsCtrl" showHeader="false" sidebar="false">
+    <apex:includeScript value="{!$Resource.JQuery_New}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.SCNewHomePage,'css/bootstrap_jquerydatatable.css')}"/>
+    <apex:includeScript value="/support/console/32.0/integration.js"/>
+    <style>
+        body,html {
+            width:100%;
+            height:100%;
+        }
+        
+        table td{
+            overflow: hidden;
+            display: inline-block;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size:10px;
+        }
+     
+        .table>thead>tr>th, .table>tbody>tr>th, 
+        .table>tfoot>tr>th, .table>thead>tr>td, 
+        .table>tbody>tr>td, .table>tfoot>tr>td {
+            padding:3px;
+        }
+     
+        .truncate{
+             width: 100%;
+             overflow: hidden;
+             display: inline-block;
+             text-overflow: ellipsis;
+             white-space: nowrap;
+             margin-bottom:0px;
+        }
+          
+    </style>
+    <script type="text/javascript">
+         var userId = '{!$User.Id}';    
+       
+        $(document).ready(function() {
+           if('{!profileCheck}'=='false')
+                sforce.console.setCustomConsoleComponentButtonText('');
+            else
+                setBtn(null);
+           
+           if ('{!profilecheck}'=='true'){
+                 sforce.console.addEventListener('CaseNotification_'+userId, CaseNotificationHandler);
+                 sforce.console.addEventListener('GlobalRefreshStreamingNotify', globalRefreshCaseNotify);
+                 sforce.console.addEventListener('ClearCaseFromHomePage', CaseNotificationHandler);
+            }    
+       });
+    
+        var globalRefreshCaseNotify = function(result){
+            forceRefreshMessgaesNotify();
+        };    
+    
+        var CaseNotificationHandler = function (result) {
+                forceRefreshMessgaesNotify();
+        }; 
+            
+        function setBtn(pCnt) {
+            var cnt;
+            if(pCnt==null)
+                cnt={!lCaseUpdatesCnt};
+            else
+                cnt=pCnt;
+            if(cnt > 0){
+                sforce.console.setCustomConsoleComponentButtonText('Case Updates ('+cnt+')');
+                sforce.console.setCustomConsoleComponentButtonStyle('background:red;color:white;');
+            }
+            else {
+                sforce.console.setCustomConsoleComponentButtonText('No Case Updates');
+                sforce.console.setCustomConsoleComponentButtonStyle('background:gray;color:white;');
+                sforce.console.setCustomConsoleComponentVisible(false);
+            }
+        }
+    
+        
+        function openConsole(SF_Id,AkamId,caseId)
+        {
+            document.getElementById('caseUpdateNotificationPage:caseUpdateNotificationForm:hiddenCaseIdForUpdating').value = caseId;
+            supressCaseUpdateApex();
+            Tab_Label = AkamId;
+            sforce.console.generateConsoleUrl(['/'+SF_Id], openConsoleUrl);        
+        }  
+        
+        function fireClearCaseFromCaseNotification()
+        {
+        	sforce.console.fireEvent('ClearCaseFromCaseNotification','ClearCaseFromCaseNotification');
+        }   
+        var openConsoleUrl = function(result){
+            sforce.console.openConsoleUrl(null, result.consoleUrl,true,[Tab_Label],null,openSuccess);        
+        }
+    
+        var openSuccess = function(result) {
+            //Report whether opening the new tab was successful
+            if (result.success == false)
+                alert('The corresponding tab is already opened');
+        };
+                        
+    </script>
+
+    
+    <apex:form id="caseUpdateNotificationForm" style="width:100%;height:100%" >
+        <apex:inputHidden value="{!hiddenCaseId}" id="hiddenCaseIdForUpdating"/>
+        <apex:pagemessages id="errorMessages"/>
+         <apex:actionStatus id="actStatusId" >
+             <apex:facet name="start" >
+                 <img src="/img/loading.gif" />                    
+             </apex:facet>
+         </apex:actionStatus> 
+        <apex:actionFunction action="{!suppressCaseUpdate}" status="actStatusId" name="supressCaseUpdateApex" rerender="errorMessages" oncomplete="forceRefreshMessgaesNotify();fireClearCaseFromCaseNotification();return false;"/>
+        <div style="width:100%;height:100%;overflow:auto" >
+            <apex:outputPanel id="Panel">
+                <apex:outputPanel rendered="{!(profileCheck=='true')}">
+                    <!-- commenting action poller as of now. using streaming instead of polling --> 
+                    <apex:actionfunction name="forceRefreshMessgaesNotify" reRender="Panel"  action="{!updatelCaseUpdates}" oncomplete="setBtn({!(lCaseUpdates.size)})"/> 
+                     <apex:actionPoller reRender="Panel" interval="8" action="{!updatelCaseUpdates}" rendered="{!enablePolling}" oncomplete="setBtn({!(lCaseUpdates.size)})"/> 
+                    <apex:OutputPanel rendered="{!IF(lCaseUpdates.size=0,true,false)}" id="footerPanel">
+                        <p style="text-align:center">No New Case Updates!!!</p>
+                    </apex:OutputPanel>
+                    <apex:dataTable value="{!lCaseUpdates}" var="CaseRec" styleClass="table" rendered="{!IF(lCaseUpdates.size=0,false,true)}"  id="updatesTable">
+                        <apex:column style="width:18%" >
+                            <a onClick="openConsole('{!CaseRec.Id}#RelatedHistoryList','{!CaseRec.AKAM_Case_ID__c}','{!CaseRec.Id}');" style="cursor: pointer; text-decoration: underline; color:#3597dc;">{!CaseRec.AKAM_Case_ID__c}</a>
+                        </apex:column>
+                        <!--
+                        <apex:column style="width:16%" >
+                            <a onClick="supressRecentUpdateFlag('{!CaseRec.Id}');return false;" style="cursor: pointer; text-decoration: underline; color:#3597dc;">Clear Case Update</a>
+                        </apex:column>
+                        -->
+                        <apex:column style="width:35%">
+                            <apex:outputText styleClass="truncate" value="{!CaseRec.Account.Name}"/>
+                        </apex:column>
+                        <apex:column style="width:40%" >
+                            <a class="truncate" onClick="openConsole('{!CaseRec.Id}#RelatedHistoryList','{!CaseRec.AKAM_Case_ID__c}','{!CaseRec.Id}');" style="cursor: pointer; text-decoration: underline; color:#3597dc;">{!CaseRec.Subject}</a>    
+                        </apex:column>
+                    </apex:dataTable>
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </div> 
+    </apex:form>
+</apex:page>

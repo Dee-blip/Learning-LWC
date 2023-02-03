@@ -1,0 +1,244 @@
+<aura:component controller="SF1_MobileTaskManagementAppController" implements="force:lightningQuickActionWithoutHeader,force:hasRecordId,force:appHostable,flexipage:availableForAllPageTypes" access="global" >
+
+    <aura:attribute name="recordId"  type="Id" />
+    <aura:attribute name="statusOptionsPicklist" type="List" />
+    <aura:attribute name="subjectOptionsPicklist" type="List" />
+    <aura:attribute name="priorityOptions" type="List"/>
+    <aura:attribute name="orderApproval" type="Order_Approval__c"/>
+    <aura:attribute name="paramMap" type="Map" />
+    <aura:attribute name="comingFromTaskManagementApp" type="Boolean" default="false" />
+    <aura:attribute name="subjectShowAsPicklist" type="Boolean" default="true" />
+    <aura:attribute name="legalFollowUpNeeded" type="Boolean" default="false" />
+    <aura:attribute name="showError" type="Boolean" default="false" />
+    <aura:attribute name="subjectValue" type="String" default="{!v.paramMap.tsk5}"/>
+    <aura:attribute name="subjectEditValue" type="String" default="{!v.subjectValue}"/>
+    <aura:attribute name="oldvalue" type="String" default=""/>
+    <aura:attribute name="statusValue" type="String" default="Not Started"/>
+    <aura:attribute name="priorityValue" type="String" default="Normal"/>
+    <aura:attribute name="ActivityDate" type="Date" />
+    <aura:attribute name="message" type="String" />
+    <aura:attribute name="createTaskTypesOptions" type="List" default="['Create Deal Desk + Legal Task' , 'Create OM Task' ,
+                                                                       'Create Deal Desk Task' , 'Create Legal Task', 'Create CC Task',
+                                                                       'China CDN Approval', 'Edgesuite Transition Approval', 'PS Approval',
+                                                                       'Create Product Ops Request'
+                                                                       ]" />
+
+    <aura:attribute name="showCreateNewTask" type="Boolean" default="true"/>
+    <aura:attribute name="showCreateNewTaskBody" type="Boolean" default="false"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:registerEvent name="nagivateToOA" type="c:SF1_NavigationBetweenComponentsEvent"/>
+
+
+    <aura:if isTrue="{!v.showCreateNewTask}">
+
+        <div class="demo-only" style="height: 80vh;">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <div class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"  onclick="{!c.closeCreateNewTask}">
+                            <lightning:icon iconName="utility:close" size="x-small"/>
+                        </div>
+                        <h4 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">SELECT TASK/APPROVAL TYPE</h4>
+
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <table style="table-layout: fixed;">
+                            <tr style="height: 40px;">
+                                <lightning:button aura:id="first" variant="neutral" label="Create Deal Desk + Legal Task" onclick="{! c.createNewTaskBody }" />
+                            </tr>
+                            <tr style="height: 40px;">
+                                <lightning:button aura:id="second" variant="neutral" label="Create OM Task" onclick="{!c.createNewTaskBody}"/>
+                            </tr>
+                            <tr style="height: 40px;">
+                                <lightning:button aura:id="third" variant="neutral" label="Create Deal Desk Task" onclick="{!c.createNewTaskBody}"/>
+                            </tr>
+                            <tr style="height: 40px;">
+                                <lightning:button aura:id="fourth" variant="neutral" label="Create Legal Task" onclick="{!c.createNewTaskBody}"/>
+                            </tr>
+                            <tr style="height: 40px;">
+                                <lightning:button aura:id="fifth" variant="neutral" label="China CDN Approval" onclick="{!c.createNewTaskBody}"/>
+                            </tr>
+                            <tr style="height: 40px;">
+                                <lightning:button aura:id="sixth" variant="neutral" label="Edgesuite Transition Approval" onclick="{!c.createNewTaskBody}"/>
+                            </tr>
+                            <tr style="height: 40px;">
+                                <lightning:button aura:id="seventh" variant="neutral" label="PS Approval"  onclick="{!c.createNewTaskBody}"/>
+                            </tr>
+                            <tr style="height: 40px;">
+                                <lightning:button aura:id="eighth" variant="neutral" label="Create Product Ops Request" onclick="{!c.createNewTaskBody}"/>
+                            </tr>
+                        </table>
+                    </div>
+
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+
+
+    </aura:if>
+
+    <!-- new task -->
+    <aura:if isTrue="{!v.showCreateNewTaskBody}">
+
+        <header class=" headerLayout uiBlock oneHeader" style="padding-bottom:3%;height:15%;" id="oneHeader">
+            <div class="forceHeaderLayout">
+                <div class="slds-box slds-box_xx-small slds-text-body_small" style="background-color: rgb(0, 112, 210);">
+                  <table style="table-layout: fixed;">
+                    <tr>
+                      <td style="text-align: left;width: 20%;">
+                          <lightning:button variant="inverse" label="SAVE"  type="submit" onclick="{!c.saveTaskAndNavigatebackToOACmp}" />
+                      </td>
+                      <td style="text-align: center;width: 55%;">
+                          <p style="font-size:13px;">
+                            <b style="color:white;font-size:15px;">CREATE TASK</b>
+                          </p>
+                      </td>
+
+                      <td style="text-align: right;width: 25%;">
+                          <lightning:button variant="inverse" label="CANCEL"  type="submit" onclick="{!c.closeCreateNewTaskBodyAndNavigatebackToOACmp}" />
+                      </td>
+                    </tr>
+                    </table>
+                </div>
+            </div>
+        </header>
+
+        <!-- error validation message -->
+        <div id="message" style="display:none;height:18%;">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <div class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"  onclick="{!c.closeErrorMessage}">
+                            <lightning:icon iconName="utility:close" size="x-small"/>
+                        </div>
+                        <h4 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">ERROR</h4>
+
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <aura:if isTrue="{!v.showError}">
+                            <ui:message title="" severity="error" closable="false">{!v.message}</ui:message>
+                        </aura:if>
+                    </div>
+
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+
+
+        <div style="padding:35px;height:85%;">
+            <table style="table-layout: fixed;">
+                <tr style="height: 75px;">
+                    <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                        <div class="slds-form-element__control">
+                            <label class="slds-form-element__label" for="input-01">
+                                <abbr class="slds-required" title="required">*</abbr>
+                                Assigned To
+                            </label>
+                            <c:SF1_LookupComponent placeholderText="User" whereClause=" IsActive = true " type="User" value="{!v.paramMap.tsk1_lkid}"
+                                                   fieldsToShowInSuggestion="FirstName" requiredField="true"/>
+                        </div>
+                    </div>
+
+                </tr>
+                <tr style="height: 75px;">
+                    <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                        <div class="slds-form-element__control">
+                            <aura:if isTrue="{!v.subjectShowAsPicklist}">
+                              <table style="table-layout: fixed;">
+                                  <tr>
+                                    <td style="width: 90%;">
+                                        <lightning:select label="Subject" aura:id="selectionSubject" onchange="{!c.changeSubject}" value="{!v.subjectValue}" required="true">
+                                                      <aura:iteration items="{!v.subjectOptionsPicklist}" var="sub">
+                                                          <option text="{!sub}" label="{!sub}"/>
+                                                      </aura:iteration>
+                                        </lightning:select>
+                                    </td>
+                                    <td style="padding-top: 8%;">
+                                      <lightning:buttonIcon variant="neutral" iconName="utility:edit"  type="submit" onclick="{!c.editSubject}" />
+                                    </td>
+                                  </tr>
+
+                                </table>
+
+                                <aura:set attribute="else">
+                                  <table style="table-layout: fixed;">
+                                    <tr>
+                                        <td style="width: 90%;">
+                                            <lightning:input label="Edit Subject" name="Subject"  aura:id="editSubject" value="{!v.subjectValue}" required="true"/>
+                                        </td>
+
+                                        <td style="padding-top: 8%;">
+                                          <lightning:buttonIcon variant="neutral" iconName="utility:check"  type="submit" onclick="{!c.goBackToPicklist}" />
+                                        </td>
+                                    </tr>
+                                  </table>
+                                </aura:set>
+                            </aura:if>
+                        </div>
+                    </div>
+
+                </tr>
+                <tr style="height: 75px;">
+                    <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                        <div class="slds-form-element__control">
+                            <lightning:select label="Status" aura:id="selectionStatus" onchange="{!c.changeStatus}" value="{!v.paramMap.status}" >
+                                <aura:iteration items="{!v.statusOptionsPicklist}" var="status">
+                                    <option text="{!status}" label="{!status}"/>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                    </div>
+
+                </tr>
+                <tr style="height: 75px;">
+                    <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                        <div class="slds-form-element__control">
+                            <lightning:select label="Priority" aura:id="selectionPriority" onchange="{!c.changePriority}" value="{!v.paramMap.priority}" >
+                                <aura:iteration items="{!v.priorityOptions}" var="priority">
+                                    <option text="{!priority}" label="{!priority}"/>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                    </div>
+
+                </tr>
+                <tr style="height: 55px;">
+                    <div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                        <div class="slds-form-element__control" style="color: rgb(84, 105, 141);font-size: .875rem;line-height: 1.375;">
+                            <label>Legal Followup Needed</label>
+                            <lightning:input type="checkbox" aura:id="legalId" label="" name="Legal Followup Needed" checked="{!v.legalFollowUpNeeded}" onchange="{!c.changeLegalFollowUpNeeded}" />
+                        </div>
+                    </div>
+
+                </tr>
+                <tr style="height: 90px;">
+                    <div id="date" class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+                        <div class="slds-form-element__control">
+                            <lightning:input type="date" label="Due Date" name="ActivityDate" value="{!v.ActivityDate}"  />
+                        </div>
+                    </div>
+
+                </tr>
+                <tr style="height: 165px;">
+                  <div class="" style="width:100%;font-size: 0.8em;">
+                      <table>
+                        <tr>
+                            <td class="slds-size_1-of-1">
+                              <ui:scrollerWrapper class="sWrapTest">
+                                <lightning:textarea aura:id="taskCommentInputId" name="Comments" value="{!v.paramMap.description}"
+                                  placeholder="Type your comments here" label="Comments" class="lightningTextarea"/>
+                             </ui:scrollerWrapper>
+                            </td>
+                        </tr>
+                      </table>
+                  </div>
+                </tr>
+
+
+            </table>
+        </div>
+    </aura:if>
+</aura:component>

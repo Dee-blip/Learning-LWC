@@ -1,0 +1,226 @@
+<!--
+Author          : Pinkesh / Sumukh SS
+Description     : Component for Handler Edit Page. 
+
+Date                 Developer                  JIRA #          Description                                                       
+23 Sep 2019         Sumukh/Pinkesh 								SOCC CAR 2 - RunBooks 
+-->
+<aura:component
+                controller="SC_SOCC_Handler_Controller"
+                implements="lightning:actionOverride,lightning:isUrlAddressable,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                access="global"
+                >
+    <!-- attributes to control new/view/edit visiblity -->
+    <aura:attribute name="isNew" type="Boolean" default="true" />
+    <aura:attribute name="isView" type="Boolean" default="false" />
+    <aura:attribute name="isEdit" type="Boolean" default="false" />
+    
+    <!-- attributes to control show/hide of Instructions -Ignore Conditions -->
+    <aura:attribute name="showSituationInstruction" type="Boolean" default="false" />
+    <aura:attribute name="showIgnoreCondition" type="Boolean" default="false" />
+        <aura:attribute name="showEscalationContacts" type="Boolean" default="false" />
+    
+    <!-- attribute for spinner -->
+    <aura:attribute name="showspinner" type="Boolean" default="false"/>
+    
+    <!-- attribute to see if handlerId is available -->
+    <aura:attribute name="recordId" type="String"/>
+    
+    <!-- attribute to store policyDomain Id if populated from Parent -->
+    <aura:attribute name="policyDomainId" type="String"/>
+    
+    <!-- attribute to show Escalation List -->
+    <aura:attribute name="showEscalationList" type="Boolean" default="false"/>
+    
+    <aura:attribute name="handlerName" type="String" />
+    <aura:attribute
+                    name="selectedHandlerTypeRecord"
+                    type="sObject"
+                    default="{}"
+                    />
+    <!-- converting handler type to picklist -->
+    <aura:attribute name="HandlerType" type="List" />
+    <aura:attribute name="selectedHandlerTypeValue" type="String"/>
+        <aura:attribute name="HandlerTypeFieldstoShow" type="List" />
+    
+    <aura:attribute
+                    name="selectedPolicyDomainRecord"
+                    type="sObject"
+                    default="{}"
+                    />
+    <aura:attribute name="selectedPolicyDomainRecordId" type="String" />
+    <aura:attribute
+                    name="selectedEscalationListRecord"
+                    type="sObject"
+                    default="{}"
+                    />
+    <aura:attribute name="situationInstruction" type="String" />
+    <aura:attribute name="IgnoreCondition" type="String" />
+    <aura:attribute name="pdId" type="String" />
+    <aura:attribute name="escalationrecordCount" type="Boolean" default="false" />
+    <aura:attribute name="suggestedSituationInstruction" type="String" />
+    <aura:attribute name="suggestedIgnoreCondition" type="String" />
+    
+    <!--attributes for view Section -->
+    <aura:attribute name="handlerRec" type="Object" />
+    <aura:attribute
+                    name="escalationRecordViewCount"
+                    type="Boolean"
+                    default="true"
+                    />
+    
+    <!--change handler when policy domain changes -->
+    <aura:handler
+                  name="change"
+                  value="{!v.selectedPolicyDomainRecord}"
+                  action="{!c.emptyEscalationList}"
+                  />
+    
+    
+    <!--change handler when Escalation List changes -->
+    <aura:handler
+                  name="change"
+                  value="{!v.selectedEscalationListRecord}"
+                  action="{!c.getEscalationDetails}"
+                  />
+    <aura:handler name="init" value="{! this }" action="{! c.doinit }" />
+    
+    
+    
+    
+    <!-- workspace -->
+    <lightning:workspaceAPI aura:id="workspace" />
+    <lightning:navigation aura:id="navService"/>
+    <!--spinner section -->
+    
+    
+    
+    <!--spinner section ends -->
+    <!-- New Handler Creation Section -->
+    
+    <div class="slds-box" style="background-color:white">
+        <br/>
+        <aura:if isTrue="{!v.showspinner}">
+            <lightning:spinner variant="brand" alternativeText="Loading" size="large" />
+        </aura:if>
+        
+        <div class="slds-grid slds-align--absolute-center slds-m-bottom--large">
+            <lightning:buttonGroup>
+                <lightning:button
+                                  label="Save"
+                                  variant="brand"
+                                  onclick="{!c.saveHandler}"
+                                  class="buttonRadius slds-m-right--xx-small"
+                                  />
+                <lightning:button
+                                  label="Cancel"
+                                  onclick="{!c.cancel}"
+                                  class="buttonRadius slds-m-right--xx-small"
+                                  />
+            </lightning:buttonGroup>
+        </div>
+        
+        <div class="slds-grid">
+            <div class="slds-size_5-of-12 slds-m-right--large">
+                <lightning:input name="HandlerName"
+                                 value="{!v.handlerName}"
+                                 label="Handler Name"
+                                 />
+            </div>
+            
+                           
+            <div class="slds-size_5-of-12" style="margin-left:2%">
+                
+                <lightning:select name="handlerTypeSelect" label="Handler Type:" aura:id="HandlerTypeSelect" value="{!v.selectedHandlerTypeValue}" onchange="{!c.handleChangeHandlerType}">
+                    <aura:iteration items="{!v.HandlerType}" var="item">
+                        <option text="{!item.label}" value="{!item.value}" selected="{!item.selected}"/>
+                    </aura:iteration>
+                </lightning:select>
+            </div>
+        </div>
+        
+        <div class="slds-grid">
+            <div class="slds-size_5-of-12 slds-m-right--large">
+                <c:SC_CustomLookup
+                                   objectAPIName="Policy_Domain__c"
+                                   IconName="standard:account"
+                                   label="Policy Domain"
+                                   selectedRecord="{!v.selectedPolicyDomainRecord}"
+                                   selectedRecordId="{!v.selectedPolicyDomainRecordId}"
+                                   />
+            </div>
+            
+            <div class="slds-size_5-of-12" style="margin-left:2%">
+                
+                <c:SC_CustomLookup aura:id="escChild"
+                                   objectAPIName="SC_SOCC_Escalation_List__c"
+                                   IconName="standard:account"
+                                   label="Escalation List"
+                                   selectedRecord="{!v.selectedEscalationListRecord}"
+                                   pdId="{!v.selectedPolicyDomainRecordId}"
+                                   />
+                
+            </div>
+        </div>
+        
+        
+        
+        <div class="slds-grid">
+            <div class="slds-size_5-of-12 slds-m-right--large">
+                <aura:if isTrue="{!v.showSituationInstruction}">
+                    <h2 class="slds-m-top--small">Active Situation Instruction</h2>
+                    <lightning:formattedRichText
+                                                 value="{!v.situationInstruction}"
+                                                 label="Situation Instruction"
+                                                 disabled="true"                       
+                                                 />
+                </aura:if>
+            </div>
+            <div class="slds-size_5-of-12" style="margin-left:2%">
+                
+                <aura:if isTrue="{!v.showIgnoreCondition}">
+                    <h2 class="slds-m-top--small">Active Ignore Condition</h2>
+                    <lightning:formattedRichText
+                                                 value="{!v.IgnoreCondition}"
+                                                 label="Ignore Condition"
+                                                 disabled="true" 
+                                                 />
+                </aura:if>
+                
+            </div>
+        </div>
+        
+        <div class="slds-grid">
+            <div class="slds-size_5-of-12 slds-m-right--large">
+                <aura:if isTrue="{!v.showSituationInstruction}">
+                    <h2 class="slds-m-top--small">Suggested Situation Instruction</h2>
+                    <lightning:inputRichText
+                                             value="{!v.suggestedSituationInstruction}"
+                                             label="Situation Instruction"
+                                             />
+                </aura:if>
+            </div>
+            
+            <div class="slds-size_5-of-12" style="margin-left:2%">
+                <aura:if isTrue="{!v.showIgnoreCondition}">
+                    <h2 class="slds-m-top--small">Suggested Ignore Instruction</h2>
+                    <lightning:inputRichText
+                                             value="{!v.suggestedIgnoreCondition}"
+                                             label="IgnoreCondition"
+                                             />
+                </aura:if>
+            </div>
+        </div>
+        <br/> 
+        <br/> 
+                        <aura:if isTrue="{!v.showEscalationContacts}">
+
+        <!-- calling child to display escalation contact details -->
+        <aura:if isTrue="{!v.escalationrecordCount}">
+            <c:SC_SOCC_EscalationContact_Edit aura:id="escalationContactEditSections" />                
+        </aura:if>
+        </aura:if>
+    </div>
+    
+    <!-- New Handler Creation Section Ends -->
+</aura:component>

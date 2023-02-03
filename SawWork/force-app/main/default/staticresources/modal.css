@@ -1,0 +1,114 @@
+
+.c-modal-header {
+  padding-top: 10px;
+  text-align:center;
+  position: relative;
+  background: #fff;
+  /* display: flex; */
+}
+.c-modal-title {
+  /* background-color: white; */
+  font-size: 26px;
+  font-weight: 300;
+  color: #777;
+}
+.c-modal-close {
+  position: absolute;
+  top:10px;
+  right:20px;
+  padding:0;
+  background:none;
+  border:0;
+  /* width: 30px;
+  height: 30px; */
+  font-size: 4.5rem;
+  font-weight: 100;
+  line-height: 24px;
+  color: #777;
+  cursor:pointer;
+  outline: none;
+  
+}
+
+
+
+
+.c-modal-container {
+  position: fixed;
+  display: table;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  transform: scale(0);
+  z-index: 1000;
+}
+
+.c-modal-container.c-on {
+  transform: scaleY(0.01) scaleX(0);
+  animation: c-unfoldIn 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+.c-modal-container.on .c-modal-background .c-modal {
+  height: 0;
+  opacity: 0;
+
+  animation: c-zoomIn 0.5s 0.2s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+
+.c-modal-container.c-on.c-out {
+  transform: scale(1);
+  animation: c-unfoldOut 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+.c-modal-container.c-on.c-out .c-modal-background .c-modal {
+  animation: c-zoomOut 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+
+.c-modal-container .c-modal-background {
+  display: table-cell;
+  background: rgba(0, 0, 0, 0.8);
+  text-align: center;
+  vertical-align: middle;
+}
+
+@keyframes c-unfoldIn {
+  0% {
+    transform: scaleY(0.003) scaleX(0);
+  }
+  50% {
+    transform: scaleY(0.003) scaleX(1);
+  }
+  100% {
+    transform: scaleY(1) scaleX(1);
+  }
+}
+@keyframes c-unfoldOut {
+  0% {
+    transform: scaleY(1) scaleX(1);
+  }
+  50% {
+    transform: scaleY(0.003) scaleX(1);
+  }
+  100% {
+    transform: scaleY(0.003) scaleX(0);
+  }
+}
+@keyframes c-zoomIn {
+  0% {
+    opacity: 0;
+    height: 0;
+  }
+  100% {
+    opacity: 1;
+    height: 100%;
+  }
+}
+@keyframes c-zoomOut {
+  0% {
+    opacity: 1;
+    height: 100%;
+  }
+  100% {
+    opacity: 0;
+    height: 0;
+  }
+}

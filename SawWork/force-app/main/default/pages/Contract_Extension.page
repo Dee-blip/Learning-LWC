@@ -1,0 +1,120 @@
+<apex:page id="ExtensionPage" controller="Contract_Extension_Controller" tabStyle="Opportunity" lightningStylesheets="true">
+<style type='text/css'>
+.betaLink {
+color: grey;
+border:1px solid #D4DADC;
+display:inline-block;
+font-weight:bold;
+line-height:25px;
+margin-bottom:15px;
+padding:0 7px;
+}
+</style>
+<script>
+      function noenter(e){   
+       if(window.event){
+           key = window.event.keyCode;
+        }else if(e.which){    
+            key = e.which; //firefox
+        }else if (e.keyCode){
+           key = e.keyCode;
+        }
+        if(key == 13) {           
+            var ele=document.getElementById('ExtensionPage:submitform:contractInfo:pageButtons:pageSubmit');
+            ele.click();
+            return false;
+        } else{
+            return true;
+        }
+   }
+   </script>
+    <apex:actionStatus id="OpportunityStatus">
+        <apex:facet name="start">
+            <c:enhancedActionStatus BackColor="#ffffff" borderColor="#ffffff" borderSize="2" height="50px" width="150px" ImageUrl="/changemgmt/img/spinner24.gif" Message="Loading..." messageStyle="color:darkred;font-size:11pt;font-weight:bold;"/>
+        </apex:facet>   
+    </apex:actionStatus>
+    <apex:pageBlock id="momentumForm">
+        <apex:pageMessages id="PageMessages"/>
+        <apex:pageMessage id="pageCurrencyErrorMessage" summary="{!strErrMsg}" rendered="{!contractCurrencyEmptyFlag}" severity="error" strength="2"> 
+            <span style="padding-left:9px">Please contact CMG team (<a href="mailto:cmg@akamai.com">cmg@akamai.com</a>) for further assistance.</span>
+        </apex:pageMessage>
+        <apex:pageBlockSection rendered="{!extendedFlag}" columns="1">
+            <div style="visibility:hidden">
+                <form method="GET" action="{!momentumLink}/{!oa.Associated_Opportunity__r.AKAM_Opportunity_Id__c}/auto_create_and_upload" target="my_iframe" id="momentumForm">
+                     <input type="text" name="contract_id" value="{!contractHeader.Original_Contract_Id__c}"/>
+                     <input type="text" name="contract_title" value="{!title}"/>
+                     <input type="text" name="extend_to_date" value="{!extendedEndDate}"/>
+                     <input type="text" name="defer_to_date" value="{!deferToDate}"/>      
+                     <input type="text" name="addendum_type" value="{!addendumType}"/> 
+                     <input type="submit" value="Submit"/>
+                </form>
+            </div>
+            <iframe name="my_iframe" width="100%" height="300"/>
+                <script>
+                    document.getElementById('momentumForm').submit();
+                </script>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+    <apex:form id="submitform" >
+    <!--apex:commandLink action="{!viewExistingOA}" style="float:right; color:blue; font-size:15px;" value="View Extended Order Approval >>" rendered="{!contractAlreadyExtended}"/--> 
+    <br></br> 
+    <br></br>       
+    <apex:pageBlock title="{!pageTitle}" id="contractInfo">
+        <apex:pageBlockSection title="Contract Information">
+            <apex:outputField value="{!contractHeader.Original_Contract_Id__c}"/>
+            <apex:outputField value="{!contractHeader.Account_Name__c}"/>
+            <apex:outputField value="{!contractHeader.Effective_Start_Date__c}"/>
+            <apex:outputField value="{!contractHeader.Effective_End_Date__c}"/>
+            <apex:outputField value="{!contractHeader.Active__c}"/>
+            <apex:outputField value="{!contractHeader.Currency__c}"/>
+            <apex:outputField value="{!contractHeader.Locked__c}"/>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Extension Information" columns="1" rendered="{!initializeFlag && !extendedFlag && isContractExtensionRequest}">
+            <apex:pageBlockSectionItem >            
+                <apex:outputText value="Contract Title"/>
+                <apex:inputText value="{!title}" onkeypress="return noenter(event);" maxlength="60"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputText value="Extend Contract Upto"/>
+                <apex:inputField value="{!opp.CloseDate}" required="false" onkeypress="return noenter(event);" />
+            </apex:pageBlockSectionItem>
+        </apex:pageBlockSection>
+        <apex:pageBlockSection title="Deferment Information" columns="1" rendered="{!initializeFlag && !extendedFlag && isBEDDefermentRequest}">
+            <apex:pageBlockSectionItem >            
+                <apex:outputText value="Contract Title"/>
+                <apex:inputText value="{!title}" onkeypress="return noenter(event);" maxlength="60"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:outputText value="BED Defer to Date"/>
+                <apex:inputField value="{!opp.CloseDate}" required="false" onkeypress="return noenter(event);" />
+            </apex:pageBlockSectionItem>
+        </apex:pageBlockSection>
+        <!--apex:pageBlockSection title="Contract does not have an associated Opportunity, please choose appropriate data for below fields as these would be used to create Addendum Only Order." collapsible="false" rendered="{!initializeFlag && missingOpptyInfoFlag && !extendedFlag && !contractAlreadyExtended}"/-->        
+        <apex:pageBlockSection title="Order Information" columns="1" rendered="{!initializeFlag && !extendedFlag && !contractAlreadyExtended}">
+            <!--apex:outputPanel -->
+            <div class="betaLink">Warning: Please choose appropriate data for below fields as these would be used to create the Order.</div>
+            <!--/apex:outputPanel-->
+            <apex:pageBlockSectionItem rendered="true">
+                <apex:outputText value="Order Locale"/>
+                <apex:inputField value="{!opp.Order_Locale__c}" required="true" onkeypress="return noenter(event);" />
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem rendered="true">
+                <apex:outputText value="Order Region"/>
+                <apex:inputField value="{!opp.Order_Region__c}" required="true" onkeypress="return noenter(event);"/>
+            </apex:pageBlockSectionItem>
+            <!--apex:pageBlockSectionItem rendered="true">
+                <apex:outputText value="Order Currency"/>
+                <apex:inputField value="{!opp.CurrencyIsoCode}" required="true" onkeypress="return noenter(event);"/>
+            </apex:pageBlockSectionItem-->
+        </apex:pageBlockSection>
+    <apex:pageBlockButtons location="both" id="pageButtons" >
+         <apex:commandButton action="{!cancel}" value="Return To Contract" immediate="true"/> 
+         <apex:commandButton action="{!viewOppty}" value="View Opportunity" rendered="{!extendedFlag}"/>
+         <apex:commandButton action="{!viewOA}" value="View Order Approval" rendered="{!extendedFlag}"/>
+         <!--apex:commandButton action="{!contd}" value="Continue" rendered="{!contractAlreadyExtended}"/-->         
+         <apex:commandButton action="{!submit}" value="Submit" id="pageSubmit" status="OpportunityStatus" rerender="momentumForm, contractInfo" rendered="{!initializeFlag && !extendedFlag && !contractAlreadyExtended}"/> 
+         <!--apex:commandButton action="{!viewExistingOA}" value="View Existing Order Approval" rendered="{!contractAlreadyExtended}"/-->         
+    </apex:pageBlockButtons>
+    </apex:pageBlock>
+    </apex:form>
+</apex:page>

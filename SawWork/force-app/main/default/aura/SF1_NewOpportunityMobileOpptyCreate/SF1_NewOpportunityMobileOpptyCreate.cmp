@@ -1,0 +1,353 @@
+<aura:component controller="SF1_NewOpportunityMobileController">
+
+  <aura:attribute name="accountDetails" type="Account"/>
+  <!-- details of account from previous tile -->
+  <aura:attribute name="newOpportunity"
+    type="Opportunity"
+    default="{
+    'AccountId' : '',
+    'Name' : '',
+    'CurrencyIsoCode' : '',
+    'Deal_Type__c' : '',
+    'StageName' : '',
+    'CloseDate' : '',
+    'Partner_Involved__c' : '',
+    'Channel_Manager__c' : ''
+    }"/>
+  <!-- new opportunity to be created -->
+  <aura:attribute name="CurrencyIsoCode" type="List" default="[]"/>
+  <!-- get currency picklist values from controller -->
+  <aura:attribute name="DealType" type="List" default="[]"/>
+  <!-- get deal type picklist values from controller -->
+  <aura:attribute name="StageName"
+    type="List"
+    default="[
+    {'label': '1. Identify Need', 'value': '1. Identify Need'},
+    {'label': '2. Explore Options', 'value': '2. Explore Options'},
+    {'label': '3. Verify Options', 'value': '3. Verify Options'},
+    {'label': '4. Select Option', 'value': '4. Select Option'},
+    {'label': '5. Negotiate', 'value': '5. Negotiate'}
+    ]"/><!--SFDC-3539 modified picklist values-->
+  <!-- set stage picklist values -->
+  <aura:attribute name="allFieldsNotSet" type="Boolean" default="false"/>
+  <!-- checkfield to determine if all the required fields are set -->
+  <aura:attribute name="partnerInvolvedFieldNotSet" type="Boolean" default="false"/>
+  <!-- checkfield to determine if partnerInvolvedFieldNotSet field is not set -->
+  <aura:attribute name="channelManagerFieldNotSet" type="Boolean" default="false"/>
+  <!-- checkfield to determine if channelManagerFieldNotSet is not set -->
+  <aura:attribute name="insertFailed" type="Boolean" default="false"/>
+  <!-- checkfield to determine if inserting new oppty failed -->
+  <aura:attribute name="failureMessage" type="String" default=""/>
+  <!-- failure message in case of failure -->
+  <!-- dynamically create where clause for channel manager to send as an attribute for SF1_LookupController -->
+  <aura:attribute name="channelManagerWhereClause" type="String" default=""/>
+  <aura:attribute name="nameValue" type="String" default=""/>
+  <!-- checkfield to determine if channelManagerFieldNotSet is not set -->
+  <aura:attribute name="showOpptyForm" type="Boolean" default="true"/>
+  <!-- util event to handle navigation -->
+  <aura:registerEvent name="Opportunity Type Identifier" type="c:SF1_NewOpportunityMobileUtilEvent"/>
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+  <!-- SFDC-3550 -->
+  <aura:attribute name="selectedOppType" type="String" default=""/>
+
+  <header class="slds-docked-composer__header slds-shrink-none" aria-live="assertive">
+    <article class="slds-tile slds-tile_board ">
+      <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-8">
+          <lightning:icon iconName="standard:opportunity" size="small" alternativeText="Opportunity"/>
+        </div>
+        <div class="slds-col slds-size_6-of-8 slds-truncate">
+          <h1 class="slds-text-heading--small ">
+            <div class="slds-truncate" style="text-align:center; ">New Opportunity</div>
+          </h1>
+        </div>
+        <div class="slds-col slds-size_1-of-8"></div>
+      </div>
+    </article>
+  </header>
+  <c:SF1_CustomLoader />
+
+  <aura:if isTrue="{! v.showOpptyForm}">
+    <div id="scrollableDiv" class="slds-scrollable_y" style="height: 80vh;">
+      <br/>
+      <div class="slds-box">
+
+        <aura:if isTrue="{! v.allFieldsNotSet }">
+          <!-- error message when all fields aren't set -->
+          <div>
+            <ui:message title="Error" severity="error" closable="false">
+              The required fields must be completed.
+            </ui:message>
+          </div>
+        </aura:if>
+
+        <aura:if isTrue="{! v.partnerInvolvedFieldNotSet }">
+          <!-- error message when partnerInvolved Field NotSet -->
+          <div>
+            <ui:message title="Error" severity="error" closable="false">
+              Partner Involved is mandatory if Deal type is not 'Direct'.
+            </ui:message>
+          </div>
+        </aura:if>
+
+        <aura:if isTrue="{! v.channelManagerFieldNotSet }">
+          <!-- error message when channelManager Field NotSet -->
+          <div>
+            <ui:message title="Error" severity="error" closable="false">
+              Channel Manager is mandatory when 'Partner Involved?'' is populated.
+            </ui:message>
+          </div>
+        </aura:if>
+
+        <aura:if isTrue="{!v.insertFailed }">
+          <!-- error message when insertFailed -->
+          <ui:message title="Insert Failed! " severity="error" closable="false">
+            {!failureMessage}.
+          </ui:message>
+        </aura:if>
+
+        <div style="padding: 5px 5px">
+          <label class="slds-form-element__label" for="combobox-unique-id">
+            <span style="color: red">*</span>
+            Account Name
+          </label>
+          <div class="slds-box slds-box_xx-small">
+            <lightning:tile >
+              <aura:set attribute="media">
+                <lightning:icon iconName="standard:account" size="small" alternativeText="Account"/>
+              </aura:set>
+              <div style="padding: 1px 1px" class="slds-truncate">
+                {!v.accountDetails.Name}
+              </div>
+            </lightning:tile>
+          </div>
+        </div>
+
+        <div style="padding: 5px 5px">
+          <label class="slds-form-element__label" for="combobox-unique-id">
+            <span style="color: red">*</span>
+            Opportunity Name
+          </label>
+          <lightning:input variant="label-hidden" aura:id="field" name="input2" value="{! v.newOpportunity.Name }" label="Opportunity Name"/>
+        </div>
+
+        <div style="padding: 5px 5px">
+          <label class="slds-form-element__label" for="combobox-unique-id">
+            <span style="color: red">*</span>
+            Close Date
+          </label>
+          <lightning:input variant="label-hidden" type="Date" aura:id="field" label="Close Date" class="field" value="{! v.newOpportunity.CloseDate }"/>
+        </div>
+
+        <div style="padding: 5px 5px">
+          <!-- <lightning:combobox name="Currency" label="Opportunity Currency" placeholder="Select Currency" value="{! v.newOpportunity.CurrencyIsoCode}" options="{! v.CurrencyIsoCode }" required="true"/> -->
+          <label class="slds-form-element__label" for="combobox-unique-id">
+            <span style="color: red">*</span>
+            Opportunity Currency
+          </label>
+          <!-- <div class="slds-form-element__control"> -->
+          <!-- <div class="slds-combobox_container"> -->
+          <!-- <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aria-expanded="false" aria-haspopup="listbox" role="combobox"> -->
+          <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+            <lightning:combobox variant="label-hidden" name="Currency" label="Opportunity Currency" placeholder="Select Currency" value="{! v.newOpportunity.CurrencyIsoCode}" options="{! v.CurrencyIsoCode }"/>
+            <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
+              <lightning:icon iconName="utility:down" size="xx-small" alternativeText="Down"/>
+            </span>
+          </div>
+          <!-- </div> -->
+          <!-- </div> -->
+          <!-- </div> -->
+        </div>
+
+        <div style="padding: 5px 5px">
+          <!-- <lightning:combobox name="StageName" label="Stage" placeholder="Select Stage" value="{! v.newOpportunity.StageName }" options="{! v.StageName }" required="true"/> -->
+          <label class="slds-form-element__label" for="combobox-unique-id">
+            <span style="color: red">*</span>
+            Stage
+          </label>
+          <!-- <div class="slds-form-element__control"> -->
+          <!-- <div class="slds-combobox_container"> -->
+          <!-- <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aria-expanded="false" aria-haspopup="listbox" role="combobox"> -->
+          <div class="slds-input-has-icon slds-input-has-icon_right" role="none">
+            <lightning:combobox variant="label-hidden" name="StageName" label="Stage" placeholder="Select Stage" value="{! v.newOpportunity.StageName }" options="{! v.StageName }"/>
+            <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
+              <lightning:icon iconName="utility:down" size="xx-small" alternativeText="Down"/>
+            </span>
+          </div>
+          <!-- </div> -->
+          <!-- </div> -->
+          <!-- </div> -->
+
+        </div>
+
+        <div style="padding: 5px 5px">
+          <!-- <lightning:combobox variant="label-hidden" class="slds-combobox" name="DealType" label="Deal Type" placeholder="Select Deal Type" value="{! v.newOpportunity.Deal_Type__c}" options="{! v.DealType }" required="true" onchange="{! c.validateRendering }"/> -->
+          <!-- <lightning:select name="DealType" label="Deal Type" aura:id="DealType" value="{!v.newOpportunity.Deal_Type__c}" required="true" onchange="{! c.validateRendering }">
+          <aura:iteration items="{!v.DealType}" var="option">
+            <option text="{!option.label}" value="{!option.value}"/>
+          </aura:iteration>
+        </lightning:select> -->
+          <label class="slds-form-element__label" for="combobox-unique-id">
+            <span style="color: red">*</span>
+            Deal Type
+          </label>
+          <!-- <div class="slds-form-element__control"> -->
+          <!-- <div class="slds-combobox_container"> -->
+          <!-- <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aria-expanded="false" aria-haspopup="listbox" role="combobox"> -->
+          <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+            <lightning:combobox variant="label-hidden" class="slds-combobox" name="DealType" label="Deal Type" placeholder="Select Deal Type" value="{! v.newOpportunity.Deal_Type__c}" options="{! v.DealType }" onchange="{! c.validateRendering }"/>
+            <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
+              <lightning:icon iconName="utility:down" size="xx-small" alternativeText="Down"/>
+            </span>
+          </div>
+          <!-- </div> -->
+          <!-- </div> -->
+          <!-- </div> -->
+
+        </div>
+
+      </div>
+    </div>
+
+    <footer class="slds-docked-composer__footer slds-shrink-none">
+      <button type="button" class="slds-button slds-button_neutral" onclick="{!c.moveBack}">Back</button>
+
+      <aura:if isTrue="{! v.newOpportunity.Deal_Type__c != 'Indirect' }">
+        <div class="slds-col_bump-left slds-text-align_right">
+          <button
+            type="button"
+            class="slds-button slds-button_brand"
+            disabled="{!v.newOpportunity.Name == '' || v.newOpportunity.CloseDate == '' || v.newOpportunity.CurrencyIsoCode == '' ||  v.newOpportunity.StageName == '' || v.newOpportunity.Deal_Type__c == '' }"
+            onclick="{! c.saveOppty }">Save</button>
+        </div>
+      </aura:if>
+      <aura:if isTrue="{! v.newOpportunity.Deal_Type__c == 'Indirect' }">
+        <div class="slds-col_bump-left slds-text-align_right">
+          <button
+            type="button"
+            class="slds-button slds-button_brand"
+            disabled="{!v.newOpportunity.Name == '' || v.newOpportunity.CloseDate == '' || v.newOpportunity.CurrencyIsoCode == '' ||  v.newOpportunity.StageName == '' || v.newOpportunity.Deal_Type__c == '' }"
+            onclick="{! c.moveNext }">Next</button>
+        </div>
+      </aura:if>
+
+    </footer>
+    <aura:set attribute="else">
+
+      <div id="scrollableDiv" class="slds-scrollable_y" style="height: 80vh;">
+        <br/>
+        <div class="slds-box">
+
+          <!-- display only if Deal_Type__c == 'Indirect' -->
+          <aura:if isTrue="{! v.newOpportunity.Partner_Involved__c.Id == null }">
+            <div style="padding: 5px 5px">
+              <label class="slds-form-element__label" for="combobox-unique-id">
+                <span style="color: red">*</span>
+                Partner Involved?
+              </label>
+              <br/>
+              <c:SF1_LookupComponent aura:id="field" placeholderText="Account" type="Account" valueSObject="{! v.newOpportunity.Partner_Involved__c }" fieldsToShowInSuggestion="createddate,Owner.Name,Account_Status__c" requiredField="true"/>
+            </div>
+            <aura:set attribute="else">
+
+              <div style="padding: 5px 5px">
+                <label class="slds-form-element__label" for="combobox-unique-id">
+                  <span style="color: red">*</span>
+                  Partner Involved?
+                </label>
+                <div class="slds-input-has-icon slds-input-has-icon_right" role="none">
+                  <div class="slds-box slds-box_xx-small">
+                    <lightning:tile >
+                      <aura:set attribute="media">
+                        <lightning:icon iconName="standard:account" size="small" alternativeText="Account"/>
+                      </aura:set>
+                      <div style="padding: 1px 1px" class="slds-size_7-of-8 slds-truncate">
+                        {!v.newOpportunity.Partner_Involved__c.Name}
+                      </div>
+                    </lightning:tile>
+                  </div>
+                  <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right" onclick="{! c.removePartnerInvolved }">
+                    <lightning:icon iconName="utility:close" size="xx-small" alternativeText="Down"/>
+                  </span>
+                </div>
+              </div>
+
+              <!-- <div class="slds-input-has-icon slds-input-has-icon_right" role="none">
+              <lightning:combobox variant="label-hidden" name="StageName" label="Stage" placeholder="Select Stage" value="{! v.newOpportunity.StageName }" options="{! v.StageName }"/>
+              <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
+                <lightning:icon iconName="utility:down" size="xx-small" alternativeText="Down"/>
+              </span>
+            </div> -->
+
+            </aura:set>
+          </aura:if>
+
+          <aura:if isTrue="{!v.newOpportunity.Partner_Involved__c.Id != null }">
+            <!-- display only if Partner_Involved__c is set -->
+
+            <aura:if isTrue="{! v.newOpportunity.Channel_Manager__c.Id == null }">
+              <div style="padding: 5px 5px" onclick="{! c.populateWhereClause }">
+                <!-- populate the dynamic where clause -->
+                <label class="slds-form-element__label" for="combobox-unique-id">
+                  <span style="color: red">*</span>
+                  Channel Manager
+                </label>
+                <br/>
+                <c:SF1_LookupComponent aura:id="field"
+                  placeholderText="Channel Mapping"
+                  type="Channel_Mapping__c"
+                  valueSObject="{! v.newOpportunity.Channel_Manager__c }"
+                  fieldsToShowInSuggestion="createddate"
+                  whereClause="{! v.channelManagerWhereClause }"
+                  requiredField="true"/>
+              </div>
+              <aura:set attribute="else">
+
+                <div style="padding: 5px 5px">
+                  <label class="slds-form-element__label" for="combobox-unique-id">
+                    <span style="color: red">*</span>
+                    Channel Manager
+                  </label>
+                  <div class="slds-input-has-icon slds-input-has-icon_right" role="none">
+                    <div class="slds-box slds-box_xx-small">
+                      <lightning:tile >
+                        <aura:set attribute="media"></aura:set>
+                        <div style="padding: 1px 1px" class="slds-size_7-of-8 slds-truncate">
+                          {!v.newOpportunity.Channel_Manager__c.Name}
+                        </div>
+                      </lightning:tile>
+                    </div>
+                    <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right" onclick="{! c.removeChannelManager }">
+                      <lightning:icon iconName="utility:close" size="xx-small" alternativeText="Down"/>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- <div class="slds-input-has-icon slds-input-has-icon_right" role="none">
+                <lightning:combobox variant="label-hidden" name="StageName" label="Stage" placeholder="Select Stage" value="{! v.newOpportunity.StageName }" options="{! v.StageName }"/>
+                <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
+                  <lightning:icon iconName="utility:down" size="xx-small" alternativeText="Down"/>
+                </span>
+              </div> -->
+
+              </aura:set>
+            </aura:if>
+
+          </aura:if>
+        </div>
+      </div>
+
+      <footer class="slds-docked-composer__footer slds-shrink-none">
+        <button type="button" class="slds-button slds-button_neutral" onclick="{!c.moveToOpptyForm}">Back</button>
+
+        <div class="slds-col_bump-left slds-text-align_right">
+          <button type="button" class="slds-button slds-button_brand" disabled="{!v.newOpportunity.Partner_Involved__c.Id == null || v.newOpportunity.Channel_Manager__c.Id == null }" onclick="{! c.saveOppty }">Save</button>
+        </div>
+
+      </footer>
+
+    </aura:set>
+  </aura:if>
+
+</aura:component>

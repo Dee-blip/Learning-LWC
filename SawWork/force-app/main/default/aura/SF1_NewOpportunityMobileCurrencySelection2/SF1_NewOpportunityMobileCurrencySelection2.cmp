@@ -1,0 +1,157 @@
+<aura:component controller="SF1_NewOpportunityMobileController">
+
+  <!-- details of account recieved from previous component component -->
+  <aura:attribute name="accountDetails" type="Account"/>
+  <!-- List of open opportunities obtained from do-Init function -->
+  <aura:attribute name="newOpportunity" type="Opportunity"/>
+  <!-- checkfield to recognize if withContractCurrency should be rendered -->
+  <aura:attribute name="currencyMismatch" type="Boolean" default="false"/>
+  <!-- checkfield to recognize if ther's no open oppties -->
+  <aura:attribute name="withContractCurrency" type="Boolean" default="false"/>
+  <!-- used if user doesn't decide to proceed with same currency as that of contract -->
+  <aura:attribute name="withoutContractCurrency" type="Boolean" default="false"/>
+  <!-- currency for the new Opportunity if created -->
+  <aura:attribute name="newCurrency" type="String" default=""/>
+  <!-- contract's old Currency-->
+  <aura:attribute name="oldCurrency" type="String"/>
+  <!-- picklist value for user to select new currency if opted -->
+  <aura:attribute name="CurrencyIsoCode" type="List" default="[]"/>
+  <!-- Ids of selected Contracts -->
+  <aura:attribute name="selectedContractIDs" type="String[]"/>
+
+  <aura:attribute name="oppty" type="Opportunity" default="{ 'sobjectType': 'Opportunity' }"/>
+
+  <!-- util event for navigation -->
+  <aura:registerEvent name="Opportunity Type Identifier" type="c:SF1_NewOpportunityMobileUtilEvent"/>
+
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+  <!-- Start: SFDC-3550 -->
+  <aura:attribute name="opptyTypes" type="List"/>
+  <aura:attribute name="selectedOppType" type="String" default=""/>
+  <aura:handler event="c:GSM_OpptyTypeChangeEvt" action="{!c.setOpptyType}"/>
+  <aura:attribute name="isTypeMissing" type="Boolean" default="false"/>
+  <!-- End: SFDC-3550 -->
+
+  <header class="slds-docked-composer__header slds-shrink-none" aria-live="assertive">
+    <article class="slds-tile slds-tile_board ">
+      <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-8">
+          <lightning:icon iconName="custom:custom17" size="medium" alternativeText="Currency"/>
+        </div>
+        <div class="slds-col slds-size_6-of-8 slds-has-flexi-truncate">
+          <h1 class="slds-text-heading--small ">
+            <div class="slds-has-flexi-truncate" style="text-align:center;font-size:16px">Choose Currency and Type for New Opportunity</div>
+          </h1>
+        </div>
+        <div class="slds-col slds-size_1-of-8"></div>
+      </div>
+    </article>
+  </header>
+  <c:SF1_CustomLoader />
+
+  <div class="slds-scrollable_y" style="height: 76vh;">
+
+    <ul class="slds-has-dividers_around-space ">
+      <li>
+        &nbsp;
+      </li>
+      <aura:if isTrue="{!v.currencyMismatch == false}">
+        <li class="slds-item slds-color__background_gray-3">
+          <article class="slds-tile slds-tile_board ">
+            <div class="slds-grid">
+              <div class="slds-col slds-size_4-of-6">
+                <div style="text-align:center">With Selected Contract's Currency</div>
+              </div>
+              <div class="slds-col slds-size_1-of-6"></div>
+              <div class="slds-col slds-size_1-of-6">
+
+                <div class="slds-form-element">
+                  <label class="slds-checkbox_toggle slds-grid">
+                    <input type="checkbox" name="checkbox" aria-describedby="toggle-desc" value="on" checked="{! v.withContractCurrency}" onchange="{!c.toggleWithContractCurrency}"/>
+                    <span id="toggle-desc" class="slds-checkbox_faux_container" aria-live="assertive">
+                      <span class="slds-checkbox_faux"></span>
+                    </span>
+                  </label>
+                </div>
+
+              </div>
+            </div>
+          </article>
+        </li>
+      </aura:if>
+
+      <li class="slds-item slds-color__background_gray-3">
+        <article class="slds-tile slds-tile_board ">
+          <div class="slds-grid">
+            <div class="slds-col slds-size_4-of-6">
+              <div style="text-align:center">Other Currency</div>
+            </div>
+            <div class="slds-col slds-size_1-of-6"></div>
+            <div class="slds-col slds-size_1-of-6">
+
+              <div class="slds-form-element">
+                <label class="slds-checkbox_toggle slds-grid">
+                  <input type="checkbox" name="checkbox" aria-describedby="toggle-desc" value="on" checked="{! v.withoutContractCurrency}" onchange="{!c.toggleWithoutContractCurrency}"/>
+                  <span id="toggle-desc" class="slds-checkbox_faux_container" aria-live="assertive">
+                    <span class="slds-checkbox_faux"></span>
+                  </span>
+                </label>
+              </div>
+
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <aura:if isTrue="{!v.withoutContractCurrency}">
+        <li class="slds-item slds-color__background_gray-3">
+          <!-- <lightning:combobox class="slds-input" name="Currency" label="Opportunity Currency" placeholder="Select Currency" value="{! v.newCurrency }" options="{! v.CurrencyIsoCode }" required="true"/> -->
+          <label class="slds-form-element__label" for="combobox-unique-id">
+            <span style="color: red">*</span>
+            Opportunity Currency
+          </label>
+          <!-- <div class="slds-form-element__control"> -->
+            <!-- <div class="slds-combobox_container"> -->
+              <!-- <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aria-expanded="false" aria-haspopup="listbox" role="combobox"> -->
+                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                  <lightning:combobox variant="label-hidden" name="Currency" label="Opportunity Currency" placeholder="Select Currency" value="{! v.newCurrency}" options="{! v.CurrencyIsoCode }" />
+                  <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
+                    <lightning:icon iconName="utility:down" size="xx-small" alternativeText="Down"/>
+                  </span>
+                </div>
+              <!-- </div> -->
+            <!-- </div> -->
+          <!-- </div> -->
+
+        </li>
+      </aura:if>
+    </ul>
+
+    <!-- Start: SFDC-3550 -->
+    <div style="margin-top:8px">
+      <ul class="slds-has-dividers_around-space ">
+         <li class="slds-item slds-color__background_gray-3">
+            <c:GSM_OpptyTypeSelection opptyTypes="{!v.opptyTypes}" doneLoading="true"/>
+         </li>
+      </ul>
+    </div>
+    <div>
+      <aura:if isTrue="{!v.isTypeMissing}">
+        <ui:message severity="error" closable="false">
+            Please select Opportunity Type.
+        </ui:message>
+      </aura:if>
+    </div>
+  <!-- End: SFDC-3550 -->
+  </div>
+
+  <footer class="slds-docked-composer__footer slds-shrink-none">
+    <button type="button" class="slds-button slds-button_neutral" onclick="{!c.moveBack}">Back</button>
+
+    <div class="slds-col_bump-left slds-text-align_right">
+      <button type="button" class="slds-button slds-button_brand" disabled="{!v.withContractCurrency == true || v.withoutContractCurrency == true ? false : true}" onclick="{!c.skipToCreate}">Create Opportunity</button>
+    </div>
+  </footer>
+
+</aura:component>

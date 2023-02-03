@@ -1,0 +1,36 @@
+<!-- sldsModal -->
+<aura:component access="public">
+    <aura:attribute name="header" type="Aura.Component[]" access="public"/>
+    <aura:attribute name="content" type="Aura.Component[]" access="public"/>
+    <aura:attribute name="footer" type="Aura.Component[]" access="public"/>
+    <aura:attribute name="closeAction" type="Aura.Action" access="public"/>
+
+    <!-- <aura:attribute name="modalStyle" type="String" access="public"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />   -->
+
+    <aura:method name="open" action="{!c.toggleModal}" />
+    <aura:method name="close" action="{!c.toggleModal}" />
+
+    <!-- bgColor  -->
+	<div class="slds-modal slds-fade-in-open slds-modal_large" aura:id="modal" aria-hidden="false" role="dialog" > 
+        <!-- style="height: 640px;" -->
+  		<div class="slds-modal__container">
+            <div class="slds-modal__header" onclick="{!v.closeAction}" style="margin-top:10%;"> <!-- slds-modal__footer -->
+                <button class="slds-button slds-button--icon-inverse slds-modal__close">
+                    <lightning:icon iconName="utility:close" size="xx-small"/>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 class="slds-text-heading--medium">{!v.header}</h2>
+            </div>
+             <div class="slds-modal__content slds-p-around--medium">
+                {!v.content}
+            </div>
+            <div class="slds-modal__footer">
+                {!v.footer}
+            </div>
+        </div>
+    </div>
+    
+    <!-- <div class="slds-backdrop" aura:id="modal-backdrop"></div>  -->
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</aura:component>

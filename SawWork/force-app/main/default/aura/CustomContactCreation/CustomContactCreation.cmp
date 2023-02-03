@@ -1,0 +1,153 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:hasPageReference,force:hasRecordId,force:hasSObjectName" 
+                access="global" controller="CreateCustomContactController">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="pageReference" type="Object" />
+    <aura:handler name="change" value="{!v.pageReference}" action="{!c.handlePageChange}" />
+    <aura:attribute name="newContact" type="Contact" default="{'sobjectType': 'Contact'}"/>
+    <aura:attribute name="displayForm" type="boolean" default="true"/>
+    <aura:attribute name="displayPSAForm" type="boolean" default="false"/>
+    <aura:attribute name="displayContactExistsButtons" type="boolean" default="false"/>
+    <aura:attribute name="displayLeadExistsButtons" type="boolean" default="false"/>
+    <aura:attribute name="showError" type="boolean" default="false"/>
+    <aura:attribute name="displayStandardButtons" type="boolean" default="true"/>
+    <aura:attribute name="displaySpinner" type="boolean" default="false"/>
+    <aura:attribute name="navigatedId" type="String" default=""/>
+    <aura:attribute name="errorMessage" type="String" default=""/>
+    <aura:attribute name="contactRecordType" type="RecordType" default="{'sobjectType': 'RecordType'}"/>
+    <aura:attribute name="isFirstNameMandatory" type="boolean" default="false"/>
+    <aura:attribute name="showIgnoreAndCreateButton" type="boolean" default="false"/>
+    <aura:attribute name="returnURL" type="String" default=""/>
+    
+    <aura:if isTrue="{!v.displaySpinner}">
+        <center><lightning:spinner variant="brand" size="large" aura:id="ltngSpinner" class="slds-show"/></center>
+    </aura:if>
+    <aura:if isTrue="{!v.showError}">
+        <!-- Show the message to ui -->
+        <div style="margin-bottom:1%; max-width:30%" class="slds-notify slds-notify_toast slds-theme_error slds-align_absolute-center">
+            <span class="slds-assistive-text">error</span>
+            <div class="slds-notify__content">
+                <h5 class="slds-text-heading_small">Error Message </h5>
+                <br/>
+                <p class="slds-align_absolute-center">{!v.errorMessage}</p>                
+            </div>
+        </div>
+    </aura:if>
+    <div>
+        <lightning:recordEditForm objectApiName="Contact">
+            <div style="margin:auto; max-width:60%">
+                <aura:if isTrue="{!v.displayForm}">
+                    <div class="slds-box slds-theme_default">
+                        <lightning:messages />
+                        <div class="slds-grid slds-gutters">
+                            <div class="slds-col slds-size_1-of-1">
+                                <h1 style="font-size: 2em; margin-bottom: 5%" class="slds-align_absolute-center">
+                                    New Contact : {!v.contactRecordType.Name}
+                                </h1>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-gutters">
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:inputField fieldName="FirstName" required = "{!v.isFirstNameMandatory}" value ="{!v.newContact.FirstName}"/>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:inputField fieldName="LastName" required = "true" value ="{!v.newContact.LastName}"/>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-gutters">
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:inputField fieldName="Email" required = "true" value ="{!v.newContact.Email}"/>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:inputField fieldName="AccountId" required = "true" value ="{!v.newContact.AccountId}"/>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-gutters">
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:inputField fieldName="Title" value ="{!v.newContact.Title}"/>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:inputField fieldName="Phone" value ="{!v.newContact.Phone}"/>
+                                <lightning:inputField fieldName="Phone_Custom__c" value ="{!v.newContact.Phone_Custom__c}"/>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-gutters">
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:inputField fieldName="Title_Level__c" value ="{!v.newContact.Title_Level__c}"/>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:inputField fieldName="adg_Department__c" value ="{!v.newContact.adg_Department__c}"/>
+                            </div>
+                        </div>
+                        <aura:if isTrue="{!v.displayPSAForm}">
+                            <div class="slds-page-header" style= "margin-bottom: 2%">
+                                PSA Resource Information
+                            </div>
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning:inputField fieldName="CurrencyIsoCode" required = "true" value ="{!v.newContact.CurrencyIsoCode}"/>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning:inputField fieldName="pse__Salesforce_User__c" value ="{!v.newContact.pse__Salesforce_User__c}"/>
+                                </div>
+                            </div>
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning:inputField fieldName="pse__Region__c" value ="{!v.newContact.pse__Region__c}"/>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning:inputField fieldName="pse__Practice__c" value ="{!v.newContact.pse__Practice__c}"/>
+                                </div>
+                            </div>
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning:inputField fieldName="pse__Group__c" value ="{!v.newContact.pse__Group__c}"/>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning:inputField fieldName="pse__Start_Date__c" value ="{!v.newContact.pse__Start_Date__c}"/>
+                                </div>
+                            </div>
+                            
+                        </aura:if>
+                    </div>
+                </aura:if>
+                <div class="slds-box slds-theme_shade">
+                    <aura:if isTrue="{!v.displayContactExistsButtons}">
+                        <h1 style = 'font-size : 1.5em'> A Contact already exists with the Email address: <b><u>{!v.newContact.Email}</u></b></h1>
+                        <h2> Do you want to navigate to the existing Contact or go back to the previous screen to update the email address, or cancel the creation request?"</h2>
+                        <lightning:button class="slds-m-top_small" 
+                                          variant="brand"
+                                          onclick="{!c.NavigateToExistingContact}" label="Navigate To Existing Contact" />
+                        <lightning:button class="slds-m-top_small" 
+                                          variant="brand"
+                                          onclick="{!c.GoBack}" label="Go Back" />
+                    </aura:if>
+                    <aura:if isTrue="{!v.displayLeadExistsButtons}">
+                        <h1 style = 'font-size : 1.5em'> A Lead already exists with the email address: <b><u>{!v.newContact.Email}</u></b></h1>
+                        <h2>Do you want to navigate to the Lead record, convert the existing Lead record to a Contact automatically, ignore the existing Lead and create a new Contact record or cancel the creation request?</h2>
+                        <lightning:button class="slds-m-top_small" 
+                                          variant="brand"
+                                          onclick="{!c.NavigateToExistingLead}" label="Navigate To Existing Lead" />
+                        <lightning:button class="slds-m-top_small" 
+                                          variant="brand"
+                                          onclick="{!c.ConvertLeadToContact}" label="Convert Existing Lead to Contact" />
+                        <aura:if isTrue="{!v.showIgnoreAndCreateButton}">
+                            <lightning:button class="slds-m-top_small" 
+                                              variant="brand"
+                                              onclick="{!c.IngnoreandCreate}" label="Ignore and Create" />
+                        </aura:if >
+                    </aura:if >
+                    <aura:if isTrue="{!v.displayStandardButtons}">
+                        <lightning:button class="slds-m-top_small"
+                                          variant="brand" 
+                                          onclick="{!c.SaveNewContact}" label="Create new" />
+                    </aura:if>
+                    <lightning:button class="slds-m-top_small"  
+                                      onclick="{!c.CancelContactCreation}" label="Cancel" />
+                </div>
+                
+            </div>
+        </lightning:recordEditForm>
+    </div>
+    
+</aura:component>

@@ -1,0 +1,16 @@
+<apex:page showHeader="true" sidebar="true" standardController="SFDC_MDF__c" extensions="FRToCampaignAssociationController" lightningStylesheets="true">
+
+   <apex:form id="associateFRToCampaign" >
+        <apex:pageBlock id="associateFRToCampaignMain" mode="edit" title="Campaign">
+             <apex:pageBlockButtons location="bottom">
+                <apex:commandButton value="Save" action="{!saveCampaignID}"/>
+                 <apex:commandButton value="Cancel" action="{!redirectToRequest}"/>
+            </apex:pageBlockButtons>
+            <apex:pageMessages />
+            <apex:pageBlockSection >
+                 <apex:inputField value="{!pageObject.Fund_Request_Campaign__c}"></apex:inputField>
+             </apex:pageBlockSection> 
+             <p id="submittingStatus"></p>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

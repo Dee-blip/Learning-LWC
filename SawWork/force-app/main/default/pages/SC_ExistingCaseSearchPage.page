@@ -1,0 +1,168 @@
+<apex:page controller="SC_ExistingCaseSearchCtrl" showHeader="false" sidebar="false" title="Add Existing Case" id="pageId" lightningStylesheets="true">
+   <style>
+    .RedText{
+       color:Red;
+       font-weight:900;
+       text-align:Center;
+       width: 100%;
+       height: 100%;
+       }   
+    </style>
+    <br/><center><h1> Search Existing Case by Entering Akam Case Id or Case Number</h1></center><br/>
+    <apex:pageMessages id="pageMessageId"/>
+    <apex:form id="formId">
+        <apex:inputHidden value="{!exceptionOccured}" id="exceptionId"/>
+        <apex:outputpanel >
+            <apex:actionstatus id="goStatus">
+                <apex:facet name="start">
+                    <div class="waitingSearchDiv"
+                        style="background-color: #fbfbfb; height: 100%; opacity: 0.65; width: 100%;position:fixed;z-index:1000;">
+                    <div class="waitingHolder" style="top: 50%; width: 91px; position: fixed;z-index: 1001; left: 50%;">
+                    <img class="waitingImage" src="/img/loading.gif"
+                        title="Please Wait.." /> <span class="waitingDescription">Loading..</span>
+                    </div>
+                    </div>
+                </apex:facet>
+            </apex:actionstatus>
+        </apex:outputpanel>
+        <apex:pageBlock id="pageBlockId">
+            <apex:pageBlockSection columns="2" collapsible="true" id="pageBlockSectionId">
+                <apex:selectList multiselect="false" size="1" label="Search Based On :" value="{! searchBasedOn}">
+                    <apex:selectOptions value="{!lPickListOptions}"></apex:selectOptions>
+                </apex:selectList>
+                
+                <apex:inputTextarea label="Akam Case Id / Case Number" id="akamCaseId" value="{!akamCaseId}" required="true" style="width: 350px; height: 75px;"/>
+
+            </apex:pageBlockSection>
+            <!--apex:pageBlockSection columns="1"-->
+                <div align="center" draggable="false">
+                    <apex:commandButton value="Search Case" action="{!searchCaseBasedOnAkamId}" id="idSearchButton" reRender="idSearchResult,formId,pageMessageId" status="goStatus"/>
+                </div>    
+            <!--/apex:pageBlockSection-->
+            
+        </apex:pageBlock>
+        <apex:pageBlock id="idSearchResult" rendered="{! lCaseWrapperToDisplay != null && lCaseWrapperToDisplay.size > 0}">
+        <apex:pageBlockSection columns="1">
+        <apex:pageBlockTable var="caseToDisplay" value="{! lCaseWrapperToDisplay}">
+            <apex:column headerValue="Selected Case"  width="5%">
+                    <apex:inputCheckbox title="{! caseToDisplay.title}" value="{!caseToDisplay.selectedCase}"  Rendered="{!NOT(caseToDisplay.makeColumnReadOnly)}"/>
+                    &nbsp;<apex:outputText value="X" title="This is either a Closed case or a Parent case or already has a Parent Case" rendered="{!caseToDisplay.makeColumnReadOnly}" styleclass="RedText" ></apex:outputText>   
+            </apex:column>
+            <apex:column headerValue="Case Number">
+                  <apex:outputLink onclick="openCaseInSubtab('{!caseToDisplay.caseToDisplayWrapper.Id}','{!caseToDisplay.caseToDisplayWrapper.CaseNumber}');return false;">{!caseToDisplay.caseToDisplayWrapper.CaseNumber}</apex:outputLink>
+            </apex:column>    
+            <apex:column value="{!caseToDisplay.caseToDisplayWrapper.Subject}"/>
+            <apex:column value="{!caseToDisplay.caseToDisplayWrapper.AccountId}" onclick="openAccountInPrimaryTab('{!caseToDisplay.caseToDisplayWrapper.AccountId}','{!caseToDisplay.caseToDisplayWrapper.Account.Name}');return false;"/>
+            <apex:column value="{!caseToDisplay.caseToDisplayWrapper.AKAM_Case_ID__c}" />
+            <apex:column value="{!caseToDisplay.caseToDisplayWrapper.ParentId}" onclick="openCaseInSubtab('{!caseToDisplay.caseToDisplayWrapper.ParentId}','{!caseToDisplay.caseToDisplayWrapper.Parent.CaseNumber}');return false;"/>
+            <apex:column value="{!caseToDisplay.caseToDisplayWrapper.Status}" />
+            <apex:column value="{!caseToDisplay.caseToDisplayWrapper.Owner.Name}" headerValue="Owner"/>
+            <apex:column value="{!caseToDisplay.caseToDisplayWrapper.RecordType.Name}" headerValue="Record Type"/>
+
+        </apex:pageBlockTable>
+        </apex:pageBlockSection>
+        <div align="center" draggable="false">    
+            <apex:commandButton value="Update Case" action="{!updateParentCase}" id="idUpdateButton" reRender="idSearchResult,formId,pageMessageId" oncomplete="afterUpdateOperations();return false" status="goStatus"/>
+        </div>    
+        </apex:pageBlock>
+    </apex:form>
+    <apex:includeScript value="/soap/ajax/26.0/connection.js"/>
+    <apex:includeScript value="/support/console/32.0/integration.js"/>
+    <script type="text/javascript">
+        
+        var caseIdToOpenInSubtab;
+        var caseNumberToDisplayInSubtab;
+    	var accountIdToOpenInPrimaryTab;
+    	var accountNameToOpenInPrimaryTab;
+        var url = window.location.protocol + '//' + window.location.host + '/';
+        var confrmMessage;
+    	if(sforce.console.isInConsole()){
+             confrmMessage = 'Cases updated successfully. Please click on Ok and Close this tab.';
+        }
+        else{
+        	confrmMessage = 'Cases updated successfully. Please click on Ok and Close this tab.';
+	    }
+    
+        function openCaseInSubtab(caseId, caseNumber){ 
+                       
+            if (sforce.console.isInConsole()) {
+            	caseIdToOpenInSubtab = caseId;
+           		 caseNumberToDisplayInSubtab = caseNumber;
+          		 //sforce.console.openPrimaryTab(null, url, true);
+           		 //sforce.console.getEnclosingPrimaryTabId(openNewSubtab);
+           		 sforce.console.generateConsoleUrl(['/'+caseId], openConsoleUrl); 
+           		 return false;
+           	} 
+            else 
+            {
+                window.open(url+caseId);
+        	}
+
+        }
+        
+        function openAccountInPrimaryTab(accountId, accountName){
+            accountIdToOpenInPrimaryTab = accountId;
+            accountNameToOpenInPrimaryTab = accountName;
+            openNewPrimaryTab();
+        }
+        function afterUpdateOperations() {
+
+            //First find the ID of the current tab to close it
+            var hasErrorOccured = document.getElementById("pageId:formId:exceptionId").value;
+            if(hasErrorOccured == 'false'){
+                var confirmAction = confirm(confrmMessage);    
+                if(confirmAction){
+                    if(sforce.console.isInConsole()){
+                   		 sforce.console.getEnclosingPrimaryTabId(refreshPrimaryTab);
+                   		 sforce.console.getEnclosingTabId(closeSubtab);
+                    }
+                    else{
+                    	window.parent.opener.location.reload(true);
+                        open(location, '_self').close();
+                        //window.location.reload(true);
+                    }
+                }
+            }
+        }
+        
+        var closeSubtab = function closeSubtab(result) {
+            //Now that we have the tab ID, we can close it
+            var tabId = result.id;
+            	sforce.console.closeTab(tabId);     
+        };
+        
+       
+        var refreshPrimaryTab = function refreshPrimaryTab(result){
+
+            var tabId = result.id;
+            sforce.console.refreshPrimaryTabById(tabId,false);
+
+        };
+        
+       /* var openNewSubtab = function openNewSubtab(result){
+            var primaryTabId = result.id;
+            sforce.console.openSubtab(primaryTabId , '/'+ caseIdToOpenInSubtab, false, 
+                                      caseNumberToDisplayInSubtab, null, openSuccess, 'salesforceSubtab');
+            
+        };*/
+        
+        var openConsoleUrl = function(result){
+        	sforce.console.openConsoleUrl(null, result.consoleUrl,true,null,null,null);        
+    	};
+        
+        var openSuccess = function openSuccess(){
+           // alert(result);    
+        };
+        
+    	var openNewPrimaryTab = function openNewPrimaryTab(){
+            if (sforce.console.isInConsole()) {
+            	sforce.console.openPrimaryTab(null, '/'+ accountIdToOpenInPrimaryTab, true,
+                						  accountNameToOpenInPrimaryTab, openSuccess, 'salesforceTab');
+			}
+            else{
+           	 	window.open(url+accountIdToOpenInPrimaryTab);
+            }
+        };
+        
+    </script>
+</apex:page>

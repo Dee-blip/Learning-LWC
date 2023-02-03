@@ -1,0 +1,257 @@
+<apex:page controller="AgentHomePageController" standardStylesheets="false" showHeader="false" sidebar="false" title="Service Incidents">
+    <!-- Include css and js files for Bootstrap-->
+    <script src="{!$Resource.JQuery_New}"></script>
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrap, '/css/bootstrap.min.css')}"/>
+    <script src="{!URLFOR($Resource.bootstrap, '/js/bootstrap.min.js')}"></script>
+    <script src="{!URLFOR($Resource.SCloud_HomePage, '/js/jquery.dataTables.min.js')}"></script>
+    
+    <!-- Include css and js files for Tablesorter 
+    <apex:stylesheet value="{!URLFOR($Resource.JQuery_Tablesorter, '/css/theme.default.css')}"/>
+    <script src="{!$Resource.JQuery}"></script>
+    <script src="{!URLFOR($Resource.JQuery_Tablesorter, '/js/jquery.tablesorter.js')}"></script>-->
+    
+    <!-- Include js file for sevice cloud -->
+    <apex:includeScript value="/support/console/32.0/integration.js"/>
+    
+    <style>
+        
+        .btn-custom {
+          background-color: hsl(206, 71%, 53%) !important;
+          background-repeat: repeat-x;
+          filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#3292dc", endColorstr="#3292dc");
+          background-image: -khtml-gradient(linear, left top, left bottom, from(#3292dc), to(#3292dc));
+          background-image: -moz-linear-gradient(top, #3292dc, #3292dc);
+          background-image: -ms-linear-gradient(top, #3292dc, #3292dc);
+          background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #3292dc), color-stop(100%, #3292dc));
+          background-image: -webkit-linear-gradient(top, #3292dc, #3292dc);
+          background-image: -o-linear-gradient(top, #3292dc, #3292dc);
+          background-image: linear-gradient(#3292dc, #3292dc);
+          border-color: #3292dc #3292dc hsl(206, 71%, 53%);
+          color: #fff !important;
+          text-shadow: 0 1px 1px rgba(255, 255, 255, 0.00);
+          -webkit-font-smoothing: antialiased;
+        }
+        
+        .bPageBlock{ 
+            background-color:#FFFFFF !important;
+            border-top: 0px !important; 
+            border-bottom: 0px !important; 
+            border-left: 0px !important; 
+            border-radius: 0px 0px 0px 0px;
+            border-right: 0px !important; 
+        }
+       
+        .pane-header {
+            background: url("{!URLFOR($Resource.PaneHeaderImage)}") repeat-x scroll left 1px #FFFFFF;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .sorting_asc div {
+            background: url("{!URLFOR($Resource.SCloud_HomePage, '/i/icon-sort-asc.png')}") right center no-repeat;
+            padding-right: 15px;
+        }
+            
+        .sorting_desc div {
+            background: url("{!URLFOR($Resource.SCloud_HomePage, '/i/icon-sort-desc.png')}") right center no-repeat;
+            padding-right: 15px;
+        }
+        
+        .alert-updated {
+            background: url("{!URLFOR($Resource.RedIcon)}") center center no-repeat;
+            display: block;
+            overflow: hidden;
+            text-indent: -9999px;
+        }
+    </style>
+    <script type="text/javascript">
+      
+      function openConsole(url)
+        {
+        sforce.console.generateConsoleUrl([url], openConsoleUrl);        
+        }   
+        
+        var openConsoleUrl = function(result){
+            sforce.console.openConsoleUrl(null, result.consoleUrl,true,null,null,openSuccess);        
+        }
+        
+        var openSuccess = function(result) {
+            //Report whether opening the new tab was successful
+            if (result.success == false)
+                alert('The corresponding tab is already opened');
+        };
+
+		//Set the current tab's title
+        var pageLoad = window.onload;
+        window.onload = function() 
+        {
+            if (pageLoad) 
+            {
+                pageLoad();
+            }
+            sforce.console.setTabTitle('Service Incidents');
+        }
+    
+        function openQueueListView(objectName, qName) {
+            var listViewMap;
+            var rec;
+            var prefix;
+            if('Incident') {
+                listViewMap = '{!incidentsListViewMap}';
+                listViewMap = listViewMap.replace("{", ", ");
+                if(listViewMap.indexOf(", "+qName) == -1) {
+                    qName = 'All';
+                }
+                 preFix = '/{!$Setup.sobject_prefixes__c.Incident__c}/l?fcf=';            
+                 
+            }
+            rec = listViewMap.substring(listViewMap.indexOf(", "+qName));
+            rec = rec.substring(1);
+            rec = rec+', END';
+            rec = rec.substring(0, rec.indexOf(","));
+            rec = rec.substring(rec.indexOf("=")+1);
+            rec = rec.substring(0, 15);
+            openConsole(preFix+rec+'&isdtp=4');
+        }
+    
+
+</script>
+
+    <apex:form >
+        <apex:pageMessages id="msgs"/>
+        <apex:outputpanel >
+            <apex:actionstatus id="goStatus">
+                <apex:facet name="start">
+                    <div class="waitingSearchDiv"
+                        style="background-color: #fbfbfb; height: 100%; opacity: 0.65; width: 100%;position:fixed;z-index:1000;">
+                    <div class="waitingHolder" style="top: 50%; width: 91px; position: fixed;z-index: 1001; left: 50%;">
+                    <img class="waitingImage" src="/img/loading.gif"
+                         title="Please Wait..." /> <span class="waitingDescription">Loading../</span>
+                    </div>
+                    </div>
+                </apex:facet>
+            </apex:actionstatus>
+        </apex:outputpanel>
+        
+        <apex:actionFunction name="applyIncidentFilter" action="{!populateIncidents}" reRender="incidentSection" status="goStatus" oncomplete="addSorting('incidentSortableTable'); applyFormating()"/>
+        
+        <apex:pageBlock id="topBlock">
+            <!-- Commenting out User Availability as not asked in requirements -->
+            <!--
+            <apex:commandButton value="{!IF(isAvailable, 'Available', 'Unavailable')}" action="{!toggleUserAvailability}" rendered="{!showAvailability}"
+            style="{!IF(isAvailable, 'background:green !important;', 'background:#FD9193 !important;')}float:right;margin-right:13px;"
+            styleClass="btn btn-primary btn-custom"/> 
+         	-->
+            
+            <table class="table">
+                <tbody>
+                <tr style="height:20px;"><td></td><td></td></tr>
+                    <tr>
+                        <td style="width:50%;border:0px;">
+                            <apex:panelGroup id="incidentSection">
+                                <div style="height:520px;border: 1px solid #DDDDDD;border-radius: 10px;">
+                                    <apex:outputPanel layout="block" style="height:40px; padding-top:10px;font-weight:bold;" styleClass="pane-header">
+                                        <div style="float:left; margin-left:10px; font-size:16px;"> Service Incidents </div>
+                                        <div style="float:right;">
+                                            
+                                            <apex:selectList value="{!incidentFilter}" size="1" style="margin-right: 10px;" onchange="applyIncidentFilter();">
+                                                <apex:selectOptions value="{!incidentFilterOptions}"></apex:selectOptions>
+                                            </apex:selectList>
+                                            <input type="button" value="" title="Refresh" onClick="applyIncidentFilter();" 
+                                            class="btn btn-primary btn-custom" style="margin-right: 10px;margin-bottom:10px;background: url('/img/alohaSkin/sync.png') no-repeat scroll 4px 5px  !important;"/>
+                                        </div>
+                                    </apex:outputPanel>
+                                    <div style="height:430px; overflow:auto;">
+                                        <apex:dataTable value="{!lstIncidents}" var="incidentRec" cellpadding="5" cellspacing="5" 
+                                        styleClass="table table-striped" style="margin-bottom:0px;" id="incidentSortableTable">
+                                            <apex:column >
+                                                <apex:facet name="header">Incident # </apex:facet>
+                                                <apex:outputText >{!incidentRec.Name}</apex:outputText>
+                                            </apex:column>
+                                            <apex:column >
+                                                <apex:facet name="header">Title</apex:facet>
+                                                <a onClick="openConsole('/{!incidentRec.Id}')" style="cursor: pointer; text-decoration: underline; color:#3597dc;">{!incidentRec.BMCServiceDesk__Service_Request_Title__c}</a>
+                                            </apex:column>
+                                            <apex:column >
+                                                <apex:facet name="header">Status</apex:facet>
+                                                <apex:outputText >{!incidentRec.BMCServiceDesk__FKStatus__r.Name}</apex:outputText>
+                                            </apex:column>
+                                            <apex:column >
+                                                <apex:facet name="header">Incident Start</apex:facet>
+                                                <apex:outputText >{!incidentRec.SI_Incident_Start_Time_InternationalForm__c}</apex:outputText>
+                                            </apex:column>
+                                            <apex:column >
+                                                <apex:facet name="header">Urgency</apex:facet>
+                                                <apex:outputText >{!incidentRec.BMCServiceDesk__FKUrgency__r.Name}</apex:outputText>
+                                            </apex:column>
+                                            
+                                        </apex:dataTable>
+                                    </div>
+                                    <apex:outputPanel >
+                                        <span style="float:right;margin-right:5px;margin-top:5px;">
+                                            <apex:commandButton value="VIEW ALL" onClick="openQueueListView('Incident', '{!incidentFilter}');return false" styleClass="btn btn-primary btn-custom pull-left"/>
+                                        </span>
+                                    </apex:outputPanel>
+                                </div>
+                            </apex:panelGroup>
+                        </td>
+
+                    </tr>
+                </tbody>
+            </table>
+        </apex:pageBlock>
+    </apex:form>
+   <script>
+   function addSorting(ids) { 
+    $("[id$='"+ids+"']").dataTable({
+        sDom:'t',
+        iDisplayLength:-1
+        ,"aaSorting": []
+        ,fnDrawCallback:function() {
+            //no sort empty row
+            var tr = $(this).find('tr.no-sort');
+            if(tr.length>0) {
+                tr.detach();
+                $(this).find('tbody').append(tr);
+                $(this).find('tbody tr:odd').addClass('odd').removeClass('even');
+                $(this).find('tbody tr:even').addClass('even').removeClass('odd');
+            }
+        }
+     });
+    }
+    
+    function addSortingCaseTable(ids) {  
+    $("[id$='"+ids+"']").dataTable({
+        sDom:'t',
+        iDisplayLength:-1
+        ,"aaSorting": [[6,'asc']]
+        ,"aoColumns": [ null, null, null, null, null, null, null, {"bSortable": false}, null]
+        ,fnDrawCallback:function() {
+            //no sort empty row
+            var tr = $(this).find('tr.no-sort');
+            if(tr.length>0) {
+                tr.detach();
+                $(this).find('tbody').append(tr);
+                $(this).find('tbody tr:odd').addClass('odd').removeClass('even');
+                $(this).find('tbody tr:even').addClass('even').removeClass('odd');
+            }
+        }
+     });
+    }
+    
+    function applyFormating() {
+       $(".numbers").each(function() {
+       //alert($(this).text().indexOf(".") > 0);
+           if($(this).text().indexOf(".") > 0) {
+            var num = parseFloat($(this).text());
+            var new_num = $(this).text(num.toFixed(0));
+            }
+       });
+    }
+    
+   $(document).ready(function() {
+       addSorting('SortableTable');
+       addSortingCaseTable('SortableCaseTable')
+       applyFormating();
+    });   
+    </script>
+</apex:page>

@@ -1,0 +1,30 @@
+.THIS .outer-container{
+    border: 1px solid #0695d3;
+}
+
+.THIS .my-heading-container{
+    background-color: aliceblue;
+    /*
+    height: 12vh;
+    */
+}
+.THIS .my-body-without-heading{
+    /*
+    height: 30vh;
+    */
+}
+
+.THIS .my-status-icons-div{
+    height: 15vh;
+    position: relative;
+}
+
+.THIS .my-quote-icon-container{
+    flex-basis: 0;
+    flex-grow: 1;
+}
+
+.THIS .my-title-text-container{
+    flex-basis:0;
+    flex-grow:5;
+}

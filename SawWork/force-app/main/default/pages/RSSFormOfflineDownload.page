@@ -1,0 +1,19 @@
+<apex:page standardController="RSS_Form__c" extensions="RSS_FormController"  showHeader="{!if(Offline,false,true)}" cache="true" sidebar="false" contentType="{!if(Offline,'application/html#eRSSOffline.HTML','')}" >
+<!--apex:page controller="RSS_FormController"  showHeader="false" cache="true" sidebar="false" contentType="application/html#eRSSOffline.HTML" >
+<apex:outputText value="{!JSON}" escape="false"></apex:outputText-->
+
+<apex:form rendered="{!!Offline}"> 
+<apex:OutputText >
+Select the Forms which you  would want to work Offline with.
+</apex:OutputText>
+<br/>
+<apex:selectList multiselect="true" size="10" value="{!UserForms}">
+<apex:selectOptions value="{!OfflineRSSForms}">
+</apex:selectOptions>
+</apex:selectList>
+<br/>
+<apex:commandButton value="Download Offline Form" action="{!TempMethod}" />
+
+</apex:form>
+<apex:outputText value="{!JSON}"  rendered="{!Offline}"></apex:outputText> 
+</apex:page>

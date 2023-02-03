@@ -1,0 +1,3 @@
+<apex:page standardController="Budget_Allocation__c">
+    <c:NotesAndAttachmentVfComp parentSobjectId="{!Budget_Allocation__c.Id}"/>
+</apex:page>

@@ -1,0 +1,86 @@
+<apex:page showHeader="true" sidebar="false" standardController="Opportunity" extensions="OpportunityWarningsExtensionController" lightningStylesheets="true">
+    <apex:outputLink value="/{!opportunityId}"> Back to Opportunity </apex:outputLink>
+
+    <apex:pageMessages rendered="{!IF(showWarnings,'true','false')}" id="msgs" escape="false"/> <!-- SFDC-5897 Modified to have IF condition-->
+
+    <apex:form id="IALTButtons">
+        <style>
+    .popupBackground {
+        /* Background color */
+        background-color:black;
+        opacity: 0.20;
+        filter: alpha(opacity = 20);
+
+        /* Dimensions */
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 998;
+        position: absolute;
+
+        /* Mouse */
+        cursor:wait;
+    }
+
+    .PopupPanel {
+        /* Background color */
+
+        /* Dimensions */
+        left: 50%;
+        width: 200px;
+        margin-left: -100px;
+        top: 50%;
+        height: 50px;
+        margin-top: -25px;
+        z-index: 999;
+        position: fixed;
+
+        /* Mouse */
+        cursor:pointer;
+    }
+    #button-div
+    {
+        margin-top: 10px;
+    }
+
+</style>
+        <script type="text/javascript">
+        function isEmpty(str) {
+                return (!str || 0 === str.length);
+        }
+
+        function redirectToIALTForm(ialtURL){
+            if(!isEmpty(ialtURL) && ("{! JSENCODE($User.UIThemeDisplayed) }" != "Theme4t")) // SFDC-5897 modfieid to have JSENCODE
+            {
+                window.open(ialtURL, '_blank');
+            }
+        }
+
+    </script>
+
+        <apex:actionStatus id="showLoading" stopText="">
+            <apex:facet name="start">
+                <div>
+                    <div class="popupBackground" />
+                    <div class="PopupPanel">
+                        <table border="0" width="100%" height="100%">
+                            <tr>
+                                <td align="center"><img src="/img/loading32.gif"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </apex:facet>
+        </apex:actionStatus>
+        <div align="center" draggable="false" id="button-div">
+            <apex:commandButton rendered="{!currentOppty.Is_Restricted_Country__c && !currentOppty.IALT_Received__c}" action="{!markFieldAsChecked}" rerender="msgs" status="showLoading" value="Request IALT" oncomplete="redirectToIALTForm('{!JSINHTMLENCODE(ialtApprovalURL)}');"> <!-- SFDC-5897 Added JSINHTMLENCODE -->
+                <apex:param name="fieldName" value="IALT_Requested__c" assignTo="{!fieldName}"/>
+            </apex:commandButton>
+            <apex:commandButton rendered="{!currentOppty.Is_Restricted_Country__c && !currentOppty.IALT_Received__c}" value="IALT Received" action="{!markFieldAsChecked}" rerender="msgs" status="showLoading">
+                <apex:param name="fieldName" value="IALT_Received__c" assignTo="{!fieldName}"/>
+            </apex:commandButton>
+        </div>
+    </apex:form>
+
+</apex:page>

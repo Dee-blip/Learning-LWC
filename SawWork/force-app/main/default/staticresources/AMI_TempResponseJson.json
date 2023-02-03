@@ -1,0 +1,32 @@
+{
+  "id": "df6b38c7-9032-0ac8-f326-cf1eb92d096b",
+  "publisherId": "akamai-technologies",
+  "offerId": "test_product_transact-preview",
+  "name": "Test Product Plan 1 subscription",
+  "saasSubscriptionStatus": "PendingFulfillmentStart",
+  "beneficiary": {
+    "emailId": "syaramak@akamai.com",
+    "objectId": "7a6ae661-e952-4466-9357-6c109f323834",
+    "tenantId": "514876bd-5965-4b40-b0c8-e336cf72c743",
+    "puid": "10037FFE90CBF3CF",
+    "companyName": "akamai",
+    "givenName": "sunil",
+    "surname": "muniyappa",
+    "displayName": "sunil muniyappa",
+    "jobTitle": "SSE",
+    "mobilePhone": "9202020",
+    "businessPhones": ["+0191", "+9002"]
+  },
+  "purchaser": {
+    "emailId": "syaramak@akamai.com",
+    "objectId": "7a6ae661-e952-4466-9357-6c109f323834",
+    "tenantId": "514876bd-5965-4b40-b0c8-e336cf72c743",
+    "puid": "10037FFE90CBF3CF"
+  },
+  "planId": "plan-1",
+  "term": {
+    "termUnit": "P1M"
+  },
+  "sessionId": "2d7f942d-b9d9-452e-846f-1eecb3abd9f2",
+  "fulfillmentId": "5cdd7701-0857-46ce-8e29-34a2ea38c5cb"
+}

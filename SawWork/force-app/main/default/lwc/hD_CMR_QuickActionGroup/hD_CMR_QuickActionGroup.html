@@ -1,0 +1,9 @@
+<template>
+    <div class="slds-page-header__col-actions slds-float_right">
+        <lightning-button-group>
+            <template for:each={listofactionsdisplay} for:item="item">
+                <lightning-button data-id={item} label={item} onclick={performAction} key={item.key}></lightning-button>
+            </template>
+        </lightning-button-group>
+    </div>
+</template>

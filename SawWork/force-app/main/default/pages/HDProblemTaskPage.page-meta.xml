@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>29.0</apiVersion>
+    <availableInTouch>false</availableInTouch>
+    <confirmationTokenRequired>false</confirmationTokenRequired>
+    <description>This Page will be used in Task related list in Problem Page.</description>
+    <label>HDProblemTaskPage</label>
+    <packageVersions>
+        <majorNumber>201301</majorNumber>
+        <minorNumber>14</minorNumber>
+        <namespace>BMCServiceDesk</namespace>
+    </packageVersions>
+</ApexPage>

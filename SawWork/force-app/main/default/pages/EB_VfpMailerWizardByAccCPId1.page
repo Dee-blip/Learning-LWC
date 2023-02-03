@@ -1,0 +1,42 @@
+<!--
+Author: Sharath K
+Description: Page for displaying the Accounts based on search criteria for Account Id/CP search.
+11/21/2011 - removing commented lines of old code for better understanding
+-->
+
+<apex:page controller="EB_CtrlMailerWizardByAccCPId" id="Page1" wizard="false" sidebar="false" tabStyle="Create_Mailer__tab">
+    <apex:form id="form1">
+        <apex:pageBlock Title=" Search Based on {!dispvalue}" id="PBS_Search1">
+        <apex:pageMessages id="errorMessage">
+        </apex:pageMessages>
+            <apex:pageBlockSection title="Please enter the list of {!dispvalue}, one value per line" showHeader="true" collapsible="false" id="section1" columns="1">
+                    <apex:panelGroup >
+                    <apex:commandButton value="Edit Account Search" action="{!enable}" reRender="queryStringAccount"/>
+                    &nbsp;
+                    <apex:commandButton value="Clear Account Search" action="{!clearSearch}" reRender="queryStringAccount"/>
+               </apex:panelGroup>
+                <apex:panelGroup id="queryStringAccount">
+                    <apex:inputTextarea id="queryString" value="{!SQLWhere}" rows="25" style="font-family: 'courier new'; font-size: 12px" cols="50" disabled="{!disableStatus}"/>
+               </apex:panelGroup>
+           </apex:pageBlockSection>
+
+          
+               <br />
+               <br />
+                <apex:panelGroup id="dispAccountSQL" >
+                    <apex:outputText id="Accountquery" value="{!debugAccountSQL}"  style="font-family: 'courier new'; font-size: 12px;"  />
+               </apex:panelGroup>
+               <apex:panelGroup id="dispProductSQL" >
+                    <apex:outputText id="Productquery" value="{!debugProductSQL}"  style="font-family: 'courier new'; font-size: 12px;"  />
+              </apex:panelGroup>
+               <apex:panelGroup id="dispProductSQLtemp" >
+                    <apex:outputText id="Productquerytemp" value="{!debugFinalSQL}"  style="font-family: 'courier new'; font-size: 12px;"  />
+               </apex:panelGroup> 
+           <apex:pageBlockButtons location="bottom">
+           <apex:commandButton Value="Previous" action="{!main_page}" /> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+           <apex:commandButton value="Validate Search" action="{!validateAccount}"/> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+           <apex:commandButton Value="Next" action="{!page2}"   />
+           </apex:pageBlockButtons>
+       </apex:pageBlock>
+   </apex:form> 
+</apex:page>

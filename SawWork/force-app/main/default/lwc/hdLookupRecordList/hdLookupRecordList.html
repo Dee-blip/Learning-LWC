@@ -1,0 +1,61 @@
+<template>
+    <div class="slds-is-relative">
+        <template if:false={showAdvancedTemplate}>
+            <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option"
+                onclick={handleSelect}>
+                <h2>{fieldValue}</h2>
+                <!-- <p class="slds-truncate">
+                    <template if:true={metaData}>
+                        <div class="">
+                            <span
+                                class="slds-listbox__option-meta slds-listbox__option-meta_entity slds-m-around_xx-small"
+                                key={datum}>
+                                <template for:each={metaData} for:item="datum">
+                                    {datum} •
+                                </template>
+                            </span>
+                        </div>
+                    </template>
+                </p> -->
+            </div>
+        </template>
+        <template if:true={showAdvancedTemplate}>
+            <lightning-tile label={fieldValue} type="media" onmouseover={handleMouseEnter} onmouseout={handleMouseOut}
+                class={itemClass} href={getURL} onclick={onNewWindowClicked} role="option" data-id="container">
+                <lightning-icon slot="media" icon-name={iconname} class="slds-m-top_xx-small"></lightning-icon>
+                <lightning-layout horizontal-align="spread">
+                    <lightning-layout-item size={colSize}>
+                        <div class="slds-size_1-of-1">
+                            <p class="slds-truncate">
+                                <template if:true={metaData}>
+                                    <span
+                                        class="slds-listbox__option-meta slds-listbox__option-meta_entity slds-m-top_xx-small"
+                                        key={datum}>
+                                        <template iterator:it={metaData}>
+                                            <template if:false={it.last}>
+                                                <span key={it.value}>{it.value}</span>
+                                                <span key={it.value}> &#8226; </span>
+                                            </template>
+                                            <template if:true={it.last}>
+                                                {it.value}
+                                            </template>
+                                        </template>
+                                    </span>
+                                </template>
+                            </p>
+                        </div>
+                    </lightning-layout-item>
+                    <lightning-layout-item>
+                        <lightning-button icon-name="utility:link" label="Link" size="large" onclick={onLinkClicked}
+                            variant="base" title="Link Knowledge Article to Incident">
+                        </lightning-button>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </lightning-tile>
+            <c-hd-modal-popup title={fieldValue} is-large="true" data-id="modal">
+                <c-hd-k-a-viewer record-id={record.Id} object-api-name="BMCServiceDesk__KM_KnowledgeArticle__c"
+                    fields="BMCServiceDesk__Question__c,BMCServiceDesk__Answer__c"></c-hd-k-a-viewer>
+            </c-hd-modal-popup>
+        </template>
+    </div>
+</template>

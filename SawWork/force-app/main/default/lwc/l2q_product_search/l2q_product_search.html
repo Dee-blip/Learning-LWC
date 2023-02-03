@@ -1,0 +1,22 @@
+<template>
+    <template if:true={isloading}> 
+        <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+    </template>
+    <lightning-input onclick={handleFocus} onfocus={handleFocus} type="text" placeholder={placeholdertext}
+        onchange={handleProductSearch}>
+    </lightning-input>
+    <template if:true={showresults}>
+        <div onmouseleave={handleBlur} style={customstyle} class="slds-scrollable--y search_results">
+            <template if:true={temp_products}>
+                <template for:each={temp_products} for:item="product">
+                    <div key={product.product.Id} style="padding: 3px; padding-left: 0px;">
+                        <lightning-input key={product.product.Id} type="checkbox"
+                            label={product.product.Product_Name__c} onchange={onProductSelect}
+                            value={product.product.Id} class={product.product.Id} checked={product.checked}>
+                        </lightning-input>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </template>
+</template>

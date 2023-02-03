@@ -1,0 +1,512 @@
+<template>
+
+    <div class="slds-card" style="height: auto; margin-top: 15px;max-height: 90vh; zoom:90%;">
+        <!-- <div class="slds-card" style="height: 65vh; margin-top: 15px"> -->
+        <div class="slds-grid slds-gutters headerStyle">
+            
+        <!-- *************************** HEADER **********************************************-->
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+
+                <div>
+                    <template if:true={loadSpinner}>
+                        <div style="opacity: 0.7;" class="slds-spinner_container">
+                            <lightning-spinner alternative-text="Loading" variant="brand" size="medium">
+                            </lightning-spinner>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="slds-media__figure slds-col slds-size_1-of-5">
+
+                    <ul class="slds-list_horizontal slds-media_center">
+                        <li>
+                            <template if:true={displayCase}>
+                                <lightning-button-icon
+                                    icon-name="utility:chevrondown"
+                                    variant="bare"
+                                    style="padding-right: 6px; padding-left: 2px;"
+                                    alternative-text="Collapse"
+                                    title="Collapse"
+                                    onclick={hideCaseTable}>
+                                </lightning-button-icon>
+                            </template>
+
+                            <template if:false={displayCase}>
+                                <lightning-button-icon
+                                    icon-name="utility:chevronright"
+                                    variant="bare"
+                                    style="padding-right: 6px; padding-left: 2px;"
+                                    alternative-text="Collapse"
+                                    title="Collapse"
+                                    onclick={showCaseTable}>
+                                </lightning-button-icon>
+                            </template>
+                        </li>
+
+                        <li>
+                            <lightning-icon icon-name="standard:case" size="small" alternative-text="Cases" title="Cases">
+                            </lightning-icon>
+                        </li>
+
+                        <li>
+                            <span style="font-size:16px;padding-left: 10px;">{sevSelected} Open Cases ({totalCases})</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="slds-media slds-col slds-size_1-of-9">
+                        <lightning-input type="toggle" 
+                        label="My Cases" class="myBox"
+                        name="my" message-toggle-active="" 
+                        data-element="myToggle" 
+                            message-toggle-inactive="" 
+                            onchange={toggleChecked}>
+                        </lightning-input>
+                </div>
+
+                <div class="slds-media slds-col slds-size_1-of-8">
+                        <lightning-input type="toggle" label="Unassigned" 
+                        name="unassigned" message-toggle-active="" class="unassignedBox"
+                        message-toggle-inactive="" data-element="unassignedToggle" 
+                        onchange={toggleChecked}>
+                        </lightning-input>
+                </div>
+
+                <div class="slds-media slds-col slds-size_1-of-7">
+                    <lightning-button variant="brand" label="Change Shift Owner" title="Change Shift Owner"
+                        icon-name="utility:adduser" icon-position="left"
+                        class="slds-button slds-m-left_x-small changeOwnerButton" onclick={openShiftOwnerPopup}
+                        disabled>
+                    </lightning-button>
+                </div>
+
+                <div class="slds-media slds-col slds-size_1-of-5">
+                    <lightning-button variant="brand" label="Change Case Owner" title="Change Case Owner"
+                        icon-name="utility:adduser" icon-position="left"
+                        class="slds-button slds-m-left_x-small changeCaseOwnerButton" onclick={openCaseOwnerPopup}
+                        disabled>
+                    </lightning-button>
+                </div>
+
+                <div class="slds-col slds-size_1-of-6" style="padding: 0px;">
+                    <lightning-input value={caseSearchText} placeholder="Search Cases..." type="text"
+                    name="Case Search" class="labelHidden" onchange={delayedSearch}>                      
+                    </lightning-input>
+                </div>
+
+                <div class="slds-col" style="padding-left: 0px;">
+                    <button class="slds-button" onclick={clearSearchInput}>
+                        <lightning-icon icon-name="utility:clear" alternative-text="Clear" size="x-small"></lightning-icon>
+                    </button>
+                </div>
+
+                <div class="slds-col rightAlign ">
+                    <button class="slds-button" onclick={refreshCaseTable}>
+                        <lightning-icon icon-name="action:refresh" alternative-text="Refresh" size="x-small">
+                        </lightning-icon>
+                    </button>
+                </div>
+
+            </header>
+        </div>
+
+        <!-- ****************************** CASES TABLE ************************************ -->
+
+        <!-- <template if:true={displayCase}> -->
+            <div class="datatableStyle" id="dt" data-id="pCase">
+                <div id="divForDatatable" class="panelCase" style="height:70vh;">
+                    <lightning-datatable 
+                            key-field="caseId" 
+                            data={SlicedDatalist}
+                            columns={caseColumns}
+                            onrowaction={handleRowAction} 
+                            data-id="caseDatatable"
+                            wrap-text-max-lines="2" 
+                            column-widths-mode="auto" 
+                            sorted-by={sortBy} 
+                            sorted-direction={sortDirection}
+                            onsort={updateColumnSorting} 
+                            onrowselection={casesSelected} 
+                            selected-rows={selectedRows}
+                            max-row-selection="50">
+                    </lightning-datatable>
+                </div>
+            </div>
+
+            <div class="slds-theme--default slds-align_absolute-center">
+
+            <lightning-button variant="brand" label={currentpage}></lightning-button>
+        
+            <template for:each={paginationRange} for:item="var1">
+                <lightning-button variant="brand-outline" data-item={var1} label={var1} key={var1}
+                onclick={handlePaginationClick}></lightning-button>
+            </template>
+            </div>
+        <!-- </template> -->
+
+
+        <!-- ************************ CASE INLINE EDIT MODAL ***************************************** -->
+
+        <template if:true={showEditModal}>
+            <lightning-record-edit-form 
+                record-id={caseRecordId} 
+                object-api-name="Case"
+                record-type-id={recordTypeId} 
+                onsubmit={handleCaseEditSubmit} 
+                onsuccess={handleCaseEditSuccess}
+                onerror={handleCaseEditError}>
+
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                    aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open modalZIndex">
+                    <div class="slds-modal__container" style="font-size: 11px; max-width: 42rem">
+                        <!-- Modal/Popup Box LWC header here -->
+                        <header class="slds-modal__header">
+
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeCaseEditModal}>
+                                <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small"></lightning-icon>
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+
+                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                                Edit {caseAKAMId}</h2>
+                        </header>
+
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <div>
+                                <template if:true={loadModalSpinner}>
+                                    <div style="opacity: 0.7;height:95%" class="slds-spinner_container">
+                                        <lightning-spinner alternative-text="Loading" variant="brand" size="medium">
+                                        </lightning-spinner>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <lightning-messages></lightning-messages>
+                            <lightning-output-field field-name="AccountId">
+                            </lightning-output-field>
+                            <lightning-input-field variant="label-inline" field-name="Subject" required>
+                            </lightning-input-field>
+                            <lightning-input-field variant="label-inline" field-name="Description" required>
+                            </lightning-input-field>
+                            <lightning-input-field variant="label-inline" field-name="Shift_Owner__c">
+                            </lightning-input-field>
+                            <lightning-input-field variant="label-inline" field-name="OwnerId">
+                            </lightning-input-field>
+                            <lightning-input-field variant="label-inline" field-name="Severity__c" required>
+                            </lightning-input-field>
+                            <!--lightning-input-field variant="label-inline" field-name="PS_Product__c">
+                            </lightning-input-field-->
+                            <lightning-input-field variant="label-inline" field-name="Case_Product__c">
+                            </lightning-input-field>
+                            <lightning-input-field variant="label-inline" field-name="pse_Project__c">
+                            </lightning-input-field>
+                            <lightning-input-field variant="label-inline" field-name="Service__c" required>
+                            </lightning-input-field>
+                            <lightning-input-field variant="label-inline" field-name="Request_Type__c" required> 
+                            </lightning-input-field>
+                            <lightning-input-field variant="label-inline" field-name="Status" required>
+                            </lightning-input-field>
+                            <lightning-input-field variant="label-inline" field-name="Close_Code__c"> 
+                            </lightning-input-field>
+                            <lightning-input-field variant="label-inline" field-name="Sub_Type__c">
+                            </lightning-input-field>
+                            <lightning-input-field variant="label-inline" field-name="Fund_Type__c">
+                            </lightning-input-field>
+                            <lightning-input-field variant="label-inline" field-name="Logo_Type__c">
+                            </lightning-input-field>
+                            <lightning-input-field variant="label-inline" field-name="Special_Logo_Type__c">
+                            </lightning-input-field>
+                            <!--<lightning-input-field field-name="Is_SOCC_Priority__c" variant="label-inline">
+                            </lightning-input-field> -->
+                            <lightning-input-field variant="label-inline" field-name="Priority_Type__c">
+                            </lightning-input-field>
+                            <!--<lightning-input-field variant="label-inline"  field-name="Priority_Expiry_Date__c">
+                            </lightning-input-field> -->
+                            <lightning-input-field variant="label-inline"  field-name="Requested_Completion_Date_UTC__c">
+                            </lightning-input-field>
+                            <lightning-input-field variant="label-inline" field-name="Solution_Summary__c">
+                            </lightning-input-field>
+                            <lightning-input-field variant="label-inline" field-name="Living_Summary_Next_Steps__c">
+                            </lightning-input-field>
+                                
+                        </div>
+
+                        <footer class="slds-modal__footer">
+                            <!--<button class="slds-button slds-button_neutral" onclick={closeModal}
+                                title="Cancel">Cancel</button>-->
+                            <button class="slds-button slds-button_brand" type="submit" name="Save"
+                                title="Save">Save</button>
+                        </footer>
+                        <!-- Modal/Popup Box LWC footer starts here -->
+
+                    </div>
+                </section>
+
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </lightning-record-edit-form>
+        </template>
+
+        <!-- ************************ VIEW ESCALATIONS MODAL ***************************************** -->
+
+        <template if:true={showEscModal}>
+
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_large">
+                <div class="slds-modal__container" >
+                    <!-- Modal/Popup Box LWC header here -->
+                    <header class="slds-modal__header">
+
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                            title="Close" onclick={closeEscModal}>
+                            <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                                size="small"></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+
+                        <h2 class="slds-text-heading_medium slds-hyphenate">
+                            <b>Escalations on {caseAKAMId}</b></h2>
+                    </header>
+
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <div>
+                            <template if:true={loadModalSpinner}>
+                                <div style="opacity: 0.7;height:95%" class="slds-spinner_container">
+                                    <lightning-spinner alternative-text="Loading" variant="brand" size="medium">
+                                    </lightning-spinner>
+                                </div>
+                            </template>
+
+                            <template if:true={escData}>
+                                <lightning-datatable 
+                                    key-field="caseId" 
+                                    data={escData} 
+                                    columns={escColumns}
+                                    wrap-text-max-lines="5" 
+                                    hide-checkbox-column=true>
+                                </lightning-datatable>
+                            </template>
+
+                        </div>
+
+                    </div>
+                    <!-- Modal/Popup Box LWC footer starts here -->
+
+                </div>
+            </section>
+
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- ************************ CHANGE SHIFT OWNER MODAL ***************************************** -->
+
+        <template if:true={showShiftOwnerModal}>
+            <lightning-record-edit-form record-id={shiftOwnerCaseId} object-api-name="Case" record-type-id={recordTypeId}>
+
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                    aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container" style="width: 70rem">
+                        <!-- Modal/Popup Box LWC header here -->
+                        <header class="slds-modal__header">
+
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                title="Close" onclick={closeShiftOwnerModal}>
+                                <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                                    size="small"></lightning-icon>
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+
+                            <h2 class="slds-text-heading_medium slds-hyphenate">
+                                Change Shift Owner</h2>
+                        </header>
+
+                        <div class="slds-modal__content slds-p-around_medium" style="height: 30vh">
+
+                            <template if:true={showShiftOwnerSpinner}>
+                                <div style="opacity: 0.7;height:95%" class="slds-spinner_container">
+                                    <lightning-spinner alternative-text="Loading" variant="brand" size="medium">
+                                    </lightning-spinner>
+                                </div>
+                            </template>
+                            
+
+                            <!--<lightning-messages></lightning-messages> -->
+
+                            <lightning-input-field variant="label-inline" field-name="Shift_Owner__c" value="" class="shiftOwnerInput" >
+                            </lightning-input-field>
+
+                        </div>
+
+                        <footer class="slds-modal__footer">
+                            <button class="slds-button slds-button_neutral" onclick={handleClearShiftOwner}
+                                title="Clear">Clear Owner</button>
+                            <button class="slds-button slds-button_brand" onclick={handleSubmitShiftOwner}
+                                title="Save">Save</button>
+                        </footer>
+                        <!-- Modal/Popup Box LWC footer starts here -->
+
+                    </div>
+                </section>
+
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </lightning-record-edit-form>
+        </template>
+
+        <!-- ************************ CHANGE CASE OWNER MODAL ***************************************** -->
+
+        <template if:true={showCaseOwnerModal}>
+            
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                    aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container" style="width: 70rem">
+                        <!-- Modal/Popup Box LWC header here -->
+                        <header class="slds-modal__header">
+
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                title="Close" onclick={closeCaseOwnerModal}>
+                                <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                                    size="small"></lightning-icon>
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+
+                            <h2 class="slds-text-heading_medium slds-hyphenate">
+                                Change Case Owner</h2>
+                        </header>
+
+                        <div class="slds-modal__content slds-p-around_medium" style="height: 30vh">
+
+                            <template if:true={showCaseOwnerSpinner}>
+                                <div style="opacity: 0.7;height:95%" class="slds-spinner_container">
+                                    <lightning-spinner alternative-text="Loading" variant="brand" size="medium">
+                                    </lightning-spinner>
+                                </div>
+                            </template>
+
+                            <lightning-record-edit-form record-id={caseOwnerCaseId} 
+                                    object-api-name="Case" 
+                                    onsubmit={onSubmitCaseOwner}
+                                    record-type-id={recordTypeId}>
+                                
+                                <!--    <lightning-messages></lightning-messages> -->
+
+                                <div style="float:left;padding-top: 0.35rem;
+                                        font-size: var(--lwc-formLabelFontSize,0.75rem);
+                                        color: var(--lwc-colorTextLabel,rgb(62, 62, 60));" 
+                                        class="slds-media slds-col slds-size_2-of-6">
+                                    <label for="fieldid">Case Owner</label>
+                                </div>
+                                <div style="float:left;" class="slds-media slds-col slds-size_4-of-6">
+                                    <lightning-input-field variant="label-hidden" field-name="Shift_Owner__c" value=""
+                                        class="caseOwnerInput" style="width:100%;">
+                                    </lightning-input-field>
+                                </div>
+                            </lightning-record-edit-form>
+
+                        </div>
+
+                        <footer class="slds-modal__footer">
+                            <button class="slds-button slds-button_neutral" onclick={handleSubmitCaseOwnerQueue}
+                                title="Clear">Assign to Prolexic Queue</button>
+                            <button class="slds-button slds-button_brand" onclick={handleSubmitCaseOwner}
+                                title="Save">Save</button>
+                        </footer>
+                        <!-- Modal/Popup Box LWC footer starts here -->
+
+                    </div>
+                </section>
+
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            
+        </template>
+
+        <!-- ************************ NEW ESCALATION MODAL ***************************************** -->
+
+        <template if:true={showNewEscModal}>
+            <lightning-record-edit-form 
+                object-api-name="Engagement_Request__c"
+                record-type-id={extTeamRecTypeId} 
+                onsubmit={handleSubmitEsc} 
+                onsuccess={handleSuccessEsc} 
+                onerror={handleErrorEsc}>
+
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+                    <div class="slds-modal__container" style="font-size: 11px;">
+                        <!-- Modal/Popup Box LWC header here -->
+                        <header class="slds-modal__header">
+
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                title="Close" onclick={closeNewEscModal}>
+                                <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                                    size="small"></lightning-icon>
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+
+                            <h2 class="slds-text-heading_medium slds-hyphenate">
+                                New Escalation for {caseAKAMId}</h2>
+                        </header>
+
+                        <div class="slds-modal__content">
+                            <c-sc-external-team-escalation case-rec-id={caseRecordId} new-inline="true">
+                            </c-sc-external-team-escalation>
+                        </div>
+
+                    </div>
+                </section>
+
+            <div class="slds-backdrop slds-backdrop_open"></div>
+            </lightning-record-edit-form>
+        </template>
+
+        <!-- ************************ VIEW TASKS MODAL ***************************************** -->
+
+        <template if:true={showViewTaskModal}>
+
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_large">
+                <div class="slds-modal__container" >
+                    <!-- Modal/Popup Box LWC header here -->
+                    <header class="slds-modal__header">
+
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                            title="Close" onclick={closeViewTaskModal}>
+                            <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                                size="small"></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+
+                        <h2 class="slds-text-heading_medium slds-hyphenate">
+                            <b>Tasks on {caseAKAMId}</b></h2>
+                    </header>
+
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <div>
+                            <template if:true={loadModalSpinner}>
+                                <div style="opacity: 0.7;height:95%" class="slds-spinner_container">
+                                    <lightning-spinner alternative-text="Loading" variant="brand" size="medium">
+                                    </lightning-spinner>
+                                </div>
+                            </template>
+
+                            <template if:true={taskData}>
+                                <lightning-datatable 
+                                    key-field="caseId" 
+                                    data={taskData} 
+                                    columns={taskColumns}
+                                    wrap-text-max-lines="5" 
+                                    hide-checkbox-column=true>
+                                </lightning-datatable>
+                            </template>
+
+                        </div>
+
+                    </div>
+                    <!-- Modal/Popup Box LWC footer starts here -->
+
+                </div>
+            </section>
+
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+    </div>
+
+</template>

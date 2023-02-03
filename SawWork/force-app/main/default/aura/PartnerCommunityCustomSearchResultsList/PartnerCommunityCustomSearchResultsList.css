@@ -1,0 +1,22 @@
+.THIS .circleSpan {
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    padding: 6px;
+
+    background: #fff;
+    border: 2px solid #666;
+    color: #666;
+    text-align: center;
+	float:right;
+    font: 12px Arial, sans-serif;
+}
+
+.THIS.pageSpinner{
+    position: relative;
+    display: inline-block;
+    margin-left: 50%;
+    width: 55px;
+    vertical-align: middle;
+    white-space: nowrap;
+}

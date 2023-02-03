@@ -1,0 +1,122 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" access="global" 
+                controller="GSM_Lite_ContactToLeadCreateController" >
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="contactId" type="String"/>
+    <aura:attribute name="contactDetails" type="Contact"/>
+    <aura:attribute name="productLines" type="String[]"/>
+    <aura:attribute name="leadType" type="String[]"/>
+    
+    <aura:attribute name="productLineValue" type="String"/>
+    <aura:attribute name="successMessage" type="String"/>
+    <aura:attribute name="showPage" type="Boolean" default="false"/>
+    <aura:attribute name="afterInit" type="Boolean" default="false"/>
+    <aura:attribute name="isDoNotCallEmailSet" type="Boolean" default="false"/>
+    <aura:attribute name="showCancelButton" type="Boolean" default="false"/>
+    <aura:attribute name="showError" type="boolean" default="false"/>
+    <aura:attribute name="errorMsg" type="String" default=""/>
+    
+    <aura:attribute name="showSDRLeadType" type="Boolean" default="false"/>
+    <aura:attribute name="parent" type="Aura.Component"/>
+    <aura:method name="setLeadExists" action="{!c.setLeadExistsComponent}" />
+    <aura:method name="createC2ALead" action="{!c.createC2ALeadComponent}" />
+    
+    
+    <aura:attribute name="newLead" type="Lead"
+                    default="{
+                             'Product_Line__c' : '',
+                             'Description' : ''
+                             }"/>
+    
+    <aura:attribute name="ErrorMessage" type="String"/>
+    <aura:attribute name="productSelected" type="String"/>
+    <aura:attribute name="enableButton" type="boolean"/>
+    <aura:attribute name="leadTypeSelected" type="String"/>
+    
+    <aura:attribute name="Notes" type="String"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:if isTrue="{!v.afterInit}">
+        <aura:if isTrue="{!v.showPage}">
+            
+            <div>
+                <center>
+                    <lightning:spinner variant="brand" size="large" aura:id="ltngSpinner" class="slds-hide"/>
+                </center>
+            </div>
+            <!-- Remove this div tag and use generic error aura tag {!v.showError} and {!v.errorMsg} --> 
+            <div class="slds-hide" style="color:red;" aura:id="ErrorMessageId">
+                <p>     Error: </p>
+                <p> {!v.ErrorMessage}</p>
+            </div>
+            <div class="slds-box slds-theme_shade slds-theme_alert-texture slds-hide" 
+                 style="color:green;" aura:id="SuccessId">
+                <p><strong>{!v.successMessage} </strong>
+                    You are getting redirected to the Lead..</p>
+            </div>
+            
+            <div class="slds-panel slds-grid slds-grid_vertical slds-nowrap slds-show"
+                 aura:id="createLeadId">
+                <div class="slds-form slds-form_stacked slds-grow slds-scrollable_y">
+                    <div class="slds-panel__section">
+                        <ul>
+                           <lightning:select aura:id="productNameId" value="{!v.productSelected}" 
+                                              label="Product Line" required="true" onchange="{!c.toggleButton}">
+                                <option text="--none--" label = "--None--"/>
+                                <aura:iteration items="{!v.productLines}" var="val">
+                                    <option text="{!val}" label="{!val}"/>
+                                </aura:iteration>
+                            </lightning:select>
+                            <br/>
+                            
+                            <aura:if isTrue="{!v.showSDRLeadType}">
+                                <lightning:select aura:id="leadTypeId" value="{!v.leadTypeSelected}" 
+                                                  label="Self Generated Lead Type" required="true" onchange="{!c.toggleButton}">
+                                    <option text="--none--" label = "--None--"/>
+                                    <aura:iteration items="{!v.leadType}" var="valType">
+                                        <option text="{!valType}" label="{!valType}"/>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </aura:if>
+                            <br/>
+                            <lightning:textarea name="Notes" value="{!v.Notes}" label="Notes"/>
+                            <br/>
+                            <lightning:button variant="brand" label="Create C2A" 
+                                              iconName="utility:approval" iconPosition="center"
+                                              disabled="{!v.enableButton}"
+                                              onclick="{!c.checkAndCreateLead}" />
+                            <!--div class="slds-hide" aura:id="cancelBtnId"-->
+                            <aura:if isTrue="{!v.showCancelButton}">
+                                <lightning:button variant="brand" label="Cancel" 
+                                                  iconName="utility:approval" iconPosition="center"
+                                                  onclick="{!c.goToContact}" />
+                            </aura:if>
+                            <!--/div-->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- Todo: Modify these 2 errors to use single generic error message aura tag i.e {!v.showError} and {!v.errorMsg} -->
+            <aura:set attribute="else">
+                <ui:message title="Error:" severity="error" closable="false">
+                    You do not have sufficient access to perform this operation.
+                </ui:message>
+                <lightning:button variant="brand" label="Back" 
+                                  iconName="utility:approval" iconPosition="center"
+                                  
+                                  onclick="{!c.goToContact}" />
+            </aura:set>
+            <aura:if isTrue="{!v.isDoNotCallEmailSet}">     
+                <ui:message title="Error:" severity="error" closable="false">       
+                    Cannot create C2A when "Do Not Call" and "Email Opt Out" is checked.     
+                </ui:message>       
+            </aura:if>
+            <aura:if isTrue="{!v.showError}">     
+                <ui:message title="Error:" severity="error" closable="false">       
+                    <p>{!v.errorMsg}</p>     
+                </ui:message>       
+            </aura:if>   
+        </aura:if>
+    </aura:if>
+</aura:component>

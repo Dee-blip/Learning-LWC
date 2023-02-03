@@ -1,0 +1,150 @@
+<aura:component controller="SC_AMG_Lightning" extends="c:AuraUtils" implements="lightning:hasPageReference,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:isUrlAddressable" access="global" >
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>   
+    <aura:handler event="force:refreshView" action="{!c.init}" />
+	<aura:attribute name="taskList" type="Task[]"/>
+    <aura:attribute name="mycolumns" type="List"/>
+    <aura:attribute name="rowSelected" type="Boolean" default="false"/>
+    <aura:attribute name="selectedIds" type="List" />
+    <aura:attribute name="statusValue" type="String" default="Not Started"/>
+    <aura:attribute name="loadSpinner" type="Boolean" default="true" />
+    <aura:attribute name="taskSize" type="Integer" default="0" />
+    <aura:attribute name="displayModal" type="Boolean" default="false" />
+    <aura:attribute name="displayModalRT" type="Boolean" default="false" />
+    <aura:attribute name="lstOfRecordType" type="String[]" />
+    <aura:attribute name="selectedRT" type="String" />
+    <aura:attribute name="sortedBy" type="String" default="AKAM_Modified_Date__c"/>
+    <aura:attribute name="sortedDirection" type="String" default="desc"/>
+     <!-- LOAD MORE DATA ATTRIBUTES -->
+    <aura:attribute name="enableInfiniteLoading" type="Boolean" default="false"/>
+    <aura:attribute name="initialRows" type="Integer" default="50"/>
+    <aura:attribute name="rowsToLoad" type="Integer" default="20"/>
+    <aura:attribute name="totalNumberOfRows" type="Integer" default="0"/>
+    <aura:attribute name="loadMoreStatus" type="String" default="Scroll down to load more!"/>
+    <aura:attribute name="showRowNumberColumn" type="Boolean" default="false"/>
+    <aura:attribute name="rowNumberOffset" type="Integer" default="0"/>
+    <aura:attribute name="rowsToAdd" type="Integer" default="20"/>
+    <aura:attribute name="currentCount" type="Integer" default="50"/>
+
+    <article class="slds-card" >
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                 <div>
+                    <aura:if isTrue="{!v.loadSpinner}">
+                        <div style="opacity: 0.7;" aura:id="spinnerId" class="slds-spinner_container">
+                                <lightning:spinner alternativeText="Loading" variant="brand" size="medium" />
+                        </div>
+                    </aura:if>
+                </div>
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container slds-icon-standard-account" title="Open Activities">
+                        <lightning:icon iconName="standard:task" alternativeText="Open Activities" title="Open Activities" size="small"/>
+                        <span class="slds-assistive-text">Open Activities</span>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <div class="slds-text-title_bold slds-truncate" title="Open Activities">
+                            <span>Open Activities ({!v.taskSize}{!(v.taskSize lt v.totalNumberOfRows)?'+':''})</span>
+                        </div>
+                    </h2>
+                </div>
+                <div class="slds-no-flex slds-grid">
+                    
+                    
+                    <button class="slds-button slds-button_neutral"  disabled="{!!v.rowSelected}" onclick="{!c.showPopupModal}">Change Task Status</button>
+                    
+                    <button class="slds-button slds-button_neutral" onclick="{!c.fetchListOfRecordTypes}">New Task</button>
+                    <button class="slds-button slds-button_neutral" onclick="{!c.createNewEvent}">New Event</button>
+                    <button class="slds-button" label="Refresh"
+                            onclick="{!c.updateTable}">
+                        <lightning:icon iconName="action:refresh" alternativeText="Refresh" size="x-small" />
+                    </button>
+                </div>
+            </header>
+        </div>
+        <div style="height:260px;margin:1%;border:1px rgb(221, 219, 218) solid;">
+            <lightning:datatable data="{! v.taskList }"
+                                 columns="{! v.mycolumns }"
+                                 keyField="id"
+                                 onrowselection="{! c.getSelectedName }"
+                                 sortedBy="{!v.sortedBy}"  
+                                 onsort = "{!c.updateColumnSorting}"
+                                 sortedDirection="{!v.sortedDirection}"
+                                 rowNumberOffset="0"
+                                 onrowaction="{! c.handleRowAction }"
+                                 enableInfiniteLoading="{!v.enableInfiniteLoading}"
+                                 onloadmore="{!c.handleLoadMoreTask}"/>
+            
+        </div>
+        
+    </article>
+    
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~Close Task Modal ~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+ 
+    <aura:if isTrue="{!v.displayModal}">
+        <div class="slds-m-around_xx-large">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modalForChat" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModal }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Select status for task update:</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" aura:id="modalPopUp">
+                        <lightning:select name="Status" label="Status"  value="{!v.statusValue}" >
+                        <option value="Not Started">Not Started</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Not Applicable">Not Applicable</option>
+                        <option value="Postponed - Agreed with Customer/IAT">Postponed - Agreed with Cust./IAT</option>
+                    </lightning:select>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" id="cancelButton" onclick="{!c.closeModal}">Cancel</button>
+                        <button class="slds-button slds-button_neutral " id="updateTask" onclick="{!c.updateTaskStatus}">Save</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+    
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~Record Type Selection Page ~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+ 
+    <aura:if isTrue="{!v.displayModalRT}">
+        <div class="slds-m-around_xx-large">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modalForChat" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModalRT }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Select task record type:</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" aura:id="modalRT">
+                        <lightning:select name="recordType" label="Task record type"  value="{!v.selectedRT}">
+                            <aura:iteration items="{!v.lstOfRecordType}" var="rt">
+                                <option text="{!rt}" value="{!rt}" />
+                            </aura:iteration>
+                        </lightning:select>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" id="cancelButton" onclick="{!c.closeModalRT}">Cancel</button>
+                        <button class="slds-button slds-button_neutral " id="updateTask" onclick="{!c.createNewTask}">Next</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+    
+    
+</aura:component>

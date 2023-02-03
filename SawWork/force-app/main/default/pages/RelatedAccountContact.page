@@ -1,0 +1,56 @@
+<!--=====================================================================================================+
+    Page Name           :   RelatedAccountContact 
+    Author              :   Aditya Sonam
+    Created             :   19-May-2016
+    Purpose             :   This page display BOCC contacts associated with BOCC Case
+
+    Last Modified    Developer   	 CR	 	   Purpose            
+    =============    =========     =======	  =========
+
++=====================================================================================================-->
+
+<apex:page standardController="Case" extensions="RelatedAccountContactController">     
+   <apex:pageBlock id="pbID" > 
+      <apex:pageBlockButtons location="Bottom" rendered ="{!caseContact.size >0}">
+        <apex:outputPanel id="pageButton">
+          <apex:form >   
+            <apex:actionStatus id="status">
+    		  <apex:facet name="start">   
+                 Fetching Records...<img src="/img/loading.gif" />
+                 <div class="waitingSearchDiv" style="background-color: #fbfbfb; height: 100%; opacity: 0.50; width: 100%;position:fixed;z-index:1000;"> 
+                 <div class="waitingHolder" style="top: 50%; width: 100px; position: fixed;z-index: 1001; left: 50%;">    	
+                 </div>
+                 </div>
+     		  </apex:facet>
+   			</apex:actionStatus>
+ 
+            <apex:commandButton status="status" action="{!first}" title="First Page" value="<<" disabled="{! !(hasPrevious)}" reRender="pbID"/>
+            <apex:commandButton status="status" action="{!previous}" title="Previous Page" value="<" disabled="{! !(hasPrevious)}" reRender="pbID"/>
+            <apex:outputText value="Page {!currentPageNumber} of {!totalNumberOfPages}"></apex:outputText>
+            <apex:commandButton status="status" action="{!next}" title="Next Page" value= ">" disabled ="{! !(hasNext)}" reRender="pbID"/>
+            <apex:commandButton status="status" action="{!last}" title="Last Page" value= ">>" disabled ="{! !(hasNext)}" reRender="pbID"/>
+
+          </apex:form>
+        </apex:outputPanel>
+      </apex:pageBlockButtons>
+       
+      <apex:outputLabel value="No BOCC Contact To Display" rendered="{!caseContact.size = 0}" style="font-weight:550;font-style:italic;color:#71981F" ></apex:outputLabel>
+       <apex:outputPanel >
+         <apex:pageBlockTable value="{!caseContact}" var="caseVar" rendered="{!NOT(ISNULL(caseContact))}">                    
+            <apex:column value="{!contactType}">
+               <apex:facet name="header">Contact Type</apex:facet> 
+            </apex:column>
+             <apex:column >
+               <apex:facet name="header">Contact Name</apex:facet>    
+               <a href="/{!caseVar.Id}" target="_blank">{!caseVar.Name}</a>
+             </apex:column>
+             <apex:column value="{!caseVar.Email}">
+             	<apex:facet name="header">Contact Email</apex:facet> 
+             </apex:column>
+             <apex:column value="{!caseVar.Phone}">
+            	 <apex:facet name="header">Contact Phone</apex:facet> 
+             </apex:column>                    
+         </apex:pageBlockTable>
+      </apex:outputPanel>    
+   </apex:pageBlock>
+</apex:page>

@@ -1,0 +1,8 @@
+<template>
+    <p class="slds-truncate slds-p-horizontal_x-small" title={value}>
+        <!-- <lightning-formatted-rich-text value={value}></lightning-formatted-rich-text> -->
+        <template if:true={value}>
+            <lightning-helptext content={value}></lightning-helptext>
+        </template>
+    </p>
+</template>

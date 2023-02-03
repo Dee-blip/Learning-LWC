@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>51.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+            <target>lightning__AppPage</target>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default">
+            <property name="recordId" default="{!recordId}" type="String" label="Record ID"/>
+            <property name="HeaderName" type="String" label="Header Name"/>
+            <property name="ApplicationName" type="String"  label = "Application Name"/>
+            <property name="ParentObject" type="String" label="Parent Object"/>
+            <property name="hideHeader" type="Boolean" label="Hide Header"/>
+            <property name="enablePolling" type="Boolean" label="Enable Polling"/>
+            <property name="pollingInterval" type="Integer" label="Polling Interval" default="60000"/>
+            <property name="isFileUpload" type="Boolean" label="File Upload Available?"/>
+            <property name="visibility" type="String" label="Visibility" default="Public"/>
+        </targetConfig>
+           <targetConfig targets="lightning__RecordPage">
+            <property name="HeaderName" type="String" label="Header Name"/>
+            <property name="ApplicationName" type="String"  label = "Application Name"/>
+            <property name="ParentObject" type="String" label="Parent Object"/>
+            <property name="hideHeader" type="Boolean" label="Hide Header"/>
+            <property name="enablePolling" type="Boolean" label="Enable Polling"/>
+            <property name="pollingInterval" type="Integer" label="Polling Interval" default="60000"/>
+            <property name="isFileUpload" type="Boolean" label="File Upload Available?"/>
+            <property name="visibility" type="String" label="Visibility" default="Public"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

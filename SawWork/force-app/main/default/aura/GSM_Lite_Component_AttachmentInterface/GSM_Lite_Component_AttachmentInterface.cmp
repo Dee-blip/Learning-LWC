@@ -1,0 +1,249 @@
+<aura:component controller="GSM_Lite_Controller_Attachment" implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickAction" access="global">
+<aura:attribute name="recordId" type="String" />	
+<aura:attribute name="fromClassic" type="boolean" default="false" />
+<aura:attribute name="accountId" type="String" />
+<aura:attribute name="accountName" type="String" />	
+<aura:attribute name="selectedEffectiveDate" type="Date" />
+<aura:attribute name="selectedExpirationDate" type="Date" />
+<aura:attribute name="selectedStandardCust" type="String" />
+<aura:attribute name="selectedDocumentType" type="String" />
+<aura:attribute name="optionsDocumentType" type="String[]" />
+<aura:attribute name="optionsStandardCustomized" type="String[]" />
+<aura:attribute name="newDocumentId" type="String" default="" />
+<aura:attribute name="fileName" type="String" default="No File Selected.."  />
+<aura:attribute name="documentName" type="String" default=""  />
+<aura:attribute name="errormessage" type="String" default="" />
+<aura:attribute name="successMessage" type="String" default="" />
+<aura:attribute name="finished" type="Boolean" default="false" />
+<aura:attribute name="hasAccessError" type="Boolean" default="true" />
+<aura:attribute name="originalOpportunityName" type="String" default="" />
+<aura:attribute name="originalOpportunityId" type="String" default="" />
+<aura:attribute name="masterLegalDocObject" type="Legal_Documents__c" />
+
+
+
+ <c:SF1_CustomLoader />
+  <aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
+<div class="slds-box" style=" text-align:center;">
+<aura:if isTrue="{!v.fromClassic}">
+  <div class="slds-media">
+    <div class="slds-media__body" style="background-color:#1589ee; padding:1%;color:white;">
+
+      <h1 class="slds-page-header__title slds-truncate slds-align-middle" >Attach Files</h1>
+     
+    </div>
+
+  </div>
+</aura:if>
+<aura:if isTrue="{!!v.hasAccessError}">
+<div class="slds-page-header">
+  <div class="slds-media">
+    <div class="slds-media__body">
+
+      <h1 class="slds-page-header__title slds-truncate slds-align-middle" ><lightning:icon iconName="standard:account" size="medium" alternativeText="Account" />&nbsp;&nbsp;Account : {!v.accountName}</h1>
+     
+    </div>
+  </div>
+</div>
+<aura:if isTrue="{!v.newDocumentId == '' ? true : false}">
+
+   <lightning:input aura:id="fileId" onchange="{!c.handleFilesChange}" type="file" name="file" label="UPLOAD ATTACHMENT (upto 4.5MB)" multiple="false" disabled="{!v.finished}"/>
+   <div class="slds-text-body_small slds-text-color_error">{!v.fileName} </div>
+ 
+ <!--use aura:if for show-hide the --> 
+ 
+   
+ <br/>
+ <div class=" slds-align_absolute-center">
+  <div class="slds-form slds-form_compound slds-align_absolute-center">
+    <fieldset class="slds-form-element slds-align_absolute-center">
+      <legend class="slds-form-element__label slds-text-title_caps" style="font-weight:bold;">Enter Account Document Details</legend>
+      <div class="slds-form-element__group slds-box">
+
+
+ 
+
+		<aura:if isTrue="{!v.originalOpportunityName != null ? true : false}">
+
+      	  <div class="slds-form-element__row">
+			<div class="slds-form-element" style="text-align:left;">
+            <label class="slds-form-element__label" for="input-01">Original Opportunity</label>
+             <lightning:input type="text" value="{!v.originalOpportunityName}" disabled="true"/>
+        	</div>
+        
+      	  </div>
+      	</aura:if>
+
+      	  <div class="slds-form-element__row">
+			<div class="slds-form-element" style="text-align:left;">
+            <label class="slds-form-element__label" for="input-01">Name <span style="color:red;">*</span></label>
+            <lightning:input type="text" value="{!v.documentName}" />
+        </div>
+        
+      </div>
+        <div class="slds-form-element__row">
+          <div class="slds-form-element" style="text-align:left;">
+            <label class="slds-form-element__label" for="input-01">Effective Date <span style="color:red;">*</span></label>
+            <lightning:input aura:id="mydateId" type="date" value="{!v.selectedEffectiveDate}" />
+          
+          </div>
+      </div>
+      <div class="slds-form-element__row">
+          <div class="slds-form-element" style="text-align:left;">
+            <label class="slds-form-element__label" for="input-01">Expiration Date <span style="color:red;">*</span></label>
+           <lightning:input type="date" value="{!v.selectedExpirationDate}"/>
+          </div>
+      </div>
+      <div class="slds-form-element__row">
+          <div class="slds-form-element" style="text-align:left;">
+            <label class="slds-form-element__label" for="input-02">Document type <span style="color:red;">*</span></label>
+            <lightning:select name="mySelect"  aura:id="docType" value="{!v.selectedDocumentType}">
+        	<aura:iteration items="{!v.optionsDocumentType}" var="item">
+            	<option text="{!item}" value="{!item}"/>
+         	</aura:iteration>
+    		</lightning:select>
+
+          </div>
+        </div>
+       <div class="slds-form-element__row">
+          <div class="slds-form-element " style="text-align:left;">
+            <label class="slds-form-element__label" for="input-02">Standard/Customized <span style="color:red;">*</span></label>
+            <lightning:select name="mySelect"  aura:id="akamaiType" value="{!v.selectedStandardCust}">
+        	<aura:iteration items="{!v.optionsStandardCustomized}" var="item">
+            	<option text="{!item}" value="{!item}"/>
+         	</aura:iteration>
+    		</lightning:select>
+
+          </div>
+        </div>
+
+
+         <div class="slds-form-element__row">
+          <div class="slds-form-element " style="text-align:left;width:100%;">
+            <label class="slds-form-element__label" for="input-02">Master Legal Document :</label>
+            <c:SF1_LookupComponent placeholderText="Legal Doc" type="Legal_Documents__c" valueSObject="{!v.masterLegalDocObject}"  fieldsToShowInSuggestion="Document_Type__c" />
+            
+        	
+
+          </div>
+        </div>
+
+      </div>
+         
+    </fieldset>
+
+
+</div>
+
+</div>
+</aura:if>
+ <aura:if isTrue="{!v.newDocumentId != '' ? true : false}">
+
+ <div class="slds-text-body_medium " style="color:green;"><lightning:icon iconName="action:approval" size="xx-small" alternativeText="success"/>&nbsp;{!v.fileName} </div>
+ <br/>
+<div class=" slds-align_absolute-center">
+  <div class="slds-form slds-form_compound slds-align_absolute-center">
+    <fieldset class="slds-form-element slds-align_absolute-center">
+      <legend class="slds-form-element__label slds-text-title_caps" style="font-weight:bold;">Account Document Details</legend>
+      <div class="slds-form-element__group slds-box">
+      	  <div class="slds-form-element__row">
+			<div class="slds-form-element">
+            <label class="slds-form-element__label" for="input-01">Name :</label>
+            <lightning:formattedText value="{!v.documentName}" />
+        </div>
+        
+      </div>
+
+
+      <div class="slds-form-element__row">
+          <div class="slds-form-element " style="text-align:left;">
+            <label class="slds-form-element__label" for="input-02">Original Opportunity :</label>
+            <lightning:formattedText value="{!v.originalOpportunityName}" />
+        	
+
+          </div>
+        </div>
+
+        <div class="slds-form-element__row">
+          <div class="slds-form-element" style="text-align:left;">
+            <label class="slds-form-element__label" for="input-01">Effective Date :</label>
+            <lightning:formattedText value="{!v.selectedEffectiveDate}" />
+          
+          </div>
+      </div>
+      <div class="slds-form-element__row">
+          <div class="slds-form-element" style="text-align:left;">
+            <label class="slds-form-element__label" for="input-01">Expiration Date :</label>
+           <lightning:formattedText value="{!v.selectedExpirationDate}"/>
+          </div>
+      </div>
+      <div class="slds-form-element__row">
+          <div class="slds-form-element" style="text-align:left;">
+            <label class="slds-form-element__label" for="input-02">Document type :</label>
+            <lightning:formattedText value="{!v.selectedDocumentType}" />
+
+
+          </div>
+        </div>
+       <div class="slds-form-element__row">
+          <div class="slds-form-element " style="text-align:left;">
+            <label class="slds-form-element__label" for="input-02">Standard/Customized :</label>
+            <lightning:formattedText value="{!v.selectedStandardCust}" />
+        	
+
+          </div>
+        </div>
+
+
+
+     
+      <div class="slds-form-element__row">
+          <div class="slds-form-element " style="text-align:left;">
+            <label class="slds-form-element__label" for="input-02">Master Legal Document :</label>
+            <lightning:formattedText value="{!v.masterLegalDocObject.Name}" />
+        	
+
+          </div>
+        
+
+      </div>
+     </div>
+    </fieldset>
+
+
+</div>
+
+</div>
+ </aura:if>
+
+</aura:if>
+
+ <!-- <aura:if isTrue="{!v.fromClassic}"> -->
+ 	
+    <br/>
+    <aura:if isTrue="{!v.finished}">
+    	<button class="slds-button slds-button_brand" onclick="{!c.doBack}">Back to Record</button>
+    </aura:if>
+    <aura:if isTrue="{!!v.finished}">
+   		<button class="slds-button slds-button_brand" disabled="{!v.newDocumentId != '' ? true : false}" onclick="{!c.doSave}">Upload Attachment</button>
+	</aura:if>
+
+
+
+
+  <aura:if isTrue="{!v.errormessage != '' ? true : false}">
+      
+      <ui:message title="Error" severity="error" closable="false">
+        {!v.errormessage}
+      </ui:message>
+      
+   </aura:if>
+	<aura:if isTrue="{!v.successMessage != '' ? true : false}">
+      
+      <ui:message title="Success" severity="confirm" closable="false">
+        {!v.successMessage}
+      </ui:message>
+      
+    </aura:if>
+</div>
+</aura:component>

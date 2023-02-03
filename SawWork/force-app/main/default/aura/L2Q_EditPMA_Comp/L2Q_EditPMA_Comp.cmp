@@ -1,0 +1,43 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="L2Q_PAEOverrideController">
+    <aura:attribute name="opportunityId" type="string" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="pmaId" type="string"/>
+    <aura:attribute name="partnerInvolved" type="string"/>
+    <aura:attribute name="whereClause" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="pageMessage" type="string" default=""/>
+    <aura:attribute name="msgSeverity" type="string" />
+    
+    <!-- Spinner -->
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner />
+    </aura:if>
+    
+    <!-- Page Message -->
+    <aura:if isTrue="{!v.pageMessage != ''}">
+        <ui:message title="Error" severity="{!v.msgSeverity}">
+            {!v.pageMessage}
+        </ui:message>
+    </aura:if>
+    
+    <!-- Page Markups -->
+    <div class="slds-grid slds-wrap" style="height:500px;padding-left:5px">
+        <div class="slds-col slds-size_1-of-2">
+            <b class="header-text" style="font-size:15px;">Edit Partner Marketing Activity</b>
+            <br></br><br></br>
+            <div>
+                <label class="slds-form-element__label" for="combobox-unique-id">
+                    <span style="color: red">*</span>
+                    Partner Marketing Activity
+                </label>
+                <c:SF1_LookupComponent aura:id="field" whereClause="{!v.whereClause}" placeholderText="Partner Marketing Activity" type="Partner_Marketing_Activity__c" value="{!v.pmaId}" fieldsToShowInSuggestion="createddate" requiredField="true"/>
+            </div>
+            <div class="slds-m-top_medium" style="margin-top:20px;">
+                <lightning:button variant="neutral" name="cancel" label="Cancel" onclick="{!c.handleCancel}"/>
+                <lightning:button variant="brand" name="save" label="Save" onclick="{!c.handleSave}"/>
+            </div>
+        </div>
+        <div class="slds-col slds-size_1-of-2">&nbsp;</div>
+    </div>
+    
+</aura:component>

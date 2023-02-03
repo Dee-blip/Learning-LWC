@@ -1,0 +1,13 @@
+NAME,VALUE__C
+leadQualityForPartner,Partner
+QFAJob#ExcludedLeadStatuses,"Converted,Sales-Converted,Sales-Rejected"
+QFAJob#Countries,"USA,Canada"
+QFAJob#ExcludedAccountStatuses,"ISP - Active,Multiple w ISP - Active"
+QFAJob#ExcludedCampaignOwners,Lauren Fermani
+QFAJob#LastNDays,7
+QFAJob#MaxLeadsLimit,100
+QFAJob#ProspectOrCustomer,Customer
+QFAJob#RecordTypes,012A0000000Cy1zIAC
+QFAJob#ErrorEmailToList,"hchawda@akamai.com,svijayal@akamai.com,pbalacha@akamai.com,sraj@akamai.com"
+QFAJob#AweRecordTypeId,012A00000003Df7
+QFAJob#PendingLeadsEmail,"hchawda@akamai.com,svijayal@akamai.com"

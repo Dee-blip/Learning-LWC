@@ -1,0 +1,320 @@
+<aura:component controller="SF1_Controller_TaskInterfaceClass" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+
+
+
+  <!-- Attributes-->  
+    <!-- START Required Attribute --> 
+   <aura:attribute name="taskId" type="String" required="true" default="null"/> 
+      <!-- END Required Attribute --> 
+
+   <aura:attribute name="currentUserName" type="String" />   
+   <aura:attribute name="taskComment" type="String" /> 
+   <aura:attribute name="taskSubject" type="String" /> 
+   <aura:attribute name="taskStatus" type="String" /> 
+   <aura:attribute name="taskType" type="String" /> 
+   <aura:attribute name="taskAssignedTo" type="String" /> 
+   <aura:attribute name="taskAssignedToID" type="String" /> 
+   <aura:attribute name="taskRelatedTo" type="String" /> 
+   <aura:attribute name="taskUserOfficePhone" type="String" /> 
+   <aura:attribute name="taskUserCellPhone" type="String" /> 
+   <aura:attribute name="relatedObjectId" type="String" />
+   <!--<aura:attribute name="legalFollowUpNeeded" type="boolean" />-->
+   <aura:attribute name="newtaskCommentInputbyUser" type="String" /> 
+   <aura:attribute name="displayModal" type="Boolean" default="false"/>
+   <aura:attribute name="displayUserModal" type="Boolean" default="false"/>
+   <aura:attribute name="displayEditModal" type="Boolean" default="false"/>
+   <aura:attribute name="atMentionUserId" type="User" />
+   <aura:attribute name="atMentionUserList" type="User[]" />
+   <aura:attribute name="updateTaskObject" type="Task"  default="{ 'sobjectType': 'Task',}"/>
+   <aura:attribute name="taskStatusValues" type="String[]" />
+   <aura:attribute name="taskEditError" type="String" default="" />
+   <aura:attribute name="taskDueDate" type="String" />
+ 
+   <!-- HANDLERS and EVENTS-->
+   <aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
+   
+   <aura:registerEvent name="nagivateToTaskApp" type="c:SF1_NavigationBetweenComponentsEvent"/>
+
+<!-- START  HTML BODY-->
+
+<div class="slds-grid slds-wrap" style="height:97vh;width:97vw;">
+
+<c:SF1_CustomLoader />
+
+<!-- START Task information section -->
+<div class="slds-col slds-size--1-of-1">
+<div class="slds-box slds-box_x-small slds-theme_shade slds-text-body_small" style="background-color: #e6f0ff;" aura:id="taskInfoSection">
+  <table>
+
+    <tr>
+      <td style="width:10%">
+<lightning:icon iconName="standard:task" variant="inverse" size="medium" alternativeText="task" />  
+</td>
+<td style="width:85%; padding-left:2%;">
+<b>Task : </b><ui:outputText value="{!v.taskSubject}" />
+</td>
+<td style="width:5%">
+  <lightning:buttonIcon iconName="utility:threedots_vertical" variant="bare" onclick="{!c.showEditModal}" alternativeText="Call user" size="large"/>
+  </td>
+</tr>
+<tr>
+  <td>
+  </td>
+  <td>
+    <div style="font-size: 0.8em;text-align: center;color:#808080; font-weight: bold;">
+<ui:outputText value="{!v.taskType}" /> &nbsp;.&nbsp; <ui:outputText value="{!v.taskStatus}" />&nbsp;.&nbsp; <ui:outputText value="{!v.taskDueDate}" />
+</div>
+</td>
+</tr>
+<tr>
+  <td>
+  </td>
+  <td style="padding-left:2%;padding-top:1%">
+    <table>
+    <tr>
+      <td style="text-align:center;"> 
+        <button class="slds-button slds-button_neutral" style="font-size: 0.775em;" onclick="{! c.loadOAAndTaskComponent }"> Order Approval Tasks
+        </button>
+      </td>
+    </tr>
+    </table>
+  </td>
+</tr>
+</table>
+
+</div>
+</div>
+<!-- END   Task information section -->
+
+<!-- <div style="padding-top: 5px;"></div> -->
+
+
+
+<!-- START Call selection popup -->
+
+ <aura:if isTrue="{!v.displayModal}">
+    <div>
+        <div aria-hidden="false" role="dialog" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container" role="document" tabindex="0">
+                <div class="slds-modal__menu" style="text-align:center;">
+                    <div class="slds-box slds-box_xx-small" style="background-color:#ccddff; margin-bottom:3%;">
+  
+  &nbsp;<lightning:icon iconName="standard:user" variant="inverse" size="small" alternativeText="User" /> 
+  &nbsp;&nbsp;<ui:outputText value="{!v.taskAssignedTo}" />
+                        
+</div>
+                    
+                  <aura:if isTrue="{!v.taskUserCellPhone != null}">
+                    <div class="slds-button slds-button--neutral">
+                      <table>
+                        <tr><!-- <td class="slds-size_1-of-3">
+                      <lightning:icon iconName="custom:custom28" variant="inverse" size="small" alternativeText="User" />
+                                          </td> -->
+                    <td style="text-align:center;">
+                      <a href="{!'tel:'+v.taskUserCellPhone}">Cell:&nbsp;&nbsp;{!v.taskUserCellPhone}</a>
+                    </td>
+                </tr>
+            </table>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.taskUserOfficePhone != null}">
+                    <div class="slds-button slds-button--neutral" >
+                      <table>
+                        <tr><!-- <td class="slds-size_1-of-3">
+                      <lightning:icon iconName="custom:custom22" variant="inverse" size="small" alternativeText="User" />
+                    </td> -->
+                    <td style="text-align:center;">
+                      <a href="{!'tel:'+v.taskUserOfficePhone}">Phone:&nbsp;&nbsp;{!v.taskUserOfficePhone}</a></td></tr></table>
+                    </div>
+                </aura:if>
+                    <button class="slds-button slds-button--neutral" onclick="{!c.hideModal}">
+                      Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </div>
+</aura:if>
+<!-- END Call selection popup -->
+
+<!-- START @User selection popup -->
+
+ <aura:if isTrue="{!v.displayUserModal}">
+    <div>
+        <div aria-hidden="false" role="dialog" class="slds-modal slds-fade-in-open">
+                              
+            <div class="slds-modal__container" role="document" tabindex="0">
+
+              <div class="slds-modal__menu">
+                    <div > 
+                      
+
+                      <c:SF1_LookupComponent placeholderText="User" type="User" valueSObject="{!v.atMentionUserId}"  fieldsToShowInSuggestion="User.FirstName" />
+                    </div>
+                    <table>
+                      <tr>
+                      <td>
+                    <lightning:buttonIcon iconName="utility:success" variant="bare" onclick="{! c.selectUserModal }" alternativeText="Select User" size="large"/>
+                </td>
+            <td>
+
+                    <lightning:buttonIcon iconName="utility:clear" variant="bare" onclick="{! c.cancelUserModal }" alternativeText="Cancel User" size="large"/></td>
+                </tr>
+            </table>
+
+               
+                   
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </div>
+</aura:if>
+<!-- END @User selection popup -->
+
+<!-- START EDIT TASK popup -->
+
+ <aura:if isTrue="{!v.displayEditModal}">
+    <div>
+        <div aria-hidden="false" role="dialog" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container" role="document" tabindex="0">
+
+                <div class="slds-modal__menu" style="text-align:center;font-size: 0.8em;">
+                <div class="slds-box slds-box_small" style="background-color: #e6f0ff;">
+                <b><ui:outputText value="{!v.taskSubject}" /></b>
+              </div>
+                  <div class="slds-box slds-box_small">
+                   <div class="slds-form--stacked">
+            
+           <div class="slds-form-element slds-is-required">
+                  <div class="slds-form-element__control" >
+                    <table>
+                      <tr ><td>Status</td><td>
+                                  <lightning:select value="{!v.updateTaskObject.Status}">
+                                        
+                                        <aura:iteration items="{!v.taskStatusValues}" var="val">
+                                          <option text="{!val}" label="{!val}"/>
+                                      </aura:iteration>
+                                  </lightning:select>
+                   
+               
+
+
+               </td>
+                            </tr>
+                            <!--<tr><td style="padding:3%;"></td></tr>
+                            <tr>
+                              <td>Legal Followup Needed?</td>
+                              <td>
+        <ui:inputCheckbox value="{!v.updateTaskObject.Legal_Followup_Needed__c}"/>
+      </td></tr>-->
+      <tr><td style="padding:3%;"></td></tr>
+                            <tr>
+                              <td>Due Date</td>
+                              <td>
+        <ui:inputDate displayDatePicker="true" value="{!v.updateTaskObject.ActivityDate}"/>
+      </td></tr>
+       <tr><td style="padding:3%;"></td></tr>
+                                  <tr>
+                              <td>Associated To</td>
+                              <td>
+                                 <c:SF1_LookupComponent placeholderText="User" type="User" value="{!v.updateTaskObject.OwnerId}"  fieldsToShowInSuggestion="User.FirstName" />
+        
+      </td></tr>
+
+  <tr><td style="padding:3%;"></td></tr>
+                      <tr >
+                        <td style="padding-right:2%;">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.saveEditModal}">
+                      Save
+                    </button>
+                  </td>
+                  <td style="padding-left:10%;">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.cancelEditModal}">
+                      Cancel
+                    </button>
+                  </td>
+                </tr>
+              </table>
+                             </div>
+
+            </div>
+              </div>
+                </div>
+                <aura:if isTrue="{!v.taskEditError != ''}">
+                <div class="slds-box slds-box_small" style="color:red;font-weight:bold;">
+                   <ui:outputText value="{!v.taskEditError}" />
+                </div>
+              </aura:if>
+            </div>
+        </div>
+      </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </div>
+</aura:if>
+<!-- END EDIT TASK popup -->
+
+<div class="slds-col slds-size--1-of-1">
+<!-- START  TaskAssignedTo information section -->
+<div class="slds-col slds-size--1-of-1">
+<div class="slds-box slds-box_xx-small slds-text-body_small" style="background-color:#ccddff;">
+  <table>
+    <tr>
+      <td>
+  &nbsp;<lightning:icon iconName="standard:user" variant="inverse" size="small" alternativeText="User" /> 
+  &nbsp;&nbsp;<ui:outputText value="{!v.taskAssignedTo}" /> 
+</td>
+<td style="text-align:right;">  
+  <lightning:buttonIcon iconName="utility:call" variant="bare" onclick="{!c.showModal}" alternativeText="Call user" size="large"/>  
+</td>
+</tr>
+</table>
+</div>
+
+<!-- END TaskAssignedTo information section -->
+
+<!-- START  Task comment section -->
+
+  
+<div class="slds-box slds-box_small   slds-scrollable slds-theme_default slds-text-body_small" style="height:58vh;width:100%;">
+       
+  <ui:outputText value="{!v.taskComment}" /> <br/><br/>
+
+</div>
+
+<!-- END  Task comment section-->
+
+<!-- START  Task Message Input section-->
+
+<div class="slds-box slds-box_xx-small" style="width:100%; background-color:#ccddff;font-size: 0.8em;">
+<table>
+  <tr>
+<td class="slds-size_1-of-8">
+   &nbsp;
+     <lightning:buttonIcon iconName="utility:adduser" variant="bare" onclick="{! c.showUserModal }" alternativeText="Send message" size="large"/>
+   
+</td>
+<td class="slds-size_6-of-8"> 
+    <ui:inputTextArea aura:id="taskCommentInputId" value="{!v.newtaskCommentInputbyUser}" rows="3" placeholder="Type a message" class="slds-textarea" focus="{!c.commentBoxInFocus}" blur="{!c.commentBoxOutFocus}"/>
+</td>
+<td class="slds-size_1-of-8">
+   &nbsp;
+     <lightning:buttonIcon iconName="utility:success" variant="bare" onclick="{! c.submitComment }" alternativeText="Send message" size="large"/>
+   
+</td>
+</tr>
+</table>
+</div>
+</div>
+
+<!-- END  Task Message Input section-->
+
+</div>
+</div>
+
+ 
+
+
+
+</aura:component>

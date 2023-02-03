@@ -1,0 +1,49 @@
+.THIS .visible {
+    display:none;
+}
+.THIS .floatRight {
+    float: right; 
+}
+
+.THIS.floatRight {
+    float: right; 
+}
+.THIS.customRadioCls .slds-form-element__control .slds-radio{
+    display : inline-block !important;
+}
+
+.THIS .customRadioCls .slds-form-element__control .slds-radio{
+    display : inline-block !important;
+}
+
+
+.THIS .header {
+    padding: 7px;
+    /* text-align: center; */
+    background:white;
+    color: black;
+    /* font-size: 30px; */
+    border-bottom: 1px solid rgba(0, 153, 204, 1);
+    border-bottom-width: 2px;
+    position: relative;
+    
+    
+  }
+
+  .THIS .inputHeight 
+  {
+     min-height: 20%;
+  }
+
+  .THIS .borderRadius
+  {
+    border-radius: 0.25rem;
+  }
+
+  .THIS.borderRadius
+  {
+    border-radius: 10rem;
+  }
+  .THIS .slds-pill__remove{
+    display:none;
+}

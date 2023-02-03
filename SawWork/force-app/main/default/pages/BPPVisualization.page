@@ -1,0 +1,133 @@
+<apex:page standardController="Lead" extensions="BPPVisualizationController" Title="BPP" sideBar="false" showHeader="false" lightningStylesheets="true">
+<!-- docType="html-5.0" --> 
+<!--<style type="text/css">
+		#col1,#col2,#col3,#col4{width:49%;display:inline-block;background-color: #F7F7FA;border-radius: 5px;}
+		#row1{height:10vh; width:94%;background-color: #F7F7FA;border-radius: 5px;padding-top: 10px;padding-right: 3px;padding-bottom: 5px;padding-left: 50px;}
+		#row2{height:100%;width:100%;}
+		#row3{height:10px;width:100%;}
+		#half{height:50%;}
+	</style>-->
+	<style>
+thead, th {text-align: center;}
+function refreshPage(){
+	alert('alert');
+	alert('{!redirectUrl}');
+    window.top.location.href =  '{!redirectUrl}';//define this in the controller
+}
+.rowWithBorder {
+        border-bottom: 1pt solid black;
+    }
+</style>
+	<apex:form >
+	<!-- title="BPP Visualization"  -->
+		<apex:pageBlock id="block" mode="detail">
+			<apex:pageMessages escape="false" />
+            <apex:pageBlockButtons location="top" rendered="{!editing}">
+                <center>
+                    <apex:commandButton value="Update C2A" action="{!SaveLead}" status="saving" rerender="block"/>
+                    <apex:commandButton value="Cancel" action="{!OnCancel}"/>
+                    <apex:actionStatus id="saving">
+                        <apex:facet name="start">
+                            <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.25; z-index: 1000; background-color: black;">
+                                &nbsp;
+                            </div>
+                            <div style="position: fixed; left: 0; top: 0; bottom: 0; right: 0; z-index: 1001; margin: 10% 50%">
+                                <div style="display: inline-block; padding: 2px; background-color: #fff; width: 175px;">
+                                    <img src="/img/loading.gif" style="float: left; margin: 8px;" />
+                                    <span style="display: inline-block; padding: 10px 0px;">Updating C2A record...</span>
+                                </div>
+                            </div>
+                        </apex:facet>
+                    </apex:actionStatus>
+                </center>    
+            </apex:pageBlockButtons>
+			<apex:pageBlockSection columns="2">
+				<apex:pageBlockSection columns="1">
+					<!-- <apex:pageBlockSectionItem> -->
+					<apex:dataTable value="{!barGraphData}" var="bgd" frame="border" width="550px" rules="cols" rowclasses="rowWithBorder" headerClass="rowWithBorder" >
+				    <!-- cols -->
+				       <apex:column >
+				        <apex:facet name="header">Summary </apex:facet> 
+				        <apex:outputText value="{!bgd.att}" style="text-align:center;"/>        
+				      </apex:column>
+				      
+				      
+				      <apex:column style="background-color:{!bgd.E};">
+				        <apex:facet name="header">E</apex:facet>
+				      </apex:column>
+				      
+				      <apex:column style="background-color:{!bgd.QE};">
+				        <apex:facet name="header">QE</apex:facet>
+				        <!-- <apex:outputText >{!a.type}</apex:outputText> -->
+				      </apex:column>      
+				      
+				      <apex:column style="background-color:{!bgd.QL};">
+				        <apex:facet name="header">QL</apex:facet>
+				        <!-- <apex:outputText >{!a.industry}</apex:outputText> -->
+				      </apex:column> 
+
+				      <apex:column style="background-color:{!bgd.O};">
+				        <apex:facet name="header">O</apex:facet>
+				        <!-- <apex:outputText >{!a.industry}</apex:outputText> -->
+				      </apex:column>  
+
+				      <apex:column >
+				        <apex:facet name="header"></apex:facet>
+				        <apex:outputText >{!bgd.Letter}</apex:outputText>
+				      </apex:column>    
+				    
+				    </apex:dataTable>  
+			    <!-- </apex:pageBlockSectionItem> -->
+				</apex:pageBlockSection>
+				<apex:pageBlockSection columns="1">
+					<apex:selectList id="picklist1" rendered="{!IF((leadObj.adg_Lead_Qual_Stg_Performance__c ='Qualified Lead - Warm' || leadObj.adg_Lead_Qual_Stg_Performance__c ='Qualified Lead - Hot') && isRecordtypeakamai ,true,false)}" value="{!leadObj.adg_Status_Performance__c}" size="1" label="Status - Performance" >
+            			<apex:selectOptions value="{!perfoptions}"/>
+            			<apex:actionSupport event="onchange" action="{!OnEdit}"/>
+	        		</apex:selectList>
+	        		<!-- <apex:outputField value="{!leadObj.adg_Status_Performance__c}" rendered="{!IF(leadObj.adg_Lead_Qual_Stg_Performance__c ='Qualified Lead - Warm' || leadObj.adg_Lead_Qual_Stg_Performance__c ='Qualified Lead - Hot' ,true,false)}">
+
+                    <apex:inlineEditSupport  event="ondblclick" changedStyleClass="myBoldClass" />
+                    <apex:actionSupport event="onchange" action="{!OnEdit}"/>
+                	</apex:outputField> -->
+
+	        		<apex:selectList id="picklist2" rendered="{!IF((leadObj.adg_Lead_Qual_Stg_Growth__c ='Qualified Lead - Warm' || leadObj.adg_Lead_Qual_Stg_Growth__c ='Qualified Lead - Hot') && isRecordtypeakamai ,true,false)}" value="{!leadObj.adg_Status_Growth__c}" size="1" label="Status - Growth">
+	            		<apex:selectOptions value="{!growthoptions}"/>
+	            		<apex:actionSupport event="onchange" action="{!OnEdit}"/>
+	        		</apex:selectList>
+	        		<apex:selectList id="picklist3" rendered="{!IF((leadObj.adg_Lead_Qual_Stg_Security__c ='Qualified Lead - Warm' || leadObj.adg_Lead_Qual_Stg_Security__c ='Qualified Lead - Hot') && isRecordtypeakamai ,true,false)}" value="{!leadObj.adg_Status_Security__c}" size="1" label="Status - Security">
+	            		<apex:selectOptions value="{!secoptions}"/>
+	            		<apex:actionSupport event="onchange" action="{!OnEdit}"/>
+	        		</apex:selectList>
+	        		<apex:selectList id="picklist4" rendered="{!IF((leadObj.adg_Lead_Qual_Stg_Cost__c ='Qualified Lead - Warm' || leadObj.adg_Lead_Qual_Stg_Cost__c ='Qualified Lead - Hot') && isRecordtypeakamai ,true,false)}" value="{!leadObj.adg_Status_Cost__c}" size="1" label="Status - Monetization and Cost">
+	            		<apex:selectOptions value="{!costoptions}"/>
+	            		<apex:actionSupport event="onchange" action="{!OnEdit}" />
+	            		<!-- oncomplete="refreshPage();" -->
+	        		</apex:selectList>
+	        		<apex:selectList id="picklist5" rendered="{!IF((leadObj.adg_Lead_Qual_Stg_UX__c ='Qualified Lead - Warm' || leadObj.adg_Lead_Qual_Stg_UX__c ='Qualified Lead - Hot') && isRecordtypeakamai ,true,false)}" value="{!leadObj.adg_Status_UX__c}" size="1" label="Status - UX">
+	            		<apex:selectOptions value="{!uxOptions}"/>
+	            		<apex:actionSupport event="onchange" action="{!OnEdit}"/>
+	        		</apex:selectList>
+	        		<!-- <apex:outputField value="{!lead.First_SLA__c}"/>
+	        		<apex:outputField value="{!lead.Last_SLA__c}"/> -->
+	        		<apex:outputField value="{!lead.DoNotCall}"/>
+                    <apex:outputField value="{!lead.HasOptedOutOfEmail}"/>
+	        		<!-- SFDC-5166 -->
+	        		<!-- <apex:outputField value="{!lead.adg_Self_Generated_Lead_Type__c}"/> -->
+	        		<apex:repeat value="{!$ObjectType.Lead.FieldSets.Annuitas_Demand_Gen_Page_Fields}"  var="f">
+									<!--    -->
+									<apex:outputField value="{!Lead[f]}" />
+						</apex:repeat>
+				</apex:pageBlockSection>
+			</apex:pageBlockSection>
+			<!-- <apex:actionStatus id="status" startText="Searching... please wait..."/> -->
+			<apex:outputPanel rendered="{!refreshPage}">
+			   <script>
+			      window.top.location='/{!Lead.id}';
+			   </script>
+			</apex:outputPanel>
+
+            
+		</apex:pageBlock>
+	</apex:form>
+	
+</apex:page>

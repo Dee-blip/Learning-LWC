@@ -1,0 +1,2 @@
+<apex:page controller="SelectAssociationOnRecordController" action="{!addPreferredAccountAssociation}">
+</apex:page>

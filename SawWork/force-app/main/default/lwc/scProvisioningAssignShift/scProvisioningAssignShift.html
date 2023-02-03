@@ -1,0 +1,35 @@
+<template>
+    <div>
+        <template if:true={loadSpinner}>
+            <div style="opacity: 0.7;" class="slds-spinner_container">
+                <lightning-spinner alternative-text="Loading" variant="brand" size="medium">
+                </lightning-spinner>
+            </div>
+        </template>
+    </div>
+
+    <lightning-card  title="Assign Shift">
+        <header class="slds-media slds-media_center slds-has-flexi-truncate">
+            <div class="slds-media slds-col slds-size_3-of-4">
+                <lightning-combobox
+                    name="Assign Shift"
+                    value={shiftSelected}
+                    options={shiftSelectedVal}
+                    onchange={shiftSelectedChanged}
+                    style="width: 110%;
+                    padding-left: 1rem;
+                    padding-bottom: 0.5rem;
+                    margin-top: -1rem;
+                    padding-top: 0.5rem;"
+                ></lightning-combobox>
+            </div>
+
+            <div class="slds-media slds-col slds-size_1-of-4" style="padding-left: 1.5rem;">
+                <lightning-button variant="brand" disabled={disableSave} label="Save" title="Save"
+                    onclick={saveShift} class="slds-button slds-m-left_x-small">
+                </lightning-button>
+            </div>
+        </header>
+    </lightning-card>
+
+</template>

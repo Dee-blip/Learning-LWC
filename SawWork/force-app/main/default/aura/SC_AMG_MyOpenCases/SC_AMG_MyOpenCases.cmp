@@ -1,0 +1,430 @@
+<aura:component controller="SC_AMG_Home_Lightning" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" extends="c:AuraUtils" >
+    
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <lightning:navigation aura:id="navService"/>
+    <lightning:navigation aura:id="navigation"/>
+    <!--<aura:registerEvent name="DoneLoading" type="c:DoneLoading" />-->
+    <aura:registerEvent name="passFilterValEvt" type="c:SC_AMG_PassFilterValue_Event" />
+    
+    
+    <!-- HANDLERS -->
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:handler name="render" value="{!this}" action="{!c.afterRender}"/>
+    <aura:handler name="change" value="{!v.filterVal}" action="{!c.updateTable}"/>
+    <aura:handler name="Loading" event="c:Loading" action="{!c.spinnerShow}" />
+    <aura:handler name="DoneLoading" event="c:DoneLoading" action="{!c.spinnerHide}" />
+    <aura:handler event="c:refreshParentComp_Event" action="{!c.refreshCmp}"/>
+    <aura:handler name="destroy" value="{!this}" action="{!c.handleDestroy}"/>
+    
+    <!-- ATTRIBUTES -->    
+    <aura:attribute name="casesCount" type="Integer" access= "global" default="-1"/>
+    
+    <aura:attribute name="columns" type="List" default="[]"/>
+    
+    <aura:attribute name="data" type="List" access= "global" default="[]"/>
+    <aura:attribute name="dataFiltered" type="List" access= "global" default="[]"/>
+    <aura:attribute name="filteredDataCount" type="Integer" default="0"/>
+    
+    <aura:attribute name="keyField" type="String" default="caseRecId"/>
+    <aura:attribute name="caseListToIterate" type="Case" access="global"/>
+    <aura:attribute name="fieldsList" type="List" default="[]"/>
+    <aura:attribute name="selectedRowsCount" type="Integer" default="0"/>
+    <aura:attribute name="recId" type="Id" />
+    <aura:attribute name="showPop" type="boolean" default="false" />
+    <aura:attribute name="loadSpinner" type="Boolean" default="false" />
+    <aura:attribute name="loadButtonSpinner" type="Boolean" default="false" />
+    <aura:attribute name="loadBackupSpinner" type="Boolean" default="false" />
+    <aura:attribute name="disableBackupButtons" type="Boolean" default="false" />
+    
+    <aura:attribute name="fieldList" type="String[]" />
+    <aura:attribute name="idList" type="String[]" />
+    
+    <aura:attribute name="filterVal" type="String" default="My Open Cases"/>
+    <aura:attribute name="myCaseSearchText" type="String" default=""/>
+    
+    <aura:attribute name="sortedBy" type="String" default="agedays"/>
+    <aura:attribute name="sortedDirection" type="String" default="asc"/>
+	
+    <aura:attribute name="slaAlertCount" type="Integer" access= "global" default="0"/>
+    <aura:attribute name="slaAlertColour" type="String" access= "global" default="green"/>
+    <aura:attribute name="ageingCasesCount" type="Integer" access= "global" default="0"/>
+    <aura:attribute name="ageingCasesColour" type="String" access= "global" default="green"/>
+    <aura:attribute name="escalationsCount" type="Integer" access= "global" default="0"/>
+    <aura:attribute name="siCount" type="Integer" access= "global" default="0"/>
+    <aura:attribute name="pageReference" type="Object"/>
+	
+    <aura:attribute name="akachatTranscript" type="String" default="chat"/>
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isBackupModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="userAvailable" type="boolean" default="true"/>
+    <aura:attribute name="userRecordId" type="String"/>
+    <aura:attribute name="backupUser" type="Id"/>
+    <aura:attribute name="backupUserName" type="String"/>
+    <aura:attribute name="backupSet" type="boolean" default="false"/>
+    
+    <!-- LOAD MORE DATA ATTRIBUTES -->
+    <aura:attribute name="enableInfiniteLoading" type="Boolean" default="true"/>
+    <aura:attribute name="initialRows" type="Integer" default="50"/>
+    <aura:attribute name="rowsToLoad" type="Integer" default="20"/>
+    <aura:attribute name="totalNumberOfRows" type="Integer" default="0"/>
+    <aura:attribute name="loadMoreStatus" type="String" default="Scroll down to load more!"/>
+    <aura:attribute name="showRowNumberColumn" type="Boolean" default="false"/>
+    <aura:attribute name="rowNumberOffset" type="Integer" default="0"/>
+    <aura:attribute name="rowsToAdd" type="Integer" default="20"/>
+    <aura:attribute name="currentCount" type="Integer" default="50"/>
+    
+    <!-- Clone Attributes -->
+    <aura:attribute name="showSpinner" type="boolean" default="false" />
+    <aura:attribute name="showCloneModal" type="Boolean" default="false" />
+    <aura:attribute name="showSingCloneModal" type="Boolean" default="false" />
+    <aura:attribute name="recIdtoClone" type="Id" />
+    <aura:attribute name="recTypeIdAMG" type="Id" />
+    <aura:attribute name="homeURL" type="String"/>
+    <aura:attribute name="showCloneMultiModal" type="Boolean" default="false" />
+    
+    <aura:attribute name="isUserManager" type="Boolean"/>
+    <aura:attribute name="slaTitle" type="String" default="SLA Alert"/>
+    <aura:attribute name="ageingTitle" type="String" default="Aging Case"/>
+    
+    
+    <aura:attribute name="selectedRows" type="String[]" default="[]"/>
+    <aura:attribute name="allSelectedRows" type="String[]" default="[]"/>
+    <aura:attribute name="bypassSelectionRowMethod" type="Boolean" default="false"/>
+    <aura:attribute name="displayReopenModal" type="Boolean" default="false"/>
+    <aura:attribute name="reOpenErrMsg" type="String" default=""/>
+    <aura:attribute name="setIntervalId" type="Integer"/>
+    <!--<aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>-->
+    
+    
+    <div class="slds-card">
+        <div class="slds-card__header slds-grid slds-gutters">
+            <header class="slds-align_absolute-center">
+                
+                <div>
+                    <aura:if isTrue="{!v.loadButtonSpinner}">
+                        <div aura:id="buttonSpinnerId" class="slds-spinner slds-spinner_medium slds-is-relative">
+                            <lightning:spinner alternativeText="Loading" variant="brand" size="medium" />
+                        </div>
+                    </aura:if>
+                </div>
+                
+                <div class="slds-col">
+                    <!--<button class="slds-button slds-button_outline-brand" label="SLA Alert"
+                            onclick="{!c.slaAlertButtonNav}">{!'SLA Alert (' + v.slaAlertCount + ')'}</button>-->
+                    <lightning:button aura:id="slaAlertButton" label="{!'SLA Alert (' + v.slaAlertCount + ')'}" 
+                                      onclick="{!c.slaAlertButtonNav}">
+                        <aura:set attribute="title" value="{!v.slaTitle}"/>
+                    </lightning:button>
+                </div>
+                
+                <div class="slds-col">
+                    <lightning:button aura:id="ageingCaseButton" label="{!'Aging Cases (' + v.ageingCasesCount + ')'}"
+                                      onclick="{!c.ageingCaseButtonNav}" >
+                        <aura:set attribute="title" value="{!v.ageingTitle}"/>
+                    </lightning:button>
+                </div>
+                
+                <div class="slds-col">
+                    <lightning:button aura:id="escalationButton" variant="brand" label="{!'Escalations (' + v.escalationsCount + ')'}" title="Escalations" 
+                                      onclick="{!c.escalationButtonNav}" />
+                </div>
+                
+                <div class="slds-col">
+                    <lightning:button aura:id="servIncButton" variant="brand" label="{!'Service Incidents (' + v.siCount + ')'}" title="Service Incidents" 
+                                      onclick="{!c.servIncButtonNav}" />
+                </div>
+                <div class="slds-col">
+                    <lightning:button aura:id="availButton" variant="{!v.userAvailable ? 'success' : 'destructive'}" label="{!v.userAvailable ? 'Available' : 'Unavailable'}" title="{!v.userAvailable ? 'Available' : 'Unavailable'}" 
+                                      onclick="{!c.toggleAvailability}" />
+                </div>
+                
+                <aura:if isTrue="{!!v.userAvailable}">
+                    <div class="slds-col">
+                        <lightning:button aura:id="backupUser" variant="base" iconName="utility:adduser" iconPosition="right" label="Choose Backup" title="Choose Backup" 
+                                          onclick="{!c.openBackupModal}" />
+                        <aura:if isTrue="{!v.backupSet}">
+                            <span style="font-size:13px;padding-left: 10px;">({!v.backupUserName})</span>
+                        </aura:if>
+                    </div>
+                </aura:if>
+                
+            </header>     
+        </div>
+       
+    </div>
+    
+    <div id="sldcCardTable" style="margin-top: 4px;" class="slds-card">
+        <div class="slds-card__header slds-grid slds-gutters">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                
+                <div>
+                    <aura:if isTrue="{!v.loadSpinner}">
+                        <div style="opacity: 0.7;" aura:id="spinnerId" class="slds-spinner_container">
+                                <lightning:spinner alternativeText="Loading" variant="brand" size="large" />
+                        </div>
+                    </aura:if>
+                </div>
+                
+                <div class="slds-col slds-size_1-of-11">
+                    
+                    <ul class="slds-list_horizontal slds-media_center">
+                        <li>
+                            <lightning:icon iconName="standard:user" class="slds-icon" />
+                        </li>
+                        <li class="">
+                            <span style="font-size:17px;padding-left: 10px;">My Cases <b>({!v.totalNumberOfRows})</b></span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <aura:if isTrue="{!!v.isUserManager}">
+                    <div class="slds-col slds-size_1-of-11" >
+                        <lightning:select name="filterSelect" value="{!v.filterVal}" class="label-hidden" variant="label-hidden">
+                        <option text="My Open Cases"></option>
+                        <option text="My Closed Cases (Last 3 Months)"></option>
+                        <option text="My Open Cases with Tasks"></option>
+                        <option text="My Team's Open Cases with SLA running"></option>
+                    </lightning:select>
+                    </div>
+
+                    <aura:set attribute ="else">
+                        <div class="slds-col slds-size_1-of-11" >
+                            <lightning:select name="filterSelect" value="{!v.filterVal}" class="label-hidden" variant="label-hidden">
+                                <option text="My Team's Open Cases with SLA running"></option>
+                                <option text="My Open Cases"></option>
+                                <option text="My Closed Cases (Last 3 Months)"></option>
+                                <option text="My Open Cases with Tasks"></option>
+                            </lightning:select>
+                        </div>
+                    </aura:set>
+                </aura:if>
+                
+                <div class="slds-col slds-size_1-of-11">
+                    <lightning:button variant="brand" label="New Case" title="New Case" 
+                                      onclick="{!c.newCase }" />
+                </div>
+                
+                <div class="slds-col slds-size_1-of-11">
+                   <!-- <button class="slds-button slds-button_outline-brand" label="New Case"
+                            onclick="{!c.newCase}" disabled="true">Clone</button> -->
+                     <lightning:button class="slds-button slds-button_brand Viewallfilters" aura:id="cloneCase" 
+                                      onclick="{!c.cloneCases}" disabled="true" variant="Brand">Clone</lightning:button>
+                </div>
+                
+                <div class="slds-col slds-size_1-of-11">
+                    <!--<button class="slds-button slds-button_outline-brand" label="New Case"
+                            onclick="{!c.newCase}" disabled="true">Clone on Multiple Accounts</button>-->
+                     <lightning:button class="slds-button slds-button_brand Viewallfilters" aura:id="cloneMultiple" 
+                                      onclick="{!c.cloneCaseOnMultiAcc}" disabled="true" variant="Brand">Clone on Multiple Accounts</lightning:button>
+                    
+                </div>
+                <aura:if isTrue="{!v.filterVal!='My Closed Cases (Last 3 Months)'}">
+                <div class="slds-col slds-size_1-of-11">
+                    <lightning:button class="slds-button slds-button_brand Viewallfilters" aura:id="closebulkbtn" 
+                                      onclick="{!c.closeBulkCases}" disabled="true" variant="destructive">Take me to Case Closure</lightning:button>
+                </div>
+                </aura:if>
+                <aura:if isTrue="{!v.filterVal=='My Closed Cases (Last 3 Months)'}">
+                <div class="slds-col slds-size_1-of-11">
+                    <lightning:button class="slds-button slds-button_brand Viewallfilters" aura:id="reopenBulkBtn" 
+                                      onclick="{!c.reopenCase}" disabled="true" variant="destructive">Reopen</lightning:button>
+                </div>
+                </aura:if>
+                
+                <div class="slds-col slds-no-flex slds-size_1-of-11">
+                    <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                        <lightning:input value="{!v.myCaseSearchText}" onchange="{!c.filter}" placeholder="Search on Cases..." type="text" class="label-hidden" variant="label-hidden" label="" name="Case Search"/>
+                        <!--<p style="text-align:center">{!v.filteredDataCount} of {!v.casesCount}</p>-->
+                    </div>		
+                </div>
+                
+                
+                <div class="slds-col rightAlign">
+                    <button class="slds-button" label="Refresh"
+                            onclick="{!c.updateTable}">
+                        <lightning:icon iconName="action:refresh" alternativeText="Refresh" size="x-small"/>
+                    </button>
+                </div>
+                
+            </header>
+           
+        </div>
+        
+        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~ CASES DATATABLE ~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+        
+        <div class="slds-card__body slds-card__body_inner" style="max-height:660px;min-height:260px;">
+            <aura:if isTrue="{!v.casesCount > 0}">
+                <div style="max-height:640px;min-height:240px;overflow: scroll;">
+                    <!--
+                    <div class="slds-float_left">
+                        <strong>Total {!v.totalNumberOfRows} Cases</strong>
+                    </div>
+                    <div class="slds-float_right">
+                        <strong>{!v.loadMoreStatus}</strong>
+                    </div>
+                    <br/> -->
+                    <lightning:datatable 
+                                         data="{!v.dataFiltered}" 
+                                         columns="{!v.columns}" 
+                                         keyField="caseRecId"
+                                         aura:Id="datatable"
+                                         onsort = "{!c.updateColumnSorting}"
+                                         sortedBy="{!v.sortedBy}"  
+                                         sortedDirection="{!v.sortedDirection}"
+                                         onrowselection="{!c.updateSelectedText}"
+                                         onrowaction="{!c.handleRowAction }"
+                                         rowNumberOffset="0"
+                                         enableInfiniteLoading="{!v.enableInfiniteLoading}"
+                                         onloadmore="{!c.handleLoadMoreCases}"
+                                         selectedRows="{! v.selectedRows }"
+                                         />
+                </div>
+                <aura:set attribute ="else">
+                    <aura:if isTrue="{!v.casesCount == 0}">
+                        <div class="slds-text-heading_medium slds-align_absolute-center" style="padding: 30px;">
+                            Hurrah! 🥳 You're all caught up here! 🙌🏼
+                        </div>
+                        
+                        <aura:set attribute="else">
+                            <div class="slds-text-heading_medium slds-align_absolute-center" style="padding: 30px;">
+                                Loading something spectacular... Hang tight!
+                            </div>
+                        </aura:set>  
+                    </aura:if>
+                </aura:set>
+            </aura:if>
+            
+        </div>
+        <footer class="slds-card__footer"></footer>
+    </div>
+    <!--Markup ends-->
+    
+    <aura:if isTrue="{!v.showSpinner}">
+        <div class="demo-only demo-only demo-only_viewport demo--inverse" style="height:6rem">
+            <div class="slds-spinner_container slds-is-fixed">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if> 
+    
+   <aura:if isTrue="{!v.showSingCloneModal}">
+            <c:SC_AMG_CloneCase showClone="{!v.showSingCloneModal}" caserecId="{!v.recIdtoClone}" />   
+    </aura:if>
+    
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~ AKACHAT TRANSCRIPT MODAL ~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+ 
+    <aura:if isTrue="{!v.isModalOpen}">
+        <div class="slds-m-around_xx-large">
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modalForChat" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModal }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">AkaChat Transcript</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modalForChat">
+                        <ui:outputRichText class="slds-text-longform" value="{!v.akachatTranscript}" />
+                    </div>
+                    
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+    
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~ BACKUP SELECT MODAL ~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+    
+    <aura:if isTrue="{!v.isBackupModalOpen}">
+        <lightning:card>
+            
+            <lightning:recordEditForm aura:id="userRecordViewForm"
+                                      recordId="{!v.userRecordId}"
+                                      objectApiName="User"
+                                      onsubmit="{!c.handleSubmit}"
+                                      onsuccess="{!c.handleSuccess}"
+                                      onerror="{!c.handleError}"
+                                      >
+                
+                <div class="slds-m-around_xx-large">
+				
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modalForBackup" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            
+                            <header class="slds-modal__header">
+                                <div>
+                                    <aura:if isTrue="{!v.loadBackupSpinner}">
+                                        <div aura:id="backupSpinnerId" class="slds-spinner_container" style="z-index: 10000 !important;">
+                                            <lightning:spinner alternativeText="Loading" variant="brand" size="large" />
+                                        </div>
+                                    </aura:if>
+                                </div>
+                                <!--<lightning:messages />-->
+                                <lightning:buttonIcon iconName="utility:close"
+                                                      onclick="{!c.closeBackupModal}"
+                                                      alternativeText="close"
+                                                      variant="bare-inverse"
+                                                      class="slds-modal__close"/>
+                                <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Choose Backup</h2>
+                            </header>
+                            <div class="slds-modal__content slds-p-around_medium" id="modalForBackup">
+                                <lightning:inputField fieldName="Backup_User__c" value="{!v.backupUser}"/>
+                            </div>
+                            
+                            <footer class="slds-modal__footer">
+                                <!--<lightning:button onclick="{!c.closeBackupModal}" disabled="{!v.disableBackupButtons}" variant="neutral">Cancel</lightning:button>
+                                <lightning:button onclick="{!c.handleSubmit}" disabled="{!v.disableBackupButtons}" variant="brand">Save</lightning:button>-->
+                                <button class="slds-button slds-button_neutral" id="cancelButton" onclick="{!c.closeBackupModal}">Cancel</button>
+                                <button class="slds-button slds-button_brand" id="saveBackupButton" onclick="{!c.handleSubmit}">Save</button>
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </div>
+                
+            </lightning:recordEditForm>
+        </lightning:card>
+    </aura:if>
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~Reopen ~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+ 
+    <aura:if isTrue="{!v.displayReopenModal}">
+        <div class="slds-m-around_xx-large">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modalForChat" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeReopenModal }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Re-open Case</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" aura:id="modalReopen">
+                        <ui:outputText class="slds-text-longform errorMsg"  value="{!v.reOpenErrMsg}" />
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral " id="cancelButton" onclick="{!c.closeReopenModal}">Close</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+    
+    
+    
+    
+    
+    
+</aura:component>

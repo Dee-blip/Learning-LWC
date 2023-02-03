@@ -1,0 +1,63 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:hasSObjectName">
+    
+    <aura:attribute name="chevronState" type="String" default="Pre-Incident"/>
+    <aura:attribute name="location" type="String" default="1"/>
+    <aura:attribute name="picklistValueList" type="List" default="['Incident Request','1: In Progress','2: Impact Mitigated','3: Resolved','Closed']"/>
+	<aura:attribute name="sObjectRecord" type="Object"/>
+    <aura:attribute name="recordLoadError" type="String"/>
+    
+    <aura:attribute name="GlobalId" type="String" access="GLOBAL" description="my id" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+   
+    
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+    <lightning:layout class="slds-grid_align-center">
+
+    <aura:if isTrue="{!v.showSpinner}">
+        <div class="slds-align--absolute-center">
+            <lightning:spinner aura:id="spinner" variant="brand" size="large"/>
+        </div>
+    </aura:if>
+
+    <lightning:layoutItem flexibility="auto" size="12" largeDeviceSize="12" mediumDeviceSize="12" smallDeviceSize="12">  
+        <!-- Lightning Data service for fetching Status of current SI record-->
+        <force:recordData aura:id="recordLoader"
+        recordId="{!v.recordId}"
+        fields="Status__c"
+        targetFields="{!v.sObjectRecord}"
+        targetError="{!v.recordLoadError}"
+        recordUpdated = "{!c.recordUpdated}"
+        />
+
+        <div class="slds-path-coach">
+       
+        <div class="slds-grid">
+            <div class="slds-tabs_path" role="application">
+                <ul class="slds-tabs_path__nav" role="listbox" aria-orientation="horizontal">     
+                <!-- aura:iteration section to crete icon for each picklist value and styling based on received map value from controller.
+                     if map value is 'traversed' , show image in green else show in blue or gray based on present state-->
+
+                     <aura:iteration items="{!v.picklistValueList}" var="picklistValue" indexVar="key">
+                       
+                        <li class="{!picklistValue == v.chevronState ? 'slds-tabs_path__item slds-is-current' : v.location > key ? 'slds-tabs_path__item traversed' : 'slds-tabs_path__item slds-is-incomplete'}" role="presentation">
+ 
+                             <a  data-ansIndex= "{!picklistValue}" aria-selected="false" class="slds-tabs_path__link"  href="javascript:void(0);" role="option" tabindex="-1">
+ 
+                                 <span class="slds-tabs_path__stage slds-form-element__icon" > 
+                                     <lightning:icon iconName="action:approval" class="icon" size="xx-small" title="11" alternativeText="Study Country"/>
+                                 </span> 
+                                 <span class="{!v.location > key ? 'slds-tabs_path__title white' : 'slds-tabs_path__title'}">{!picklistValue}</span>
+ 
+                             </a>
+                         </li>
+                     </aura:iteration>
+                 </ul>
+             </div>
+         </div>
+     </div>
+  
+    
+    
+    </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

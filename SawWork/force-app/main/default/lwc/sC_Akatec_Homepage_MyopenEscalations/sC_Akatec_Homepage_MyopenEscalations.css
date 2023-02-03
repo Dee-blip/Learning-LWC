@@ -1,0 +1,19 @@
+.datatableStyle
+{
+    overflow: auto;
+    padding-top: 1.5vh;
+}
+
+.escsearch
+{
+    padding: 0px 0px 0px 20px;
+}
+
+.slds-checkbox {
+    display: inline !important;
+}
+
+.escspan
+{
+    position: absolute; display: block; left: 5px; top: 10px; z-index: 9;
+}

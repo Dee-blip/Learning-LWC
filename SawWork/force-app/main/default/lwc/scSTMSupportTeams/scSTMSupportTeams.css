@@ -1,0 +1,39 @@
+.mainTableWidth{
+    width:100%;
+}
+
+.reducedWidth{
+    width:50%;
+}
+
+.reducedWidth1{
+    width:40%;
+    float:left;
+}
+
+.pagination{
+background-color:blue;
+}
+
+.slds-picklist__label{
+    width: 21vw;
+    height: 2vw;
+}
+
+.slds-page-header{
+    height: 53px;
+    border-radius: 5px;
+}
+
+.subHeader{
+    font-size: 14px;
+}
+
+.slds-modal__content{
+    overflow-x: initial !important;
+    overflow-y: initial !important;
+}
+
+.mainTable{
+    line-height: 33px;
+}

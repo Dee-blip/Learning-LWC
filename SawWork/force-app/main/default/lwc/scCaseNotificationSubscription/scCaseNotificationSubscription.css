@@ -1,0 +1,43 @@
+.show-on-hover{
+    display: none;
+}
+
+.show-on-hover:hover{
+    display: inline-block;
+}
+
+.slds-text-link{
+    cursor: pointer;
+    user-select: none;
+}
+.cursor-pointer{
+    cursor: pointer;
+}
+.c-pill{
+    margin: 2px;
+    line-height: 1.3rem;
+}
+.temp1{
+    max-width: 800px;
+}
+.slds-listbox__option{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.listbox-font-main-text{
+    font-size: .9rem !important;
+}
+.listbox-font-sub-text{
+    font-size: .8rem !important;
+}
+
+:host {
+    --sds-c-card-heading-font-weight: 400;
+    --sds-c-card-heading-font-size: .9rem;
+    --sds-c-card-body-spacing-inline-start: 0px;
+}
+
+.c-card{
+    border: 1px solid #cdcdcd;
+}

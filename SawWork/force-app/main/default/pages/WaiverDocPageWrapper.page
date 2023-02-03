@@ -1,0 +1,59 @@
+<apex:page controller="L2Q_WaiverEmailGenerator" showHeader="false" sidebar="false">
+  <script type="text/javascript">
+    window.onload = function () {
+      setRenderWaiverDocPageJS();
+      setTimeout(function () {
+        reloadCurrentPageJS();
+      }, {!redirectionWaitTime});
+    };
+  </script>
+
+  <style>
+
+    .loader {
+      position: absolute;
+      top: 45%;
+      left: 45%;
+      border: 16px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 16px solid #3498db;
+      width: 120px;
+      height: 120px;
+      -webkit-animation: spin 2s linear infinite;
+      /* Safari */
+      animation: spin 2s linear infinite;
+    }
+
+    /* Safari */
+    @-webkit-keyframes spin {
+      0% {
+        -webkit-transform: rotate(0deg);
+      }
+      100% {
+        -webkit-transform: rotate(360deg);
+      }
+    }
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+  </style>
+
+  <apex:pageMessage summary="Your Document is being downloaded and you will be redirected to the Order Approval shortly..." severity="info" strength="3"/>
+
+
+  <div class="loader"></div>
+
+
+  <apex:form >
+    <apex:actionFunction action="{!setRenderWaiverDocPage}" name="setRenderWaiverDocPageJS"/>
+    <apex:actionFunction action="{!refreshCurrentPage}" name="reloadCurrentPageJS"/>
+  </apex:form>
+
+  <apex:include pageName="L2Q_WaiverDocPage" rendered="{!renderWaiverDocPage}"/>
+</apex:page>

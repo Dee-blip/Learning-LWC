@@ -1,0 +1,35 @@
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction"
+    access="global" controller="MARIT_CTAPathComponent">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="variant" type="String" default="non-linear" />
+    <aura:attribute name="hideUpdateButton" type="Boolean" default="true" />
+    <aura:attribute name="showBody" type="boolean" default="false" />
+    <aura:attribute name="isPathReadOnly" type="boolean" default="false" />
+    <aura:attribute name="newLead" type="Lead" default="{'sobjectType': 'Lead'}" />
+    <aura:attribute name="statusValue" type="String" default="New" />
+    <aura:attribute name="oldStatusValue" type="String" default="Undefined" />
+    <aura:handler name="change" value="{!v.statusValue}" action="{!c.handleValueChange}" />
+    <!--<aura:handler name="render" value="{!this}" action="{!c.onrender}" />-->
+    <aura:attribute name="leadRecord" type="RecordType" default="{'sobjectType': 'RecordType'}" />
+    <lightning:card title="Call To Action - Summary Section">
+        <aura:if isTrue="{!v.isPathReadOnly}">
+            <!-- Make path read only -->
+            <div style="pointer-events: none;">
+                <lightning:path aura:id="path" recordId="{!v.recordId}" variant="{!v.variant}"
+                    hideUpdateButton="{!v.hideUpdateButton}" onselect="{!c.handleSelect}" />
+            </div>
+            <aura:set attribute="else">
+                <!--Make path active-->
+                <lightning:path aura:id="path" recordId="{!v.recordId}" variant="{!v.variant}"
+                    hideUpdateButton="{!v.hideUpdateButton}" onselect="{!c.handleSelect}" />
+            </aura:set>
+        </aura:if>
+        <div class="slds-media__body" style="font-weight: bold;">
+            <aura:if isTrue="{!v.showBody}">
+                <c:mARIT_CustomPathForCTA aura:id="childlwc" recordId="{!v.recordId}" selectedStatus="{!v.statusValue}"
+                    leadObjAura="{!v.leadRecord}" onrecordChange="{!c.refreshView}"></c:mARIT_CustomPathForCTA>
+            </aura:if>
+        </div>
+    </lightning:card>
+</aura:component>

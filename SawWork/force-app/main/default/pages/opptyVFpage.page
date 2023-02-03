@@ -1,0 +1,22 @@
+<!--
+Page to display links to visual flows on the opportunity detail page. 
+-->
+<apex:page standardController="opportunity" extensions="opptyVFpageController" >
+  <apex:form id="form1" >
+  <apex:pageBlock >
+  <apex:pageBlockSection >
+  <apex:repeat value="{!wrapperList}" var="wr" rendered="{!NOT(isPilotUser)}">
+        <apex:outputLink value="{!wr.Value}" target="_blank" >{!wr.Name}</apex:outputLink>
+   </apex:repeat>
+   <apex:repeat value="{!pilotWrapperList}" var="wr" rendered="{!isPilotUser}">
+        <apex:outputLink value="{!wr.Value}" target="_blank" >{!wr.Name}</apex:outputLink>
+   </apex:repeat>
+  <!--onclick="flowDetailCall('{!wr.Name}','{!NOW()}')"<apex:actionFunction name="flowDetailCall" action="{!FlowDetail}" reRender="form1">
+<apex:param name="firstParam" assignTo="{!trackerFlowName}"  value="" />
+<apex:param name="secondParam" assignTo="{!trackerTimeStamp}"  value="" />
+</apex:actionFunction> -->
+     </apex:pageBlockSection>
+  </apex:pageBlock>
+     
+   </apex:form>
+</apex:page>

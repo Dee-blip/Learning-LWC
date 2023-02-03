@@ -1,0 +1,347 @@
+<aura:component controller="L2Q_RSSEditTemplateController"
+   implements="lightning:actionOverride,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+   access="global">
+   <!-- Begin loading boots strap -->
+   <ltng:require styles="{! $Resource.bootstrap441 + '/bootstrap-4.4.1-dist/css/bootstrap.min.css'}" scripts="{!join(',',
+      $Resource.jquery224 ,
+      $Resource.bootstrap441 + '/bootstrap-4.4.1-dist/js/bootstrap.min.js')
+    }" afterScriptsLoaded="{!c.scriptsLoaded}" />
+   <!-- End  loading boots strap -->
+   <!-- Begin HTML for Modal Page-->
+   <aura:html tag="style">
+      .slds-modal__container{
+      max-width: 95rem !important;
+      width:50% !important;
+      }
+   </aura:html>
+   <!-- End HTML for Modal Page-->
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+   <!-- Begin Attribute Decalaration -->
+   <!--Note : We can use one object for attribute type but in certain solution grouping done for similar use case so have kept Individual attribute decalaration -->
+   <aura:attribute type="String" name="sectDeleteId" default=" " />
+   <aura:attribute type="String" name="quesDelete" default=" " />
+   <aura:attribute name="showSave" type="boolean" default="false" />
+   <aura:attribute name="showQuestion" type="boolean" default="false" />
+   <aura:attribute name="questionGrouplength" type="Integer" default="0" />
+   <aura:attribute name="questionlength" type="Integer" default="0" />
+   <aura:attribute name="sectionUniquenumber" type="Integer" default="0" />
+   <aura:attribute name="questionUniquenumber" type="Integer" default="0" />
+   <aura:attribute name="WriteAccessOfUser" type="boolean" default="false" />
+   <aura:attribute name="Disabled" type="boolean" default="false" />
+   <aura:attribute type="String" name="newGroupname" default="" />
+   <aura:attribute type="boolean" name="isOpen" default="false" />
+   <aura:attribute type="boolean" name="isOpenq" default="false" />
+   <aura:attribute type="Object[]" name="sectionList" default="[]" />
+   <aura:attribute name="optionsMap" type="Map" />
+   <aura:attribute name="selectedValue" type="String" access="PRIVATE" />
+   <aura:attribute type="String" name="recordId" default=" " />
+   <aura:attribute type="Map" name="qQuestion"
+      default="{'Survey__c':'','Name':'','Choices__c':'','Required__c':false,'Type__c':'','UniqueName__c':'','Category__c':'','OrderNumber__c':'','Question__c':'','QuestionDescription__c':'','SectionName':''}" />
+   <aura:attribute name="sectionsMap" type="Map" />
+   <aura:attribute name="questiongroupuniqueName" type="String" default="" />
+   <aura:attribute name="isError" type="boolean" default="false" />
+   <aura:attribute name="isLoading" type="boolean" default="false" />
+   <aura:attribute name="editUniquekey" type="String" default="" />
+   <aura:attribute name="editquesUniquekey" type="String" default="" />
+   <aura:attribute name="disableSecSelect" type="boolean" default="false" />
+   <aura:attribute name="isFreetext" type="boolean" default="false" />
+   <aura:attribute name="templName" type="String" default=" " />
+   <aura:attribute name="versionNum" type="Integer" default="0" />
+   <aura:attribute name="enablePublish" type="boolean" default="false" />
+   <aura:attribute name="enableSave" type="boolean" default="false" />
+   <aura:attribute name="isDeleteallowed" type="boolean" default="false" />
+   <aura:attribute name="isPublished" type="boolean" default="false" />
+   <!-- End Attribute Decalaration -->
+
+
+
+   <!--Begin handler Decalaration-->
+   <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+   <!--End handler Decalaration-->
+
+   <!--Begin Spinner Declaration-->
+   <aura:if isTrue="{!v.isLoading}">
+      <lightning:spinner class="slds-spinner_brand" alternativeText="loading..." size="large" />
+   </aura:if>
+   <!--End Spinner Declaration-->
+
+   <div class="slds-theme_default" style="position:relative;">
+      <div class="navbar navbar-expand-lg navbar-light bg-light" style="border-bottom:2px solid rgba(0, 153, 204, 1)">
+         <span class="nav-item active">
+            <aura:if isTrue="{!and(not(v.Disabled),v.WriteAccessOfUser)}">
+               <lightning:button aura:id="AddQuestionGroup" label="Add Section" onclick="{!c.buttonClick}"
+                  disabled="{!v.isPublished}" />
+            </aura:if>
+         </span>
+         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+         </button>
+         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+               <lightning:buttonGroup>
+                  <aura:if isTrue="{!and(not(v.Disabled),v.WriteAccessOfUser)}">
+                     <li class="nav-item">
+                        <span class="nav-link">
+                           <lightning:button aura:id="AddQuestion" label="Add Questions" onclick="{!c.buttonClick}"
+                              class="{!(v.showQuestion) ? 'slds-show':'slds-hide'}" disabled="{!v.isPublished}" />
+                        </span>
+                     </li>
+                     <li class="nav-item">
+                        <span class="nav-link">
+                           <lightning:button aura:id="SaveQuestions" label="Save" onclick="{!c.buttonClick}"
+                              class="{!(v.showSave) ? 'slds-show':'slds-hide'}" disabled="{!v.isPublished}" />
+                        </span>
+                     </li>
+                     <li class="nav-item">
+                        <span class="nav-link">
+                           <lightning:button aura:id="PublishTemplateId" label="Save &#38; Publish"
+                              onclick="{!c.buttonClick}" class="{!(v.showSave) ? 'slds-show' : 'slds-hide'}"
+                              disabled="{!v.isPublished}" />
+                        </span>
+                     </li>
+                  </aura:if>
+                  <li class="nav-item">
+                     <span class="nav-link">
+                        <aura:if isTrue="{!and(v.Disabled,v.WriteAccessOfUser)}">
+                           <lightning:button aura:id="CloneTemplate" label="Revise" onclick="{!c.buttonClick}" />
+                        </aura:if>
+                     </span>
+                  </li>
+               </lightning:buttonGroup>
+               <li class="nav-item">
+                  <span class="nav-link">
+                     <!-- <ui:inputText aura:id="templateNameId" value="{!v.templName}" placeholder="Template Name .."
+                        class="slds-input inputHeight" disabled="{!(v.isPublished)? true :false}" /> -->
+                  </span>
+               </li>
+            </ul>
+            <div class="form-inline my-2 my-lg-0">
+               <div class="slds-badge" style="font-size: medium;" aria-label="text">
+                  <lightning:icon iconName="{!(v.isPublished) ? 'standard:task2':'standard:drafts'}"
+                     alternativeText="Account" size="small" /> &nbsp;
+                  {!(v.isPublished) ? 'Published':'In Draft'}
+               </div>
+               <div class="slds-badge" style="font-size: medium;" aria-label="text">
+                  Version:&nbsp;{!v.versionNum}
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <lightning:layout multipleRows="true">
+         <lightning:layoutItem size="12" smallDeviceSize="12" largeDeviceSize="4">
+            <lightning:input aura:id="templateNameId" value="{!v.templName}" placeholder="Template Name ...."
+               disabled="{!(v.isPublished)? true :false}" required="true" label="Template Name:"
+               style="padding: 4px 4px 4px 4px;" />
+         </lightning:layoutItem>
+      </lightning:layout>
+      <!-- Begin Section Group-->
+      <div class="slds-m-around_xx-small">
+         <aura:if isTrue="{!v.isOpen}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+               aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+               <div class="slds-modal__container">
+                  <header class="slds-modal__header">
+                     <lightning:buttonIcon iconName="utility:close" onclick="{!c.closeModel }" alternativeText="close"
+                        variant="bare-inverse" class="slds-modal__close" aura:id="isOpen" />
+                     <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Section Detail</h2>
+                  </header>
+                  <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                     <div id="CreateQuestionGroupDivBackground">
+                        <div id="CreateQuestionGroupDiv">
+                           <lightning:input aura:id="sectionnameId" type="text" value="{!v.newGroupname}"
+                              label="Section Name:" messageWhenValueMissing="Complete this field" required="true" />
+                           <div style="text-align:center">
+                              <aura:if isTrue="{!not(v.editUniquekey.length>0)}">
+                                 <lightning:button aura:id="createSecId" onclick="{!c.buttonClick}"
+                                    label="Save Question Group" />
+                              </aura:if>
+                              <aura:if isTrue="{!v.editUniquekey.length>0}">
+                                 <lightning:button name="{!v.editUniquekey}" aura:id="updateSecId"
+                                    onclick="{!c.secUpdate}" label="Update Question Group" />
+                              </aura:if>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <footer class="slds-modal__footer">
+                  </footer>
+               </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+         </aura:if>
+      </div>
+      <!-- End Section Group-->
+
+      <!--Begin Question Preview-->
+      <aura:iteration items="{!v.sectionList}" var="sList" indexVar="index">
+         <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12" mediumDeviceSize="12" largeDeviceSize="12" smallDeviceSize="12">
+               <div class="slds-box" style="margin:4px 4px 4px 4px;border-width:2px">
+                  <lightning:formattedText aura:id="{!sList.UniqueName}" value="{!sList.questionGroup.Name}" />
+                  &nbsp;
+                  <div class="slds-float_right" style="position: relative;">
+                     <lightning:buttonGroup>
+                        <lightning:button variant="brand" name="{!sList.UniqueName}" label="Update Section"
+                           onclick="{!c.editSection}" iconName="utility:edit" iconPosition="left"
+                           disabled="{!(v.isPublished) ? true :false}" />
+                        <lightning:button variant="brand" name="{!sList.UniqueName}" label="Delete Section"
+                           onclick="{!c.deleteSection}" iconName="utility:delete" iconPosition="left"
+                           disabled="{!(v.isPublished) ? true :false}" />
+                     </lightning:buttonGroup>
+                  </div>
+                  <hr />
+                  <aura:iteration items="{!sList.surveyQuestions}" var="ques">
+                     <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" mediumDeviceSize="12" largeDeviceSize="12" smallDeviceSize="12">
+                           <div class="slds-box" style="margin: 4px 4px 4px 4px">
+                              <lightning:radioGroup name="verticalChoice" label="{!ques.question.Question__c}"
+                                 options="{!ques.choicesObj }" type="radio" value=""
+                                 required="{!(ques.question.Required__c == true ? true: false)}"
+                                 disabled="{!v.isPublished}"
+                                 class="{!(ques.question.Type__c == 'Single Select--Vertical'? 'slds-show' : 'slds-hide')}"
+                                 title="{!ques.question.QuestionDescription__c}" />
+                              <lightning:radioGroup name="horizonalChoice" label="{!ques.question.Question__c}"
+                                 options="{!ques.choicesObj }" type="radio" value="" disabled="{!v.isPublished}"
+                                 required="{!(ques.question.Required__c == true ? true: false)}"
+                                 class="{!(ques.question.Type__c == 'Single Select--Horizontal'? 'slds-show customRadioCls' : 'slds-hide customRadioCls')}"
+                                 title="{!ques.question.QuestionDescription__c}" />
+                              <!-- <lightning:dualListbox name="languages"
+                                 class="{!(ques.question.Type__c == 'Multi-Select-Vertical' ? 'slds-show' : 'slds-hide')}"
+                                 label="{!ques.question.Question__c}" sourceLabel="Available" selectedLabel="Selected"
+                                 options="{!ques.choicesObj}"
+                                 disabled="{!v.isPublished}"
+                                 required="{!(ques.question.Required__c == true ? true: false)}" /> -->
+
+                              <lightning:checkboxGroup name="Checkbox Group" label="{!ques.question.Question__c}"
+                                 options="{!ques.choicesObj }"
+                                 required="{!(ques.question.Required__c == true ? true: false)}"
+                                 class="{!(ques.question.Type__c == 'Multi-Select--Vertical' ? 'slds-show' : 'slds-hide')}"
+                                 value=" " disabled="{!v.isPublished}"
+                                 title="{!ques.question.QuestionDescription__c}" />
+                              <lightning:textarea label="{!ques.question.Question__c}"
+                                 required="{!(ques.question.Required__c == true ? true: false)}"
+                                 class="{!(ques.question.Type__c == 'Free Text' ? 'slds-show' : 'slds-hide')}"
+                                 disabled="{!v.isPublished}" title="{!ques.question.QuestionDescription__c}" />
+                              <lightning:select label="{!ques.question.Question__c}" disabled="{!v.isPublished}"
+                                 required="{!(ques.question.Required__c == true ? true: false)}"
+                                 class="{!(ques.question.Type__c == 'Picklist' ? 'slds-show' : 'slds-hide')}"
+                                 title="{!ques.question.QuestionDescription__c}">
+                                 <option value=" " text="--None--" />
+                                 <aura:iteration items="{!ques.choicesObj}" var="pick">
+                                    <option text="{!pick.value}" value="{!pick.value}" />
+                                 </aura:iteration>
+                              </lightning:select>
+                              <hr />
+                              <div class="slds-align_absolute-center">
+                                 <lightning:buttonGroup>
+                                    <lightning:button name="{!ques.UniqueName}" label="Edit Question"
+                                       onclick="{!c.editQues}" iconName="utility:edit" iconPosition="left"
+                                       disabled="{!v.isPublished}" />
+                                    <lightning:button name="{!ques.UniqueName}" label="Delete Question"
+                                       onclick="{!c.deleteQues}" iconName="utility:delete" iconPosition="left"
+                                       disabled="{!v.isPublished}" />
+                                 </lightning:buttonGroup>
+                              </div>
+                           </div>
+                        </lightning:layoutItem>
+                     </lightning:layout>
+                  </aura:iteration>
+               </div>
+            </lightning:layoutItem>
+         </lightning:layout>
+      </aura:iteration>
+      <!-- End Preview Mode -->
+
+      <!--Begin Question Detail-->
+      <div class="slds-m-around_xx-large">
+         <aura:if isTrue="{!v.isOpenq}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+               aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+               <div class="slds-modal__container">
+                  <header class="slds-modal__header">
+                     <lightning:buttonIcon iconName="utility:close" onclick="{!c.closeModel }" alternativeText="close"
+                        variant="bare-inverse" class="slds-modal__close" aura:id="isOpenq" />
+                     <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Questions Detail</h2>
+                     <!-- <aura:if isTrue="{!v.isError}">
+                        <ui:message title="Error" severity="error" closable="true">
+                           Please complete mandatory field before submitting question.
+                        </ui:message>
+                     </aura:if> -->
+                  </header>
+                  <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                     <lightning:select aura:id="questypeId" name="questypePicklis" label="Question Type" required="true"
+                        onchange="{!c.typeChange}" value="{!v.qQuestion.Type__c}"
+                        messageWhenValueMissing="'Question Type' is mandatory field.">
+                        <option value="">--SELECT--</option>
+                        <aura:iteration items="{!v.optionsMap}" var="item">
+                           <option text="{!item.value}" value="{!item.value}" />
+                        </aura:iteration>
+                     </lightning:select>
+                     <!-- Question Box-->
+                     <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" mediumDeviceSize="12" smallDeviceSize="12" largeDeviceSize="12"
+                           padding="around-small">
+                           <lightning:textarea aura:id="questionId" label="Questions:"
+                              value="{!v.qQuestion.Question__c}" required="true"
+                              messageWhenValueMissing="'Question' is mandatory field." />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" mediumDeviceSize="4" smallDeviceSize="4" largeDeviceSize="4"
+                           padding="around-small">
+                           <lightning:input type="checkbox" label="Required Question ?"
+                              checked="{!v.qQuestion.Required__c}" />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" mediumDeviceSize="4" smallDeviceSize="4" largeDeviceSize="4"
+                           padding="around-small">
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" mediumDeviceSize="4" smallDeviceSize="4" largeDeviceSize="4"
+                           padding="around-small">
+                           <aura:if isTrue="{!not(v.disableSecSelect)}">
+                              <lightning:select aura:id="questiongroupId" name="questiongroupName" label="Section"
+                                 value="{!v.qQuestion.SectionName}" required="true"
+                                 messageWhenValueMissing="'Section' is mandatory field.">
+                                 <option value="">--None--</option>
+                                 <aura:iteration items="{!v.sectionsMap}" var="ind" indexVar="key">
+                                    <option text="{!ind.key}" value="{!ind.value}" />
+                                 </aura:iteration>
+                              </lightning:select>
+                           </aura:if>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" mediumDeviceSize="12" smallDeviceSize="12" largeDeviceSize="12"
+                           padding="around-small">
+                           <lightning:textarea value="{!v.qQuestion.QuestionDescription__c}"
+                              label="Question Description : " />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" mediumDeviceSize="12" smallDeviceSize="12" largeDeviceSize="12"
+                           padding="around-small">
+                           <lightning:textarea aura:id="choiceId" value="{!v.qQuestion.Choices__c}"
+                              title="Answers to question..."
+                              class="{!(v.isFreetext == true ? 'slds-hide' : 'slds-show')}"
+                              required="{!not(v.isFreetext)}"
+                              label="Please enter the list of answers/responses in the field below. Each value should be separated by a new line."
+                              messageWhenValueMissing="'Choice' is mandatory field." />
+                        </lightning:layoutItem>
+                     </lightning:layout>
+
+                     <!--End Question Box End-->
+                  </div>
+                  <footer class="slds-modal__footer">
+                     <aura:if isTrue="{!not(v.editquesUniquekey.length>0)}">
+                        <lightning:button aura:id="AddSecQuestion" label="Add Question" onclick="{!c.buttonClick}" />
+                     </aura:if>
+                     <aura:if isTrue="{!v.editquesUniquekey.length>0}">
+                        <lightning:button name="{!v.editquesUniquekey}" aura:id="updSecQuestion" label="Update Question"
+                           onclick="{!c.secquesUpdate}" />
+                     </aura:if>
+                  </footer>
+               </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+         </aura:if>
+         <!--End Question Detail-->
+      </div>
+   </div>
+
+</aura:component>

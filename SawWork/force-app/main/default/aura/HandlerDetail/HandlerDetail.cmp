@@ -1,0 +1,288 @@
+<aura:component controller="SC_SOCC_RUN_BOOK" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <!--<ltng:require styles="{!$Resource.fontawesome + '/fontawesome-free-5.11.2-web/css/fontawesome.css'}"/>-->
+    <aura:attribute name="Instructioncount" type="Integer" default="0"/>
+    <aura:attribute name="pdId" type="String"/>
+    <aura:attribute name="handlerRecId" type="String"/>
+    <aura:attribute name="shMapId" type="String"/>
+    <aura:attribute name="suggestionCapture" type="String"/>
+    <aura:attribute name="situationSuggestionCapture" type="String"/>
+    <aura:attribute name="ignoreSuggestionCapture" type="String"/>
+    <aura:attribute name="displayButton" type="Boolean"/>
+    <aura:attribute name="escalationContactId" type="String"/>
+    <aura:attribute name="instructtype" type="String"/>
+    <aura:attribute name="SuggestedSituationInstructions" type="String"/>
+    <aura:attribute name="fieldsToShowList" type="List"/>
+    <aura:attribute name="editInPortalLink" type="String"/>
+    
+    
+    <!-- attributes that will be passed from Parent -->
+    <aura:attribute name="HandlerDetails" type="Object"/>
+    <aura:attribute name="EscalationContactList" type="Object"/>
+    <aura:attribute name="showMultiEdit" type="Boolean" default="false"/>
+    <aura:attribute name="showIgnoreCondition" type="Boolean" default="false"/>
+    <aura:attribute name="showEscalationList" type="Boolean" default="false"/>
+    <aura:attribute name="isSpinner" type="Boolean" default="false"/>
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isNotification" type="boolean" default="false"/>
+    <aura:attribute name="isEscalationList" type="boolean" default="true"/>
+    <aura:attribute name="confirmMasterEdit" type="boolean" default="false"/>
+    <aura:attribute name="isCommunity" type="boolean" default="false"/>
+    <aura:attribute name="notificationMessage" type="String"/>
+	<!--<aura:attribute name="parentDisplayMasterEdit" type="boolean" default="false" access="public"/>-->
+    <aura:attribute name="vfURL" type="String"/>
+    <!--<aura:attribute name="method" type="Aura.action"/>-->
+    <aura:attribute name="parent" type="Aura.Component"/>
+
+    <!-- attribute for Radio Button -->
+    <aura:attribute name="options" type="List"/>
+    
+    <!--handlers-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:method name="masterEdit" description="Sample method with server-side call">
+        <aura:attribute name="showIgnoreCondition" type="Boolean" default="false"/>
+        <aura:attribute name="showEscalationList" type="Boolean" default="false"/>
+    </aura:method>
+    <aura:method name="updateMasterEdit" description="Sample method with server-side call">
+        <!--<aura:attribute name="situationSuggestionCapture" type="String" default=""/>
+        <aura:attribute name="ignoreSuggestionCapture" type="Boolean" default=""/>
+        <aura:attribute name="handlerInstructionMap" type="Map"/>
+        <aura:attribute name="currentHandler" type="String"/>
+        <aura:attribute name="totalHandlers" type="String"/>-->
+        <aura:attribute name="instructionWrapperList" type="List"/>
+    </aura:method>
+    <aura:method name="closeMasterEdit" description="Sample method with server-side call">
+        <aura:attribute name="showIgnoreCondition" type="Boolean" default="false"/>
+        <aura:attribute name="showEscalationList" type="Boolean" default="false"/>
+    </aura:method>
+
+    <lightning:recordViewForm recordId="{!v.handlerRecId}" objectApiName="Handler__c">
+        
+        <div>
+            <div style ="padding-left: 20px;padding-top: 15px;padding-right: 10px;" class="slds-col slds-size_4-of-4">
+                <div style="padding-bottom: 20px;">
+                    <div class="slds-col slds-size_3-of-4" style ="float: left; max-height: 24px;">
+                        <label style="font-size: 19px;"><b>{!$Label.c.Jarvis_HandlerDetail_HandlerHeading}<!--Handler--></b></label>
+                    	<div style="float: right;padding-right: 85%;">
+                            <lightning:buttonIcon class="notificationCls" iconName="utility:notification" variant="container" onblur ="{!c.hideNotification}" onclick ="{!c.showNotification}" alternativeText="{!$Label.c.Jarvis_HandlerDetail_NotificationsButtonAltText}"/>
+                        </div>
+                        
+                        <aura:if isTrue = "{!v.isNotification}">
+                            <div aura:id="notificationIconId" class="slds-popover slds-popover_tooltip slds-nubbin_bottom-left" role="tooltip" id="help" style="position:relative;top:-75px;left:10%" >
+                                <div class="slds-popover__body" >{!v.notificationMessage}</div>
+                            </div>
+                        </aura:if>
+                    </div>
+                    <div class="slds-col slds-size_1-of-4" style ="float: left;">
+                        <!--<lightning:buttonIcon class="printCls" iconName="utility:print" variant="container" onclick="{!c.printPage}" alternativeText="Print" />-->
+                        <div class="slds-button-group" role="group">
+                            <button onclick="{!c.printPage}" class="slds-button slds-button_icon slds-button_icon-border-filled" title="{!$Label.c.Jarvis_HandlerDetail_PrintButtonAltText}" aria-pressed="false" style="background-color: rgba(255, 255, 255, 0.2);border-color: #2d2d2d26;">
+                                <lightning:icon size="x-small" class="printCls" iconName="utility:print" variant="container" alternativeText="{!$Label.c.Jarvis_HandlerDetail_PrintButtonAltText}" /> 
+                                <span class="slds-assistive-text">{!$Label.c.Jarvis_HandlerDetail_PrintButtonAltText}<!--Print--></span>
+                            </button>
+                            <button onclick="{!c.PDFPage}" class="slds-button slds-button_icon slds-button_icon-border-filled" title="PDF" aria-pressed="false" style="background-color: rgba(255, 255, 255, 0.2);border-color: #2d2d2d26;">
+                                <lightning:icon size="x-small" class="printCls" iconName="utility:page" variant="container" alternativeText="PDF" />
+                                <span class="slds-assistive-text">PDF</span>
+                            </button>
+                        </div>
+                        <aura:if isTrue = "{!!v.showMultiEdit}">
+                            <lightning:button disabled="{!v.showMultiEdit}" class="buttonstyle" label="{!$Label.c.Jarvis_HandlerDetail_SuggestAnEditButton}" variant="brand" onclick="{!c.addSuggestion}"/>
+                        </aura:if>
+                    </div>
+                                            
+
+                </div>
+                <div style ="padding-top: 2%;">
+                    <lightning:outputField class="slds-page-header__title" fieldName="Name" />
+                    <lightning:outputField class="slds-page-header__title" fieldName="Handler_Type__c" style="pointer-events: none !important;cursor: not-allowed !important;"/>
+                    
+                    <aura:if isTrue="{!!v.showMultiEdit}">
+                        <lightning:outputField class="slds-page-header__title"  fieldName="Situation_Instruction__c" />
+                    </aura:if>
+                    <aura:if isTrue="{!!v.showMultiEdit}">
+                        <aura:if isTrue="{!v.showIgnoreCondition}">
+                            <lightning:outputField class="slds-page-header__title"  fieldName="Ignore_Condition__c" />
+                        </aura:if>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.showMultiEdit}">
+                        <div style ="padding-left: 3px;padding-top: 20px;padding-bottom: 20px;" class="slds-col slds-size_2-of-2">
+                            <label ><b>{!$Label.c.Jarvis_HandlerDetail_SituationInstruction}<!--Situation Instruction--></b></label>
+                            <lightning:inputRichText aura:id="suggestionBox" value="{!v.situationSuggestionCapture}" placeholder="{!$Label.c.Jarvis_HandlerDetail_SuggestionTextboxPlaceholderText}" label="{!$Label.c.Jarvis_HandlerDetail_SuggestionTextbox}"/>
+                        </div>
+                        <aura:if isTrue="{!v.showIgnoreCondition}">
+                            <div style ="float: left;padding-left: 3px;padding-bottom: 20px;" class="slds-col slds-size_2-of-2">
+                                <label ><b>{!$Label.c.Jarvis_HandlerDetail_IgnoreCondition}<!--Ignore Condition--></b></label>
+                                <lightning:inputRichText aura:id="suggestionBox" value="{!v.ignoreSuggestionCapture}" placeholder="{!$Label.c.Jarvis_HandlerDetail_SuggestionTextboxPlaceholderText}" label="{!$Label.c.Jarvis_HandlerDetail_SuggestionTextbox}"/>
+                            </div>
+                        </aura:if>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.showEscalationList}">
+                        <div style="padding-top: 25px;padding-bottom: 20px; padding-left: 4px;">
+                            <label ><b>{!$Label.c.Jarvis_HandlerDetail_EscalationListHeading}<!--Escalation List--></b></label>
+                            <div style="padding-left:9px;" class="slds-form-element slds-form-element_horizontal">
+                                <label class="slds-form-element__label" for="form-element-01">{!$Label.c.Jarvis_HandlerDetail_EscalationListNameLabel}<!--Name--></label> 
+                                <lightning:outputField class="slds-page-header__title" fieldName="Escalation_List__c" variant="label-hidden" style="pointer-events: none !important;cursor: not-allowed !important;" /> 
+                            </div>
+                            <div class="slds-form-element_horizontal" style="padding-left: 8px;" id="portalContactId">
+                                <!--<div><ui:outputText class="slds-form-element__label" value="Contacts" /></div>-->
+                                <label class="slds-form-element__label" for="form-element-01">{!$Label.c.Jarvis_HandlerDetail_EscalationListContactsLabel}<!--Contacts--></label> 
+                                <div class="slds-form-element__control"><a href="{!v.editInPortalLink}" target="_blank">{!$Label.c.Jarvis_HandlerDetail_EditInACCLink}<!--Edit in Akamai Control Center--></a></div>
+                            </div>
+                        </div>
+                    </aura:if>
+                    
+                    <!--<aura:if isTrue="{!!v.showMultiEdit}">
+                        <lightning:outputField class="slds-page-header__title"  fieldName="Situation_Instruction__c" />
+                        <lightning:outputField class="slds-page-header__title"  fieldName="Ignore_Condition__c" />
+                    </aura:if>-->
+                    
+                    
+                    <!--<div style="padding-top: 25px;padding-bottom: 20px; padding-left: 4px;">
+                        <label ><b>Escalation List</b></label>
+                        <div style="padding-left:9px;" class="slds-form-element slds-form-element_horizontal">
+                            <label class="slds-form-element__label" for="form-element-01">Name</label> 
+                            <lightning:outputField class="slds-page-header__title" fieldName="Escalation_List__c" variant="label-hidden" style="pointer-events: none !important;cursor: not-allowed !important;" /> 
+                        </div>
+                        <div class="slds-form-element_horizontal" style="padding-left: 8px;">
+                            <div><ui:outputText class="slds-form-element__label" value="Contacts" /></div>
+                            <div style="padding-left: 311px;;margin-top: 2px;"><a href="">Edit in Portal</a></div>
+                        </div>
+                    </div>-->
+                </div>
+            </div>
+            <div style ="padding-left: 20px;padding-top:15px;" class="slds-col slds-size_1-of-4">
+                <!--<div id="suggestEditId">there is double eifen align and absolute
+                    <lightning:button class="slds-align-absolute-center buttonstyle" label="Suggest an Edit" variant="brand" onclick="{!c.addSuggestion}"/>
+                </div>-->
+                <!--<i class="fa fa-bell fa-2x" data-count="{!v.Instructioncount}" style="margin-left: 80%;color: grey;"></i>-->
+                <div id="suggestedit">
+                    <aura:if isTrue="{!v.displayButton}">
+                        <!--<div class="slds-m-bottom-medium">
+                    		<lightning:radioGroup name="radioGroup"
+                                          label="Suggestion Type"
+                                          options="{! v.options }"
+                                          type="radio"
+                                          onchange="{!c.handleRadioOptions}"
+                                          required="true"/>           
+                		</div>-->
+                        
+                        <div class="slds-m-around_large">
+                            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                                <div class="slds-modal__container">
+                                    <!-- Modal/Popup Box Header Starts here-->
+                                    <header class="slds-modal__header">
+                                        <lightning:buttonIcon iconName="utility:close"
+                                                              onclick="{! c.cancelSuggestion }"
+                                                              alternativeText="{!$Label.c.Jarvis_HandlerDetail_ModalCloseAltText}"
+                                                              variant="bare-inverse"
+                                                              class="slds-modal__close"/>
+                                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Jarvis_HandlerDetail_ModalHeadingAddInstructions}<!--Add Instructions--></h2>
+                                    </header>
+                                    <!--Modal/Popup Box Body Starts here-->
+                                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                        <aura:if isTrue="{!v.isSpinner}">
+                                            <lightning:spinner variant="brand"  size="large" />
+                                        </aura:if>
+                                        
+                                        <aura:if isTrue="{!v.confirmMasterEdit}">
+                                            <div class="slds-m-around_large">
+                                                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                                                    <div class="slds-modal__container" style="width:100%">
+                                                        <!-- Modal/Popup Box Header Starts here-->
+                                                        <header class="slds-modal__header">
+                                                            <lightning:buttonIcon iconName="utility:close"
+                                                                                  onclick="{!c.closeConfirmation}"
+                                                                                  alternativeText="{!$Label.c.Jarvis_HandlerDetail_ModalCloseAltText}"
+                                                                                  variant="bare-inverse"
+                                                                                  class="slds-modal__close"/>
+                                                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Jarvis_HandlerDetail_ModalHeadingConfirmEdit}<!--Confirm--></h2>
+                                                        </header>
+                                                        <!--Modal/Popup Box Body Starts here-->
+                                                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                                            <center>{!$Label.c.Jarvis_HandlerDetail_ModalBodyConfirmEdit}<!--Are you sure you want to submit the suggestions?--></center>
+                                                        </div>
+                                                        <!--Modal/Popup Box Footer Starts here-->
+                                                        <footer class="slds-modal__footer">
+                                                            <lightning:button class="slds-button slds-button_neutral masterEditCls" label="{!$Label.c.Jarvis_HandlerDetail_ModalFooterSubmitButton}" onclick="{!c.saveSuggestion}"/>
+                                                            <lightning:button class="slds-button slds-button_neutral masterEditCls" label="{!$Label.c.Jarvis_HandlerDetail_ModalFooterCancelButton}" onclick="{!c.closeConfirmation}"/>
+                                                        </footer>
+                                                    </div>
+                                                </section>
+                                                <div class="slds-backdrop slds-backdrop_open"></div>
+                                            </div>
+                                        </aura:if>
+                                        
+                                        <div style ="float: left;padding-left: 20px;" class="slds-col slds-size_2-of-2">
+                                            <label ><b>{!$Label.c.Jarvis_HandlerDetail_SituationInstruction}<!--Situation Instruction--></b></label>
+                                            <lightning:inputRichText aura:id="suggestionBox" value="{!v.situationSuggestionCapture}" placeholder="{!$Label.c.Jarvis_HandlerDetail_SuggestionTextboxPlaceholderText}" label="{!$Label.c.Jarvis_HandlerDetail_SuggestionTextbox}"/>
+                                            <!--<lightning:inputField class="slds-page-header__title" fieldName="Situation_Instruction__c" value="{!v.situationSuggestionCapture}" variant="label-hidden"/>-->
+                                        </div>
+                                        <aura:if isTrue="{!v.showIgnoreCondition}">
+                                            <div style ="float: left;padding-left: 20px;padding-top: 20px;" class="slds-col slds-size_2-of-2">
+                                                <label ><b>{!$Label.c.Jarvis_HandlerDetail_IgnoreCondition}<!--Ignore Condition--></b></label>
+                                                <lightning:inputRichText aura:id="suggestionBox" value="{!v.ignoreSuggestionCapture}" placeholder="{!$Label.c.Jarvis_HandlerDetail_SuggestionTextboxPlaceholderText}" label="{!$Label.c.Jarvis_HandlerDetail_SuggestionTextbox}"/>
+                                                <!--<lightning:inputField class="slds-page-header__title" fieldName="Ignore_Condition__c" value="{!v.ignoreSuggestionCapture}" variant="label-hidden"/>-->
+                                            </div>
+                                        </aura:if>
+                                    </div>
+                                    <!--Modal/Popup Box Footer Starts here-->
+                                    <footer class="slds-modal__footer">
+                                        <lightning:button label="{!$Label.c.Jarvis_HandlerDetail_ModalFooterSaveButton}" class="buttonstyle" variant="brand" onclick="{!c.openConfirmation}"/>
+                                        <lightning:button label="{!$Label.c.Jarvis_HandlerDetail_ModalFooterCancelButton}" class="buttonstyle" variant="brand" onclick="{!c.cancelSuggestion}"/>
+                                    </footer>
+                                </div>
+                            </section>
+                            <div class="slds-backdrop slds-backdrop_open"></div>
+                        </div>
+                    </aura:if> 
+                </div>
+            </div>
+        </div>
+        <aura:if isTrue="{!v.isModalOpen}">
+            <iframe src="{!v.vfURL}" width="100%" height="0px;" frameBorder="0"/>
+        </aura:if>
+        <aura:if isTrue="{!v.isModalOpen}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="{!$Label.c.Jarvis_HandlerDetail_ModalCloseAltText}"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Jarvis_HandlerDetail_ModalHeadingGenerating}<!--Generating--></h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <center>{!$Label.c.Jarvis_HandlerDetail_ModalBodyGenerating}<!--Please wait while we process..--></center>
+                        <!--<iframe src="{!v.vfURL}" width="100%" height="0px;" frameBorder="0"/>-->
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral"
+                                          label="{!$Label.c.Jarvis_HandlerDetail_ModalFooterCancelButton}"
+                                          title="{!$Label.c.Jarvis_HandlerDetail_ModalFooterCancelButton}"
+                                          onclick="{! c.closeModel }"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+        
+        <!-- commenting this part as of now
+            <p class="slds-form-element slds-form-element_horizontal">Suggested Situation Instructions</p>
+            <div class="slds-grid slds-box">
+             <div>
+                <lightning:formattedRichText value="{!v.SuggestedSituationInstructions}" label="Suggested Situation Instruction"/>
+             </div>
+            </div>
+             <div>
+                <lightning:button label="Approve" variant="brand" onclick="{!c.saveSuggestion}"/>
+                <lightning:button label="Reject" variant="brand" onclick="{!c.cancelSuggestion}"/>
+             </div>
+         -->
+        <!-- Display List existing + selected Escalation Contacts : SC_SOCC_EscalationContact_Edit -->
+        <aura:if isTrue="{!v.showEscalationList}">
+        	<c:SC_SOCC_EscalationContact_Edit aura:id="escalationContactEditSection"/>
+        </aura:if>
+    </lightning:recordViewForm>
+</aura:component>

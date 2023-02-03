@@ -1,0 +1,142 @@
+<aura:component controller="SF1_NewOpportunityMobileController">
+
+  <aura:attribute name="withContractBL" type="Boolean" default="false"/> <!-- checkfield to identify user's selection for with contract baseline option -->
+  <aura:attribute name="withoutContractBL" type="Boolean" default="false"/> <!-- checkfield to identify user's selection for without contract baseline option -->
+  <aura:attribute name="accountDetails" type="Account"/> <!-- details of account recieved from SF1_LookupComponent component -->
+
+  <!-- ID of account received from account section-->
+  <aura:attribute name="receivedAccountID" type="String"/>
+
+  <!-- ID of previously account selected from custom Lookup Component -->
+  <aura:attribute name="previousAccountId" type="String"/>
+  <!-- Ids of selected Contracts -->
+  <aura:attribute name="selectedContractIDs" type="String[]" default="[]"/>
+
+  <!-- util event for navigation -->
+  <aura:registerEvent name="Opportunity Type Identifier" type="c:SF1_NewOpportunityMobileUtilEvent"/>
+
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+  <header class="slds-docked-composer__header slds-shrink-none" aria-live="assertive">
+    <article class="slds-tile slds-tile_board ">
+      <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-8">
+          <lightning:icon iconName="standard:opportunity" size="small" alternativeText="Opportunity"/>
+        </div>
+        <div class="slds-col slds-size_6-of-8 slds-truncate">
+          <h1 class="slds-text-heading--small ">
+            <div class="slds-truncate" style="text-align:center; ">Create Opportunity</div>
+          </h1>
+        </div>
+        <div class="slds-col slds-size_1-of-8"></div>
+      </div>
+    </article>
+  </header>
+
+  <div class="slds-scrollable_y" style="height: 80vh;">
+
+    <ul class="slds-has-dividers_around-space ">
+      <li>
+        &nbsp;
+      </li>
+      <!-- create SF1_LookupComponent dynamically -->
+      <li >
+        {!v.body}
+      </li>
+
+      <li>
+        &nbsp;
+      </li>
+
+      <aura:if isTrue="{!v.accountDetails == null ? false : true}"> <!-- display only if account is selected -->
+
+        <li class="slds-item slds-color__background_gray-1">
+          <article class="slds-tile slds-tile_board">
+            <div >
+              <lightning:tile >
+                <aura:set attribute="media">
+                  <lightning:icon iconName="standard:account" size="large" alternativeText="Account..."/>
+                </aura:set>
+                <ul >
+                  <li class="slds-item slds-has-flexi-truncate" onclick="{! c.displayRecord}">
+                    <a href="">{!v.accountDetails.Name}</a>
+                  </li>
+                  <li class="slds-item slds-has-flexi-truncate">{!v.accountDetails.Account_Status__c}</li>
+                  <li class="slds-item slds-has-flexi-truncate">{!v.accountDetails.Owner.Name}</li>
+                </ul>
+                <div onclick="{!c.removeAccountDetails}">
+                  <span class="slds-icon_container slds-tile_board__icon" title="description of icon when needed">
+                    <lightning:icon iconName="utility:close" size="x-small" alternativeText="Remove..."/>
+                    <span class="slds-assistive-text">Close Icon</span>
+                  </span>
+                </div>
+              </lightning:tile>
+            </div>
+          </article>
+        </li>
+
+        <li class="slds-item slds-color__background_gray-2">
+          <article class="slds-tile slds-tile_board ">
+                <div style="text-align:center"><strong>Select Contract Baseline</strong></div>
+          </article>
+        </li>
+
+        <li class="slds-item slds-color__background_gray-3">
+          <article class="slds-tile slds-tile_board ">
+            <div class="slds-grid">
+              <div class="slds-col slds-size_4-of-6">
+                <div style="text-align:center">Create Opportunity With Contract Baseline</div>
+              </div>
+              <div class="slds-col slds-size_1-of-6"></div>
+              <div class="slds-col slds-size_1-of-6">
+
+                <div class="slds-form-element">
+                  <label class="slds-checkbox_toggle slds-grid">
+                    <input type="checkbox" name="checkbox" aria-describedby="toggle-desc" value="on" checked="{!v.withContractBL}" onchange="{!c.toggleWithContractBL}"/>
+                    <span id="toggle-desc" class="slds-checkbox_faux_container" aria-live="assertive">
+                      <span class="slds-checkbox_faux"></span>
+                    </span>
+                  </label>
+                </div>
+
+              </div>
+            </div>
+          </article>
+        </li>
+
+        <li class="slds-item slds-color__background_gray-3">
+          <article class="slds-tile slds-tile_board ">
+            <div class="slds-grid">
+              <div class="slds-col slds-size_4-of-6">
+                <div style="text-align:center">New Opportunity Without Contract Baseline</div>
+              </div>
+              <div class="slds-col slds-size_1-of-6"></div>
+              <div class="slds-col slds-size_1-of-6">
+
+                <div class="slds-form-element">
+                  <label class="slds-checkbox_toggle slds-grid">
+                    <input type="checkbox" name="checkbox" aria-describedby="toggle-desc" value="on" checked="{!v.withoutContractBL}" onchange="{!c.toggleWithoutContractBL}"/>
+                    <span id="toggle-desc" class="slds-checkbox_faux_container" aria-live="assertive">
+                      <span class="slds-checkbox_faux"></span>
+                    </span>
+                  </label>
+                </div>
+
+              </div>
+            </div>
+          </article>
+        </li>
+
+      </aura:if>
+    </ul>
+  </div>
+
+  <c:SF1_CustomLoader />
+
+  <footer class="slds-docked-composer__footer slds-shrink-none">
+    <div class="slds-col_bump-left slds-text-align_right">
+      <!-- enable button only if one of the two available ways to create an opportunity is selected -->
+      <button type="button" class="slds-button slds-button_brand" onclick="{!c.nextPage}" disabled="{!v.withContractBL == true || v.withoutContractBL == true ? false : true}">Next</button>
+    </div>
+  </footer>
+</aura:component>

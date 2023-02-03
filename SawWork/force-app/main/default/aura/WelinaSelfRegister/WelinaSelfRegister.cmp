@@ -1,0 +1,227 @@
+<!-- add implements="forceCommunity:availableForAllPageTypes" to surface the component in community builder -->
+<aura:component controller="WelinaSelfRegisterController" implements="forceCommunity:availableForAllPageTypes">
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <aura:attribute name="accountId" type="String" required="false" description="accountId for creating the user. If not specified, it will create a PersonAccount if possible for B2C scenario. Or otherwise if it's in a community, the community's self-registration accountId will be used."/>
+    <aura:attribute name="regConfirmUrl" type="String" required="true"/>
+    <aura:attribute name="startUrl" type="String" required="false" description="The url you go to after a successful login" />
+    <aura:attribute name="showError" type="Boolean" required="true" description="" default="false" access="private"/>
+    <aura:attribute name="errorMessage" type="String" required="false" description="" access="private"/>
+    <aura:attribute name="showSuccess" type="Boolean" required="true" description="" default="false" access="private"/>
+    <aura:attribute name="successMessage" type="String" required="false" description="" access="private"/>
+    <aura:attribute name="firstnameLabel" type="String" required="true" default="First Name"/>
+    <aura:attribute name="lastnameLabel" type="String" required="true" default="Last Name"/>
+    <aura:attribute name="emailLabel" type="String" required="true" default="Email"/>
+    <aura:attribute name="companyNameLabel" type="String" required="true" default="Company"/>
+    <aura:attribute name="linkedInLabel" type="String" required="false" default="LinkedIn URL"/>
+    <aura:attribute name="CountryLabel" type="String" required="true" default="Country"/>
+    <aura:attribute name="countryPicklist" type="String[]" default="USA"/>
+    <aura:attribute name="StateLabel" type="String" required="true" default="State (US residents, use your two-character state code)"/>
+    <aura:attribute name="passwordLabel" type="String" required="false" default="Create Password"/>
+    <aura:attribute name="confirmPasswordLabel" type="String" required="false" default="Confirm Password"/>    
+    <aura:attribute name="submitButtonLabel" type="String" required="false" default="Register"/>
+    <aura:attribute name="cancelButtonLabel" type="String" required="false" default="Already have an account? Log in"/>
+    <aura:attribute name="isUserRegisterSuccessOpenModal" type="boolean" default="false"/>
+    <aura:attribute name="includePasswordField" type="Boolean" required="false" default="false" description="Whether to include password"/>    
+    <aura:attribute name="extraFieldsFieldSet" type="String" required="false" description="A field set name whose fields are desired for user registration"/>
+    <aura:attribute name="extraFields" type="list" required="false" description="A field set name whose fields are desired for user registration"/>
+    <aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
+    <aura:attribute name="expid" type="String" required="false" description="The branding experience ID" />  
+    <aura:attribute name="registerConfirmationText" type="boolean" default="false"/>
+    <aura:attribute name="showState" type="boolean" default="false"/>
+    <aura:attribute name="usePolicy" type="boolean" default="true"/>
+    <aura:attribute name="registerMessage" type="string" default="You need to select Use Policy to Register"/>
+    
+    
+    
+    
+    <aura:registerevent name="sitePropagatedStartUrl" type="c:setStartUrl"/>
+    <aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
+    <aura:dependency resource="c:setStartUrl" type="EVENT"/>
+    
+    <aura:dependency resource="siteforce:registerQueryEventMap" type="EVENT"/>
+    
+    <aura:handler event="c:setStartUrl" action="{!c.setStartUrl}"/> 
+    <aura:handler event="c:setExpId" action="{!c.setExpId}"/>    
+    <aura:dependency resource="c:setExpId" type="EVENT"/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+   
+    <aura:if isTrue="{! !v.registerConfirmationText}">
+        <div> 
+            <!--loading spinner start... style=Brand Medium (blue dots)-->
+            <aura:if isTrue="{!v.Spinner}">
+                <div aura:id="spinnerId" class="slds-spinner_container">
+                    <div class="slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                        <span class="slds-assistive-text">Loading</span>
+                        <div class="slds-spinner__dot-a"></div>
+                        <div class="slds-spinner__dot-b"></div>
+                    </div>
+                </div>
+            </aura:if>
+            <!-- Loading spinner end--> 
+            <div style="text-align:center; font-size:1.5rem;">Hello Akamai User Registration</div>
+            <br></br>
+            <aura:renderIf isTrue="{!v.showError}">
+                <div id="error">
+                    <ui:outputRichText value="{!v.errorMessage}"/>
+                </div>
+            </aura:renderIf>
+            <aura:renderIf isTrue="{!v.showSuccess}">
+                <div id="success">
+                    <ui:outputRichText value="{!v.successMessage}"/>
+                </div>
+            </aura:renderIf>
+            <div id="sfdc_username_container" class="sfdc">
+                <span style="display:none" id="sfdc_user" class="login-icon" data-icon="a"></span>
+                <ui:inputText value="" aura:id="firstname" placeholder="{!v.firstnameLabel}" keyup="{!c.onKeyUp}" class="input sfdc_usernameinput sfdc"/>
+            </div>
+            
+            <div id="sfdc_nickname_container" class="sfdc">
+                <span style="display:none" id="sfdc_user" class="login-icon" data-icon="a"></span>
+                <ui:inputText value="" aura:id="lastname" placeholder="{!v.lastnameLabel}" keyup="{!c.onKeyUp}" class="input sfdc_usernameinput sfdc"/>
+            </div>
+            
+            <div id="sfdc_email_container" class="sfdc">
+                <span style="display:none" id="sfdc_user" class="login-icon" data-icon="k"></span>
+                <ui:inputText value="" aura:id="email" placeholder="{!v.emailLabel}" keyup="{!c.onKeyUp}" class="input sfdc_usernameinput sfdc"/>
+            </div>
+            
+            <div id="sfdc_email_container" class="sfdc">
+                <span style="display:none" id="sfdc_user" class="login-icon" data-icon="k"></span>
+                <ui:inputText value="" aura:id="companyName" placeholder="Company" keyup="{!c.onKeyUp}" class="input sfdc_usernameinput sfdc"/>
+            </div>
+            <!--
+            <div id="sfdc_email_container" class="sfdc">
+                <span style="display:none" id="sfdc_user" class="login-icon" data-icon="k"></span>
+                <ui:inputText value="" aura:id="countryName" placeholder="{!v.CountryLabel}" keyup="{!c.onKeyUp}" class="input sfdc_usernameinput sfdc"/>
+            </div>-->
+            <div id="sfdc_email_container" class="sfdc">
+                <lightning:select class="country-picklist" aura:id="cntryPicklist" name="select" label="Country" required="true">
+                    <aura:iteration items="{!v.countryPicklist}" var="cntry">
+                        <option text="{!cntry}"></option>
+                    </aura:iteration>
+                </lightning:select>
+            </div>
+            <div id="sfdc_email_container" class="sfdc">
+                <span style="display:none" id="sfdc_user" class="login-icon" data-icon="k"></span>
+       			<div class="slds-grid slds-gutters">
+                    <div class="slds-col slds-size_1-of-24">
+                        <input type="checkbox" name="usePolicy" style="height:18px;width:18px;" aura:id="usePolicy" checked="" value="" onclick="{!c.handleChecked}"/>
+                    </div>
+                    <div class="slds-col slds-size_3-of-24">
+                        <p>I have read and accept the <a style="color:white; line-height:25px;" target="_blank" href="/welinaplaygroundlogin/s/welina-policy"><b>{!$Label.c.Hello_Akamai_Policy_Label}</b></a></p>
+                    </div>
+                </div>  
+                
+            </div>
+            <!--
+            <aura:if isTrue="{!v.showState}">
+                <div id="sfdc_email_container" class="sfdc">
+                    <span style="display:none" id="sfdc_user" class="login-icon" data-icon="k"></span>
+                    <ui:inputText value="" aura:id="stateName" placeholder="{!v.StateLabel}" keyup="{!c.onKeyUp}" class="input sfdc_usernameinput sfdc"/>
+                </div>
+            </aura:if>-->
+            
+            <aura:iteration aura:id="extraFields" items="{!v.extraFields}" var="curField" indexVar="index">
+                <div id="sfdc_extrafield_container" class="sfdc">
+                    <span style="display:none" id="sfdc_user" class="login-icon" data-icon="a"></span>
+                    <ui:inputText value="{!curField.value}" aura:id="{!curField.fieldPath}" placeholder="{!curField.label}" keyup="{!c.onKeyUp}" class="input sfdc_extrafieldinput sfdc"/>
+                </div>
+            </aura:iteration>
+            
+            <!--aura:renderIf isTrue="{!v.includePasswordField}">
+                <div id="sfdc_password_container" class="sfdc">
+                    <span id="sfdc_lock" class="login-icon sfdc" data-icon="c"></span>
+                    <ui:inputSecret value="" aura:id="password" placeholder="{!v.passwordLabel}" keyup="{!c.onKeyUp}" class="input sfdc_passwordinput sfdc"/>
+                </div>
+                
+                <div id="sfdc_confirm_password_container" class="sfdc">
+                    <span id="sfdc_lock" class="login-icon sfdc" data-icon="c"></span>
+                    <ui:inputSecret value="" aura:id="confirmPassword" placeholder="{!v.confirmPasswordLabel}" keyup="{!c.onKeyUp}" class="input sfdc_passwordinput sfdc"/>
+                </div>
+            </aura:renderIf-->
+            
+            <div style="text-align:center">
+                <aura:if isTrue="{!v.usePolicy}">
+                    <lightning:button variant="brand" class="slds-button slds-button_stretch register-button-disabled" aura:id="submitButtonDisabled" label="Register" disabled="{!v.usePolicy}" title="{!v.registerMessage}"/>
+                    <aura:set attribute="else">
+                        <lightning:button variant="brand" class="slds-button slds-button_stretch register-button" aura:id="submitButton" label="Register" onclick="{!c.handleSelfRegister}" title="{!v.registerMessage}"/>
+                    </aura:set>
+                </aura:if>
+                <br></br><br></br>
+            </div>
+            <div style="text-align: center">
+                <a class="login-in-link" href="/welinaplaygroundlogin/s/login" type="button">Already have an account? Log in</a>
+            </div>
+            
+            
+            <!--Use aura:if tag to display Model Box, on the bese of conditions. [isOpen boolean attribute] -->   
+            <aura:if isTrue="{!v.isUserRegisterSuccessOpenModal}">
+                
+                <!--###### MODAL BOX Start From Here ######--> 
+                <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+                    <div class="slds-modal__container">
+                        <!-- ###### MODAL BOX HEADER Part Start From Here ######-->
+                        <div class="slds-modal__header">
+                            <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                                X
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                            <h2 id="header99" class="slds-text-heading--medium">Guest Registration</h2>
+                        </div>
+                        <!--###### MODAL BOX BODY Part Start From Here ######-->
+                        <div class="slds-modal__content slds-p-around--medium">
+                            <p><b>Your new account is waiting to be confirmed.</b></p>
+                        </div>
+                        <!--###### MODAL BOX FOOTER Part Start From Here ######-->
+                        <div class="slds-modal__footer">
+                            <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >Close</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-backdrop slds-backdrop--open"></div>
+                <!--###### MODAL BOX Part END Here ######-->
+                
+            </aura:if>
+        </div>
+    </aura:if>
+    <aura:if isTrue="{!v.registerConfirmationText}">
+        <br></br><br></br><br></br>
+        <div data-region-name="content" data-item-id="d0d654ee-c26e-412b-aab0-cfd4baa6da3b" data-aura-rendered-by="65:2;a">
+            <div class="ui-widget" data-item-id="ad8d3f04-8fef-4681-912d-721561a1de4f" data-aura-rendered-by="32:2;a">
+                <div data-aura-rendered-by="23:2;a" class="forceCommunityRichText forceCommunityRichTextInline" data-aura-class="forceCommunityRichText forceCommunityRichTextInline">
+                    <div dir="ltr" data-aura-rendered-by="27:2;a" class="uiOutputRichText" data-aura-class="uiOutputRichText">
+                        <p style="text-align: center;" data-aura-rendered-by="28:2;a">
+                            <b style="font-size: 22px; color: white">NOW, CHECK YOUR EMAIL</b>
+                        </p><!--render facet: 28:2;a-->
+                    </div>
+                    <div class="clear" data-aura-rendered-by="29:2;a">
+                    </div>
+                </div>
+            </div>
+            <br></br>
+            <div class="ui-widget" data-item-id="0dc267d2-3d85-42fa-828d-93e2921b5861" data-aura-rendered-by="47:2;a">
+                <div data-aura-rendered-by="38:2;a" class="forceCommunityRichText forceCommunityRichTextInline" data-aura-class="forceCommunityRichText forceCommunityRichTextInline">
+                    <div dir="ltr" data-aura-rendered-by="42:2;a" class="uiOutputRichText" data-aura-class="uiOutputRichText">
+                        <p style="text-align: center;" data-aura-rendered-by="43:2;a">
+                            <span style="color: white;"> Please check your email and verify your email address in order to log into the Hello Akamai Playground. If you don't receive an email or are not able to log in, contact us at helloakamai@akamai.com</span>
+                        </p><!--render facet: 43:2;a-->
+                    </div>
+                    <div class="clear" data-aura-rendered-by="44:2;a">
+                    </div>
+                </div>
+            </div>
+            <div class="ui-widget" data-item-id="106f08b1-6749-4a6f-b24e-d40825ea1e41" data-aura-rendered-by="62:2;a">
+                <div data-aura-rendered-by="53:2;a" class="forceCommunityRichText forceCommunityRichTextInline" data-aura-class="forceCommunityRichText forceCommunityRichTextInline">
+                    <div dir="ltr" data-aura-rendered-by="57:2;a" class="uiOutputRichText" data-aura-class="uiOutputRichText">
+                        <br></br><br></br>
+                        <p style="text-align: center;" data-aura-rendered-by="58:2;a">
+                            <a class="backtologin" target="_top" href="/welinaplaygroundlogin/s/login">Back to login</a>
+                        </p><!--render facet: 58:2;a--></div><div class="clear" data-aura-rendered-by="59:2;a">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    
+</aura:component>

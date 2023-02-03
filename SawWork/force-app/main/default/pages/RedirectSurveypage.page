@@ -1,0 +1,9 @@
+<apex:page standardcontroller="Survey__c" extensions="RedirectSurveyPageController"  sidebar="false" showHeader="false" >
+ <script>
+ window.onload = redirectPage();
+ function redirectPage()
+ {
+     window.location='{!location}';
+ }
+ </script>
+</apex:page>

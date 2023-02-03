@@ -1,0 +1,23 @@
+<template>
+    <div if:false={chat}>
+        <template if:false={support}>
+            <template if:false={privacy}>
+                <p class="chat-body">{chatText.welcomeText}</p>
+                <button class="custom-btn" onclick={initiateChat}>{chatText.salesChat}</button>
+                <button class="custom-btn" onclick={handleSupport}>{chatText.supportConnect}</button>
+                <br><br>
+                <lightning-formatted-rich-text class="bottom-text" value={chatText.privacyPolicyText}></lightning-formatted-rich-text>
+                </template>    
+        </template>
+    </div>
+    <br/>
+    <br/>
+    <br/>
+    <div if:true={support} if:false={chat}>
+        <div class = "chat-body">{chatText.supportWelcomeText}</div>
+        <p class="chat-body">{chatText.supportLogOn} <a href="https://community.akamai.com/" target="_blank" onclick={communityEvent}>Akamai Customer Site</a></p>
+        <p class="chat-body" if:true={displayPhone}>{chatText.supportCall} <a href={geoContextLink}>{geoContactText}</a></p>
+        <p class="chat-body">{chatText.supportEmail}<a href="mailto:support@akamai.com" onclick={mailEvent}>support@akamai.com</a></p>
+        <button class="custom-btn" onclick={handleRedirection}>{chatText.contactOptions}</button>
+    </div>
+</template>

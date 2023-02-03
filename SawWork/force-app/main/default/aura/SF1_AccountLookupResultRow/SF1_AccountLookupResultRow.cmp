@@ -1,0 +1,23 @@
+<!-- SF1_AccountLookupResultRow --> 
+<aura:component >
+    <aura:attribute name="oAccount" type="Account" />
+  <!--Register the component level event-->
+    <aura:registerEvent name="oSelectedAccountEvent" type="c:SF1_SelectedAccountEvent"/>
+    
+    <li role="presentation">
+        <span class="slds-lookup__item-action slds-media slds-media--center" id="lookup-option-350" role="option">
+         <div class="slds-media__body">
+          <div class="slds-input-has-icon slds-input-has-icon--right">
+            <!--c:svg class="slds-input__icon" xlinkHref="{!$Resource.SLDS24 + '/assets/icons/standard-sprite/svg/symbols.svg#account'}" /-->                   
+            <lightning:icon iconName="standard:account" size="x-small" alternativeText="arrowdown" class="slds-button__icon"/>
+            <div class="slds-lookup__result-text">
+              <a onclick="{!c.selectAccount}">{!v.oAccount.Name}</a><br/> 
+                <div style="font-size: 0.8em;color:#808080; font-weight: bold;">
+                    {!v.oAccount.Account_Owner_Alias__c  } &nbsp;.&nbsp; {!v.oAccount.Account_Status__c }
+                </div>
+            </div>
+          </div>
+        </div>    
+        </span>
+    </li>
+</aura:component>

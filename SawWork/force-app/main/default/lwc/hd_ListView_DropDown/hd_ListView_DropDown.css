@@ -1,0 +1,16 @@
+.panel {
+  display: none;
+  position: absolute;
+  border: 1px solid #b6b6b6;
+  border-radius: 5px;
+  background-color: #ffffff;
+  overflow: visible;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  -webkit-transform: translate3d(0, 0, 0);
+}
+.panel.open,
+.panel.transitioning {
+  display: block;
+}

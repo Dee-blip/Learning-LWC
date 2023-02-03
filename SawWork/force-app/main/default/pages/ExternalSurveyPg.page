@@ -1,0 +1,143 @@
+<!--
+ - Created by kusharma on 07/06/17.
+ -->
+
+<apex:page id="ExternalSurveyPg" controller="ExternalSurveyCtrl" showHeader="false" standardStylesheets="false" title="Akamai Survey Form">
+    <!--<html>
+    <head>
+        <link rel="icon shortcut" href="{!$Site.Prefix}/favicon.ico" />
+    </head>
+    <body>
+    </body>
+    </html>-->
+    <script src="{!URLFOR($Resource.BootstrapCommonFiles, '/bootstrap-3.3.2-dist/js/bootstrap.min.js')}"></script>
+    <apex:stylesheet value="{!URLFOR($Resource.BootstrapCommonFiles, '/bootstrap-3.3.2-dist/css/bootstrap.min.css')}"/>
+    <apex:includeScript value="{!$Resource.JQuery_New}"/>
+    <apex:includeScript value="{!$Resource.ExternalSurvey}"/>
+
+    <apex:includeScript value="{!URLFOR($Resource.BootstrapCommonFiles, '/bootstrap-3.3.2-dist/js/bootstrap.min.js')}"/>
+    <style>
+        html{
+            background-color:#d6e9c6;
+            min-width: 100%;
+            min-height: 100%;
+        }
+        body {
+            height: auto;
+            background-color: #e8f3cf;
+            font-family: Frutiger;
+        }
+        .hCenter {
+                left: 100px;
+                line-height: 200px;
+                margin: auto;
+                margin-top: -100px;
+                position: absolute;
+                top: 50%;
+                width: 60%;
+        }
+    </style>
+    <apex:pageMessages id="msgs" />
+
+    <div id="parentDiv" class="row" style="background-color:#d6e9c6">
+
+        <div class="page-header" style="text-align:center;border-bottom:none;background-color:#d6e9c6">
+            <h1> <apex:image id="theImage" value="{!$Resource.AkamaiLogoSurvey}" width="250" height="130"/><br/><small>Please help us reinforce success and improve by answering a few questions.</small></h1>
+        </div>
+
+        <div id="surveySubmitted">
+
+        </div>
+
+        <div class="container" style="width:60%; background-color: white; box-shadow:0px 0px 20px 5px #888888; margin-bottom: 350px">
+
+            <div id="surveyDiv" class="col-md-12" style="margin-top:25px; margin-bottom:3px;">
+                <div class="alert alert-danger" role="alert" style="width:100%;display:none;text-align:center;font-weight:bold;" id="invalidFormId"><span class="glyphicon glyphicon-remove" aria-hidden="true" style="padding-right:1px"></span>Oh snap! This link is invalid.</div>
+                <div class="alert alert-success" role="alert" style="width:100%;display:none;text-align:center;font-weight:bold;" id="successMessageId"><span class="glyphicon glyphicon-ok" aria-hidden="true" style="padding-right:1px"></span> This form has been saved successfullly..!</div>
+                <apex:form id="surveyBlk" rendered="{! !invalidForm}">
+                    <fieldset disabled="" id="masterFieldSetId">
+                        <apex:repeat id="masterRepeat" value="{! lDataToDisplayOnPage}" var="surveyData">
+                            <div id="masterDiv{!surveyData.typeOfQuestion+surveyData.questionSequence}" class="panel panel-success">
+                                <div class="panel-body">
+
+                                    <apex:outputPanel rendered="true">
+                                        <h4>{!surveyData.question}<apex:outputPanel rendered="{! surveyData.requiredQuestion}"><span class="glyphicon glyphicon-asterisk" aria-hidden="true" style="color:red; padding-left: 2px; font-size:small"></span></apex:outputPanel></h4>
+                                    </apex:outputPanel>
+
+                                    <apex:outputPanel rendered="{!if(surveyData.typeOfQuestion = 'Radio',true,false)}">
+                                        <div class="radio" id="{!surveyData.typeOfQuestion+surveyData.questionSequence}{!IF(surveyData.requiredQuestion,'RequiredQues','OptQues')}">
+                                            <label>
+                                                <apex:selectRadio value="{!surveyData.response}" layout="pageDirection" onClick="validateIndividualField('{!surveyData.typeOfQuestion+surveyData.questionSequence}{!IF(surveyData.requiredQuestion,'RequiredQues','OptQues')}','');">
+                                                    <apex:selectOptions value="{!surveyData.choices}"/>
+                                                </apex:selectRadio>
+                                            </label>
+                                        </div>
+                                    </apex:outputPanel>
+
+                                    <apex:outputPanel rendered="{!if(surveyData.typeOfQuestion = 'Checkbox',true,false)}">
+                                        <div class="checkbox" id="{!surveyData.typeOfQuestion+surveyData.questionSequence}{!IF(surveyData.requiredQuestion,'RequiredQues','OptQues')}">
+                                            <label>
+                                                <apex:selectCheckboxes value="{!surveyData.lCheckboxResponses}" onClick="validateIndividualField('{!surveyData.typeOfQuestion+surveyData.questionSequence}{!IF(surveyData.requiredQuestion,'RequiredQues','OptQues')}','');" disabled="false" layout="pageDirection" rendered="{!if(surveyData.typeOfQuestion = 'Checkbox',true,false)}" >
+                                                    <apex:selectOptions value="{!surveyData.choices}"/>
+                                                </apex:selectCheckboxes>
+                                            </label>
+                                        </div>
+                                    </apex:outputPanel>
+
+                                    <apex:outputPanel rendered="{!if(surveyData.typeOfQuestion = 'Text',true,false)}">
+                                        <div id="{!surveyData.typeOfQuestion+surveyData.questionSequence}{!IF(surveyData.requiredQuestion,'RequiredQues','OptQues')}">
+                                            <apex:inputTextarea value="{!surveyData.response }" rows="5" style="width:100%;" onKeyUp="validateIndividualField('{!surveyData.typeOfQuestion+surveyData.questionSequence}{!IF(surveyData.requiredQuestion,'RequiredQues','OptQues')}','')"/>
+                                        </div>
+                                    </apex:outputPanel>
+
+                                    <apex:outputPanel rendered="{!if(surveyData.typeOfQuestion = 'Picklist',true,false)}">
+                                        <div id="{!surveyData.typeOfQuestion + surveyData.questionSequence}{!IF(surveyData.requiredQuestion,'RequiredQues','OptQues')}">
+                                            <apex:selectList multiselect="false" size="1" value="{!surveyData.response}" onChange="validateIndividualField('{!surveyData.typeOfQuestion + surveyData.questionSequence}{!IF(surveyData.requiredQuestion,'RequiredQues','OptQues')}');" rendered="{!if(surveyData.typeOfQuestion = 'Picklist',true,false)}">
+                                                <apex:selectOptions value="{!surveyData.choices}"/>
+                                            </apex:selectList>
+                                        </div>
+                                    </apex:outputPanel>
+
+                                    <div id="{!surveyData.typeOfQuestion + surveyData.questionSequence}errorMessage" style="display: none; color:#d32d25;">
+                                        <h5>This is a required question</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </apex:repeat>
+
+                        <apex:actionFunction id="submitFormId" name="submitForm" action="{! submitResponses}" onComplete="showSuccessMessage();"/>
+
+                        <apex:outputPanel id="panelId" rendered="true">
+                            <div id="submitButtonDiv">
+                                <center style="padding:20px">
+                                    <apex:commandButton value="Submit" onClick="validateRequiredFields();" styleClass="btn btn-primary btn-lg" rendered="true" id="submitButtonId" reRender="msgs">
+                                    </apex:commandButton>
+                                </center>
+                            </div>
+                        </apex:outputPanel>
+
+                        <div class="modal fade" id="thankYouModal" tabindex="-1" role="dialog" aria-labelledby="thankYouModalLabel">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h3 class="modal-title" id="myModalLabel" style="text-align:center">Thank You..!!</h3>
+                                    </div>
+                                    <div class="modal-body">
+                                        <center><h3><span class="glyphicon glyphicon-saved" aria-hidden="true" style="color:green; padding-left: 2px; padding-right: 2px; text-align:center"></span></h3></center><h4>Your response has been captured. You can close this window now.</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </apex:form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var divToScroll = '';
+		var customerRespondedJS = {! customerResponded};
+        var invalidFormJS = {! invalidForm};
+    </script>
+
+</apex:page>

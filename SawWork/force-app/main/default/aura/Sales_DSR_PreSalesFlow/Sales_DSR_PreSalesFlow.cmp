@@ -1,0 +1,107 @@
+<aura:component implements="force:lightningQuickAction,lightning:availableForFlowScreens,force:hasRecordId,lightning:isUrlAddressable" access="global">
+    
+    <aura:attribute name="dsrRecordTypeId" type="String" access="global"/>
+    <aura:attribute name="accountId" type="String"  access="global"/>
+    <aura:attribute name="opportunityId" type="String"  access="global"/>
+    <aura:attribute name="requesterId" type="String"  access="global"/>
+    <aura:attribute name="newDSRId" type="String"  access="global"/>
+    <aura:attribute name="option" type="Boolean" default = "True"/>
+    <aura:attribute name="optionNoneRequestType" type="Boolean" default = "false"/>
+    <aura:attribute name="validDate" type="Boolean" default = "false"/>
+    <aura:attribute name="errorOnSubmit" type="Boolean" default = "false"/>
+    <aura:attribute name="defaultDateValue" type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    
+     <lightning:recordEditForm aura:id="dsrPreSalesNew"
+                                                      objectApiName="Deal_Support_Request__c"
+                                                      onsuccess="{!c.handleSuccess}"
+                                                      onsubmit="{!c.saveRecord}"
+                                                      onerror="{!c.handleError}"
+                                                      recordTypeId ="{!v.dsrRecordTypeId}"
+                                                      class="slds-card__body_inner "
+                                                      density="comfy"
+                                                      > 
+        <lightning:messages aura:id="formMessage" />
+        <lightning:inputField label="Account"
+                                                                name="Account__c"
+                                                                fieldName="Account__c"
+                                                                required="true"
+                                                                value="{!v.accountId}"
+                                                                disabled = "true"
+                                                                  />
+         <lightning:inputField label="Opportunity"
+                                                                name="Opportunity__c"
+                                                                fieldName="Opportunity__c"
+                                                                required="{!v.opportunityId==null?false:true}"
+                                                                value="{!v.opportunityId}"
+                                                                />
+        
+        <lightning:inputField label="Requester"
+                                                                name="Requester__c"
+                                                                fieldName="OwnerId"                                                         
+                                                                disabled = "true"
+                                                                />
+         
+         
+        <lightning:inputField label="Request Type"              aura:id="requestType"
+                                                                name="Request_Type__c"
+                                                                fieldName="Request_Type__c"
+                                                                required="true"
+                                                                onchange="{!c.onPicklistChange}"
+                                                                  />
+        
+        <aura:if isTrue="{!and(v.option, v.optionNoneRequestType)}">          
+          <lightning:inputField label="Report Type"
+                                                                name="Report_type__c"
+                                                                fieldName="Report_type__c"
+                                                                required="{!v.option}"
+                                                                />
+        </aura:if>
+        <aura:if isTrue="{!!v.option}">
+            <lightning:inputField label="Request Sub-Type"  aura:id="requestSubType"
+                                                            name="Request_Sub_Type__c"
+                                                            fieldName="Request_Sub_Type__c"
+                                                            required="{!!v.option}"
+                                                            /> 
+
+            <lightning:inputField label="product"           aura:id="product"
+                                                            name="productName"
+                                                            fieldName="Product__c"
+                                                            required="{!!v.option}"
+                                                            /> 
+
+            <lightning:inputField label="notes" 
+                                                            name = "Notes__c"
+                                                            fieldName = "Notes__c"
+                                                            required="{!!v.option}"
+                                                            />
+            
+        </aura:if>
+        <lightning:inputField label="Due Date" type="date"
+                                                            name = "Due_Date__c"
+                                                            fieldName = "Due_Date__c"
+                                                            required ="true"
+                                                            aura:id ="duedate"
+                                                            disabled = "false"
+                                                            value = "{!v.defaultDateValue}"
+                                                            onchange = "{!c.onDateChangeValidation}"
+                                                            />
+
+        <aura:if isTrue="{!v.validDate}">
+            <div>
+                <span class="slds-assistive-text">error</span>
+                    <h5 style="color:red">Due date cannot be in the past</h5>
+            </div>
+        </aura:if>
+                                                            
+        <lightning:button class="slds-m-top_small" variant="brand" type="submit" name="update" label="Create new Request" disabled="{!v.validDate}"/><br/><br/>
+        <aura:if isTrue="{!v.errorOnSubmit}">
+            <div>
+                <span class="slds-assistive-text">error</span>
+                    <h4 style="color:red">Please review the top of the page for any errors</h4>
+            </div>
+        </aura:if>
+    </lightning:recordEditForm>
+    
+</aura:component>

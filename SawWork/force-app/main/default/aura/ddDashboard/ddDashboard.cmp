@@ -1,0 +1,39 @@
+<aura:component implements="flexipage:availableForAllPageTypes" access="global">
+    <div class="slds-m-around_small">
+        <lightning:layout>
+            <lightning:layoutItem size="8" class="slds-p-right_medium">
+                <lightning:listView aura:id="mySubmittedDeals" objectApiName="SC_DD_Deal__c"
+                    listName="My_Submitted_Deals_Last_30_Days" rows="5" showSearchBar="true" showActionBar="false"
+                    enableInlineEdit="false" showRowLevelActions="false" />
+            </lightning:layoutItem>
+
+            <lightning:layoutItem flexibility="grow, auto" class="slds-card">
+                <div style="height:100%">
+                    <c:ddPendingDeals />
+                </div>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+    <div class="slds-m-around_small">
+        <lightning:layout>
+            <lightning:layoutItem size="12">
+                <lightning:listView aura:id="openDeals" objectApiName="SC_DD_Deal__c" listName="Open_Deals" rows="5"
+                    showSearchBar="true" showActionBar="false" enableInlineEdit="false" showRowLevelActions="false" />
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+    <div class="slds-m-around_small">
+        <lightning:layout>
+            <lightning:layoutItem size="{! $Browser.isDesktop ? '6' : '12' }" class="slds-p-right_medium">
+                <lightning:listView aura:id="approvedDeals" objectApiName="SC_DD_Deal__c"
+                    listName="Approved_Deals_Last_30_Days" rows="5" showSearchBar="false" showActionBar="false"
+                    enableInlineEdit="false" showRowLevelActions="false" />
+            </lightning:layoutItem>
+            <lightning:layoutItem size="{! $Browser.isDesktop ? '6' : '12' }">
+                <lightning:listView aura:id="rejectedDeals" objectApiName="SC_DD_Deal__c"
+                    listName="Rejected_Deals_Last_30_Days" rows="5" showSearchBar="false" showActionBar="false"
+                    enableInlineEdit="false" showRowLevelActions="false" />
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+</aura:component>

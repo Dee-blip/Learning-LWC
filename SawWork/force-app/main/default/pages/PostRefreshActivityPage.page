@@ -1,0 +1,41 @@
+<apex:page controller="PostRefreshActivityConroller" showHeader="false" >
+      <script>
+      body{background-color:Yellow}
+      </script>
+      <center>
+      <apex:outputText style="font-weight:800; font-size: 30px; " value="Post Refresh Activity"/>
+      </center>
+    
+    <br/><br/>
+    <Apex:pagemessages />
+    <apex:form >
+    
+    <center>
+     <table  border="5" width="80%" height="10%">
+      <tr>
+        <td align="center" vertical-align="middle" height="50"><B>Mask the Contact and Lead Email</B></td>
+        <td >
+            <B>Suffix for masking:</B> <apex:inputText value="{!suffix}"/>
+            <BR/>
+            <B>Batch Size:</B> <apex:inputText value="{!batchSize}"/>
+        </td>
+        <td align="center">
+            <apex:commandButton value="Start the Batch Job" action="{!executeBatch}"/>
+         </td> 
+      </tr>
+      <tr>
+        <td align="center" vertical-align="middle" height="50"><b>Mask the Additional Email's</b></td>
+        <td><B>Suffix for masking:</B> <!--<apex:inputText value="{!suffix}"/>--></td> 
+      </tr>
+      <tr>
+        <td align="center" vertical-align="middle" height="50"><b>Mask the Custom Settings Email's</b></td>
+        <td><B>Suffix for masking:</B> <apex:inputText value="{!maskingParam}"/></td> 
+        <td align="center">
+            <apex:commandButton value="Start Masking" action="{!maskCSAction}"/>
+         </td>
+      </tr>
+    </table>
+    </center>
+    </apex:form>
+      
+</apex:page>

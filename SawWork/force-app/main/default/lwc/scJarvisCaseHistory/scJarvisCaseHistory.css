@@ -1,0 +1,22 @@
+.customStyle
+{
+    padding-top: 0px; 
+    border-radius: 4px;
+}
+
+.tableStyle
+{
+    max-height:80vh; 
+    border-top: 1px solid #d4d4d4; 
+}
+
+.scrollClass
+{
+    overflow-y: scroll ; 
+}
+
+.historyHeaderStyle
+{
+    padding-left: 1%;
+    background-color: #F4F5F4;
+}

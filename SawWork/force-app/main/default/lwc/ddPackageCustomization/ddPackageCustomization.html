@@ -1,0 +1,75 @@
+<template>
+    <div class="slds-p-around_medium" if:false={compConfigList}>
+        No Package Components
+    </div>
+    <table class="slds-table slds-table_cell-buffer slds-no-row-hover slds-table_striped slds-table_bordered" if:true={compConfigList}> <!--slds-table_striped-->
+        <thead>
+            <tr class="slds-line-height_reset" style="padding:10px 20px;">
+                <th class="header" scope="col">
+                    <div class="slds-cell-wrap" title="Component">Component</div>
+                </th>
+                <th class="header" scope="col">
+                    <div class="slds-cell-wrap" title="Standard">Standard</div>
+                </th>
+                <th class="header" scope="col">
+                    <div class="slds-cell-wrap" title="Requested">Requested</div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <template for:each={compConfigList} for:item='cd'>
+                <tr key={cd.configName} class="slds-hint-parent">
+                    <td data-label="Component Name" class="item">
+                        <div class="slds-cell-wrap" title={cd.configName}>{cd.configLabel}</div>
+                    </td>
+                    <td data-label="Standard Value" class="item">
+                        <lightning-formatted-number value={cd.standard} maximum-fraction-digits="1"></lightning-formatted-number>
+                    </td>
+                    <td data-label="Requested" class="item">
+                        <div class="slds-truncate " title="Requested" id={cd.configName}>
+                            <div if:true={readmode}> 
+                                <lightning-formatted-number value={cd.evalValue} maximum-fraction-digits="1"> </lightning-formatted-number>
+                            </div>
+                            <lightning-layout if:false={readmode}>
+                                <lightning-layout-item size="6">
+                                <!--  value={cd.evalValue} title={cd.evalValue} min={cd.min} data-name={cd.configName} -->
+                                    <lightning-input label={cd.configName} variant="label-hidden" type="number"
+                                        value={cd.evalValue} title={cd.evalValue} min="0" data-name={cd.configName} 
+                                        disabled={cd.customFormula} onchange={handleOnChange} max={cd.max}
+                                        message-when-range-overflow={cd.maxError}
+                                        message-when-range-underflow={cd.minError} step="0.1">
+                                    </lightning-input>
+                                    <div if:true={cd.isBelowMin} style="color:red; padding-top:5px; font-size: 11px;">Requested is below Min. <br/> Check with SLM</div>
+
+                                </lightning-layout-item>
+                                <lightning-layout-item size="2">
+                                    <template if:true={cd.formattedCustomFormula}>
+                                        <lightning-helptext content={cd.formattedCustomFormula}>
+                                        </lightning-helptext>
+                                    </template>
+                                </lightning-layout-item>
+                                <lightning-layout-item size="4" class="slds-text-body_small">
+                                    <template if:false={cd.customFormula}>
+                                        <br/>
+                                        <span class="slds-text-body_small"> Min: {cd.min} </span> <!-- <br />
+                                         Max: {cd.max} -->
+                                    </template>
+                                </lightning-layout-item>
+                            </lightning-layout>
+                        </div>
+                    </td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+    <div>
+        <div class="slds-p-around_medium" if:false={readmode}>
+            <div class="slds-float_right">
+                <lightning-button label="Reset" class="slds-p-horizontal_medium" onclick={handleReset}>
+                </lightning-button>
+                <button class="slds-button button" onclick={handleDone} disabled={disableDone}>Done</button>
+            </div>
+        </div>
+    </div>
+
+</template>

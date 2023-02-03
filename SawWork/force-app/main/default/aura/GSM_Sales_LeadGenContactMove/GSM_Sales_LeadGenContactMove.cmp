@@ -1,0 +1,62 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickAction"
+                access="global"
+                controller="GSM_LeadGenContactController">
+    
+    <aura:attribute name="contactList" type="Contact[]" />
+    <aura:attribute name="mycolumns" type="List"/>
+    <aura:attribute name="selectedContactList" type="Contact[]" />
+    <aura:attribute name="selectedRowsCount" type="Integer" default="0"/>
+    <aura:attribute name="maxRowSelection" type="Integer" default="5"/>
+    <aura:attribute name="filterExp" type="String"/>
+    <aura:attribute name="pageNumber" type="Integer" default="1"/>
+    <aura:attribute name="message" type="String"/>
+    <aura:attribute name="loading" type="Boolean"/>
+    <aura:attribute name="showLoadMore" type="Boolean"/>
+    
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:if isTrue="{!v.contactList == null}">
+        <ui:message title="Error" severity="error" closable="false">
+            You cant move Contacts to WWW-Lead-Gen-Account. Please select another Account and try again.
+        </ui:message>
+    </aura:if>
+    <aura:if isTrue="{!v.contactList != null}">
+        <table><tr>
+            <td>
+                <lightning:input type="text" onchange="{!c.filter}" value="{!v.filterExp}" label="Filter" />
+            </td>
+            <td>
+                <lightning:button label="Clear" class="slds-m-top--medium slds-float_right" onclick="{!c.clearContacts}"
+                                  variant="brand" ></lightning:button>
+            </td>
+            <td>
+                <lightning:button label="Move Contacts" class="slds-m-top--medium slds-float_right" onclick="{!c.moveContacts}"
+                                  variant="brand" disabled="{!v.selectedRowsCount==0}"></lightning:button>
+            </td>
+            </tr></table>
+        <br/>
+        <h1>Selected Rows: {! v.selectedRowsCount }</h1>
+        <lightning:datatable data="{! v.contactList }"
+                             columns="{! v.mycolumns }"
+                             keyField="id"
+                             hideCheckboxColumn="false"
+                             maxRowSelection="{! v.maxRowSelection }"
+                             onrowselection="{! c.updateSelectedText }"/>
+        
+        
+        <aura:if isTrue="{!v.showLoadMore}">
+            <button class="slds-button slds-button_neutral slds-button_stretch" onclick="{!c.loadMore}">Load more</button>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.loading}">
+            
+            <div role="status" class="slds-spinner slds-spinner_medium">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+            
+        </aura:if>
+    </aura:if>
+</aura:component>

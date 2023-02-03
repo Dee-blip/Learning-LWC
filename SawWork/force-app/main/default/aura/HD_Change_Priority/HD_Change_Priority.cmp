@@ -1,0 +1,34 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="HD_IncidentDetailController"> 
+    <aura:registerEvent name="HDLogger" type="c:HDLogger"/>
+	<ltng:require scripts="{!$Resource.HD_Error_Logger}" /> 
+    <aura:attribute name="recordId" type="Id" default="a5UR0000000EG00MAG"/>
+    <aura:attribute name="warnings" type="String[]"/>
+    <aura:attribute name="selectedCategoryId" type="String"/>
+    <aura:attribute name="pagesupport" type="Boolean" default="false"/>
+
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:dependency resource="markup://force:editRecord" type="EVENT" />
+    <div>
+         <div aura:id="Accspinner" class="slds-spinner_container slds-hide">
+		<div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+			<span class="slds-assistive-text">Processing</span>
+			<div class="slds-spinner__dot-a"></div>
+			<div class="slds-spinner__dot-b"></div>
+		</div>
+	</div>
+        <div class="">
+            <label class="slds-form-element__label" for="priority-input">Select Priority: </label>
+            <ui:inputSelect class="dynamic custom-inputSelect slds-m-right--medium slds-m-left--small" aura:id="aurapriorityinput" change="{!c.onPrioritySelect}"/>
+            <div aura:id="pgsprtdiv" class="slds-show">
+                <br/>
+            <lightning:input type="checkbox" aura:id="pgsprt" label="Page Support" name="Page Support" checked="{!v.pagesupport}"/>
+                
+                </div>
+            <div class="slds-form-element">
+                <br/>
+                <ui:button aura:id="ChangePriority" label="Change Priority" press="{!c.changeIncPriority}"/>
+ 	  			<ui:inputDefaultError aura:id="warn" value="{!v.warnings}" />
+            </div>
+        </div>
+    </div>
+</aura:component>

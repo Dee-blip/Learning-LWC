@@ -1,0 +1,48 @@
+<apex:page controller="SC_ExternalLink">
+    <apex:includeScript value="/support/console/32.0/integration.js"/> 
+     <apex:includeScript value="{!$Resource.JQuery_New}"/>
+    <apex:form >
+        <apex:pagemessages id="errors"/> 
+        <apex:actionFunction action="{!loadLinks}" name="loadExternalLinks" rerender="linksSection" oncomplete="afterAJaxScripts();return false;"/>
+
+        <apex:outputpanel id="linksSection"> 
+            <apex:repeat id="links" value="{!externalLinkList}" var="x">
+                <apex:outputPanel rendered="{!x.openURLInServiceCLoud__c}">
+                	<a href="{!x.url__c}" class="serviceCloudLinks" target="_new"> {!x.url_name__c} </a>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!Not(x.openURLInServiceCLoud__c)}">
+                	<a href="{!x.url__c}" class="externalLinkClass" target="_new"> {!x.url_name__c} </a>
+                </apex:outputPanel>
+                &nbsp;&nbsp;&nbsp;
+            </apex:repeat>
+        </apex:outputpanel>    
+    </apex:form>
+    <Script>
+        var urlToOpen = null;
+        var Urlname = null;
+        
+		$(document).ready(function() {
+        	loadExternalLinks();
+        	afterAJaxScripts();
+       });
+        
+        function afterAJaxScripts(){
+        	$('.serviceCloudLinks').click(function(event) {
+        		if(sforce != undefined && sforce.console.isInConsole()){
+        			 urlToOpen = $(this).attr('href');
+        			 Urlname = $(this).text();
+                    sforce.console.getEnclosingPrimaryTabId(openSubtab);          
+        			event.preventDefault();
+        		}
+            });
+        }
+        
+        var openSubtab = function openSubtab(result) {
+            //Now that we have the primary tab ID, we can open a new subtab in it
+            var primaryTabId = result.id;
+             sforce.console.openSubtab(primaryTabId , urlToOpen, true, 
+                Urlname, null);
+        };  
+        
+    </Script>
+</apex:page>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexComponent xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>32.0</apiVersion>
+    <description>This component acts as related List for Service Request &amp; Incident Custom page implementation for now, please feel free to use it for the other component as Notes and attachment type</description>
+    <label>Notes_Attachemnt_HD</label>
+</ApexComponent>

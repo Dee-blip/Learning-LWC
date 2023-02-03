@@ -1,0 +1,23 @@
+.THIS {
+}
+
+.THIS .slds-button_neutral:disabled{
+    background-color: #E0E0E0; 
+    color: #606060;
+    font-weight:800;
+}
+
+.THIS .right_button {
+    width: 191px;
+    right: 13px;
+}
+
+.THIS .left_button {
+    width: 140px;
+    left: 16px;
+}
+
+.THIS .center_button {
+    width: 338px;
+    right: 13px;
+}

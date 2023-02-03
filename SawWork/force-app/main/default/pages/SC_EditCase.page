@@ -1,0 +1,165 @@
+<!------------------------------------------------------------------------------
+Author          : Sonia Sawhney
+Description     : Dynamic page for case creation, edit and clone functionalities 
+
+Date                        Developer             JIRA #                      Description                                                       
+------------------------------------------------------------------------------------------------------------------
+20 September 2017      Vandhana Krishnamurthy       ESESP-354      Entitled Services on PS Service Cloud Cases
+16 October 2017        Vandhana Krishnamurthy       ESESP-787      Removed loading delays for Request Type/Sub type/Close Code/Alert Type/Root Cause
+10 September 2018	   Supreeth,Sumukh,Himanshu     ESESP-1529     Adding support for lightning page / component
+-------------------------------------------------------------------------------->
+
+<apex:page StandardController="Case" extensions="SC_EditCaseController" tabStyle="Case" lightningStylesheets="true">
+    
+    <apex:includeScript value="/support/console/43.0/integration.js" />
+    <apex:includeScript value="{!$Resource.JQuery_New}" />
+    <apex:includeScript value="{!$Resource.BootstrapMinJS }"/>
+    <apex:includeScript value="{!URLFOR($Resource.AkapediaStaticResource,'/jquery.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.AkapediaStaticResource,'/typeahead.bundle.min.js')}" />
+    <!-- Checking to see if the page is opened in lightning theme -->
+    <apex:variable var="isLightning" value="{! $User.UIThemeDisplayed == 'Theme4d' || $User.UIThemeDisplayed == 'Theme4u' }" />
+
+    <style>
+        .pbButton 
+        {
+        text-align : right !Important ;
+        }
+        .pbHeader
+        {
+        width : 700px !Important;
+        }
+       
+    </style>
+    
+    <apex:sectionHeader title="Case Edit" subtitle="{!If(objCase.Id == null, 'New Case', objCase.CaseNumber)}"/>
+    <apex:form >
+        <apex:pageBlock title=" Case Edit" mode="edit" >
+            <apex:pageBlockButtons location="top"> 
+                <apex:actionStatus id="mySaveStatus">
+                    <apex:facet name="stop">
+                        <apex:outputPanel >
+                            <apex:commandButton value="Save" action="{!Save}" rerender="msg" status="mySaveStatus"/>
+                            <!--Classic Cancel Button -->
+                            <apex:commandButton value="Cancel" action="{!Cancel}" status="mySaveStatus" immediate="true" rendered="{!!isLightning}" onClick="closeTab();"/>
+                            <!--Lightning Cancel Button -->
+                            <apex:commandButton value="Cancel" status="mySaveStatus" immediate="true" rendered="{!isLightning}" onClick="Close_LC();"/>
+                            
+                            
+                        </apex:outputPanel>
+                    </apex:facet>
+                    <apex:facet name="start">
+                        <apex:outputPanel >
+                            
+                            <img src="/img/loading.gif" width="25" height="25" align="center"/>
+                            <!--<apex:commandButton disabled="true" value="Saving..." status="mySaveStatus"/> -->
+                        </apex:outputPanel>
+                    </apex:facet>
+                </apex:actionStatus>                          
+            </apex:pageBlockButtons>   
+            
+            <apex:actionFunction name="quickSave" action="{!Save}" rerender="msg" status="mySaveStatus"/>
+            
+            <apex:outputPanel style="display: none">
+                <apex:inputField value="{!objCase.Service__c}" id="stdServ" />
+            </apex:outputPanel>
+            
+            <!--
+<apex:outputPanel >
+<apex:inputField value="{!objCase.Request_Type__c}" id="stdReqTyp" />
+</apex:outputPanel>
+
+<apex:outputPanel >
+<apex:inputField value="{!objCase.Close_Code__c}" id="stdCloCod" />
+</apex:outputPanel>
+-->  
+            <apex:pageMessages id="msg"/>
+            
+            <apex:dynamicComponent componentValue="{!DynamicForm}"/>
+            
+        </apex:pageBlock>
+    </apex:form> 
+    
+    <script type="text/javascript">
+    
+    
+    
+    $(document).ready(function(){
+        var x='{!isLightning}';
+        
+        if(x.toString()=='true')
+        { 
+                setTimeout(function(){ 
+             var accstyle = document.getElementsByClassName("emptyDependentLookup");
+              accstyle[0].style.width="318px";
+              accstyle[0].style.height="30px";                        
+              accstyle[0].style.borderRadius ="0.25rem";
+              accstyle[0].style.border="1px solid rgb(221, 219, 218)";
+         	}, 1000);
+             
+        }
+    });
+    
+	//Closing for lightning
+    function Close_LC(){
+        
+        // If page is loaded from a Lightning Console
+        if (sforce.console.isInConsole())
+        {
+            sforce.console.getEnclosingTabId(closeSubtab);
+            
+        }
+        else
+        {   
+            //window.history.go(-2); // Does not work in Safari
+            sforce.one.navigateToURL('/lightning/o/Case/list?filterName=Recent');
+        }
+    }
+    
+    
+    
+    var closeSubtab = function closeSubtab(result) {
+        //Now that we have the tab ID, we can close it
+        var tabId = result.id;
+        sforce.console.closeTab(tabId);
+    };
+    
+    //Close tab for classic console       
+    function closeTab() {
+        sforce.console.getEnclosingTabId(callCloseTab);
+    }
+    var callCloseTab= function callCloseTab(result) {
+        sforce.console.closeTab(result.id);
+    } 
+    
+    var $j = jQuery.noConflict();
+    $j(function()
+       {
+           $(window).bind('keydown', function(event) 
+                          {
+                              //if (event.ctrlKey || event.metaKey) 
+                              if (event.ctrlKey) 
+                              {
+                                  if(String.fromCharCode(event.which).toLowerCase() == 's') 
+                                  {
+                                      quickSave();
+                                      event.preventDefault();
+                                  }
+                              }
+                          });
+       });
+    
+    
+    function testCloseTab() {
+        
+        sforce.console.getEnclosingPrimaryTabId(RefreshSubtab);
+    }
+    
+    var RefreshSubtab = function RefreshSubtab(result) {
+        //Now that we have the primary tab ID, we can close it
+        var tabId = result.id;
+        sforce.console.refreshPrimaryTabById(tabId, true, refreshSuccess);
+        
+    }
+    </script>  
+    
+</apex:page>

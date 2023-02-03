@@ -1,0 +1,284 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="HDUnifiedHistoryLightningEdition">
+    <aura:handler name="init" value="{!this}" action="{!c.unifiedAction}" />
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="unifiedHistoryClass" type="unifiedHistoryClass[]" />
+    <aura:attribute name="unifiedHistoryDateList" type="List" />
+    <aura:attribute name="unifiedHistoryDateListSize" type="Integer" />
+    <aura:attribute name="unifiedHistoryObjTypeList" type="List" />
+    <aura:attribute name="rowCount" type="String" default="5000" />
+    <aura:attribute name="UnifiedMap" type="Map" />
+    <aura:attribute name="record_range" type="integer"
+                    default="5" />
+    <aura:attribute name="placeholder" type="boolean"
+                    default="true" />
+    <aura:attribute name="lastrefreshed" type="String" default=""/>
+    <aura:attribute name="forPrint" type="boolean"
+                    default="false" />
+    <aura:attribute name="currentContentDocumentId" type="String" default="0690R000000GFh4QAG" />
+    
+    
+    <aura:registerEvent name="HD_EmailReceivedEvent" type="c:HD_EmailReceivedEvent"/>
+    <aura:handler event="force:refreshView" action="{!c.unifiedAction}" />
+    <aura:dependency resource="markup://c:HDUnifiedHistoryLightningEdi_ApprovalHistpullover" type="COMPONENT"/>
+    
+    <div aura:id="incHistoryDiv">
+        <div aura:id="unifiedcontent"
+             class="expanditem slds-is-relative">
+            
+            <!-- Adding Spinner -->
+            <aura:renderIf isTrue="{!v.placeholder}">
+                <c:HD_Placeholder_service />
+                <c:HD_Placeholder_service />
+            </aura:renderIf>
+            
+            <br></br>
+            <!-- END Adding Spinner -->
+            <!-- Adding refresh button -->
+            <aura:renderIf isTrue="{!v.placeholder == false ? true : false}">
+                <aura:renderIf isTrue="{!v.forPrint == false}">
+                    <div class="slds-grid slds-grid--align-spread">
+                        <div></div>
+                        <div></div>
+                        <div>
+                            <span class="slds-text-heading--x-small">{!v.lastrefreshed}</span>&nbsp;&nbsp;
+                            <button class="slds-button slds-button--icon-border" aria-haspopup="true" title="Refresh Call History" onclick="{!c.refreshHistoryView}">
+                                <lightning:icon iconName="utility:refresh"
+                                                size="x-small" alternativeText="Refresh" />
+                                <span class="slds-assistive-text">More Options</span>
+                            </button>
+                            <button class="slds-button slds-button--icon-border" aria-haspopup="true" title="Expand Call History" onclick="{!c.expandAll}">
+                                <lightning:icon iconName="utility:add"
+                                                size="x-small" alternativeText="Expand" />
+                                <span class="slds-assistive-text">More Options</span>
+                            </button>
+                        </div>            
+                    </div>
+                </aura:renderIf>
+            </aura:renderIf>    
+            <!--END Adding refresh button --> 
+            <br></br>
+            
+            <aura:iteration items="{!v.unifiedHistoryDateList}"
+                            var="datekey" indexVar="key" end="{!v.record_range}">
+                
+                
+                <!-- All History -->
+                <span class="slds-assistive-text">Call</span>
+                <div class="slds-media">
+                    <div class="slds-media__body">
+                        <div class="{!key == (v.unifiedHistoryDateListSize - 1) ? 'slds-media slds-media--timeline slds-timeline__media--call slds-media--timeline-remove':'slds-media slds-media--timeline slds-timeline__media--call'}"  id="{!key+'sldsmedia'}">
+                            <div class="slds-media__figure slds-timeline__icon">
+                                <div class="slds-icon_container" onclick="{!c.daysago}">
+                                    <lightning:icon iconName="standard:answer_public"
+                                                    size="medium" alternativeText="Indicates approval" />
+                                </div>
+                            </div>
+                            <div class="slds-media__body slds-text-body_small">
+                                <h3 class="slds-truncate" title="Incident History">
+                                    <a href="javascript:void(0);">
+                                        
+                                        <c:HD_AND_ADDER objectType="{!datekey.data}" />
+                                    </a>&nbsp;&nbsp;
+                                    <aura:if isTrue="{!key == 0 ? 'true' : 'false'}">
+                                        <span style="background-color: #f98e77;line-height: 2.25;" class="slds-badge slds-text-body--xx-small">Latest
+                                            Update</span>
+                                    </aura:if>
+                                    <!-- Setting Time-Spent --> 
+                                    <span style="background-color: #5DADE2;line-height: 2.25;" class="slds-badge slds-text-body--xx-small" title="Time Spent">
+                                        <aura:iteration items="{!datekey.data}" var="Objtype"
+                                                        indexVar="key1">
+                                            <aura:iteration items="{!Objtype.data}" var="unifieddata" indexVar="key">
+                                                {!unifieddata.duration}
+                                            </aura:iteration>
+                                        </aura:iteration>
+                                    </span>
+                                    <!--  END of Setting time-Spent -->
+                                    <c:HD_DaysAgoComponent undate="{!datekey.key}" />
+                                </h3>
+                                <div id="{!'collapsable'+key}" aura:id="{!'collapsable'+key}"
+                                     data-index="{!key}" class="">
+                                    <aura:iteration items="{!datekey.data}" var="Objtype"
+                                                    indexVar="key1">
+                                        <!-- History -->
+                                        <aura:renderIf isTrue="{!Objtype.key == 'History' ? 'true' : 'false'}">
+                                            <aura:iteration items="{!Objtype.data}" var="unifieddata"
+                                                            indexVar="key">
+                                                <p id="{!key}" class="slds-truncate" title="">
+                                                    <!--aura:unescapedHtml value="{!unifieddata.action}"/-->
+                                                    <ui:outputRichText value="{!unifieddata.action}" />
+                                                </p>
+                                            </aura:iteration>
+                                        </aura:renderIf>
+                                        <!-- END History -->
+                                        <!-- Action History -->
+                                        <aura:renderIf isTrue="{!Objtype.key == 'Action History' ? 'true' : 'false'}">
+                                            <aura:iteration items="{!Objtype.data}" var="unifieddata"
+                                                            indexVar="key">
+                                                <!-- Add new component here for Action History  -->
+                                                <c:HD_UNI_ACTION_HISTORY actionHistoryData="{!unifieddata}" forPrint="{!v.forPrint}"/>
+                                                <!--END Add new component here -->
+                                            </aura:iteration>
+                                        </aura:renderIf>
+                                        <!--- END Action History -->
+                                        <!-- Approval History -->
+                                        <aura:renderIf isTrue="{!Objtype.key == 'Approval History' ? 'true' : 'false'}">
+                                            <aura:iteration items="{!Objtype.data}" var="unifieddata"
+                                                            indexVar="key">
+                                                <p>
+                                                    <b>Approval Stages</b>
+                                                </p>
+                                                <!-- Approval steps table -->
+                                                <table
+                                                       class="slds-table slds-table_bordered slds-table_resizable-cols slds-table_fixed-layout" role="grid">
+                                                    <thead>
+                                                        <tr class="slds-line-height_reset">
+                                                            
+                                                        	<th class="slds-is-sortable slds-is-resizable slds-text-title_caps" scope="col"> <!-- PRTORES-1628 Adding Date -->
+                                                            	<div class="slds-truncate" title="Date">Date</div>
+                                                        	</th>        
+                                                            <th class="slds-is-sortable slds-is-resizable slds-text-title_caps" scope="col">
+                                                                <div class="slds-truncate" title="Status">Status</div>
+                                                            </th>
+                                                            <th class="slds-is-sortable slds-is-resizable slds-text-title_caps" scope="col">
+                                                                <div class="slds-truncate" title="Assigned To">Assigned To</div>
+                                                            </th>
+                                                            <th class="slds-is-sortable slds-is-resizable slds-text-title_caps" scope="col">
+                                                                <div class="slds-truncate" title="Actual Approver">Actual Approver
+                                                                </div>
+                                                            </th>
+                                                            <th class="slds-is-sortable slds-is-resizable slds-text-title_caps" scope="col">
+                                                                <div class="slds-truncate" title="Comment">Comment</div>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <aura:iteration items="{!unifieddata.stepandworkitemunifiedlist}"
+                                                                        var="workitem">
+                                                            <tr>
+                                                                
+                                                            	<td data-label="Date">
+                                                                	<div class="slds-truncate" title="{!workitem.stepcreatedDate}">
+                                                                  		<ui:outputDateTime format="MMM dd, yyyy hh:mm a" value="{!workitem.stepcreatedDate}" /> <!-- PRTORES-1628 Adding Date -->
+                                                                	</div>
+                                                            	</td>
+                                                                <td data-label="Status">
+                                                                    <div class="slds-truncate" title="{!workitem.stepstatus}">{!workitem.stepstatus}
+                                                                    </div>
+                                                                </td>
+                                                                <td data-label="Assigned To">
+                                                                    <div class="slds-truncate" title="{!workitem.assigned_To}">{!workitem.assigned_To}
+                                                                    </div>
+                                                                </td>
+                                                                <td data-label="Actual Approver">
+                                                                    <div class="slds-truncate" title="{!workitem.actual_Approver}">{!workitem.actual_Approver}
+                                                                    </div>
+                                                                </td>
+                                                                <td data-label="Comment">
+                                                                    <div class="wordwrap" title="{!workitem.approval_Comment}">{!workitem.approval_Comment}
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </aura:iteration>
+                                                    </tbody>
+                                                </table>
+                                                <!-- END Approval steps table -->
+                                            </aura:iteration>
+                                            <c:HDUnifiedHistoryLightningEdi_ApprovalHistpullover recordId="{!v.recordId}"/>
+                                        </aura:renderIf>
+                                        <!-- Approval History -->
+                                        <!-- Spark saved Conversation History -->
+                                        <aura:renderIf isTrue="{!Objtype.key == 'Snote' ? 'true' : 'false'}">
+                                            <aura:iteration items="{!Objtype.data}" var="unifieddata"
+                                                            indexVar="key">
+                                                
+                                                <h3 class="slds-truncate" title="">
+                                                    <span style="background-color: #EB984E" class="slds-badge slds-text-body--xx-small">
+                                                        {!Objtype.key == 'Snote' ? '' : ''}</span>
+                                                </h3> 
+                                                
+                                                <p id="{!unifieddata.incident_History_ID}" class="slds-text-color--weak slds-text-body--regular" style="white-space: pre-wrap;cursor:pointer" onclick="{!c.openFile}">
+                                                    <!--aura:unescapedHtml value="{!unifieddata.richNote}" ></aura:unescapedHtml-->
+                                                    <ui:outputRichText value="{!unifieddata.richNote}" />
+                                                    <!--lightning:formattedRichText value="{!unifieddata.richNote}" /-->
+                                                </p>
+                                            </aura:iteration>
+                                        </aura:renderIf>
+                                        <!--- END Spark saved Conversation History -->
+                                    </aura:iteration>
+                                </div>
+                                <ul class="slds-list--horizontal slds-wrap">
+                                    <li class="slds-m-right--large">
+                                        <span class="slds-text-body--small">
+                                            <aura:iteration items="{!datekey.data}" var="Objtype"
+                                                            indexVar="key">
+                                                <!-- for History badge-->
+                                                <aura:if isTrue="{!Objtype.key == ('Action History' || 'History') }">
+                                                    <span class="slds-badge slds-text-body--xx-small">
+                                                        {!Objtype.key == 'History' ? 'Ticket Update' : 'Note'}
+                                                    </span>
+                                                </aura:if> 
+                                                <!-- END for History badge --> 
+                                                <!-- for Webex Chat-->
+                                                <aura:if isTrue="{!Objtype.key == 'Snote' }">
+                                                    <span class="slds-badge slds-text-body--xx-small">
+                                                        Webex Chat
+                                                    </span>
+                                                </aura:if> 
+                                                <!-- END Webex Chat badge --> 
+                                                
+                                            </aura:iteration>
+                                        </span>
+                                    </li>
+                                    
+                                    
+                                    <li class="slds-m-right--large">
+                                        <aura:iteration items="{!datekey.data}" var="Objtype"
+                                                        indexVar="key" start="0" end="1">
+                                            <aura:iteration items="{!Objtype.data}" var="unifieddata"
+                                                            indexVar="key" start="0" end="1">
+                                                <span class="slds-text-title">
+                                                    <aura:renderIf isTrue="{!unifieddata.who.length > 0 ? true:false}">By:</aura:renderIf>
+                                                    <aura:renderIf isTrue="{!unifieddata.user_staff_name.length > 0 ? true:false}">By:</aura:renderIf>
+                                                </span>
+                                                <span class="slds-text-body--small">
+                                                    <b>&nbsp;&nbsp;
+                                                        {!unifieddata.who}{!unifieddata.user_staff_name}
+                                                    </b>
+                                                </span>
+                                            </aura:iteration>    
+                                        </aura:iteration>  
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-media__figure slds-media__figure--reverse">
+                        <div class="slds-timeline__actions">
+                            <p class="slds-timeline__date">
+                                <ui:outputDateTime format="MMM dd, yyyy hh:mm a" value="{!datekey.key}" />
+                            </p>
+                            <aura:renderIf isTrue="{!v.forPrint == false}">
+                                <button id="{!key}" data-record="{!key}" onclick="{!c.toggleCollapse}"
+                                        class="slds-button slds-button--icon-border-filled slds-button--icon-x-small"
+                                        aria-haspopup="true" title="Show or Hide History">
+                                    <lightning:icon iconName="utility:down" size="x-small"
+                                                    alternativeText="Indicates approval" />
+                                    <span class="slds-assistive-text">Updated by</span>
+                                </button>
+                            </aura:renderIf>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- END History -->
+                
+            </aura:iteration>
+        </div>
+        <aura:if isTrue="{!(v.unifiedHistoryDateListSize-v.record_range) > 0 ? true:false }">
+            <div class="slds-text-align--center" aura:id="showMore">
+                <a href="javascript:void(0);" onclick="{!c.showMoreHist}">Show
+                    +{!v.unifiedHistoryDateListSize-v.record_range }</a>
+            </div>
+        </aura:if>
+    </div>
+</aura:component>

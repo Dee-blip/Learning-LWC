@@ -1,0 +1,33 @@
+<!--CR 2801991 - NAP Portal - Update Left Menu
+Developer: Ruchika Sharma-->
+<apex:page >
+
+    <style type="text/css">
+        a:link {
+            text-decoration: none;
+        }
+
+        div,
+        html,
+        body {
+            background: #F1F3F5;
+            line-height: 170%;
+        }
+    </style>
+
+    <div>
+        <!-- SFDC-7653 - @nadesai -->
+        <a href="{!$Label.NetAlliance_Partner_Portal_Link}" target="_blank">
+            {! $Label.NapRebrand_Label1 }</a>
+        <br/>
+        <!-- CR 3018377  -->
+        <!-- <a href="{!$Label.PRM_Akamai_University_for_Partners}" target="_blank">Akamai University for Partners</a> -->
+        <!--     <apex:outputLink value="apex/AkamaiUniversityRedirect" id="akamaiUniversityLink" onclick="captureAULogin()">Akamai University for Partners</apex:outputlink>
+ -->
+        <apex:outputLink target="_blank" value="apex/AkamaiUniversityRedirect?target=_parent" id="akamaiUniversityLink">Akamai University for Partners</apex:outputlink>
+
+        <br/>
+        <a href="{!$Label.PRM_Luna_Control_Center}" target="_blank">Luna Control Center</a>
+        <br/>
+    </div>
+</apex:page>

@@ -1,0 +1,3 @@
+<apex:page controller="updateTrafficShareModifiedDateController" action="{!init}">
+    <apex:pageMessages />
+</apex:page>

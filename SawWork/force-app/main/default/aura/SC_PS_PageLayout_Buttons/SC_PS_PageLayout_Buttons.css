@@ -1,0 +1,23 @@
+.THIS.toggle {
+    display: none !Important;
+}
+.THIS .buttonfont
+{
+    font-size: 11px;
+}
+
+.THIS .buttonfont
+{
+    color:rgb(30, 87, 120) !Important;        
+}
+
+.THIS .psButtonMarginClass
+{
+    margin-right: 5px !important;
+    border-radius: 0.25rem !important;
+}
+
+.THIS .borderRadiusPS
+{
+    border-radius: 0.25rem !important;
+}

@@ -1,0 +1,10 @@
+.THIS {
+}
+
+.THIS .rightAlign{
+    text-align: right;
+}
+
+.THIS .label-hidden > label {
+    display: none;
+}

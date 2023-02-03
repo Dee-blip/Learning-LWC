@@ -1,0 +1,308 @@
+<aura:component controller="SF1_Controller_MergeOppty" implements="force:hasRecordId,force:lightningQuickAction">
+
+
+ <aura:attribute name="recordId" type="Id" />
+ <aura:attribute name="isLightning" type="boolean" default="true"/>
+ <aura:attribute name="isPrimaryFlow" type="Boolean" default="true" />
+ <aura:attribute name="selectedPrimaryOpportunity" type="Opportunity" />
+ <aura:attribute name="listOfOpportunitiesSecondary" type="Opportunity[]" />
+ <aura:attribute name="listOfOpportunitiesPrimary" type="Opportunity[]" />
+ <aura:attribute name="selectedSecondaryOpportunities" type="Opportunity[]" />
+ <aura:attribute name="selectedPrimaryOpportunityPlaceholder" type="Opportunity" />
+ <aura:attribute name="displayBackButton" type="Boolean" default="false"/>
+ <aura:attribute name="displayNextButton" type="Boolean" default="true"/>
+ <aura:attribute name="disableUpdateButton" type="Boolean" default="true"/>
+  <aura:attribute name="uncheckBoxes" type="Boolean" default="false"/>
+  <aura:attribute name="errormessage" type="String" default=""/>
+  <aura:attribute name="successMessage" type="String" default=""/>
+  
+   <aura:attribute name="dupeError" type="Boolean" default="false"/>
+
+
+ <!-- Initialization event -->
+ <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+
+
+  <c:SF1_CustomLoader />
+
+
+
+<aura:if isTrue="{!!v.isLightning }">
+<aura:if isTrue="{!v.isPrimaryFlow }">
+  <aura:if isTrue="{!!v.dupeError }">
+  <header class="slds-docked-composer__header slds-shrink-none" style="margin-top:2.5%;">
+    <article class="slds-tile slds-tile_board ">
+      <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-8">
+          <lightning:icon iconName="standard:opportunity" size="small" alternativeText="Opportunity"/>
+        </div>
+        <div class="slds-col slds-size_6-of-8 slds-truncate">
+          <h1 class="slds-text-heading--small ">
+          
+            <div class="slds-truncate" style="font-size:1rem;">Select Primary Opportunity</div>
+        
+          </h1>
+        </div>
+       
+      </div>
+    </article>
+
+
+  </header>
+<ul class="slds-has-dividers_around-space " style="margin-top:2.5%;margin-left:5%;">
+    
+<aura:iteration items="{!v.listOfOpportunitiesPrimary}" var="eachOpp">
+  <li class="slds-item slds-color__background_gray-3">
+<article class="slds-tile slds-tile_board">
+      <lightning:tile >
+       
+         
+
+        <ul >
+          <li class="slds-item slds-has-flexi-truncate">
+            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+
+              <div class="slds-p-horizontal_small slds-size_1-of-8">
+                <div class="slds-col_bump-left slds-text-align_right">
+                   <lightning:icon iconName="standard:opportunity" size="medium" alternativeText="Primary Opportunity"/>
+                </div>
+              </div>
+               <div class="slds-p-horizontal_small slds-size_5-of-8" onclick="{!c.goToOpportunity}" data-value="{! eachOpp.Id}" style="color:#0070d2;">
+                <strong><ui:outputText value="{! eachOpp.Name }"/></strong>
+              </div>
+              <div class="slds-p-horizontal_small slds-size_2-of-8" >
+                <div class="slds-col_bump-left slds-text-align_right">
+                   <lightning:input aura:id="{!eachOpp.Id}" type="checkbox-button" label=" " name="{! eachOpp.Id }" checked="{!v.uncheckBoxes}" onchange="{!c.clickOnCheckBox}"/>
+                 
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </lightning:tile>
+  
+     <lightning:tile >
+        <ul >
+          <li class="slds-item slds-truncate">
+            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+              <div class="slds-p-horizontal_small slds-size_2-of-8" style="font-weight:bold;">Contact : </div>
+              <div class="slds-p-horizontal_small slds-size_6-of-8">
+                <aura:if isTrue="{!eachOpp.ContactName != null }">
+                  <div class="slds-truncate">
+                    &nbsp;<ui:outputText value="{! eachOpp.ContactName }"/>
+                  </div>
+                  
+                </aura:if>
+
+              </div>
+            </div>
+          </li>
+      </ul>
+  </lightning:tile>
+  </article>
+</li>
+</aura:iteration>
+</ul>
+</aura:if>
+</aura:if>
+
+ <aura:if isTrue="{!!v.isPrimaryFlow }">
+
+
+ <header class="slds-docked-composer__header slds-shrink-none" style="margin-top:2.5%;">
+    <article class="slds-tile slds-tile_board ">
+      <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-8">
+          <lightning:icon iconName="standard:opportunity" size="small" alternativeText="Opportunity"/>
+        </div>
+        <div class="slds-col slds-size_6-of-8 slds-truncate">
+          <h1 class="slds-text-heading--small ">
+            
+            <div class="slds-truncate" style="font-size:1rem;">Primary Opportunity</div>
+
+          </h1>
+        </div>
+       
+      </div>
+    </article>
+  </header>
+
+
+
+  <ul class="slds-has-dividers_around-space " style="margin-top:2.5%;margin-left:5%;">
+    <li class="slds-item slds-color__background_gray-3">
+<article class="slds-tile slds-tile_board">
+      <lightning:tile >
+       
+         
+
+        <ul >
+          <li class="slds-item slds-has-flexi-truncate">
+            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+
+              <div class="slds-p-horizontal_small slds-size_1-of-8">
+                <div class="slds-col_bump-left slds-text-align_right">
+                   <lightning:icon iconName="standard:opportunity" size="medium" alternativeText="Primary Opportunity"/>
+                </div>
+              </div>
+              <div class="slds-p-horizontal_small slds-size_5-of-8" onclick="{!c.goToOpportunity}" data-value="{! v.selectedPrimaryOpportunity.Id}" style="color:#0070d2;">
+                <strong><ui:outputText value="{! v.selectedPrimaryOpportunity.Name }" /></strong>
+              </div>
+              <div class="slds-p-horizontal_small slds-size_2-of-8">
+                <div class="slds-col_bump-left slds-text-align_right">
+                   <lightning:icon iconName="standard:task2" size="medium" alternativeText="checked"/>
+                 
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </lightning:tile>
+  
+     <lightning:tile >
+        <ul >
+          <li class="slds-item slds-truncate">
+            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+              <div class="slds-p-horizontal_small slds-size_2-of-8" style="font-weight:bold;">Contact :</div>
+              <div class="slds-p-horizontal_small slds-size_6-of-8">
+                <aura:if isTrue="{!v.selectedPrimaryOpportunity.ContactName != null }">
+                  <div class="slds-truncate">
+                    &nbsp;<ui:outputText value="{!v.selectedPrimaryOpportunity.ContactName }"/>
+                  </div>
+                  
+                </aura:if>
+
+              </div>
+            </div>
+          </li>
+      </ul>
+  </lightning:tile>
+  </article>
+</li>
+</ul>
+</aura:if>
+
+<aura:if isTrue="{!!v.isPrimaryFlow}">
+  <header class="slds-docked-composer__header slds-shrink-none" style="margin-top:2.5%;">
+    <article class="slds-tile slds-tile_board ">
+      <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-8">
+          <lightning:icon iconName="standard:opportunity" size="small" alternativeText="Opportunity"/>
+        </div>
+        <div class="slds-col slds-size_6-of-8 slds-truncate">
+          <h1 class="slds-text-heading_small">
+            
+          
+            <div class="slds-truncate" style="font-size:1rem;">Secondary Opportunities</div>
+            
+           
+          </h1>
+        </div>
+       
+      </div>
+    </article>
+  </header>
+
+
+
+
+ <ul class="slds-has-dividers_around-space " style="margin-top:2.5%;margin-left:5%;">
+    
+<aura:iteration items="{!v.listOfOpportunitiesSecondary}" var="eachOpp">
+  <li class="slds-item slds-color__background_gray-3">
+<article class="slds-tile slds-tile_board">
+      <lightning:tile >
+       
+         
+
+        <ul >
+          <li class="slds-item slds-has-flexi-truncate">
+            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+
+              <div class="slds-p-horizontal_small slds-size_1-of-8">
+                <div class="slds-col_bump-left slds-text-align_right">
+                   <lightning:icon iconName="standard:opportunity" size="medium" alternativeText="Primary Opportunity"/>
+                </div>
+              </div>
+              <div class="slds-p-horizontal_small slds-size_5-of-8" onclick="{!c.goToOpportunity}" data-value="{! eachOpp.Id}" style="color:#0070d2;">
+                <strong><ui:outputText value="{! eachOpp.Name }"/></strong>
+              </div>
+              <div class="slds-p-horizontal_small slds-size_2-of-8">
+                <div class="slds-col_bump-left slds-text-align_right">
+                   <lightning:input  type="checkbox-button" label=" " name="{! eachOpp.Id }" checked="false" onchange="{!c.clickOnSecondaryCheckBox}"/>
+                 
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </lightning:tile>
+  
+     <lightning:tile >
+        <ul >
+          <li class="slds-item slds-truncate">
+            <div class="slds-grid slds-wrap slds-grid_pull-padded" style="text-align:left;">
+              <div class="slds-p-horizontal_small slds-size_2-of-8" style="font-weight:bold;">Contact : </div>
+              <div class="slds-p-horizontal_small slds-size_6-of-8">
+                <aura:if isTrue="{!eachOpp.ContactName != null }">
+                  <div class="slds-truncate">
+                    &nbsp;<ui:outputText value="{! eachOpp.ContactName }"/>
+                  </div>
+                  
+                </aura:if>
+
+              </div>
+            </div>
+          </li>
+      </ul>
+  </lightning:tile>
+  </article>
+</li>
+</aura:iteration>
+</ul>
+ </aura:if>
+
+
+<aura:if isTrue="{!v.errormessage != '' ? true : false}">
+      
+      <ui:message  title="Error" severity="error" closable="false">
+        {!v.errormessage}
+      </ui:message>
+      
+    </aura:if>
+
+
+<aura:if isTrue="{!v.successMessage != '' ? true : false}">
+      
+      <ui:message title="Success" severity="confirm" closable="false">
+        {!v.successMessage}
+      </ui:message>
+      
+    </aura:if>
+
+
+    
+
+<footer class="slds-docked-composer__footer slds-shrink-none">
+
+
+    <div class="slds-align_absolute-center">
+    <aura:if isTrue="{!v.displayBackButton}">
+      <lightning:button aura:id="backButton" type="button" class="slds-button slds-button_brand" onclick="{! c.backButton }">Back</lightning:button>
+    </aura:if>
+      
+    <aura:if isTrue="{!!v.isPrimaryFlow}">
+      <lightning:button aura:id="uoButton" type="button" disabled="{!v.selectedSecondaryOpportunities.length>0 ? false : true}" class="slds-button slds-button_brand" onclick="{! c.updateOpportunityFunction }">Update Opportunities</lightning:button>
+      <aura:set attribute="else">
+        <aura:if isTrue="{!v.displayNextButton}">
+          <lightning:button aura:id="nextButton" type="button" class="slds-button slds-button_brand" onclick="{! c.setPrimaryOpportunity }" disabled="{!v.selectedPrimaryOpportunityPlaceholder == null ? true : false}">Next</lightning:button>
+        </aura:if>
+      </aura:set>
+  </aura:if>
+  
+
+    </div>
+  </footer>
+</aura:if>
+</aura:component>

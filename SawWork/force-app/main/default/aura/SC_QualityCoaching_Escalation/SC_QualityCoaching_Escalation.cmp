@@ -1,0 +1,163 @@
+<!--=====================================================================================================+
+    Component name      : SC_QualityCoaching_Escalation
+    Author              :   Pinkesh
+    Created             :   22-Sep-19
+    JIRA                :   ESESP-2316
+    Purpose             :  Quality Coaching Create/Edit button
+             
+    Last Modified         Developer                 Purpose            
+    ============= ========================         ==========
+
++=====================================================================================================-->
+<aura:component implements="lightning:actionOverride,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:utilityItem" controller="SC_QualityCoaching_Escalation_Handler" access="global">
+    <!-- attributes coming from the parent utility bar component -->
+    <aura:attribute name="sourceId" type="String"/>
+    <aura:attribute name="sourceType" type="String"/>
+    <aura:attribute name="parentType" type="String"/>
+    
+    <!-- attributes -->
+    <!--1. To store the Quality Coaching object.-->
+    <aura:attribute name="qualityCoaching" type="Object" default="[]"/>
+    
+    <!--2. To store the table data which contains Quality Coaching Criteria.--> 
+    <aura:attribute name="tableData" type="List"/>
+    
+    <!--3. To check if user has access to create QC record -->
+    <aura:attribute name="isUserAuthorized" type="Boolean" default="false"/>
+
+    <!--4. To store the  label of the save button. Label changes dynamically during action call.-->
+    <aura:attribute name="dynamicButtonLabel" type="String" default="Save"/>
+    
+    <!--5. Error Message -->
+    <aura:attribute name="errorMessage" type="String" default="Loading...!"/>
+    
+    <!-- Loading spinner -->
+    <lightning:spinner aura:id="mySpinner" variant="brand" size="large"/>
+    
+    <!-- for utility functions -->
+    <lightning:utilityBarAPI aura:id="utilitybar" />
+    
+    <!-- Method to get and populate the data. Called from the Utility Component -->
+    <aura:method name="getData" description="Method to populate the data">
+        <aura:attribute name="sourceId" type="String" />
+        <aura:attribute name="sourceType" type="String" />
+        <aura:attribute name="parentType" type="String" />
+    </aura:method>
+    
+    <!-- If user auhtorized -->
+    <aura:if isTrue="{!v.isUserAuthorized}">
+        <div class="slds-p-around_small">
+            <!-- Table -->
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered" style="width:100%">
+                <!-- Table Header -->
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <th class="slds-text-title_caps" scope="col">
+                            <div class="slds-truncate" >Quality Theme</div>
+                        </th>
+                        <th class="slds-text-title_caps" scope="col">
+                            <table class="slds-table slds-table_cell-buffer" style="width:100%">
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th class="slds-text-title_caps" scope="col" style="width:70%">
+                                            <div class="slds-truncate" >Criteria Name</div>
+                                        </th>
+                                        <th class="slds-text-title_caps" scope="col">
+                                            <div class="slds-truncate" >Response</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </th>
+                    </tr>
+                </thead>
+                
+                <!--Table Body -->
+                <tbody id="myTable">
+                    <aura:iteration items="{!v.tableData}" var="tdRec">
+                        <tr class="slds-hint-parent">
+                            <td>
+                                <div class="slds-truncate">
+                                    {!tdRec.qualityTheme}
+                                </div>
+                            </td>
+                            <td>
+                                <table class="slds-table slds-table_cell-buffer" style="width:100%">
+                                    <tbody>
+                                        <aura:iteration items="{!tdRec.lQualityCoachingCriteria}" var="qcc">
+                                            <tr>
+                                                <td style="width: 72%; border: 0px">
+                                                    <div class="slds-truncate">
+                                                        <div class="slds-form-element">
+                                                            <div class="slds-form-element__icon" onmouseover="{!c.displayToolTip}" onmouseout="{!c.displayOutToolTip}">
+                                                                <a id="{!'tooltip_icon-'+qcc.qualityCoachingCriteria.Criteria_Number__c}" href="javascript:void(0);">
+                                                                    <lightning:icon iconName="utility:info" size="xx-small" alternativeText="Help"/>
+                                                                    <span class="slds-assistive-text">Help</span>
+                                                                </a>
+                                                            </div>
+                                                            <div class="slds-form-element__label">
+                                                                &nbsp;{!qcc.qualityCoachingCriteria.Criteria_Name__c}
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-popover slds-popover--tooltip slds-nubbin_left toggle" role="tooltip" aura:id="tooltipText" aria-live="polite" style="position:absolute;top:-1rem;margin-left:2rem;white-space:pre-wrap;">
+                                                            <div class="slds-popover__body">
+                                                                <ul class="slds-list--dotted">
+                                                                    <aura:iteration items="{!qcc.lToolTip}" var="eachTooltipText">
+                                                                        <li><p class="slds-wrap slds-hyphenate">{!eachTooltipText}</p></li>
+                                                                    </aura:iteration>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td style="border: 0px">
+                                                    <div class="slds-checkbox_add-button">
+                                                        <input type="checkbox" class="slds-assistive-text" id="{!'add-checkbox-'+qcc.qualityCoachingCriteria.Criteria_Number__c}" value="{!'add-checkbox-'+qcc.qualityCoachingCriteria.Criteria_Number__c}" checked="{!qcc.qualityCoachingCriteria.Response__c=='Good'}" onclick ="{!c.setResponseValue}" />
+                                                        <label for="{!'add-checkbox-'+qcc.qualityCoachingCriteria.Criteria_Number__c}" class="slds-checkbox_faux">
+                                                            <span class="slds-assistive-text">Select Response</span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </aura:iteration> 
+                                    </tbody>
+                                </table>                    
+                            </td>
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+            <!-- End of table. -->
+            <br/>
+            
+            <!-- Input text area for notes-->
+            <div class="slds-p-around_small">
+                <h6 style="font-size: 15px !important;"> <b>Notes</b></h6>
+                <lightning:textarea name="input3" placeholder="type your notes here..."  value="{!v.qualityCoaching.Notes__c}"/>
+            </div>
+            <br/>
+           
+           <!-- Save button-->
+            <div align="center">  
+                <lightning:button variant="brand" label="{!v.dynamicButtonLabel}" onclick="{!c.saveRecord}"/>
+            </div> 
+        
+        </div>
+        
+        <!-- If unauhtorized, display error message-->
+        <aura:set attribute="else">
+            <div class="slds-p-around_small">
+                <lightning:card>
+                    <aura:set attribute="title">
+                        <lightning:icon class="icn" iconName="utility:error" variant="error" size="large"/>
+                        <span style="padding:1rem; font-size:larger; white-space:pre-wrap;">
+                            {!v.errorMessage}
+                        </span>
+                    </aura:set>
+                </lightning:card>
+            </div>
+        </aura:set>
+    </aura:if>
+
+    
+</aura:component>

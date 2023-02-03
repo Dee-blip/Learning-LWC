@@ -1,0 +1,206 @@
+<aura:component 
+    implements="flexipage:availableForRecordHome,flexipage:availableForAllPageTypes,lightning:availableForFlowActions,forceCommunity:availableForAllPageTypes,force:appHostable,force:hasRecordId,lightning:isUrlAddressable,force:lightningQuickAction"
+    controller="L2Q_DocusignForPartnerPassThrough">
+
+    <aura:attribute name="sendToEmail" type="String" />
+    <aura:attribute name="sendToName" type="String" />
+    <aura:attribute name="checked" type="Boolean" />
+    <aura:attribute name="listOfAttachedFiles" type="List" />
+    <aura:attribute name="hasErrors" type="Boolean" default="false" />
+    <aura:attribute name="noFileAttached" type="Boolean" default="false" />
+    <aura:attribute name="tncSigningNeeded" type="Boolean" default="false" />
+    <aura:attribute name="noSigningNeededMessage" type="String" default="Loading. Please wait."/>
+    <aura:attribute name="fileDownloadUrl" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="selectedDocId" type="String" />
+    <aura:attribute name="errorMessage" type="String" default="An unexpected error has occurred, please contact system Admin"/>
+    <aura:attribute name="afterSend" type="Boolean" default="false" />
+    <aura:attribute name="successMessage" type="String" default="Success!"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.initJS}" />
+
+    <c:SF1_CustomLoader />
+    <aura:if isTrue="{!v.tncSigningNeeded}">
+    <div id="scrollableDiv" class="slds-scrollable_y" style="height: 80vh;">
+        <lightning:card iconName="standard:folder" variant="narrow">
+            <aura:set attribute="title">
+                <strong>
+                    Send T&amp;C Document for eSignature
+                </strong>
+            </aura:set>
+
+          
+            <aura:set attribute="actions">
+    
+                <button class="slds-button slds-button--neutral" onclick="{! c.sendDocusign }" 
+                disabled="{! v.selectedDocId == null || v.selectedDocId == '' ? 'true' : 'false'}">
+                    Send Document
+                </button>
+                <button class="slds-button slds-button--neutral" onclick="{! c.back }">Back</button>
+            </aura:set>
+            <div style="padding:10px">
+                <aura:if isTrue="{! v.hasErrors }">
+                    <ui:message title="" severity="error" closable="false">
+                        <strong>
+                            ERROR:
+                        </strong>
+                        <br />
+                        <ui:outputRichText class="slds-text-longform" value="{! v.errorMessage }" />
+                    </ui:message>
+                    <br />
+                    <aura:set attribute="else">
+                        <aura:if isTrue="{! v.afterSend }">
+                            <ui:message title="" severity="success" closable="false">
+                                <strong>
+                                    SUCCESS:
+                                </strong>
+                                <br />
+                                <ui:outputRichText class="slds-text-longform" value="{! v.successMessage }" />
+                            </ui:message>
+                        </aura:if>
+                    </aura:set>
+                </aura:if>
+
+                <div class="slds-box">
+                    <lightning:layout horizontalAlign="spread" multipleRows="true">
+                        <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="12"
+                            largeDeviceSize="12">
+
+                            <div class="slds-col slds-size_4-of-6">
+                                End Customer Contact Name
+                                <br />
+                                <ui:inputText
+                                    value="{! v.sendToName }"/>
+                            </div>
+
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="12"
+                            largeDeviceSize="12">
+
+                            <div class="slds-col slds-size_4-of-6">
+                                End Customer Contact Email Address
+                                <br />
+                                <ui:inputText
+                                    value="{! v.sendToEmail }"/>
+                            </div>
+
+                        </lightning:layoutItem>
+
+                        <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="12"
+                            largeDeviceSize="12">
+
+                            <div class="slds-col slds-size_4-of-6">
+                                <div style="padding-top:20px;">
+                                    T&amp;C Document
+                                </div>
+                            </div>
+
+                        </lightning:layoutItem>
+                    </lightning:layout>
+
+                    <div style="padding:5px">
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+
+                            </div>
+                        </div>
+                        <br />
+
+                        <aura:if isTrue="{! !v.noFileAttached }">
+                            <div id="scrollableDiv " class="slds-scrollable_y" style="height: 17vh;">
+                                <div class="slds-border_top">
+                                    <lightning:layout horizontalAlign="spread" multipleRows="true">
+                                        <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="12"
+                                            largeDeviceSize="12">
+                                            <div class="slds-border_bottom" style="padding:5px;">
+                                                <div class="slds-grid slds-gutters">
+                                                    <div class="slds-col slds-size_1-of-12">
+                                                        Select
+                                                    </div>
+                                                    <div class="slds-col slds-size_4-of-12">
+                                                        File Name
+                                                    </div>
+                                                    <div class="slds-col slds-size_3-of-12">
+                                                        Source Object
+                                                    </div>
+                                                    <div class="slds-col slds-size_2-of-12">
+                                                        Last Modified
+                                                    </div>
+                                                    <div class="slds-col slds-size_2-of-12">
+                                                        Created By
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </lightning:layoutItem>
+                                        <aura:iteration items="{!v.listOfAttachedFiles}" indexVar="SectionIndex"
+                                            var="eachFile">
+                                            <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="12"
+                                                largeDeviceSize="12">
+                                                <div class="slds-border_bottom" style="padding:5px;">
+                                                    <div class="slds-grid slds-gutters">
+                                                        <div class="slds-col slds-size_1-of-12">
+                                                            <lightning:input type="radio" variant="label-hidden" value="{! eachFile.ContentDocument.LatestPublishedVersionId }" name="options"
+                                                                    checked="{! eachFile.isChecked }" onchange="{!c.assignSelectedValue}" />
+                                                        </div>
+                                                        <div class="slds-col slds-size_4-of-12">
+                                                            <lightning:formattedUrl
+                                                                value="{! v.fileDownloadUrl + eachFile.ContentDocument.LatestPublishedVersionId }"
+                                                                target="" title="{! eachFile.ContentDocument.LatestPublishedVersion.Title }" 
+                                                                label="{! eachFile.ContentDocument.LatestPublishedVersion.Title }" />
+                                                            <!-- <ui:outputText
+                                                                title="{! eachFile.ContentDocument.LatestPublishedVersion.Title }"
+                                                                value="{! eachFile.ContentDocument.LatestPublishedVersion.Title }" /> -->
+                                                        </div>
+                                                        <div class="slds-col slds-size_3-of-12">
+                                                            <aura:if isTrue="{! eachFile.LinkedEntity.Type == 'Partner_Order_Acceptance_Document__c'}">
+                                                                POA
+                                                                <aura:set attribute="else">
+                                                                    {! eachFile.LinkedEntity.Type}
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </div>
+                                                        <div class="slds-col slds-size_2-of-12">
+                                                            <lightning:formattedDateTime
+                                                                value="{! eachFile.ContentDocument.ContentModifiedDate }"
+                                                                year="numeric" month="numeric" day="numeric" hour="2-digit"
+                                                                minute="2-digit" hour12="true" />
+                                                        </div>
+                                                        <div class="slds-col slds-size_2-of-12">
+                                                            {!
+                                                            eachFile.ContentDocument.LatestPublishedVersion.ContentModifiedBy.Name
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </lightning:layoutItem>
+                                        </aura:iteration>
+                                    </lightning:layout>
+                                </div>
+                            </div>
+                            <aura:set attribute="else">
+                                <div class="slds-border_top">
+                                    <i>No Files to Display</i>
+                                </div>
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+        </lightning:card>
+    </div>
+    </aura:if>
+    <aura:if isTrue="{!!v.tncSigningNeeded}">
+        <button class="slds-button slds-button--neutral" onclick="{! c.back }">Back</button>
+        <ui:message title="" severity="error" closable="false">
+                        <strong>
+                            ERROR:
+                        </strong>
+                        <br />
+                        <ui:outputRichText class="slds-text-longform" value="{! v.noSigningNeededMessage }" />
+                        
+                    </ui:message>
+                   
+    </aura:if>
+
+</aura:component>

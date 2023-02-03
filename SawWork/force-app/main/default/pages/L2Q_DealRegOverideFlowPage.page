@@ -1,0 +1,18 @@
+<apex:page extensions="L2Q_FlowLeadConvert" standardController="Opportunity">
+    <apex:includeLightning />
+    <div id="lightning" />
+    <script>
+        let existingParam = window.location.href;
+        existingParam = existingParam.substring(existingParam.lastIndexOf('/'));
+        existingParam = existingParam.replace('L2Q_DealRegOverideFlowPage', 'OpportunityCreateNew');
+        var partnerInvolved = "{!JSENCODE(partnerInvolved)}";
+        var recordId = "{!JSENCODE(recordId)}"; //SFDC-6406
+        var isPartneruser = {!IF(isPartneruser, "true", "false")};  //sanitizing the input
+        if (isPartneruser) {
+            window.location.href = '{!JSENCODE($Label.Deal_Reg_Flow_URL)}' + partnerInvolved + '&' + 'parentId=' + recordId;
+        }
+        else {
+            window.location.href = '/apex' + existingParam; //SFDC-6406 Changed to re-direct to existing logic
+        }
+    </script>
+</apex:page>

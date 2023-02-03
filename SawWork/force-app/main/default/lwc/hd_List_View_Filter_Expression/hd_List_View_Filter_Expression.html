@@ -1,0 +1,72 @@
+<template>
+    <div class={panelState} if:true={listViewMetadata} aria-hidden="false"
+        style="z-index: 10;background: var(--lwc-colorBackground,rgb(243, 242, 242));">
+        <div class="slds-panel__header" style="background: var(--lwc-colorBackgroundAlt,rgb(255, 255, 255));">
+            <h2 class="slds-panel__header-title slds-text-heading_small slds-truncate" title="Panel Header">Filters</h2>
+            <div class="slds-panel__header-actions">
+                <button class="slds-button slds-button_icon slds-button_icon-small slds-panel__close"
+                    title="Collapse Panel Header">
+                    <svg class="slds-button__icon" aria-hidden="true">
+                        <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                    </svg>
+                    <span class="slds-assistive-text">Collapse Panel Header</span>
+                </button>
+            </div>
+        </div>
+        <div class="slds-col slds-scrollable--y" style="background: var(--lwc-colorBackgroundAlt,rgb(255, 255, 255));">
+            <div class="slds-panel__body">
+                <div class="slds-filters">
+                    <h3 class="slds-text-body_small slds-m-vertical_x-small">Matching these filters</h3>
+                    <ol class="slds-list_vertical slds-list_vertical-space">
+                        <template iterator:it={listViewMetadata.filteredByInfo}>
+                            <li key={it.value.fieldApiName} class="slds-item slds-hint-parent">
+                                <lightning-layout>
+                                    <lightning-layout-item size="1">
+                                        <div class="slds-m-top_large slds-m-left_xx-small">
+                                            {it.value.order}.</div>
+                                    </lightning-layout-item>
+                                    <lightning-layout-item size="11">
+                                        <div class="slds-filters__item slds-grid slds-grid_vertical-align-center">
+                                            <button class="slds-button_reset slds-grow slds-has-blur-focus">
+                                                <span class="slds-assistive-text">Edit filter:</span>
+                                                <span
+                                                    class="slds-show slds-text-body_small fieldLabel">{it.value.label}</span>
+                                                <span class="slds-show operatorAndOperand">{it.value.operatorLabel}
+                                                    {it.value.operandLabels}</span>
+                                            </button>
+                                            <lightning-button-icon icon-name="utility:close" size="medium"
+                                                variant="bare">
+                                            </lightning-button-icon>
+                                        </div>
+                                    </lightning-layout-item>
+                                </lightning-layout>
+                            </li>
+                        </template>
+                    </ol>
+                    <!-- <div class="slds-filters__footer slds-grid slds-shrink-none">
+                        <button class="slds-button_reset slds-text-link">Add Filter</button>
+                        <button class="slds-button_reset slds-text-link slds-col_bump-left">Remove All</button>
+                    </div> -->
+                </div>
+            </div>
+            <div class="panelFooter slds-p-around--small"
+                style="background: var(--lwc-colorBackground,rgb(243, 242, 242));">
+                <div if:true={listViewMetadata.filterLogicString} class="showHideContainer slds-p-bottom--x-small"
+                    data-aura-rendered-by="1001:0"><span class="bodyTitle"><label
+                            class="slds-m-right--xx-small uiLabel"><span></span>Filter Logic
+                        </label>
+                        <lightning-helptext content="Filter logic
+                        governs how and when filters apply to your list view. Use AND and OR operators to
+                        fine-tune your results."></lightning-helptext>
+                    </span>
+                    <div class="slds-form-element " data-aura-rendered-by="1025:0">
+                        <div class="slds-form-element__control" data-aura-rendered-by="1026:0">
+                            <lightning-textarea label="" value={listViewMetadata.filterLogicString}>
+                            </lightning-textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

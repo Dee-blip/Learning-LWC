@@ -1,0 +1,12 @@
+<aura:component controller="SC_Case_LightningUtility" implements="lightning:hasPageReference,lightning:actionOverride,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction,lightning:isUrlAddressable" access="global" extends="c:AuraUtils">
+
+    <lightning:workspaceAPI aura:id="workspace" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="recordId" type="Id" access="public" />
+    <aura:attribute name="objectType" type="Id" access="public" />
+    
+    <c:scAddExistingCaseToElevation oncloseSubTab="{!c.handleCloseSubTab}" recordId="{!v.recordId}" objectType="{!v.objectType}">
+    </c:scAddExistingCaseToElevation>
+</aura:component>

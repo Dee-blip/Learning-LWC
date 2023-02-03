@@ -1,0 +1,5 @@
+<apex:page standardController="Contact" extensions="ContactCreateNew" action="{!pageRedirect}">
+<apex:form >
+Please wait...
+ </apex:form>
+</apex:page>

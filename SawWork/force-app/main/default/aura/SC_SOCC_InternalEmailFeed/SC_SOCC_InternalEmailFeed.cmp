@@ -1,0 +1,129 @@
+<aura:component controller="SC_SOCC_Case_LightningUtility" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="EmailList" type="EmailMessage[]"/>
+    <aura:attribute name="EmailContent" type="Boolean" default="false"/>
+    <aura:attribute name="ErrorContent" type="Boolean" default="false"/>
+    <aura:attribute name="recordId"  type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+    
+    <lightning:quickActionAPI aura:id="qaAPI" />
+    <aura:if isTrue="{!v.EmailContent}"> 
+    <aura:iteration items="{!v.EmailList}" var="Email" indexVar="index">
+      
+    
+    <div class="skip-feed-wrapper slds-m-top_large slds-box">
+        <div style="float:right">
+            <lightning:button label="Reply" onclick="{!c.ReplyHandler}" value="{!Email}"/>
+        </div>
+	<article class="cuf-feedElement cuf-feedItem">
+        <div class="cuf-feedItemHeader cuf-media l-first">
+            <div class="slds-grid" onclick="{!c.closesection}" data-id="{!index}">
+                <div class="slds-col slds-media slds-media_center slds-size_1-of-12">
+                    <lightning:icon iconName="utility:email" size="small"/>
+                    
+                </div>
+                <div aura:id="subEle" class="slds-col slds-size_11-of-12 " data-id="{!index}" style="font-weight: bold">
+                    <h1>{!Email.Subject}</h1>
+               </div>
+            </div>
+            <div class="slds-media slds-hide" aura:id="testli" data-id="{!index}" >
+                <div class="slds-size_1-of-1">
+                    <div class="slds-size_1-of-1 slds-grid slds-grid_vertical-stretch slds-grid_align-spread slds-has-flexi-truncate supportCompactFeedItemHeader">
+                        <div class="preamble slds-col slds-col_bump-right">
+                            <div class="slds-grid slds-wrap">
+                                <!--From Address-->
+                                <div class="slds-container_fluid">
+                                    <div class="slds-grid slds-grid_vertical-stretch">
+                                        <div class="slds-col preamble_left slds-var-p-right_x-small slds-truncate slds-size_1-of-2">
+                                            <span class="cuf-entityLinkId entityLinkHover forceChatterEntityLink">
+                                                
+                                                <p class="cuf-actorLink cuf-entityLink">
+                                                    
+                                                    From: {!Email.FromAddress}
+                                                </p>
+                                            </span>
+                                            
+                                        </div>
+                                        <div class="slds-col preamble_left slds-var-p-right_x-small slds-truncate slds-size_1-of-2" style="text-align:right">
+                                            <span class="cuf-entityLinkId entityLinkHover forceChatterEntityLink">
+                                                <p class="cuf-actorLink cuf-entityLink">
+                                                    Date: {!Email.MessageDate}
+                                                </p>
+                                            </span>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--To Address -->
+                                <div class="preamble_sub slds-container_fluid">
+                                    <div class="slds-grid slds-grid_vertical-stretch slds-size_1-of-1">
+                                        <div class="slds-col slds-var-p-right_large preambleContent">
+                                            <div class="preamble_custom slds-var-p-right_large slds-truncate">
+                                                <span class="preamble_custom-preamble">
+                                                    <div class ="supportEmailHeader">
+                                                        <p class="cuf-actorLink cuf-entityLink" style="font-weight:bold;color:rgb(22,50,92)">
+                                                           To: {!Email.ToAddress}
+                                                    </p>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="preamble_sub slds-container_fluid">
+                                    <div class="slds-grid slds-grid_vertical-stretch slds-size_1-of-1">
+                                        <div class="slds-col slds-var-p-right_large preambleContent">
+                                            <div class="preamble_custom slds-var-p-right_large slds-truncate">
+                                                <span class="preamble_custom-preamble">
+                                                    <div class ="supportEmailHeader">
+                                                      <span class="cuf-entityLinkId entityLinkHover forceChatterEntityLink">
+                                                       <p class="cuf-actorLink cuf-entityLink" style="font-weight:bold;color:rgb(22,50,92)">
+                                                           Subject: {!Email.Subject}
+                                                    </p>
+                                                        </span>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--Email Body-->
+                                <div class="slds-size--1-of-1">
+                                <div class="slds-var-m-top_medium cuf-compactBody slds-scrollable_y"  >
+                                <div class="forceChatterFeedAuxBody--default forceChatterFeedAuxBody forceChatterFeedAuxBodyEmailMessage">
+                                    <article class="cuf-auxBody cuf-auxBodyEmailMessage">
+                                        <div class="inFeed y" >
+                                            <div class="emailMessageBody forceChatterFeedAuxBodyText">
+                                                  <ui:outputRichText class="slds-text-longform" value="{!Email.HtmlBody}"/>
+                                            </div>
+                                        </div>
+                                    </article>
+                                </div>
+                                </div>
+                                <div class="slds-p-around_small" style="color:cadetblue">
+                                    <p>Click <a id ="{!Email.Id}" onclick="{!c.navigateEmail}">here</a> to check the Email Message</p>
+                                </div>
+                               </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+  </div>
+    </aura:iteration>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.ErrorContent}"> 
+          <div class="slds-text-color_destructive slds-align_absolute-center">
+              <h2>No Internal Emails </h2>
+          </div>
+    </aura:if>
+  
+         
+      
+    
+</aura:component>

@@ -1,0 +1,58 @@
+.Green {
+    padding:2px;
+    background: linear-gradient( 55deg, #08b976, #88e477 ); 
+    opacity: .8;
+    box-shadow: 0px 2px 5px rgba(50,50,50, .2);
+}
+
+.Red {
+    padding:2px;
+    background: linear-gradient(55deg,#f00a06,#ee8e8c85);
+    box-shadow: 0px 2px 5px rgba(50,50,50, .2);
+}
+.Yellow {
+    padding:2px;
+    background: linear-gradient(55deg,#FFC107,#ff980057);
+    box-shadow: 0px 2px 5px rgba(50,50,50, .2);
+}
+
+.cust-tab-header {
+    background-color:rgb(243, 242, 242);
+    padding: .5rem .75rem .5rem .75rem;    
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: rgb(221, 219, 218);
+    border-radius: .25rem .25rem 0 0;
+    box-shadow: none;
+
+    font-size: 1.125rem;
+    font-weight: 400;
+    line-height: 1.25;
+    display: block;
+}
+
+.deal-record:hover {
+    background-color: #f3f2f2; 
+    cursor: pointer;
+}
+
+.small-text {
+    font-size: 0.75rem;
+    line-height: 1.25;
+    font-weight: 300;
+}
+
+.deal-list {
+    position: absolute;
+    overflow: scroll;
+    height: calc(100% - 40px);
+    width: 100%;
+}
+
+.error-msg {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    text-align: center;
+}

@@ -1,0 +1,5 @@
+<apex:page recordSetVar="myBeeps" standardController="Beep__c" action="{!runSummarization}" extensions="BeepExtensionController">
+
+<apex:pageMessages />
+
+</apex:page>

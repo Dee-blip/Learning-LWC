@@ -1,0 +1,32 @@
+<apex:page standardController="RSS_Form__c" extensions="RSS_FormController" showHeader="true" cache="true" sidebar="false"  >
+<apex:sectionHeader title="Upload your Offline RSSForm" />
+ 
+  <apex:form >
+    <apex:pageMessages />
+    
+          <apex:outputLabel value="File" for="file"/>
+          <apex:inputFile value="{!attachment.body}" filename="{!attachment.name}" id="file" accept=".JSON"/>
+        
+ <apex:commandButton action="{!upload}" value="Save"/>
+ <br/>
+ <apex:outputPanel rendered="{!OfflineOperationDone}">
+ <br/>
+ <apex:outputPanel rendered="{!if(OfflineUpdateIds.size > 0,true,false)}"> 
+ Below are RSS Forms which have been updated
+  <br/>
+ <apex:repeat var="o" value="{!OfflineUpdateIds}">
+ <a href="/apex/RSSForm?id={!o.id}">{!o.Name}</a>
+ <br/>
+ </apex:repeat>
+ </apex:outputPanel>
+ <br/>
+ <apex:outputPanel rendered="{!if(OfflineInsertIds.size > 0,true,false)}"> 
+ Below are RSS Forms which have been Inserted  <br/>
+  <apex:repeat var="i" value="{!OfflineInsertIds}">
+   <a href="/apex/RSSForm?id={!i.id}">{!i.Name}</a>
+     <br/>
+  </apex:repeat>
+ </apex:outputPanel>
+ </apex:outputPanel>
+  </apex:form>
+</apex:page>

@@ -1,0 +1,113 @@
+<aura:component controller="LeadReassignController" implements="flexipage:availableForAllPageTypes,force:appHostable,force:hasRecordId,force:lightningQuickAction" access="global" >
+    <aura:attribute name="recordId" type="String" />
+        <aura:attribute name="vfRecordId" type="String" />
+    <aura:attribute name="fromVf" type="boolean" default="false" />
+    <aura:attribute name="isPartnerLead" type="boolean" default="false" />
+    <aura:attribute name="partnerAccountId" type="String" />
+     <aura:attribute name="homeURL" type="String" />
+         <aura:attribute name="errorSelection" type="String" />
+    <aura:attribute name="reassignReasonValue" type="String"/>
+        <aura:attribute name="ownerId" type="Id"/>
+    <!--<aura:attribute name="ownerTypeValues" type="String[]"/>-->
+        <aura:attribute name="selectedOwnerType" type="String" default="User"/>
+        <!--<aura:attribute name="ownerType" type="String" default="User"/>-->
+        <aura:attribute name="leadObj" type="Lead"/>
+    <aura:attribute name="queueWhereClause" type="String" default=""/>
+    <aura:attribute name="changeOwneroptions" type="List" default="RunRules"/>
+    <aura:attribute name="value" type="String" default="RunRules"/>
+        <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="fieldToShowInSuggestion" type="String" default="User.FirstName"/>
+    <aura:attribute name="message" type="String"/>
+  <!-- <aura:handler name="Owner" value="{!v.selectedOwnerType}" action="{!c.handleOwnerChange}"/>-->
+    <!--<aura:handler name="Lookup value" value="{!v.fieldToShowInSuggestion}" action="{!c.handleOwnerChange}"/>-->
+
+    <c:SF1_CustomLoader />
+    
+    <div class="slds-box" style="background:white;">
+        <!-- style=" text-align:center;"
+slds-align_absolute-center
+<div class="slds-hide slds-notify_container slds-is-relative" aura:id="messageId">
+            <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+              <span class="slds-assistive-text">error</span>
+              <div class="slds-notify__content">
+                <h2 class="slds-text-heading_small ">{!v.message}</h2>
+              </div>
+              <button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse" title="Close">
+               
+                <span class="slds-assistive-text">Close</span>
+              </button>
+            </div>
+      </div>-->
+          <div class="slds-page-header">
+      <div class="slds-media">
+      <div class="slds-media__body">
+    <h1 class="slds-page-header__title slds-truncate slds-align-middle" ><lightning:icon iconName="standard:user" size="medium" alternativeText="User" />&nbsp;&nbsp;Change Owner</h1>
+              </div></div></div> 
+    <div class="slds-hide" aura:id="messageId">
+            <br/>
+            <aura:if isTrue="{!v.fromVf}">
+              <ui:outputURL value="javascript:void(0)" label="Back" click="{!c.backToLead}"/>
+            </aura:if>
+                <br/><br/>
+            <ui:message title="Error" severity="error" >
+                   {!v.message}
+                 </ui:message>
+              <!--<ui:outputText class="slds-text-heading_small" value="{!v.message}"/> closable="true"-->
+       </div>
+        
+              
+        <div class="slds-show" aura:id="changeId">
+            <br/>
+            <div >
+                <!--<span class="slds-button slds-radio_button"> class="slds-radio_button-group"-->
+           <lightning:radioGroup aura:id="mygroup"
+            name="radioButtonGroup"
+            options="{! v.changeOwneroptions }"
+            value="{! v.value }"
+            onchange="{! c.handleChange }"/>
+<!--                </span>-->
+            </div>
+            <br/>
+            <br/>
+             <div class="slds-hide" aura:id="userId" >
+               <div class="{!v.fromVf ? 'lookup-class' : ''}" >
+                        
+                           <span class="slds-form-element__label">Reassign To</span>
+                                <c:SF1_LookupComponent placeholderText=""
+                                                               type="{!v.selectedOwnerType}"
+                                                               value="{!v.ownerId}"
+                                                               fieldsToShowInSuggestion="{!v.fieldToShowInSuggestion}" 
+                                                               whereClause="{!v.queueWhereClause}" 
+                                                               />
+                                    
+                                <br/>
+                 </div>
+                        </div>
+
+                                <div class="{!v.fromVf ? 'lookup-class slds-form-element slds-hint-parent' : 'slds-form-element slds-hint-parent'}">
+                                    <div class="slds-show" aura:id="reassignCommentId">
+                                        <lightning:textarea name="myTextArea"
+                                                            value="{!v.reassignReasonValue}" 
+                                                            label="Reassign Comments"/>
+                                        <br/><br/>
+                                    </div>
+                                </div>
+                            <!--class="slds-align_absolute-center"-->
+        <div >
+       <button class="slds-button slds-button_brand"
+                                    onclick="{!c.saveLead}"
+                                    aura:id="saveButtonId">
+                                    Save
+                            </button>
+         
+       <aura:if isTrue="{!v.fromVf}">
+        <lightning:button class="slds-button slds-button_brand"
+                                    onclick="{!c.backToLead}"
+                                    aura:id="cancelButtonId">
+                                    Cancel
+           </lightning:button>
+            </aura:if>
+            </div>
+            </div>
+    </div>
+</aura:component>

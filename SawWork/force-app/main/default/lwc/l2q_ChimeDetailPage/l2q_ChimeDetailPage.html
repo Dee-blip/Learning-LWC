@@ -1,0 +1,153 @@
+<!--
+  @description       : 
+  @author            : mahajan
+  @team              : GSM
+  @last modified on  : 02-10-2022
+  @last modified by  : apyati
+  Modifications Log
+  Ver   Date         Author   Modification
+  1.0   12-21-2021   mamahaja   Initial Version
+-->
+<template>
+    <div class="slds-grid"
+        style="background-color:#F9F9F9;border-radius:5px;padding:5px;padding-right: 9px;width: 100.5%;">
+        <div class="slds-col slds-size_1-of-1">
+
+            <lightning-progress-indicator current-step={currentStage} type="path" variant="base"
+                data-id="chimeProgressBar">
+                <lightning-progress-step   label="Gating" value="Gating" onclick={handleGatingClick}>
+                </lightning-progress-step>
+                <lightning-progress-step   label="Scoping" value="Scoping" onclick={handleScopingClick}>
+                </lightning-progress-step>
+                <lightning-progress-step    label="Integration" value="Integration" onclick={handleIntegrationClick}>
+                </lightning-progress-step>
+                <lightning-progress-step   label="Closed" value="Closed" onclick={handleClosedClick}>
+                </lightning-progress-step>
+            </lightning-progress-indicator>
+
+        </div>
+    </div>
+    <div class="slds-grid" style="margin-top:5px;">
+        <div class="slds-col slds-size_3-of-12"
+            style="padding:5px;background-color:#F9F9F9;min-height:400px;border-radius:5px">
+            <div data-id="chimeAddProduct" style="margin-top:-16px">
+                <template if:true={selectedProducts}>
+                    <c-l2q_product_search customstyle="height:167px;" fromwhere="detail" placeholdertext="Add Products"
+                        onselectedprod={handleProdSelectionInDetail} selectedproducts={selectedProducts}>
+                    </c-l2q_product_search>
+                </template>
+            </div>
+            <div style="margin-top:15px">
+                <template if:true={selectedProducts}>
+                    <template for:each={selectedProducts} for:item="product">
+                        <div class={product.Id} key={product.Id}>
+                            <article class="slds-card">
+                                <div class="slds-card__header slds-grid"></div>
+                                <div class="slds-card__body slds-card__body_inner">
+                                    <div key={product.Id}>
+                                        <div onclick={onProductSelect} data-id={product.Id}
+                                            style="width: 92%;float:left;padding-left:5px;padding-right:5px;cursor:pointer">
+                                            <div class="slds-grid slds-wrap" data-id={product.Id}>
+                                                <div class="slds-size_3-of-4" data-id={product.Id}>
+                                                    {product.CHIME_Product__r.Product_Name__c}
+                                                    <template if:false={hideLOETab}>
+                                                        <template if:true={product.Review_Required__c}>&nbsp;
+                                                            <lightning-icon icon-name="utility:warning" size="xx-small"
+                                                                variant="Error" alternative-text="Review Required"
+                                                                title="review Required" data-id={product.Id}>
+                                                            </lightning-icon>
+                                                        </template>
+                                                    </template>
+                                                    <template if:false={hideProductApproval}>
+                                                        <template
+                                                            if:true={product.CHIME_Product__r.Approval_Required__c}>&nbsp;
+                                                            <lightning-icon icon-name="utility:approval" size="xx-small"
+                                                                variant="warning" alternative-text="Approval Required"
+                                                                title="Approval Required" data-id={product.Id}>
+                                                            </lightning-icon>
+                                                        </template>
+                                                    </template>
+                                                </div>
+                                                <div class="slds-size_1-of-4" data-id={product.Id}>
+                                                    <span
+                                                        class="slds-badge slds-theme_warning slds-float_right slds-text-body_small"
+                                                        data-id={product.Id}>{product.Total_LoE__c} Hours</span>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div id={product.Id} style="text-align:right;padding: 7px 4px;cursor:pointer">
+                                            <lightning-button-icon size="x-small" icon-name="utility:delete"
+                                                alternative-text="Delete" disabled={disableDeleteIcon} variant="brand"
+                                                name={product.CHIME_Product__c} title={product.Id}
+                                                onclick={removeProduct}>
+                                            </lightning-button-icon>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </article>
+                        </div>
+
+                    </template>
+                </template>
+            </div>
+        </div>
+        <div class="slds-col slds-size_9-of-12"
+            style="margin-left:5px; background-color:#F3F2F2;min-height:400px;border-radius:5px">
+            <lightning-tabset active-tab-value="">
+                <lightning-tab label="Questions" value="Questions" style="text-decoration:none"
+                    onactive={handleLOETabInActive}>
+                    <div data-id="chimeDetail" style="padding-left:10px;padding-right:10px">
+                      <div class="slds-scrollable_y" style="height:55vh">
+                        <template if:true={selectedAssociation}>
+                            <template if:true={chimedata}>
+                                <c-chime-questionnaire class="questionnaire"
+                                    productid={selectedAssociation.CHIME_Product__c} chimeid={chimeId}
+                                    stage={chimedata.Stage__c} oncheckchimestage={checkOnStageChange}
+                                    chime-stage={chimedata.Stage__c} chime-status={chimedata.Status__c}
+                                    response-disable={responseDisable} ispoc={ispoc}>
+                                </c-chime-questionnaire>
+                            </template>
+
+                        </template>
+                      </div>
+                    </div>
+                </lightning-tab>
+                <template if:false={hideLOETab}>
+                    <lightning-tab label="LOE" value="LOE" onactive={handleLOETabActive}>
+                        <div style="padding-left:10px;padding-right:10px">
+                            <template if:true={showLOE}>
+                                <template if:true={selectedAssociation}>
+
+                                    <c-chime-l-o-e product={selectedAssociation.Id} chimeid={chimeId}
+                                        onrefreshproduct={handleLOEchange} read-only-user={responseDisable}>
+                                    </c-chime-l-o-e>
+                                </template>
+                            </template>
+                        </div>
+                    </lightning-tab>
+                </template>
+            </lightning-tabset>
+        </div>
+    </div>
+
+    <!--Comments section-->
+    <div onclick={toggleChat}>
+        <span data-id="chatblock" class="chat-circle">
+            <lightning-icon data-id="chatter-button" class="chatter-button" size="large" variant="inverse"
+                icon-name="utility:chat" alternative-text="Comments" title="Comments">
+            </lightning-icon>
+        </span>
+    </div>
+
+    <template if:true={showChat}>
+        <div class="chat-box slds-box">
+            <div class="chat-container">
+                <c-l2q-chime-chat-wrapper record-id={chimeId}></c-l2q-chime-chat-wrapper>
+            </div>
+        </div>
+    </template>
+
+
+</template>

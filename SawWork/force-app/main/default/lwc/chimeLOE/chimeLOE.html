@@ -1,0 +1,400 @@
+<template>
+
+  <template if:true={showSpinner}>
+  <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+  </template>
+
+  
+
+
+  <template if:true={showReasonForFrozen}>
+  <div style="font-weight:800;font-size:15px" class="slds-m-bottom_medium slds-align_absolute-center">
+  LOE tab is locked as LOE hours are being reviewed by the Case Owner - {caseOwner}. Please reach out to LOE Review Case Owner to modify any product features LOE data.
+  </div>
+  </template>
+
+  <template if:true={showLOETable}>
+
+    <div class="slds-grid" style="margin-top:40px;margin-bottom:30px;">
+      <span style="color:black;font-weight:800;font-size:15px;margin-left:400px;">Product Implementation Type</span>
+      <span class="dropdown">
+        <lightning-combobox name="productImplementationMode" label=""
+                value={productImplementationType}
+                options={productImplementationOptions}
+                onchange={handleProductImplementationChange} 
+                disabled={disableFields}></lightning-combobox>
+      </span>
+      <span>
+        <lightning-button variant="brand" disabled={disableFields} label="Update" title="Update Product Implementation Type" class="slds-m-left_xx-small" onclick={handleProductImplementationUpdate} ></lightning-button>
+      </span>
+      <!--<div class="slds-col  slds-m-left_large" style="color:black;font-weight:800;font-size:15px;">
+        Product Implementation Type
+      </div>
+      <div class="dropdown slds-col slds-m-right_small">
+        <div class="slds-grid">
+          <div class="slds-col">
+              <lightning-combobox name="productImplementationMode" label=""
+                value={productImplementationType}
+                options={productImplementationOptions}
+                onchange={handleProductImplementationChange} ></lightning-combobox>
+          </div>
+          <div class="slds-col">
+            <lightning-button variant="brand" label="Update" title="Update Product Implementation Type" class="slds-m-left_xx-small" onclick={handleProductImplementationUpdate} ></lightning-button>
+          </div>
+        </div>
+        
+      
+      </div>-->
+    </div>  
+
+    <div data-id="loeDataTableActions">
+      <div  class="slds-grid">
+          <div class="slds-col">
+              <div class="search" onkeypress={keycheck} >
+                  <lightning-input type="text" placeholder="Search Module..." value={searchKey} name="searchModule" onblur={handleSearch} class="slds-align__absolute-center"></lightning-input>
+                  
+              </div>
+          </div>
+          <div class="slds-col slds-align_absolute-center selected" style="font-size: 15px;color: #5D97C7;font-weight: 800;text-align:right;">
+              <lightning-input type="checkbox"
+              label={modulesCheckboxLabel}
+              checked={showSelectedModules}
+              onchange={handleShowSelectedModules} >
+              </lightning-input>
+
+              <lightning-input type="checkbox"
+              label={reviewCheckboxLabel}
+              checked={showTriggersForReview}
+              onchange={handleShowTriggersForReview}>
+              </lightning-input>
+          </div>
+          <!--<div class="slds-col slds-align_absolute-center trigger" style="font-size: 15px;color: #8686CC;font-weight: 800;">
+              
+          </div>-->
+          <div class="slds-col slds-align_absolute-center refresh">
+              <lightning-button-icon disabled={disableFields} onclick={handleRestore} tooltip="Restore to Default" icon-name="action:refresh" variant="brand" name="refreshModules" alternative-text="Restore to Default" title="Restore to Default"></lightning-button-icon>
+                
+          </div>
+
+      </div>
+    </div>
+    
+    
+    <div class="slds-table--header-fixed_container slds-m-top_medium" style="height:300px;">
+        <div data-id="loeDataTable" class="slds-scrollable_y" style="height:100%;">
+    <table  aria-multiselectable="true" class="slds-table slds-table_bordered slds-table--header-fixed slds-table_resizable-cols" role="grid">
+        <thead>
+          <tr>
+            <th class=" slds-text-align_right" scope="col" style="width:3.25rem">
+             
+              <div class="slds-truncate slds-cell-fixed" title="Row"></div>   
+            </th>
+            <th class="slds-text-align_right" scope="col" style="width:3.25rem">
+               
+              <div class="slds-truncate slds-cell-fixed" title="Row1"></div>  
+            </th>
+            <template if:true={currentUserIsReviewer}>
+            <th style="width:40%" aria-label="Module Name" aria-sort="none" class="slds-is-resizable slds-is-sortable" scope="col">
+             
+              <div class="slds-truncate slds-cell-fixed" title="Module Name"><lightning-helptext content="Selecting a module will default no. of units to 1 and de-slecting will remove no of units."></lightning-helptext> Module Name</div>  
+            </th>
+            </template>
+            <template if:false={currentUserIsReviewer}>
+              <th style="width:50%" aria-label="Module Name" aria-sort="none" class="slds-is-resizable slds-is-sortable" scope="col">
+               
+                <div class="slds-truncate slds-cell-fixed" title="Module Name"><lightning-helptext content="Selecting a module will default no. of units to 1 and de-slecting will remove no of units."></lightning-helptext>  Module Name</div>  
+              </th>
+              </template>
+            <th style="width:20%" aria-label="Unit Type" aria-sort="none" class="slds-is-resizable slds-is-sortable" scope="col">
+             
+              <div class="slds-truncate slds-cell-fixed" title="Unit Type">Unit Type</div> 
+            </th>
+            <th style="width:10%" aria-label="No. of Units" aria-sort="none" class="slds-is-resizable slds-is-sortable" scope="col">
+              
+              <div class="slds-truncate slds-cell-fixed" title="No. of Units">No. of Units</div> 
+            </th>
+            <th style="width:10%" aria-label="LOE (Hours)" aria-sort="none" class="slds-is-resizable slds-is-sortable" scope="col">
+             
+              <div class="slds-truncate slds-cell-fixed" title="LOE (Hours)">LOE (Hours)</div> 
+            </th>
+            <!-- Review column-->
+            <template if:true={currentUserIsReviewer}>
+            <th style="width:10%" aria-label="LOE (Hours)" aria-sort="none" class="slds-is-resizable slds-is-sortable" scope="col">
+              
+              <div class="slds-truncate slds-cell-fixed" title="Revised LOE">Revised LOE</div> 
+            </th>
+            </template>
+            
+          </tr>
+        </thead>
+        
+        <tbody>
+          
+        <template for:each={featureList} for:item="itrfeature">  
+          <tr key={itrfeature.feature.Id} aria-selected="true" class="slds-hint-parent slds-is-selected">
+            <template if:true={columnClassHide}>
+              <td role="gridcell" class="unclickable">
+                <lightning-button-icon icon-name="utility:description"   value ={itrfeature.feature.Feature__r.Feature_Name__c} name={itrfeature.feature.Id}  onclick={handleDetailsShow} alternative-text="View Module Description and Scope" class="slds-m-left_xx-small" title="Show Module Description and Scope"></lightning-button-icon>
+                <!--<lightning-helptext content={itrfeature.feature.Feature__r.Scope_of_Work__c}></lightning-helptext> -->
+              </td>
+            </template>   
+            <template if:false={columnClassHide}>
+              <td role="gridcell">
+                <lightning-button-icon icon-name="utility:description"   value ={itrfeature.feature.Feature__r.Feature_Name__c} name={itrfeature.feature.Id}  onclick={handleDetailsShow} alternative-text="View Module Description and Scope" class="slds-m-left_xx-small" title="Show Module Description and Scope"></lightning-button-icon>
+                <!--<lightning-helptext content={itrfeature.feature.Feature__r.Scope_of_Work__c}></lightning-helptext> -->
+              </td>
+
+            </template> 
+            <template if:false={columnClassHide}>
+              <td class="slds-text-align_right" role="gridcell">
+                <div class="slds-checkbox">
+                  <lightning-input type="checkbox" disabled={disableUnitChanges} name={itrfeature.feature.Id} onchange={handleSelection} checked={itrfeature.feature.Is_Selected__c}></lightning-input>
+                    
+                </div>
+              </td>
+            </template>
+            <template if:true={columnClassHide}>
+              <td class="slds-text-align_right unclickable" role="gridcell">
+                <div class="slds-checkbox">
+                  <lightning-input type="checkbox" disabled={disableUnitChanges} name={itrfeature.feature.Id} onchange={handleSelection} checked={itrfeature.feature.Is_Selected__c}></lightning-input>
+                    
+                </div>
+              </td>
+            </template>
+            <template if:true={currentUserIsReviewer}>
+            <th scope="row" style="width:40%">
+              <div class="slds-truncate" >
+                <div class="slds-truncate slds-cell-wrap" >
+                    <a title={itrfeature.feature.Id} onclick={handleFeatureLinkClick}>{itrfeature.feature.Feature__r.Feature_Name__c}</a><template if:true={itrfeature.feature.Feature__r.Review_Required__c}>&nbsp; <lightning-icon icon-name="utility:warning" size="x-small" variant="Error" alternative-text="Review Required" title="review Required"></lightning-icon></template>
+
+                </div>
+              </div>
+            </th>
+            </template>
+            <template if:false={currentUserIsReviewer}>
+              <th scope="row" style="width:50%">
+                <div class="slds-truncate" >
+                  <div class="slds-truncate slds-cell-wrap" >
+                      <a title={itrfeature.feature.Id} onclick={handleFeatureLinkClick}>{itrfeature.feature.Feature__r.Feature_Name__c}</a><template if:true={itrfeature.feature.Feature__r.Review_Required__c}>&nbsp; <lightning-icon icon-name="utility:warning" size="x-small" variant="Error" alternative-text="Review Required" title="review Required"></lightning-icon></template>
+  
+                  </div>
+                </div>
+              </th>
+              </template>
+            <td role="gridcell" style="width:20%">
+              <div class="slds-truncate" >{itrfeature.feature.Unit_Type__c}</div>
+            </td>
+
+            <template if:true={itrfeature.feature.Is_Selected__c}>
+              <template if:false={columnClassHide}>
+                <td role="gridcell" style="width:10%">
+                  <div class="slds-truncate noOfUnits" style="margin-top:-15px;">
+                  
+                    <lightning-input disabled={disableUnitChanges} value={itrfeature.feature.Units__c} type="number" onchange={handleUnitsChange} name={itrfeature.feature.Id}  label="" ></lightning-input>
+                  </div>
+                </td>
+              </template>
+              <template if:true={columnClassHide}>
+                <td role="gridcell" style="width:10%" class="unclickable">
+                  <div class="slds-truncate noOfUnits" style="margin-top:-15px;">
+                  
+                    <lightning-input disabled={disableUnitChanges} value={itrfeature.feature.Units__c} type="number" onchange={handleUnitsChange} name={itrfeature.feature.Id}  label="" ></lightning-input>
+                  </div>
+                </td>
+              </template>
+
+              <td role="gridcell" style="width:10%">
+                <div class="slds-truncate" >{itrfeature.feature.LoE__c}</div>
+              </td>
+            
+
+            
+            
+              <!--Review column-->
+              <template if:true={currentUserIsReviewer}>
+                <template if:false={columnClassHide}>  
+                  <td role="gridcell" style="width:10%">
+                    <div class="slds-truncate noOfUnits" style="margin-top:-15px;">  
+                    <lightning-input value={itrfeature.feature.LoE__c} type="number" onchange={handleLoEValueChange} name={itrfeature.feature.Id}  label="" ></lightning-input>
+                    </div>
+                  </td>
+                </template>  
+
+                <template if:true={columnClassHide}>  
+                  <td role="gridcell" style="width:10%" class="unclickable">
+                    <div class="slds-truncate noOfUnits" style="margin-top:-15px;">  
+                    <lightning-input value={itrfeature.feature.LoE__c} type="number" onchange={handleLoEValueChange} name={itrfeature.feature.Id}  label="" ></lightning-input>
+                    </div>
+                  </td>
+                </template>  
+              
+
+              </template>
+            </template>  
+
+            <!-- Blank columns if feature not selected-->
+            <template if:false={itrfeature.feature.Is_Selected__c}>
+              <td role="gridcell" style="width:10%"></td>
+              <td role="gridcell" style="width:10%"></td>
+              <template if:true={currentUserIsReviewer}>
+                <td role="gridcell" style="width:10%"></td>
+              </template>
+            </template>
+           
+            
+          </tr>
+        </template> 
+      
+        
+        </tbody>
+     
+      
+       
+      </table>
+     </div>
+    </div>
+
+
+      <div class="slds-grid slds-m-top_medium">
+        <div class="slds-col slds-m-left_large">
+            <div>
+            <span style="font-size:14px;font-weight:800;border-radius:50px 0px 0px 50px" class={baseLineClass}>Baseline</span>
+            <span style="font-size:14px;font-weight:800;border-radius:0px 50px 50px 0px" class={customClass}>Custom</span>
+            </div>
+
+           
+
+            <template if:true={showConfirm}>
+              <template if:false={hideConfirm}>
+            <div class="slds-m-top_large confirm">
+            <lightning-button variant="brand" label="Confirm" title="Confirm for the changes made." onclick={handleSave} ></lightning-button>
+            </div>
+            </template>
+            </template>
+        </div>
+        <div class="slds-col"></div>
+        <div class="slds-col slds-aloat_right">
+            <div class="demo-only">
+                <article class="slds-tile slds-media">
+                 <!-- <div class="slds-media__figure">
+                    <span class="slds-icon_container" title="description of icon when needed">
+                        <lightning-icon icon-name="utility:connected_apps" alternative-text="Connected" variant="inverse"
+                        title="medium (default)"></lightning-icon>
+                    </span>
+                  </div>-->
+                  <div class="slds-media__body">
+                    <h3 class="slds-tile__title slds-truncate" title="Salesforce UX">
+                      <p style="color:#00396B;font-weight:800;">LOE Calculations (In Hours)</p>
+                    </h3>
+                    <div class="slds-tile__detail">
+                      <dl class="slds-list_vertical">
+                        <dt class="slds-item_label slds-text-color_weak" title="First Label"><lightning-helptext content="Total effort required for this Product."></lightning-helptext> &nbsp;<span style="font-size:14px;color:#5D97C7">Selected Modules LOE: <b style="color:black">{selectedModulesLOE}</b> </span></dt>
+                        
+                        <dt class="slds-item_label slds-text-color_weak" title="Second Label"><lightning-helptext content="Estimated Effort for Project Management."></lightning-helptext> &nbsp;<span style="font-size:14px;color:#5D97C7">TPM/Security Consultant LOE: <b style="color:black">{tpmLOE}</b> </span></dt>
+                        
+                        <dt class="slds-item_label slds-text-color_weak" title="Third Label"><lightning-helptext content="Peer review , change management, testing and deployment."></lightning-helptext> &nbsp;<span style="font-size:14px;color:#5D97C7">#Technical Overhead LOE: <b style="color:black">{techOverheadLOE}</b> </span></dt>
+                      
+                        <dt class="slds-item_label slds-text-color_weak" title="Fourth Label"><lightning-helptext content="Total Estimated Effort for the Product."></lightning-helptext> &nbsp;<span style="font-size:14px;color:#5D97C7">Total: <b style="color:black">{total}</b> </span></dt>
+                        
+                      </dl>
+                    </div>
+                  </div>
+                </article>
+              </div>
+        </div>
+     </div> 
+    </template>
+
+    <template if:false={showLOETable}>
+      <div class="slds-m-top_medium">
+        <div class="slds-grid">
+          <div class="slds-col">
+            There is no LoE data configured / no modules for this product , Case Owner should enter an approximate LoE value to proceed with integration
+          </div>
+          <div class="slds-col" style="margin-top:-20px;">
+            <lightning-input type="number" disabled={disableLOEManualFields} name="LoEHours"  onchange={handleManualLoEChange} value={total} label="" ></lightning-input>
+          </div>
+          <div class="slds-col slds-m-top_small" style="margin-top:-5px;">
+            <lightning-button variant="brand" disabled={disableLOEManualFields} label="Save" class="slds-m-top_small" title="Confirm" onclick={handleSaveManualLoE} ></lightning-button>
+          </div>
+        </div>
+        
+       
+        
+        
+        </div>
+    </template>
+
+      <template if:true={showReviewers}>
+		<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+			<div class="slds-modal__container">
+				<header class="slds-modal__header">
+					<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+						<svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+							<use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+						</svg>
+						<span class="slds-assistive-text">Close</span>
+					</button>
+					<h2 id="modal-heading-04" class="slds-modal__title slds-hyphenate">Reviewers / Escalation Users for Product - Product Name</h2>
+				</header>
+				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+					
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <div>User</div>
+                            <div>Sujay</div>
+                            <div>Himanshu</div>
+                        </div>
+                        <div class="slds-col">
+                            <div>Role</div>
+                            <div>Reviewer</div>
+                            <div>Escalation 1 user</div>
+
+                        </div>
+                    </div>    
+					
+					
+						
+					
+				</div>
+				<footer class="slds-modal__footer">
+					<button class="slds-button slds-button_brand" onclick={hideReviewersList}>Close</button>
+				</footer>
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open"></div>
+  </template>
+  
+  <template if:true={showFeatureDetails}>
+		<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+			<div class="slds-modal__container">
+				<header class="slds-modal__header">
+					<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+						<svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+							<use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+						</svg>
+						<span class="slds-assistive-text">Close</span>
+					</button>
+					<h2 id="modal-heading-05" class="slds-modal__title slds-hyphenate"><b>Details for Module - {moduleName}</b></h2>
+				</header>
+				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-4">
+					
+					<div>
+            
+            <div><b>Description : </b>{featureDescription}</div>
+            </br>
+            <div><b>Scope : </b>{featureScope}</div>
+					</div>
+					
+					
+						
+					
+				</div>
+				<footer class="slds-modal__footer">
+					<button class="slds-button slds-button_brand" onclick={handleDetailsHide}>Close</button>
+				</footer>
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open"></div>
+	</template>
+</template>

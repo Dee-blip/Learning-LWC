@@ -1,0 +1,10 @@
+.mytextarea{
+    height: 400px !important;
+}
+
+.lgc-bg{
+    position: relative;
+    margin-bottom: -50px !important;
+    z-index: 1;
+    margin-right: 10px;
+}

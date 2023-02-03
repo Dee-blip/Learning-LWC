@@ -1,0 +1,125 @@
+<apex:page id="ATMpage" name="Account Team Management" controller="AccountTeamManagement" showHeader="true" sidebar="true" standardStylesheets="false" lightningStylesheets="true">
+ 
+<script type="text/javascript">
+
+function CheckAll(checkval)
+{
+    var val=checkval.checked;
+    for (var j=0;j < document.forms['ATMpage:ATMform'].elements.length;j++)
+    {
+        var e = document.forms['ATMpage:ATMform'].elements[j];
+        if (e.type == 'checkbox')
+        {
+            e.checked = val;
+        }
+    }
+}
+
+</script>
+<style type='text/css'>
+.betaLink {
+background-color:#F8F8F8;
+border:1px solid #D4DADC;
+display:inline-block;
+font-weight:bold;
+line-height:25px;
+margin-bottom:15px;
+padding:0 7px;
+}
+</style>
+<!--  div class='betaLink'>
+<b>This is a Beta Feature. Please raise a Helpdesk ticket if there are any issues.</b>
+</div-->
+  <apex:pageMessages />
+  <apex:form id="ATMform" >
+  <apex:pageBlock id="ATMblock" title="Account Team Management">
+    
+        <apex:PageblockTable value="{!AccTMember}" var="ATeamMember" width="100%" >
+          <apex:column width="10px" style="align:center" >
+             <apex:facet name="header"><input type="checkbox" Name="AlldelAccTeam" value="" onClick="CheckAll(this);" /></apex:facet>
+              <apex:panelGroup rendered="{!ATeamMember.a.Account.OwnerId!=ATeamMember.a.UserId}">
+                  <apex:inputCheckbox value="{!ATeamMember.checked}" id="new"/>
+              </apex:panelGroup>
+             
+          </apex:column>
+           <apex:column id="akam">
+              <apex:facet name="header"><b>AKAM Account Id</b></apex:facet>
+              {!ATeamMember.a.Account.AKAM_Account_ID__c}
+          </apex:column>
+          <apex:column >
+              <apex:facet name="header"><b>Name</b></apex:facet>
+                <a href="/{!ATeamMember.a.Account.Id}">{!ATeamMember.a.Account.Name}</a>
+          </apex:column>
+          <apex:column >
+              <apex:facet name="header"><b>Owner</b></apex:facet>
+                <a href="/{!ATeamMember.a.Account.OwnerId }">{!ATeamMember.a.Account.Owner.Name}</a>
+          </apex:column>
+           <apex:column >
+              <apex:facet name="header"><b>Parent Division</b></apex:facet>
+                {!ATeamMember.a.Account.Parent_Division__c}
+          </apex:column>
+           <apex:column >
+          <apex:facet name="header"><b>Division</b></apex:facet>
+                {!ATeamMember.a.Account.Division__c}
+          </apex:column>
+           <apex:column >
+          <apex:facet name="header"><b>Region</b></apex:facet>
+                {!ATeamMember.a.Account.Region__c}
+          </apex:column>
+           <apex:column >
+          <apex:facet name="header"><b>Area</b></apex:facet>
+                {!ATeamMember.a.Account.Area__c}
+          </apex:column>
+          <apex:column >
+              <apex:facet name="header"><b>Account Access</b></apex:facet>
+              {!ATeamMember.AccAccessLevel}
+          </apex:column>
+          <apex:column >
+              <apex:facet name="header"><b>Opportunity Access</b></apex:facet>
+              {!ATeamMember.OppAccessLevel}
+          </apex:column>
+          <apex:column id="role">
+            <apex:facet name="header"><b>Role type</b></apex:facet>
+                 <apex:selectList size="1" value="{!ATeamMember.BUOpt}">
+                           <apex:selectOptions value="{!ATeamMember.BUOptions}"/>
+                       </apex:selectList>
+           </apex:column>
+         </apex:PageblockTable> <br></br>  
+  <apex:pageBlockButtons >        
+       <apex:commandButton id="ATMdel" onclick="return delrows()" value="Delete Selected Rows" action="{!deleteAcc}"/> <apex:commandButton id="ATMsave" value="Save Changes" action="{!saveAcc}"/>
+    </apex:pageBlockButtons>
+    
+   
+ </apex:pageBlock>
+ </apex:form>
+ 
+  <script type="text/javascript">
+function delrows()
+{
+    var count=0;
+    for (var j=0;j < document.forms['ATMpage:ATMform'].elements.length;j++)
+    {
+        var e = document.forms['ATMpage:ATMform'].elements[j];
+        if (e.type == 'checkbox')
+        {
+            if(e.checked == true && e.name!='AlldelAccTeam')
+            count++;
+            
+        }
+    }
+    if(count==0)
+    {
+        alert('Please select atleast 1 record');
+        return false;
+    }
+    if(count>0)
+    return confirm('Are you sure you want to delete '+count+' record(s)?');
+}
+</script>
+    <apex:panelGroup id="noaGrp" rendered="{!value=='Loading Please Wait...'}">
+     {!value}
+     <script>
+    window.location.href='/apex/AccountTeamManagement';
+    </script>
+    </apex:panelGroup>
+</apex:page>

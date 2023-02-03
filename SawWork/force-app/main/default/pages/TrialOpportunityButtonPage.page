@@ -1,0 +1,2 @@
+<apex:page standardController="Opportunity" recordSetVar="op" extensions="OpportunityListViewButtonPageExtn" action="{!getTrialOpportunities}">
+</apex:page>

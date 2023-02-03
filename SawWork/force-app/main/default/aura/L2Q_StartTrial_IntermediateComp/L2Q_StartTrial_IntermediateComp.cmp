@@ -1,0 +1,176 @@
+<aura:component access="global" controller="MarketPlaceContactRoleController">
+  <aura:attribute name="objectId" type="String"/>
+  <aura:attribute name="objectType" type="string"/>
+  <aura:attribute name="redirectionURL" type="string"/>
+  <aura:attribute name="errorMessage" type="string"/>
+  <aura:attribute name="hasErrors" type="Boolean" default="false"/>
+
+  <aura:attribute name="productDetailColumnNames" type="Object"/>
+  <aura:attribute name="productDetailData" type="Object"/>
+
+  <aura:attribute name="returnErrorMessage" type="string"/>
+  <aura:attribute name="hasReturnErrors" type="Boolean" default="false"/>
+
+  <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+  <aura:if isTrue="{!v.hasReturnErrors}">
+    <ui:message title="" severity="error" closable="false">
+      <strong>
+        ERROR:
+      </strong>
+      <br/>
+      {! v.returnErrorMessage }
+    </ui:message>
+  </aura:if>
+
+  <aura:if isTrue="{!v.hasErrors}">
+    <lightning:card iconName="utility:error">
+      <ui:message title="" severity="error" closable="false">
+        <strong>
+          ERROR:
+        </strong>
+        <br/>
+        <ui:outputRichText class="slds-text-longform" value="{! v.errorMessage }"/>
+      </ui:message>
+      <lightning:button class="slds-m-left_xx-small" label="Back" variant="Neutral" onclick="{! c.back }" disabled="false"/>
+    </lightning:card>
+    <aura:set attribute="else">
+      <aura:if isTrue="{!v.objectType == 'Opportunity'}">
+        <!-- display only if objectType is Opportunity -->
+        <lightning:card iconName="standard:product">
+          <c:SF1_CustomLoader/>
+
+          <aura:set attribute="title">
+            <strong>
+              Select Marketplace Control Center Or Paper POC
+            </strong>
+          </aura:set>
+
+          <aura:set attribute="actions">
+            <lightning:button label="Back" variant="Neutral" onclick="{! c.back }" disabled="false"/>
+          </aura:set>
+
+          <ui:message title="" severity="info" closable="false">
+            <b>Note:
+            </b><br/>Marketplace Control Center supports trials only for the following products, based on whether the Account is a Prospect or Customer.
+          </ui:message>
+
+          <div class="slds-grid slds-gutters">
+
+            <div class="slds-col slds-size_2-of-4">
+              <div style="padding:20px;">
+                <div class="slds-box" style="background-color:#ecebea;padding:20px;">
+                  <h6 class="slds-text-heading--small">
+                    <strong>
+                      <center>I WANT TO START A PAPERLESS TRIAL/POC FOR...</center>
+                    </strong>
+                  </h6>
+                </div>
+              </div>
+            </div>
+
+            <div class="slds-col slds-size_2-of-4">
+              <div style="padding:20px;">
+                <div class="slds-box" style="background-color:#ecebea;padding:20px;">
+                  <h6 class="slds-text-heading--small">
+                    <strong>
+                      <center>I WANT TO START A PAPER POC FOR...</center>
+                    </strong>
+                  </h6>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_2-of-4">
+              <div class="slds-scrollable_y">
+                <div style="padding-left:20px;padding-right:20px;">
+                  <div class="slds-box">
+                    <!--lightning:datatable showRowNumberColumn="true" hideCheckboxColumn="true" data="{! v.productDetailData }" onsort="" columns="{! v.productDetailColumnNames }" keyField="Id"/-->
+                    <center>
+                        <lightning:button label="Click here for list of Paperless Trial/POC Products" variant="brand" onclick="{!c.handleOpenInNewWindow}" />
+                      </center>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="slds-col slds-size_2-of-4">
+              <div style="height:100%;padding-left:20px;padding-right:20px;">
+                <div class="slds-box" style="height:100%;">
+                  <div class="container">
+                    <div class="vertical-center">
+                      <h6 class="slds-text-heading--small">
+                        <center>All Other Products</center>
+                      </h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_2-of-4">
+              <div style="padding-left:20px;padding-right:20px;padding-top:10px;">
+                <div class="slds-box hand-cursor" style="background-color:#007add;padding:20px;" onclick="{! c.openBuyAkamaiWindow }">
+                  <h6 class="slds-text-heading--small">
+                    <center>
+                      <span style="color:white">Open Marketplace Control Center</span>
+                    </center>
+                  </h6>
+                </div>
+              </div>
+            </div>
+
+            <div class="slds-col slds-size_2-of-4">
+              <div style="padding-left:20px;padding-right:20px;padding-top:10px;">
+                <div class="slds-box hand-cursor" style="background-color:#253045;padding:20px;" onclick="{! c.openModal }">
+                  <h6 class="slds-text-heading--small">
+                    <center>
+                      <span style="color:white">Create Paper POC</span>
+                    </center>
+                  </h6>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </lightning:card>
+      </aura:if>
+    </aura:set>
+  </aura:if>
+
+  <div >
+    <div role="dialog" tabindex="-1" aura:id="Modalbox" aria-labelledby="header43" class="slds-modal  slds-modal_small ">
+      <div class="slds-modal__container">
+        <div class="slds-modal__header">
+          <button class="slds-button slds-button--icon-inverse slds-modal__close" onclick="{!c.closeModal}">
+            <span>
+              <lightning:icon iconName="utility:close" size="medium" alternativeText="close"/>
+              <span class="slds-assistive-text">Close</span>
+            </span>
+          </button>
+          <h6 id="modal-heading-01" class="slds-text-heading--small">Confirmation</h6>
+        </div>
+        <div class="slds-modal__content slds-p-around--medium">
+          <div>
+            <ul class="slds-has-dividers_around-space ">
+              Are you sure to start Paper POC for this Opportunity?
+            </ul>
+          </div>
+        </div>
+        <div class="slds-modal__footer">
+          <div style="align:">
+            <button class="slds-button slds-button--brand" onclick="{!c.startManualTrial}">Confirm</button>
+            <button class="slds-button slds-button--neutral" onclick="{!c.closeModal}">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slds-backdrop" aura:id="ModalClose"></div>
+  </div>
+</aura:component>

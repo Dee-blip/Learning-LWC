@@ -1,0 +1,5 @@
+"NAME","VALUE__C"
+"Monthly Account Revenue","https://abi-qa.akamai.com/analytics/saw.dll?Go&Path=/shared/External_Applications_Reports/Salesforce_Reports/Monthly_Revenue_With_Chart&Action=Navigate&p0=2&p1=eq&p2=%22Customer%22.%22Account%20ID%22&p3="
+"Account Cases History","https://abi-qa.akamai.com/analytics/saw.dll?PortalPages&PortalPath=/shared/External_Applications_Reports/_portal/Integration&Page=CASES&Action=Navigate&P0=1&P1=eq&P2=Customer.%22Account%20ID%22&p3="
+"Account Cases Top 10","https://abi-qa.akamai.com/analytics/saw.dll?Go&Path=/shared/External_Applications_Reports/Salesforce_Reports/CCare_Cases_Top_10&Action=Navigate&p0=1&p1=eq&p2=Customer.%22Account%20ID%22&p3="
+"Monthly Account Revenue Part 2","&p4=eq&p5=%22Parent%20Customer%22.%22Billed%20Customer%20-%20ID%22&p6="

@@ -1,0 +1,309 @@
+<!--
+Developer          	: Vandhana Krishnamurthy
+Description     	: AMG Homescreen Dashboard for Lightning
+________________________________________________________________________________________________________
+
+Date                Developer             JIRA #                      		Description                                                       
+________________________________________________________________________________________________________
+25 Nov 2019     	Vandhana      		 ESESP-1900     		AMG Homescreen Lightning Development
+________________________________________________________________________________________________________
+-->
+
+<aura:component implements="lightning:hasPageReference,lightning:isUrlAddressable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" controller="SC_AMG_Home_Lightning" access="global" extends="c:AuraUtils" >
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>   
+    
+    <lightning:navigation aura:id="navService"/>
+    <lightning:workspaceAPI aura:id="workspace"/>
+    
+    <aura:handler name="render" value="{!this}" action="{!c.afterRender}"/>
+    
+    <aura:attribute name="isJIRASystem" type="Boolean" default="false" />
+    <aura:attribute name="loading" type="Boolean" default="false" />
+    <aura:attribute name="amgEscRT" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="newEscRec" type="Boolean" default="true"/>
+    <aura:attribute name="newEscRecId" type="Id" />
+    
+    <!--<aura:handler event="force:refreshView" action="{!c.init}"/>-->
+    
+    <aura:if isTrue="{!v.newEscRec}">
+        <lightning:recordEditForm aura:id="newEscForm"
+                                  recordTypeId = "{!v.amgEscRT}"
+                                  objectApiName="Engagement_Request__c"
+                                  onsuccess="{!c.handleSuccess}"
+                                  onsubmit="{!c.handleSubmit}"
+                                  onerror="{!c.handleError}"
+                                  onload="{!c.handleLoad}">
+            <lightning:messages aura:id="OppMessage" />
+            
+            <div class="slds-card">
+                <div class="slds-card__header slds-grid slds-gutters">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-col">
+                            
+                            <ul class="slds-list_horizontal slds-media_center">
+                                <li>
+                                    <lightning:icon iconName="standard:data_integration_hub" class="slds-icon" />
+                                </li>
+                                <li class="">
+                                    <span style="font-size:17px;padding-left: 10px;"><b>AMG Escalation</b></span>
+                                </li>
+                            </ul>
+                        </div>
+                    </header>
+                </div>
+                <div class="slds-card__body slds-card__body_inner">
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col slds-size_1-of-4">
+                            <lightning:inputField required ="true" fieldName="ID__c" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                            <lightning:inputField fieldName="Case__c" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="slds-grid">    
+                        <div class="slds-col slds-size_1-of-4">
+                            <lightning:inputField aura:id="systemVal" required ="true" fieldName="System__c" onchange="{!c.systemChange}"/>
+                        </div>
+                        <div class="slds-col slds-size_3-of-4">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <aura:if isTrue="{!v.loadSpinner}">
+                            <div aura:id="spinnerId" class="slds-spinner_container" style="z-index: 10000 !important;">
+                                <lightning:spinner alternativeText="Loading" variant="brand" size="large" />
+                            </div>
+                        </aura:if>
+                    </div>
+                    
+                    <aura:if isTrue = "{!!v.isJIRASystem}">
+                        <div class="slds-grid">    
+                            <div class="slds-col slds-size_1-of-4">
+                                <lightning:inputField fieldName="Subject__c" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                                <lightning:inputField fieldName="OwnerId" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                            </div>
+                        </div>
+                        
+                        <div class="slds-grid">    
+                            <div class="slds-col slds-size_1-of-4">
+                                <lightning:inputField fieldName="Description__c" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                                <lightning:inputField fieldName="Escalation_Created_Date__c" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                            </div>
+                        </div>
+                        
+                        <div class="slds-grid">    
+                            <div class="slds-col slds-size_1-of-4">
+                                <lightning:inputField fieldName="Request_Status__c" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                                <lightning:inputField fieldName="Escalation_Created_By__c" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                            </div>
+                        </div>
+                        
+                        <div class="slds-grid">    
+                            <div class="slds-col slds-size_1-of-4">
+                                <lightning:inputField fieldName="Accepted_Date__c" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                                <lightning:inputField fieldName="Escalation_Closed_Date__c" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                            </div>
+                        </div>
+
+                        <div class="slds-grid">    
+                            <div class="slds-col slds-size_1-of-4">
+                                <lightning:inputField fieldName="ER_Severity__c" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                            </div>
+                        </div>
+
+                        <div class="slds-grid">    
+                            <div class="slds-col slds-size_1-of-4">
+                                <lightning:inputField fieldName="URL__c" />
+                            </div>
+                        </div>
+                        
+                    </aura:if>
+                    <footer class="slds-card__footer">
+                        <lightning:button variant="destructive" 
+                                          label="Cancel"
+                                          title="Cancel"
+                                          onclick="{!c.closeFocusedTab}"/>
+                        <lightning:button variant="brand" type="submit" label="Save" />
+                    </footer>
+                    
+                </div>
+                
+            </div>
+            
+            <aura:if isTrue="{!v.loading}">
+                <lightning:spinner alternativeText="Loading" />
+            </aura:if>
+            
+        </lightning:recordEditForm>
+    </aura:if>
+    
+	<aura:if isTrue="{!!v.newEscRec}">
+        <lightning:recordEditForm aura:id="newEscForm"
+                                  recordTypeId = "{!v.amgEscRT}"
+                                  recordId = "{!v.recordId}"
+                                  objectApiName="Engagement_Request__c"
+                                  onsuccess="{!c.handleSuccess}"
+                                  onsubmit="{!c.handleSubmit}"
+                                  onerror="{!c.handleError}"
+                                  onload="{!c.handleLoad}">
+            <lightning:messages aura:id="OppMessage" />
+            <div class="slds-card">
+                <div class="slds-card__header slds-grid slds-gutters">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-col">
+                            
+                            <ul class="slds-list_horizontal slds-media_center">
+                                <li>
+                                    <lightning:icon iconName="standard:data_integration_hub" class="slds-icon" />
+                                </li>
+                                <li class="">
+                                    <span style="font-size:17px;padding-left: 10px;"><b>AMG Escalation</b></span>
+                                </li>
+                            </ul>
+                        </div>
+                    </header>
+                </div>
+                <div class="slds-card__body slds-card__body_inner">
+                    
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <lightning:inputField required ="true" fieldName="ID__c" />
+                        </div>
+                        <div class="slds-col">
+                            <lightning:inputField fieldName="Case__c" />
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="slds-grid">    
+                        <div class="slds-col">
+                            <lightning:inputField aura:id="systemValEsc" required ="true" fieldName="System__c" onchange="{!c.systemChange}"/>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <aura:if isTrue="{!v.loadSpinner}">
+                            <div aura:id="spinnerId" class="slds-spinner_container" style="z-index: 10000 !important;">
+                                <lightning:spinner alternativeText="Loading" variant="brand" size="large" />
+                            </div>
+                        </aura:if>
+                    </div>
+                    
+                    <aura:if isTrue = "{!!v.isJIRASystem}">
+                        <div class="slds-grid">    
+                            <div class="slds-col">
+                                <lightning:inputField fieldName="Subject__c" />
+                            </div>
+                        </div>
+                        
+                        <div class="slds-grid">    
+                            <div class="slds-col">
+                                <lightning:inputField fieldName="Description__c" />
+                            </div>
+                            <div class="slds-col">
+                                <lightning:inputField fieldName="ER_Severity__c"/>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-grid">    
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:inputField fieldName="Escalation_Created_By__c" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:inputField fieldName="Request_Status__c" />
+                            </div>
+                        </div>
+                        
+                        <div class="slds-grid">    
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:inputField fieldName="Escalation_Created_Date__c" />
+                            </div>
+                        </div>
+                        
+                        <div class="slds-grid">
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:inputField fieldName="Accepted_Date__c" />
+                            </div>
+                        </div>
+                        
+                        <div class="slds-grid">    
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:inputField fieldName="Escalation_Closed_Date__c" />
+                            </div>
+                        </div>
+                        
+                        <div class="slds-grid">    
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:inputField fieldName="ER_Severity__c" />
+                            </div>
+                        </div>
+
+                        <div class="slds-grid">    
+                            <div class="slds-col ">
+                                <lightning:inputField fieldName="URL__c" />
+                            </div>
+                        </div>
+                    </aura:if>
+                    
+                    <footer class="slds-card__footer">
+                        <aura:if isTrue="{!v.newEscRec}">
+                            <lightning:button variant="destructive" 
+                                              label="Cancel"
+                                              title="Cancel"
+                                              onclick="{!c.closeFocusedTab}"/>
+                        </aura:if>
+                        <lightning:button variant="success" type="submit" label="Save" />
+                    </footer>
+                    
+                </div>
+                
+            </div>
+            
+            <aura:if isTrue="{!v.loading}">
+                <lightning:spinner alternativeText="Loading" />
+            </aura:if>
+            
+        </lightning:recordEditForm>
+    </aura:if>    
+</aura:component>

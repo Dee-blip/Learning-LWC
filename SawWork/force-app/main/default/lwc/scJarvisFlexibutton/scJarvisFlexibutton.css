@@ -1,0 +1,57 @@
+.button {
+    width: var(--jvButtonWidth, 100px);
+    height: var(--jvButtonHeight, 60px);
+    background-color: var(--jvButtonBgColor, #10a0f0);
+    color: var(--jvButtonTextColor, white);
+    text-align: var(--jvButtonTextAlign, center);
+    border-radius: var(--jvBorderRadius, 5px);
+    line-height: var(--jvButtonHeight, 60px);
+    cursor: pointer;
+    outline: none;
+    font-size: 1rem;
+    margin: var(--jvButtonMargin, auto);
+}
+
+.float-button {
+    position: fixed;
+    top: 50%;
+    width: var(--jvButtonWidth, 100px);
+    height: var(--jvButtonHeight, 60px);
+    background-color: var(--jvButtonBgColor, #10a0f0);
+    transform-origin: center top;
+    transform: rotate(-90deg);
+    /* font-family: "Open Sans", "Trebuchet MS", Verdana, Helvetica, Sans-Serif; */
+    color: var(--jvButtonTextColor, white);
+    text-align: var(--jvButtonTextAlign, center);
+    line-height: 50px;
+    cursor: pointer;
+    outline: none;
+    font-size:1rem;
+    z-index: 100;
+}
+.left {
+    left: -60px;
+    border-bottom-left-radius: var(--jvBorderRadius, 5px);
+    border-bottom-right-radius: var(--jvBorderRadius, 5px);
+    padding-top: 10px;
+    transition: left 0.25s;
+
+}
+.right {
+    right: 0px;
+    border-top-left-radius: var(--jvBorderRadius, 5px);
+    border-top-right-radius: var(--jvBorderRadius, 5px);
+    transition: right 0.25s;
+}
+/* 
+.float-button::first-letter {
+  font-size: 1.5rem;
+} */
+.right:hover,
+.right:focus {
+    right: 10px
+}
+.left:hover,
+.left:focus {
+    left: -50px
+}

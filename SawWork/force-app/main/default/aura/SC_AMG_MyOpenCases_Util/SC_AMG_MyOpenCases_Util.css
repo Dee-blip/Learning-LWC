@@ -1,0 +1,62 @@
+.THIS {
+}
+
+.THIS .exampleHolder{
+    position: relative;
+    display: inline-block;
+    margin-left: 15px;
+    width: 55px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.THIS .label-hidden > label {
+    display: none;
+}
+
+.THIS .hideColumn {
+    display: none;
+}
+
+.THIS .chatIcon
+{
+    font-size: 20px !important;
+}
+
+.THIS .green{
+    color : green;
+}
+.THIS .yellow{
+    color : #e8d015;
+}
+.THIS .orange{
+    color : darkorange;
+}
+.THIS .red{
+    color : red;
+}
+
+.THIS .High a{
+    color : red !important;
+}
+
+.THIS .rightAlign{
+    text-align: right;
+}
+
+
+.THIS .leftAlign button {
+    text-align: left !important;
+}
+
+.THIS #modal-content-id-1{ 
+    height : 140px; 
+} 
+/*
+.THIS .modal-body{ 
+    height : 40vh !important; 
+    max-height: 40vh !important; 
+} */
+.THIS .slds-modal__footer{ 
+    display: inline !important; 
+}

@@ -1,0 +1,662 @@
+<apex:page showHeader="false" Controller="PreChatController" >
+    <script type='text/javascript' src='https://c.la1-c1cs-dfw.salesforceliveagent.com/content/g/js/43.0/prechat.js'></script>
+    <script type="text/javascript">
+        
+        var currentURL = window.location.href;
+    var lunaDeploymentId = '{!lunaDeploymentId}';
+    var attDeploymentId = '{!attDeploymentId}';
+    var lunaSsoUrl = '{!lunaSsoUrl}';
+    var attSsoUrl = '{!attSsoUrl}';
+    var PingSpURL;
+    
+    if(currentURL.indexOf(lunaDeploymentId) > -1)
+        PingSpURL = lunaSsoUrl;
+    else if(currentURL.indexOf(attDeploymentId) > -1)
+        PingSpURL = attSsoUrl;
+    
+    var userType = {!NOT(ISPICKVAL($User.UserType,'Guest'))};
+    if(userType == false){
+        console.log(PingSpURL +'&RelayState='+ currentURL)
+        window.location = PingSpURL +'&RelayState='+ currentURL;
+    }
+    
+    </script>
+    <!-- This script takes the endpoint URL parameter passed from the deployment page and makes it the action for the form -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="{!URLFOR($Resource.EBMailerStatusUI, '/bootstrap-3.3.2-dist/js/bootstrap.min.js')}"></script>
+    
+    <apex:stylesheet value="{!URLFOR($Resource.EBMailerStatusUI, '/bootstrap-3.3.2-dist/css/bootstrap.min.css')}"/>
+    <script type='text/javascript'>
+    var ctrlFieldDesc;
+    var depFieldDesc;
+    var selectedCtrlValues;
+    var selectedDepenValues;
+    var dependentOptions;
+    var controlingId = "ctrl"
+    var dependentId = "dpnd";
+    
+    //Changes made by Pinkesh
+    //get parameter values
+    function getQueryVariable(variable) {
+        var fullURL = decodeURIComponent(window.location.href);
+        var query = fullURL.split("#");
+        var vars = query[1].split("&");
+        for (var i=0;i<vars.length;i++) {
+            var pair = vars[i].split("=");
+            if (pair[0] == variable) {
+                return pair[1];
+            }
+        } 
+        console.log('Query Variable ' + variable + ' not found');
+    }
+    //end of changes by Pinkesh
+    
+    
+    (function() {
+        function handlePageLoad() {
+            var d = new Date();
+            var currentUrl = window.location.href;
+            var akatechButtonId = document.querySelectorAll('[id$="hiddenAkatechButton"]')[0].value;
+            var amgButtonId = document.querySelectorAll('[id$="hiddenAmgButton"]')[0].value;
+            document.getElementById('shortErrorId').style.display = 'none';
+            document.getElementById('fullErrorId').style.display = 'none';
+            document.getElementById('errorId').style.display = 'none';
+            if(currentUrl.indexOf(akatechButtonId) > -1){
+                document.getElementById('hiddenAkamCaseId').value = "false";
+                document.getElementById('businessForm').style.display = 'none';
+                document.getElementById('techForm').style.display = 'block';
+                document.getElementById('visibilityId').value = "Customer";
+                document.querySelectorAll('[id$="hiddenRecordTypeId"]')[0].value = document.querySelectorAll('[id$="hiddenAkatecRecordType"]')[0].value;
+            }
+            else if(currentUrl.indexOf(amgButtonId) > -1){
+                document.getElementById('hiddenProductNameId').value = "false";
+                document.getElementById('techForm').style.display = 'none';
+                document.getElementById('businessForm').style.display = 'block';
+                document.getElementById('visibilityId').value = "Customer";
+                document.querySelectorAll('[id$="hiddenRecordTypeId"]')[0].value = document.querySelectorAll('[id$="hiddenAMGRecordType"]')[0].value;
+            }
+            
+            //Changes made by Pinkesh
+            var endpointMatcher = new RegExp("[\\?\\&]endpoint=([^&#]*)");
+            var actionURL = decodeURIComponent(endpointMatcher.exec(document.location.search)[1]);
+            if(actionURL.indexOf('deployment_id') <= -1)
+                actionURL = actionURL + '#deployment_id=' +getQueryVariable("deployment_id") + '&org_id=' +getQueryVariable("org_id")+ '&button_id=' +getQueryVariable("button_id");
+            console.log('action: ' + actionURL);
+            document.getElementById('prechatForm').setAttribute('action', actionURL);
+            //end of changes by Pinkesh
+            
+            ctrlFieldDesc = document.querySelectorAll('[id$="hiddenArea"]')[0].value;
+            depFieldDesc = document.querySelectorAll('[id$="hiddenService"]')[0].value;
+            selectedCtrlValues = document.querySelectorAll('[id$="hiddenSelCtrl"]')[0].value;
+            selectedDepenValues = document.querySelectorAll('[id$="hiddenSelDep"]')[0].value;
+            
+            dependentOptions = getDependentOptions();
+            buildControlling();
+            buildDependent();       
+            buildProductList("productId");
+        } 
+        if (window.addEventListener) {
+            window.addEventListener('load', handlePageLoad, false);
+        } 
+        else { 
+            window.attachEvent('onload', handlePageLoad, false);
+        }
+    })();
+    
+    function buildControlling() {
+        var list = JSON.parse(ctrlFieldDesc);
+        var newList = [];
+        var selectedCtrl = selectedCtrlValues.split(',');
+        var table = selectedCtrlValues.split(",").map(pair => pair.split("="));
+        for(var i=0; i < list.length; i++){
+            for(var j=0; j < table.length; j++){
+                if(list[i].label == table[j][0]){
+                    list[i].label = table[j][1];
+                    newList.push(list[i]);
+                    break;
+                }    
+            }
+        }
+        var myDiv = document.getElementById("controllingOption");
+        appendSelectOption(myDiv, newList, controlingId, buildDependent, 'liveagent.prechat:CaseArea');
+    }
+    function buildProductList(fieldId) {
+        var list = JSON.parse('{!productList}');
+        var myDiv = document.getElementById(fieldId);
+        appendProductList(myDiv, list, controlingId,'liveagent.prechat:CaseProduct');
+    }
+    function buildDependent() {
+        var selectedCtrl = selectedCtrlValues.split(',');
+        var table = selectedCtrlValues.split(",").map(pair => pair.split("="));
+        var selVal = document.getElementById(controlingId).value;
+        var x = document.getElementById(controlingId).value;
+        for(var j=0; j < table.length; j++){
+            if(x == table[j][1]){
+                x = table[j][0];
+            }
+        }
+        var myDiv = document.getElementById("dependentOption");
+        var slist = document.getElementById(dependentId);
+        if (slist) { myDiv.removeChild(slist); }
+        var newList = [];
+        var selectedDep = [];
+        var subTable = selectedDepenValues.split(";").map(pair => pair.split(":"));
+        for(var k=0; k < subTable.length; k++){
+            if(subTable[k][0] == selVal){
+                selectedDep = subTable[k][1].split(',');
+            }
+        }
+        if(dependentOptions[x] != undefined){
+            for(var i=0; i < dependentOptions[x].length; i++){
+                for(var j=0; j < selectedDep.length; j++){
+                    if(dependentOptions[x][i].label.toUpperCase() == selectedDep[j].toUpperCase()){
+                        newList.push(dependentOptions[x][i]);
+                        break;
+                    }    
+                }
+            }
+            appendSelectOption(myDiv, newList, dependentId, '', 'liveagent.prechat:CaseService');
+        }
+        else{
+            appendSelectOption(myDiv, dependentOptions[x], dependentId, '', 'liveagent.prechat:CaseService');
+        }
+    }
+    
+    //create every selectoption component
+    function appendSelectOption(myDiv, list, cId, ajax, name) {
+        selectList = document.createElement("select");
+        selectList.id = cId;
+        selectList.name = name;
+        selectList.style.width = "100%";
+        selectList.style.backgroundColor = "white";
+        selectList.style.borderStyle = "none";
+        if (ajax) {
+            selectList.onchange = buildDependent;
+        }
+        myDiv.appendChild(selectList);
+        
+        var option = document.createElement("option");
+        option.text = "--None--";
+        selectList.appendChild(option);
+        for (var item in list) {
+            if (list[item]["active"]) {
+                var option = document.createElement("option");
+                option.value = list[item]["label"];
+                option.text = list[item]["label"];
+                if (list[item]["defaultValue"]) {
+                    option.selected="selected";
+                }
+                selectList.appendChild(option);
+            }
+        }
+    }
+    function appendProductList(myDiv, list, cId, name) {
+        var pNameList = JSON.parse('{!pNameStr}');
+        selectList = document.createElement("select");
+        selectList.id = cId;
+        selectList.name = name;
+        
+        selectList.style.width = "100%";
+        selectList.style.backgroundColor = "white";
+        selectList.style.borderStyle = "none";
+        myDiv.appendChild(selectList);
+        
+        var option = document.createElement("option");
+        option.value = "";
+        option.text = "--None--";
+        selectList.appendChild(option);
+        for (j=0;j<=pNameList.length;j++){
+            for (var i in list){
+                var option = document.createElement("option");
+                if(list[i] == pNameList[j]){
+                    option.value = i;
+                    option.text = list[i];
+                    selectList.appendChild(option);
+                    break;
+                }
+            }
+        }
+    }
+    function getDependentOptions(){
+        // Set up return object
+        var dependentOptions = {};
+        var dependentOptions1 = {};
+        var ctrlValues = JSON.parse(ctrlFieldDesc);
+        
+        for (var i=0; i<ctrlValues.length; i++) {
+            dependentOptions[ctrlValues[i].label] = [];
+        }
+        // For each dependent value, check whether it is valid for each controlling value
+        var depValues = JSON.parse(depFieldDesc);
+        for (var i=0; i<depValues.length; i++) {
+            var thisOption = depValues[i];
+            var validForDec = decodeBase64(thisOption.validFor);
+            for (var ctrlValue=0; ctrlValue<100; ctrlValue++) {
+                var testBitVal = testBit(validForDec, ctrlValue);
+                if (testBitVal) {
+                    dependentOptions[ctrlValues[ctrlValue].label].push(thisOption);
+                }
+            }
+        }
+        return dependentOptions;
+    }
+    
+    function testBit (validFor, pos) {
+        var byteToCheck = Math.floor(pos/8);
+        var bit = 7 - (pos % 8);
+        return ((Math.pow(2, bit) & validFor.charCodeAt(byteToCheck)) >> bit) == 1;
+    }
+    
+    function decodeBase64(s) {
+        var e={},i,b=0,c,x,l=0,a,r='',w=String.fromCharCode,L=s.length;
+        var A="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        for(i=0;i<64;i++){e[A.charAt(i)]=i;}
+        for(x=0;x<L;x++){
+            c=e[s.charAt(x)];b=(b<<6)+c;l+=6;
+            while(l>=8){((a=(b>>>(l-=8))&0xff)||(x<(L-2)))&&(r+=w(a));}
+        }
+        return r;
+    };
+    function setProductName(){
+        var indexElement = document.getElementById('productId').childNodes[1].options.selectedIndex;
+        var selectedProduct = document.getElementById('productId').childNodes[1].options[indexElement].text
+        document.getElementById('productNameId').value = selectedProduct;
+        
+        //Adding changes for ESESP-1769
+        Visualforce.remoting.Manager.invokeAction(
+            '{!$RemoteAction.PreChatController.setAkatecAgent}',
+            selectedProduct,
+            function(result, event){
+                var endpointMatcher = new RegExp("[\\?\\&]endpoint=([^&#]*)");
+                var actionURL = decodeURIComponent(endpointMatcher.exec(document.location.search)[1]);
+                if(actionURL.indexOf('deployment_id') <= -1)
+                    actionURL = actionURL + '#deployment_id=' +getQueryVariable("deployment_id") + '&org_id=' +getQueryVariable("org_id")+ '&button_id=' +getQueryVariable("button_id");
+                setGetParameter(actionURL, "button_id", result); 
+            }
+        );
+        //End of changes 
+    }   
+    //Adding changes for ESESP-1769
+    function setGetParameter(url, paramName, paramValue)
+    {
+        var hash = location.hash;
+        url = url.replace(hash, '');
+        if (url.indexOf(paramName + "=") >= 0)
+        {
+            var prefix = url.substring(0, url.indexOf(paramName));
+            var suffix = url.substring(url.indexOf(paramName));
+            suffix = suffix.substring(suffix.indexOf("=") + 1);
+            suffix = (suffix.indexOf("&") >= 0) ? suffix.substring(suffix.indexOf("&")) : "";
+            url = prefix + paramName + "=" + paramValue + suffix;
+        }
+        else
+        {
+            if (url.indexOf("?") < 0)
+                url += "?" + paramName + "=" + paramValue;
+            else
+                url += "&" + paramName + "=" + paramValue;
+        }
+        document.getElementById('prechatForm').setAttribute('action', url);
+    } 
+    //End of changes
+    
+    //Added changes by Vikas for ESESP-1902, to get the values from community pages.
+    var detailCallback = function (details){
+        for(var i = 0; i < details.customDetails.length; i++) {
+            if(details.customDetails[i].label == 'ChatOriginFrom'){
+                document.getElementById('chatOriginId').value = 'AkaChat '+details.customDetails[i].value;
+                console.log(details.customDetails[i].value);
+            }
+        }
+    };
+    liveagent.details.preChatInit('{!akachatInitURL}','detailCallback'); 
+    
+    //Added by Vikas, for ESESP-1835 to start a chat.
+    function setSearchResult(returnValue){
+        if(returnValue == 'ONLINE')
+            document.getElementById('prechatForm').submit();
+        else if(returnValue == 'OFFLINE'){
+            document.getElementById('connectingId').style.display = 'none';
+        }
+    }
+    
+    function closeWaiting(){
+        var modal = document.getElementById('myModal');
+        modal.style.display = "none";
+    }
+    function setName() { 
+        document.getElementById("prechat_field_name").value = "{!caseContactName}";
+        document.getElementById('shortErrorId').style.display = 'none';
+        document.getElementById('fullErrorId').style.display = 'none';
+        document.getElementById('errorId').style.display = 'none';
+        document.getElementById('pErrorId').style.display = 'none';
+        document.getElementById('shortId').style.borderColor = '';
+        document.getElementById('fullId').style.borderColor = '';
+        document.getElementById('caseId').style.borderColor = '';
+        document.getElementById('productId').style.borderColor = '';
+        var caseIdSel = document.getElementById('caseId').value;
+        var caseSub = document.getElementById('shortId').value;
+        var caseDesc = document.getElementById('fullId').value;
+        
+        if(caseSub == ''){
+            document.getElementById('shortErrorId').style.display = 'block';
+            document.getElementById('shortErrorId').style.color = 'red';
+            document.getElementById('shortErrorId').innerHTML = 'Please fill this field';
+            document.getElementById('shortId').style.borderColor = 'red';
+            return false;
+        }
+        if(caseDesc == ''){
+            document.getElementById('fullErrorId').style.display = 'block';
+            document.getElementById('fullErrorId').style.color = 'red';
+            document.getElementById('fullErrorId').innerHTML = 'Please fill this field';
+            document.getElementById('fullId').style.borderColor = 'red';
+            return false;
+        }
+        var currentUrl = window.location.href;
+        var akatechButtonId = document.querySelectorAll('[id$="hiddenAkatechButton"]')[0].value;
+        if(currentUrl.indexOf(akatechButtonId) > -1){
+            var productIndex = document.getElementById('productId').childNodes[1].options.selectedIndex;
+            var productValue = document.getElementById('productId').childNodes[1].options[productIndex].text;
+            if(productValue == '--None--'){
+                document.getElementById('pErrorId').style.display = 'block';
+                document.getElementById('pErrorId').style.color = 'red';
+                document.getElementById('pErrorId').innerHTML = 'Please select a product from the list';
+                document.getElementById('productId').style.borderColor = 'red';
+                return false;
+            }
+        }
+        
+        Visualforce.remoting.Manager.invokeAction(
+            '{!$RemoteAction.PreChatController.validateCaseId}',
+            caseIdSel,
+            function(result, event){
+                if(result == ''){
+                    document.getElementById('myModal').style.display = 'block';
+                    document.getElementById('connectingId').style.display = 'block';
+                    document.getElementById('iframeId').style.display = 'none';
+                    //Added by Vikas, to wait for 3 seconds and open a popup  
+                    setTimeout(function(){ 
+                        var currentUrl = window.location.href;
+                        var akatechButtonId = document.querySelectorAll('[id$="hiddenAkatechButton"]')[0].value;
+                        var amgButtonId = document.querySelectorAll('[id$="hiddenAmgButton"]')[0].value;
+                        var myWindow;
+                        if(currentUrl.indexOf(akatechButtonId) > -1){
+                            document.getElementById('connectingId').style.display = 'none';
+                            document.getElementById("iframeId").style.display = 'block';
+                            document.getElementById("iframeId").src="/customers/apex/PreChatLiveAgent_Popup?type=Akatec";
+                        }
+                        else if(currentUrl.indexOf(amgButtonId) > -1){
+                            document.getElementById('connectingId').style.display = 'none';
+                            document.getElementById("iframeId").style.display = 'block';
+                            document.getElementById("iframeId").src="/customers/apex/PreChatLiveAgent_Popup?type=AMG";
+                        }
+                    }, 3000);
+                    //document.getElementById('prechatForm').submit();
+                }
+                else if(result == 'NO CASE'){
+                    document.getElementById('errorId').style.display = 'block';
+                    document.getElementById('errorId').style.color = 'red';
+                    document.getElementById('errorId').innerHTML = 'Please enter a valid Case Id';
+                    document.getElementById('caseId').style.borderColor = 'red';
+                    return false;
+                } 
+                    else if(result == 'NO AMG CASE'){
+                        document.getElementById('errorId').style.display = 'block';
+                        document.getElementById('errorId').style.color = 'red';
+                        document.getElementById('errorId').innerHTML = 'Please enter a valid Business Case Id';
+                        document.getElementById('caseId').style.borderColor = 'red';
+                        return false;
+                    } 
+            }
+        );
+    }
+    //End of changes
+    </script>
+    
+    <style>
+        p {font-weight: bolder }
+        
+        body {font-family: Arial, Helvetica, sans-serif;}
+        
+        /* The Modal (background) */
+        .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+        
+        /* Modal Content */
+        .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 35%;
+        height: 18%;
+        }
+        
+        /* The Close Button */
+        .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        }
+        
+        .close:hover,
+        .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+        }
+        @media only screen and (max-width: 600px) {
+            .modal-content {height: 24%;}
+            #iframeId {height:108px;}
+        }
+        @media only screen and (max-width: 1200px) {
+            .modal-content {height: 21%;}
+            #iframeId {height:92px;}
+        }
+        @media only screen and (max-width: 705px) {
+            .modal-content {height: 23%;}
+            #iframeId {height:109px;}
+        }
+        @media only screen and (max-width: 480px) {
+            .modal-content {height: 27%;}
+            #iframeId {height:124px;}
+        }
+        @media only screen and (max-width: 440px) {
+            .modal-content {height: 29%;}
+            #iframeId {height:141px;}
+        }
+        @media only screen and (max-height: 550px) {
+            .modal {height: 125%;}
+        }
+        @media only screen and (max-height: 670px) {
+            .modal {height: 125%;}
+        }
+        @media only screen and (max-height: 535px) {
+            .modal {height: 125%;}
+        }
+    </style>
+    
+    <div>
+        <center><apex:image url="{!$Resource.AkamaiLogo}"/></center>
+        <div id="myModal" class="modal">
+            <!-- Modal content -->
+            <div class="modal-content">
+                <!--<span class="close" onclick = "closeWaiting();">&times;hhujhjhj</span>-->
+                <center><p style="position: relative;padding-top: 7%;" id="connectingId">Connecting...</p></center>
+                <iframe style='display:none;' id='iframeId' frameborder="0" scrolling="no" width="100%" height="85px"></iframe>
+            </div>
+        </div>
+    </div>
+    <!-- Form that gathers information from the chat visitor and sets the values to Live Agent Custom Details used later in the example -->
+    <form method='post' id='prechatForm' class="form-horizontal" style="width: 100%;padding: 10px;">
+        <p id="demo"></p>
+        <div class="form-group">
+            <label for="shortDescription" class="col-sm-2 control-label">Short Description</label>
+            <div class="col-sm-10"> 
+                <input type="text" id="shortId" maxlength="250" class="form-control" placeholder="Brief issue description" name='liveagent.prechat:CaseSubject' required="true"/>
+                <div id="shortErrorId"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="fullDescription" class="col-sm-2 control-label">Full Description</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" id="fullId" maxlength="31000" rows="3" placeholder="Detailed description of issue" name='liveagent.prechat:CaseDescription' required="true"></textarea>
+                <div id="fullErrorId"/>
+            </div>
+        </div>
+        
+        <div id="businessForm">
+            <div class="form-group">
+                <label for="caseId" class="col-sm-2 control-label">Case Id (Please enter the Case Id if you have already created a case)</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="caseId" placeholder="Case Id" name='liveagent.prechat:AkamCaseId'/>
+                    <div id="errorId"/>
+                </div>
+            </div>
+            <div class="form-group" style="display:none;">
+                <label for="caseArea" class="col-sm-2 control-label">Area</label>
+                <div class="col-sm-10">
+                    <div class="form-control" id="controllingOption"> </div>
+                </div>
+            </div>
+            <div class="form-group" style="display:none;">
+                <label for="caseService" class="col-sm-2 control-label">Service</label>
+                <div class="col-sm-10">
+                    <div class="form-control" id="dependentOption"> </div>
+                </div>
+            </div>
+        </div>
+        <div id="techForm">
+            <div class="form-group">
+                <label for="caseProduct" class="col-sm-2 control-label">Products</label>
+                <div class="col-sm-10">
+                    <div class="form-control" id="productId" onchange="setProductName()"> </div>
+                    <div id="pErrorId"/>
+                </div>
+            </div>
+            <div style="margin-bottom: 15px;">
+                *For urgent issues, open cases, or to speak to your dedicated support engineer, please call us at {!akachatPhone}
+            </div>
+        </div>
+        <div class="form-group">
+            <center><input type='button' value='Chat Now' id='prechat_submit' onclick="setName()" class="btn btn-default"/></center>
+        </div>
+        
+        <!--Input fields to store the dependent picklist values from controller-->
+        <input type="hidden" id="hiddenArea" value="{!areaSelectOption}"/>
+        <input type="hidden" id="hiddenService" value="{!serviceSelectOption}"/>
+        <input type="hidden" id="hiddenSelCtrl" value="{!ctrlValues}"/>
+        <input type="hidden" id="hiddenSelDep" value="{!depValues}"/>
+        <input type="hidden" id="hiddenAkatechButton" value="{!akatechBtnId}"/>
+        <input type="hidden" id="hiddenAmgButton" value="{!amgBtnId}"/>
+        <input type="hidden" id="hiddenAMGRecordType" value="{!AMGRecordTypeId}"/>
+        <input type="hidden" id="hiddenAkatecRecordType" value="{!technicalRecordTypeId}"/>
+        
+        <!-- Hidden fields used to set additional custom details -->
+        <!--<input type="hidden" name="liveagent.prechat:CaseStatus" value="Assigned" /><br />-->
+        <input type="hidden" name="liveagent.prechat:ValidationOverride" value="1" /><br />
+        <input type="hidden" id="visibilityId" name="liveagent.prechat:CaseVisibility" /><br />
+        <!--<input type='hidden' name='liveagent.prechat:caseChatId' id='chatIdField'/>-->
+        
+        <!-- This example assumes that "Chat" was added as picklist value to the Case Origin field -->
+        <input type="hidden" id="chatOriginId" name="liveagent.prechat:CaseOrigin" value="{!caseChatOrigin}" /><br />
+        <input type="hidden" name="liveagent.prechat:CurrentAccountId" value="{!caseAccountId}" />
+        <input type="hidden" name="liveagent.prechat:CurrentContactId" value="{!caseContactId}" />
+        <input type="hidden" name="liveagent.prechat:Contact Name" value="{!caseContactName}" />
+        <input type="hidden" name="liveagent.prechat:Account Name" value="{!caseAccountName}" />
+        <input type="hidden" name="liveagent.prechat:Email" value="{!userEmail}" />
+        <input type="hidden" name="liveagent.prechat:Product" id="productNameId"/>
+        
+        <!-- This example will set the Case Record Type to a specific value for the record type configured on the org. Lookup the case record type's id on your org and set it here -->
+        <input type="hidden" id="hiddenRecordTypeId" name="liveagent.prechat:CaseRecordType"/>
+        
+        <!-- Used to set the visitor's name for the agent in the Console -->
+        <input type="hidden" name="liveagent.prechat.name" id="prechat_field_name"/>
+        
+        <!-- map: Use the data from prechat form to map it to the Salesforce record's fields -->
+        <input type="hidden" name="liveagent.prechat.findorcreate.map:Contact" value="Id,CurrentContactId" />
+        <input type="hidden" name="liveagent.prechat.findorcreate.map:Account" value="Id,CurrentAccountId" />
+        <input type="hidden" name="liveagent.prechat.findorcreate.map:Case" value="Subject,CaseSubject;Status,CaseStatus;Origin,CaseOrigin;RecordTypeId,CaseRecordType;
+                                                                                   Description,CaseDescription;Akam_Case_Id__c,AkamCaseId;Service__c,CaseArea;Request_Type__c,CaseService;
+                                                                                   Case_Product__c,CaseProduct;AccountId,CurrentAccountId;ContactId,CurrentContactId;Do_Not_Show_In_Portal_Picklist__c,CaseVisibility"/>
+        
+        <!-- doFind, doCreate and isExactMatch example for a Contact: 
+        Find a contact whose Id exactly matches the value generated by the case from the form 
+        If there's no match, then create a Contact record and set it's First Name, Last Name, Email, and Phone to the values provided by the customer -->
+        <!--<input type="hidden" name="liveagent.prechat.findorcreate.map.doFind:Contact" value="Id,true" />-->
+        <!--<input type="hidden" name="liveagent.prechat.findorcreate.map.doCreate:Contact" value="Id,true"/>-->
+        
+        <!--<input type="hidden" name="liveagent.prechat.findorcreate.map.doFind:Account" value="Id,true" />-->
+        <!--<input type="hidden" name="liveagent.prechat.findorcreate.map.doCreate:Account" value="Id,true"/>-->
+        
+        <!-- doCreate example for a Case: create a case to attach to the chat, set the Case Subject to the value provided by the customer and set the case's Status and Origin fields -->
+        <input type="hidden" name="liveagent.prechat.findorcreate.map.doFind:Case" value="Akam_Case_Id__c,true" />    
+        <input type="hidden" name="liveagent.prechat.findorcreate.map.doCreate:Case" value="Subject,true;Status,true;Origin,true;RecordTypeId,true;
+                                                                                            Description,true;Request_Type__c,true;Service__c,true;Akam_Case_Id__c,true;
+                                                                                            Case_Product__c,true;AccountId,true;ContactId,true;Do_Not_Show_In_Portal_Picklist__c,true"/>
+        
+        <!-- linkToEntity: Set the record Contact record, found/created above, as the Contact on the Case that's created --> 
+        <!--<input type="hidden" name="liveagent.prechat.findorcreate.linkToEntity:Contact" value="Case,ContactId" />-->
+        <!--<input type="hidden" name="liveagent.prechat.findorcreate.linkToEntity:Account" value="Case,AccountId" />-->
+        
+        <!-- showOnCreate: Open the Contact and Case records as sub-tabs to the chat for the agent in the Console -->
+        <input type="hidden" name="liveagent.prechat.findorcreate.showOnCreate:Case" value="true" />
+        <!--<input type="hidden" name="liveagent.prechat.findorcreate.showOnCreate:Account" value="false" />-->
+        
+        <!-- saveToTranscript: Associates the records found / created, i.e. Contact and Case, to the Live Chat Transcript record. --> 
+        <!-- Custom Chat Transcript Fields -->
+        <input type="hidden" name="liveagent.prechat.findorcreate.saveToTranscript:Case" value="CaseId" />
+        <input type="hidden" name="liveagent.prechat.save:CaseRecordType" value="Case_Record_Type__c" />
+        <input type="hidden" name="liveagent.prechat.save:CaseSubject" value="Case_Subject__c" />
+        <input type="hidden" name="liveagent.prechat.save:CaseOrigin" value="Case_Origin__c" />
+        <input type="hidden" name="liveagent.prechat.save:CaseRecordType" value="Case_Record_Type__c" />
+        <input type="hidden" name="liveagent.prechat.save:CaseDescription" value="Case_Description__c" />
+        <input type="hidden" name="liveagent.prechat.save:AkamCaseId" value="Akam_Case_Id__c" />
+        <input type="hidden" name="liveagent.prechat.save:CaseArea" value="Case_Service__c" />
+        <input type="hidden" name="liveagent.prechat.save:CaseService"  value="Case_Request_Type__c" />
+        <input type="hidden" name="liveagent.prechat.save:Product" value="Case_Product__c" />
+        <input type="hidden" name="liveagent.prechat.save:CaseProduct" value="Case_Product_Id__c" />
+        <input type="hidden" name="liveagent.prechat.save:CurrentAccountId" value="AccountId" />
+        <input type="hidden" name="liveagent.prechat.save:CurrentContactId" value="ContactId" />
+        <input type="hidden" name="liveagent.prechat.save:CaseVisibility" value="Case_Visibility__c" />
+        
+        <!-- displayToAgent: Hides the case record type from the agent -->
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:CaseRecordType" value="false" />
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:ValidationOverride" value="false" />
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:CaseOrigin" value="false" />
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:CaseStatus" value="false" /> 
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:CaseSubject" value="true" />
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:CaseDescription" value="true" /> 
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:CaseArea" value="false" /> 
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:AkamCaseId" id="hiddenAkamCaseId" value="true" /> 
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:CaseService" value="false" />
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:CaseProduct" value="false" />
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:CurrentAccountId" value="false" />
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:CurrentContactId" value="false" />
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:Account Name" value="true" />
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:Contact Name" value="true" />
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:Email" value="true" />
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:Product" id="hiddenProductNameId" value="true"/>
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:CaseVisibility" value="false" />
+        <input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:ChatOriginFrom" value="false" />
+        
+        
+        <!--<input type="hidden" name="liveagent.prechat.findorcreate.displayToAgent:caseChatId" value="false" />-->
+        
+        <!-- searchKnowledge: Searches knowledge article based on the text, this assumes that Knowledge is setup -->
+        <input type="hidden" name="liveagent.prechat.knowledgeSearch:CaseSubject" value="true" />
+        
+    </form>
+</apex:page>

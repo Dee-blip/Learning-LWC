@@ -1,0 +1,59 @@
+<!-- Author: Rajesh Kumar -GSM Team 
+Description : HTML file for generic file uploder functionality in flow
+JIRA : #SFDC-6777 -->
+<template>
+    <div>
+        <template if:true={isloading}>
+            <lightning-spinner size="medium" variant="brand" alternative-text="loading...">
+            </lightning-spinner>
+        </template>
+        <lightning-file-upload label={fileheaderText} name="fileUploader" record-id={recordId}
+                               onuploadfinished={handleUploadFinished} variant="label-hidden" multiple={allowMultifiles}
+                               accept={acceptedFormat} disabled={disabled} title={hooverText}>
+        </lightning-file-upload>
+        <template if:true={uploadedFilestring}>
+            <div style={tableStyle}>
+                <table class="slds-table">
+                    <thead>
+                    <tr class="slds-text-title_caps">
+                        <th scope="col">
+                            <div class="slds-truncate" title="Uploaded File Name">UPLOADED FILES</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Delete File">ACTION</div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <template for:each={uploadedFiles} for:item="file">
+                        <tr key={file.fileId}>
+                            <td data-label={file.fileName}>
+                                <div class="slds-truncate" title="Uploaded File Name">{file.fileName}</div>
+                            </td>
+                            <td data-label="Delete">
+                                <template if:true={deleteAllowed}>
+                                    <lightning-button-icon icon-name="utility:delete" alternative-text="Delete"
+                                                           value={file.fileId} onclick={handleDelete} size="x-small"
+                                                           class="slds-m-left_xx-small" title="Delete">
+                                    </lightning-button-icon>
+                                </template>
+                                <lightning-button-icon icon-name="action:download" alternative-text="Download"
+                                                       value={file.fileId} onclick={downloadFile} size="x-small"
+                                                       class="slds-m-left_xx-small" title="Download Files"> </lightning-button-icon>
+                            </td>
+                        </tr>
+                    </template>
+                    </tbody>
+                </table>
+            </div>
+        </template>
+        <template if:true={isclassicError}>
+            <div class="error-msg">
+                <span>
+                    <strong>Error : &nbsp;<br /></strong> {error}
+                    <span class="close slds-float_right" onclick={hideclassicError}>&times;</span>
+                </span>
+            </div>
+        </template>
+    </div>
+</template>

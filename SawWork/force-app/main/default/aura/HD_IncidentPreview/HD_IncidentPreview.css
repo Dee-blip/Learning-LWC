@@ -1,0 +1,37 @@
+.THIS .style-heading{
+    font-weight:bold; 
+    font-size:16px;
+    color:#00a1df;    
+}
+
+.THIS .float-left{
+    float:left;
+}
+
+.THIS .boxWidth{
+    width:150%;
+    
+}
+
+.THIS .custom-height--200px{
+		height:150px;
+        margin:0;
+}
+
+.THIS pre{
+   
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+.THIS .custom-margin-top--m1perc{
+    margin-top: -1%;
+    /*overflow:hidden*/
+}
+
+.THIS .hideForm{
+    display:none;
+}

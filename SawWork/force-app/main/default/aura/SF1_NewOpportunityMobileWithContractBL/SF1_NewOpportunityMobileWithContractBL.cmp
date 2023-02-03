@@ -1,0 +1,140 @@
+<aura:component controller="SF1_NewOpportunityMobileController">
+
+  <!-- handles expand and collapse of tile -->
+  <aura:attribute name="toggle" type="Boolean" default="false"/>
+
+  <!-- checker for empty contracts -->
+  <aura:attribute name="noContracts" type="Boolean" default="false"/>
+  <!-- checker for empty Selected contracts -->
+  <aura:attribute name="noSelectedContracts" type="Boolean" default="true"/>
+  <!-- account details -->
+  <aura:attribute name="accountDetails" type="Account"/>
+  <!-- contracts for the selected Account -->
+  <aura:attribute name="contracts" type="Merge_Contract_Header__c[]"/>
+  <!-- Ids of selected Contracts -->
+  <aura:attribute name="selectedContractIDs" type="String[]"/>
+  <!-- show the particular contracts -->
+  <aura:attribute name="productsToShow" type="List"/>
+  <!-- show modal content accordingly -->
+  <aura:attribute name="openModalOnClick" type="Boolean" default="false"/>
+
+  <!-- data for Sort Component -->
+  <aura:attribute name="mapOfFieldNamesForSorting" type="List" default="[
+  {'label': 'Contract Id', 'value': 'Name'},
+  {'label': 'Eff. End Date', 'value': 'Effective_End_Date__c'}
+  ]"/>
+
+  <!-- util event for navigation -->
+ <aura:registerEvent name="Open Contracts" type="c:SF1_NewOpportunityMobileUtilEvent"/>
+
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+  <!-- util event for Modal -->
+  <aura:handler event="c:SF1_NewOpportunityMobileModalEvent" action="{! c.manageModalRendering }"/>
+  <!-- event for sorting of contracts -->
+  <aura:handler event="c:SF1_NewOpportunityMobileSortEvent" action="{! c.sortContracts }"/>
+  <!-- event to handle selection of contracts -->
+  <aura:handler event="c:SF1_NewOpportunityMobileContractEvent" action="{! c.populateSelectedContracts }"/>
+
+  <header class="slds-docked-composer__header slds-shrink-none" aria-live="assertive">
+    <article class="slds-tile slds-tile_board ">
+      <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-8">
+          <lightning:icon iconName="standard:contract" size="small" alternativeText="Opportunity"/>
+        </div>
+        <div class="slds-col slds-size_6-of-8 slds-truncate">
+          <h1 class="slds-text-heading--small ">
+            <div class="slds-truncate" style="text-align:center; ">Select Contract(s)</div>
+          </h1>
+        </div>
+        <div class="slds-col slds-size_1-of-8"></div>
+      </div>
+    </article>
+  </header>
+  <c:SF1_CustomLoader />
+
+  <div id="scrollableDiv" class="slds-scrollable_y" style="height: 80vh;">
+    <!-- display message if no contracts found -->
+    <aura:if isTrue="{!v.noContracts}">
+      <ui:message title="Information" severity="warning" closable="false">
+        No Contract Record(s) found for the Associated Account.
+      </ui:message>
+    </aura:if>
+
+    <!-- display message if contracts found -->
+    <aura:if isTrue="{!v.noContracts == false}">
+      <div>
+        <ui:message aura:id="InformationField" title="Information" severity="info" closable="false">
+          Below are the Contracts for the Associated Account.
+        </ui:message>
+      </div>
+    </aura:if>
+
+    <!-- display contracts -->
+
+    <ul class="slds-has-dividers_around-space ">
+
+      <aura:iteration items="{!v.contracts}" var="eachContract">
+        <li class="slds-item slds-color__background_gray-3">
+          <c:SF1_NewOpportunityMobileContractTile selectedContractIDs="{! v.selectedContractIDs }" contractType="primaryContractTile" contract="{! eachContract }"/>
+        </li>
+      </aura:iteration>
+      <li>
+        &nbsp;
+      </li>
+      <li>
+        &nbsp;
+      </li>
+      <li>
+        &nbsp;
+      </li>
+    </ul>
+
+  </div>
+
+  <footer class="slds-docked-composer__footer slds-shrink-none">
+    <!-- sorting component -->
+    <aura:if isTrue="{! v.noContracts == false }">
+      <c:SF1_NewOpportunityMobileSort mapOfFieldNamesForSorting="{! v.mapOfFieldNamesForSorting }"/>
+    </aura:if>
+    <button type="button" class="slds-button slds-button_neutral" onclick="{!c.moveBack}">Back</button>
+    <div class="slds-col_bump-left slds-text-align_right">
+      <button type="button" class="slds-button slds-button_brand" disabled="{! v.noSelectedContracts }" onclick="{!c.showOpenOpportunitiesWithBL}">Next</button>
+    </div>
+  </footer>
+
+  <div class="">
+    <div role="dialog" tabindex="-1" aura:id="Modalbox" aria-labelledby="header43" class="slds-modal  slds-modal_large ">
+      <div class="slds-modal__container">
+        <div class="slds-modal__header">
+          <button class="slds-button slds-button--icon-inverse slds-modal__close" onclick="{!c.closeModal}">
+            <span>
+              <lightning:icon iconName="utility:close" size="medium" alternativeText="close"/>
+              <span class="slds-assistive-text">Close</span>
+            </span>
+          </button>
+          <h6 id="modal-heading-01" class="slds-text-heading--small">Contract Products</h6>
+        </div>
+        <div class="slds-modal__content slds-p-around--medium">
+          <div>
+            <ul class="slds-has-dividers_around-space ">
+              <aura:if isTrue="{!v.openModalOnClick }">
+                <aura:iteration items="{! v.productsToShow }" var="eachProduct">
+                  <li class="slds-item slds-color__background_gray-3">
+                    <c:SF1_NewOpportunityMobileProductTile product="{! eachProduct }"/>
+                  </li>
+                </aura:iteration>
+              </aura:if>
+            </ul>
+          </div>
+        </div>
+        <div class="slds-modal__footer">
+          <div style="align:">
+            <button class="slds-button slds-button--neutral" onclick="{!c.closeModal}">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slds-backdrop" aura:id="ModalClose"></div>
+  </div>
+
+</aura:component>

@@ -1,0 +1,364 @@
+<template>
+     <div class="slds-p-horizontal_small slds-p-top_small slds-p-bottom_xx-large"
+          style="background-color: white; border-radius: 0.25rem;">
+
+          <!-- Heading -->
+          <div class="slds-grid slds-gutters">
+               <div class="slds-col">
+                    <span class="slds-float_left">
+                         <p>Selected Records: <b>{recordsCount}</b></p>
+                    </span>
+               </div>
+               <div class="slds-col">
+                    <span if:true={isShiftManager} class="slds-float_right">
+                         <button class="slds-button slds-button_destructive"
+                              onclick={showBulkRejectConfModal}>Reject</button>
+                         <button class="slds-button slds-button_success"
+                              onclick={showBulkApproveConfModal}>Approve</button>
+                    </span>
+                    <span if:false={isShiftManager} class="slds-float_right">
+                         <button class="slds-button slds-button_destructive"
+                              onclick={showBulkRevokeConfModal}>Revoke</button>
+                    </span>
+                    <span class="slds-float_right slds-p-right_xx-small">
+                              <!-- <button class="slds-button slds-button_brand"
+                              onclick={refreshData}>Refresh</button> -->
+                              <lightning-icon class="refreshIcon" icon-name="action:refresh" size="xx-small" variant="inverse" onclick={refreshData}></lightning-icon>
+                    </span>
+               </div>
+          </div>
+         
+
+          <!--Lightning data table-->
+          <c-extended-table columns={columns} data={lInstructions} key-field="id" onviewinstruction={showViewModal}
+               onapproveinstruction={showApproveModal} onrejectinstruction={showRejectModal} onrevokeinstruction={showRevokeModal}
+               oneditinstruction={showEditModal} onrowselection={getSelectedRecords} >
+          </c-extended-table>
+
+          <!-- Modal to show individual approval records -->
+          <template if:true={isShowApprovalRecModal}>
+               <div style="height: 100%;">
+                    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small"
+                         aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                         <div class="slds-modal__container">
+                              <header class="slds-modal__header">
+                                   <button
+                                        class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                        onclick={closeApprovalRecModal} title="Close">
+                                        <lightning-icon icon-name="utility:close" alternative-text="close"
+                                             variant="inverse" size="small"></lightning-icon>
+                                        <span class="slds-assistive-text">Close</span>
+                                   </button>
+                                   <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate sectionHeading">
+                                        Approve&nbsp;{curInstruction.name}</h2>
+                              </header>
+                              <div class="slds-modal__content slds-p-around_medium;myDiv" if:true={isShiftManager}  style="width: 100%;text-align:center;">
+                                   
+                                        <div if:true={isObjectHandler} class="slds-dl_horizontal" style="width: 100%;">
+                                             <div if:true={isEsclListPresent} >
+                                                       <div data-id="toastModel" style="height: 4rem;" class="slds-show">
+                                                            <div class="slds-notify_container slds-is-relative" style="padding-left: 10rem;">
+                                                                 <div class={mainDivClass} role="status">
+                                                                      <span class="slds-assistive-text">Warning</span>
+                                                                      <span class={messageDivClass} >
+                                                                           <lightning-icon icon-name="utility:warning" size="small" variant="inverse"></lightning-icon>
+                                                                      </span>
+                                                                      <div class="slds-notify__content">
+                                                                           <h2 class="slds-text-heading_small" style="text-align:center">Escalation List not present for this Handler</h2>
+                                                                      </div>
+                                                                      <div class="slds-notify__close">
+                                                                           <button class="slds-button slds-button_icon slds-button_icon-inverse" title="Close" onclick={closeModel}>
+                                                                                <lightning-icon icon-name="utility:close" size="small" variant="inverse"> </lightning-icon>
+                                                                                <span class="slds-assistive-text">Close</span>
+                                                                           </button>
+                                                                      </div> 
+                                                                 </div>
+                                                            </div>
+                                                       </div>
+                                             </div>
+                                        
+                                        <!--<div if:true={isObjectHandler} class="slds-dl_horizontal" style="width: 100%;text-align:center;">
+
+                                        </div> -->
+
+                                  
+                                   </div>
+                              </div>
+                              <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="padding-bottom: initial;">
+                                   <dl if:true={isObjectHandler} class="slds-dl_horizontal slds-p-around_medium">
+                                        <!--Check if object is Handler-->
+                                        <div if:true={isObjectHandler} class="slds-dl_horizontal" style="width: 100%;">
+                                             <dt class="slds-dl_horizontal__label">
+                                                  <p><b>Handler:</b></p>
+                                             </dt>
+                                             <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                  <p>{curInstruction.handlerName}</p>
+                                             </dd>
+                                        </div>
+                                        <!--Check if object is Policy Domain-->
+                                        <div if:true={isObjectPD} class="slds-dl_horizontal" style="width: 100%;">
+                                             <dt class="slds-dl_horizontal__label">
+                                                  <p><b>Policy Domain:</b></p>
+                                             </dt>
+                                             <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                  <p>{curInstruction.policyDomainName}</p>
+                                             </dd>
+                                        </div>
+                                        <!--Check if object is Escalation List-->
+                                        <div if:true={isObjectEL} class="slds-dl_horizontal" style="width: 100%;">
+                                             <dt class="slds-dl_horizontal__label">
+                                                  <p><b>Escalation List:</b></p>
+                                             </dt>
+                                             <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                  <p>{curInstruction.escalationListName}</p>
+                                             </dd>
+                                        </div>
+                                   </dl>
+
+                                   <dl class="slds-dl_horizontal slds-p-around_medium">
+                                        <dt class="slds-dl_horizontal__label">
+                                             <p><b>Instruction Type:</b></p>
+                                        </dt>
+                                        <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                             <p>{curInstruction.instructionsType}</p>
+                                        </dd>
+                                   </dl>
+
+                                   <!--if Situation Handler-->
+                                   <div if:true={isSituationInstruction}>
+                                        <dl class="slds-dl_horizontal slds-p-around_medium">
+                                             <dt class="slds-dl_horizontal__label">
+                                                  <p><b>Active Instruction:</b></p>
+                                             </dt>
+                                             <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                  <p>
+                                                       <lightning-formatted-rich-text
+                                                            value={curInstruction.situationInstruction}>
+                                                       </lightning-formatted-rich-text>
+                                                  </p>
+                                             </dd>
+                                        </dl>
+                                   </div>
+                                   <!--if Ignore Condition-->
+                                   <div if:true={isIgnoreCondition}>
+                                        <dl class="slds-dl_horizontal slds-p-around_medium">
+                                             <dt class="slds-dl_horizontal__label">
+                                                  <p><b>Active Instruction:</b></p>
+                                             </dt>
+                                             <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                  <p>
+                                                       <lightning-formatted-rich-text
+                                                            value={curInstruction.ignoreCondition}>
+                                                       </lightning-formatted-rich-text>
+                                                  </p>
+                                             </dd>
+                                        </dl>
+                                   </div>
+                                   <!--if Policy Domain Instruction-->
+                                   <div if:true={isPDInstruction}>
+                                        <dl class="slds-dl_horizontal slds-p-around_medium">
+                                             <dt class="slds-dl_horizontal__label">
+                                                  <p><b>Active Instruction:</b></p>
+                                             </dt>
+                                             <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                  <p>
+                                                       <lightning-formatted-rich-text
+                                                            value={curInstruction.specialInstructions}>
+                                                       </lightning-formatted-rich-text>
+                                                  </p>
+                                             </dd>
+                                        </dl>
+                                   </div>
+                                   <!--if Escalation List Instruction-->
+                                   <div if:true={isELInstruction}>
+                                        <dl class="slds-dl_horizontal slds-p-around_medium">
+                                             <dt class="slds-dl_horizontal__label">
+                                                  <p><b>Active Instruction:</b></p>
+                                             </dt>
+                                             <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                  <p>
+                                                       <lightning-formatted-rich-text
+                                                            value={curInstruction.escalationInstructions}>
+                                                       </lightning-formatted-rich-text>
+                                                  </p>
+                                             </dd>
+                                        </dl>
+                                   </div>
+
+                                   <dl class="slds-dl_horizontal slds-p-around_medium">
+                                        <dt class="slds-dl_horizontal__label">
+                                             <p><b>Pending Instruction:</b></p>
+                                        </dt>
+                                        <dd if:false={isSave} class="slds-dl_horizontal__detail slds-tile__meta">
+                                             <p>
+                                                  <lightning-formatted-rich-text value={curInstruction.value}>
+                                                  </lightning-formatted-rich-text>
+                                             </p>
+                                        </dd>
+                                        <dd if:true={isSave} class="slds-dl_horizontal__detail slds-tile__meta slds-p-left_small slds-p-top_xx-small">
+                                             <lightning-input-rich-text value={curInstruction.value} data-id="pendingInsValue">
+                                             </lightning-input-rich-text>
+                                        </dd>
+                                   </dl>
+                                   <!--
+                                        <lightning-input if:true={isShiftManager} label ="Enter the Comment :" onchange ={captureComment} value={approvedComment} class="slds-m-bottom_x-small"></lightning-input>
+                                   -->
+                                   
+                                   <div if:true={isShiftManager}>
+                                        <dl class="slds-dl_horizontal slds-p-around_medium">
+                                             <dt class="slds-dl_horizontal__label">
+                                                  <p><b>Comment:</b></p>
+                                             </dt>
+                                             
+                                             <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                    <lightning-textarea class="styleComment" onchange ={captureComment} value={approvedComment}></lightning-textarea>
+                                             </dd>
+                                        
+                                        </dl>
+                                   </div>
+                                   
+                              </div>
+                              <footer class="slds-modal__footer">
+                                   <template if:true={isShowCancelButton}>
+                                        <button class="slds-button slds-button_neutral"
+                                             onclick={closeApprovalRecModal}>Cancel</button>
+                                   </template>
+                                   <template if:true={isShiftManager}>
+                                        <template if:true={isReject}>
+                                             <button class="slds-button slds-button_destructive"
+                                                  onclick={rejectRecord}>Reject</button>
+                                        </template>
+                                        <template if:true={isApprove}>
+                                             <button class="slds-button slds-button_success"
+                                                  onclick={approveRecord}>Approve</button>
+                                        </template>
+                                   </template>
+                                   <template if:false={isShiftManager}>
+                                        <template if:true={isRevoke}>
+                                             <button class="slds-button slds-button_destructive"
+                                                  onclick={revokeRecord}>Revoke</button>
+                                        </template>
+                                        <template if:true={isSave}>
+                                             <button class="slds-button slds-button_success"
+                                                  onclick={saveRecord}>Save</button>
+                                        </template>
+                                   </template>
+                              </footer>
+                         </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+               </div>
+          </template>
+
+          <!-- Confirmation Modal for Bulk actions on records-->
+          <template if:true={isShowBulkConfModal}>
+               <div style="height: 100%;">
+                    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small"
+                         aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2">
+                         <div class="slds-modal__container">
+                              <header class="slds-modal__header">
+                                   <button
+                                        class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                        onclick={closeBulkConfModal} title="Close">
+                                        <lightning-icon icon-name="utility:close" alternative-text="close"
+                                             variant="inverse" size="small"></lightning-icon>
+                                        <span class="slds-assistive-text">Close</span>
+                                   </button>
+                                   <h2 id="modal-heading-02" class="slds-modal__title slds-hyphenate sectionHeading">
+                                        Selected Records: &nbsp; {recordsCount}</h2>
+                              </header>
+                              <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2" style="padding-bottom: initial;">
+                                   <template if:true={hasBulkInstructionsUpdated}>
+                                        <p class="slds-text-heading_small">These following instruction approval records have been changed. Please refresh the page.</p>
+                                        <template for:each={lUpdatedBulkInstructions} for:item='eachRec'>
+                                             <dl key={eachRec.Id} class="slds-dl_horizontal slds-p-around_small">
+                                                  <dt class="slds-dl_horizontal__label">
+                                                       <p><b>{eachRec.Name} :</b></p>
+                                                  </dt>
+                                                  <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                       <p>{eachRec.Status__c}</p>
+                                                  </dd>
+                                             </dl>
+                                        </template>
+                                   </template>
+                                   
+                                   <template if:false={hasBulkInstructionsUpdated}>
+                                        <div if:true={isShiftManager} >
+                                             <div if:true={isEsclPresentinBulk} data-id="toastModel" style="height: 4rem;" class="slds-show">
+                                                  <div class="slds-notify_container slds-is-relative">
+                                                       <div class={mainDivClass} role="status">
+                                                           <span class="slds-assistive-text">Warning</span>
+                                                              <span class={messageDivClass} >
+                                                             <lightning-icon icon-name="utility:warning" size="small" variant="inverse"></lightning-icon>
+                                                           </span>
+                                                           <div class="slds-notify__content">
+                                                                <!--
+                                                                     <h2 class="slds-text-heading_small ">{count} Instructions of type Handler doesnot have escalation lists</h2>
+                                                                -->
+                                                               <h2 class="slds-text-heading_small ">Multiple instructions of type Handler doesnot have escalation lists</h2>
+                                                           </div>
+                                                           <div class="slds-notify__close">
+                                                               <button class="slds-button slds-button_icon slds-button_icon-inverse" title="Close" onclick={closeModel}>
+                                                                   <lightning-icon icon-name="utility:close" size="small" variant="inverse"> </lightning-icon>
+                                                                   <span class="slds-assistive-text">Close</span>
+                                                               </button>
+                                                           </div> 
+                                                       </div>
+                                                   </div>
+                                             </div>
+                                             
+                                        </div>
+                                        
+                                       <!--
+                                            <p style="text-align: center;">Are you sure you want to proceed?</p>
+
+                                       -->
+                                        
+                                       
+                                        <div if:true={isShiftManager} >
+                                             <dl class="slds-dl_horizontal slds-p-around_medium">
+                                                  <dt class="slds-dl_horizontal__label">
+                                                       <p><b>Comment:</b></p>
+                                                  </dt>
+                                                  <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                       <lightning-textarea class="styleComment" onchange ={captureComment} value={approvedComment}>
+                                                       </lightning-textarea>
+                                                  </dd>
+                                             </dl>
+                                        </div>
+                                        
+                                   </template>
+                              </div>
+                              <footer class="slds-modal__footer">
+                                   <template if:false={hasBulkInstructionsUpdated}>
+                                        <button class="slds-button slds-button_neutral"
+                                             onclick={closeBulkConfModal}>Cancel</button>
+
+                                        
+                                        <button if:true={isBulkApprove} class="slds-button slds-button_success"
+                                             onclick={bulkApproveRecord}>Approve</button>
+                                        
+
+                                        
+                                        
+                                        
+                                             <button if:true={isBulkReject} class="slds-button slds-button_destructive"
+                                             onclick={bulkRejectRecord}>Reject</button>
+                                        
+
+                                        <button if:true={isBulkRevoke} class="slds-button slds-button_destructive"
+                                             onclick={bulkRevokeRecord}>Revoke</button>
+                                   </template>
+                                   <template if:true={hasBulkInstructionsUpdated}>
+                                        <button class="slds-button slds-button_neutral"
+                                             onclick={closeBulkConfModal}>Close</button>
+                                   </template>
+                              </footer>
+                         </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+               </div>
+          </template>
+
+     </div>
+</template>

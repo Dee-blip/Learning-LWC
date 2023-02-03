@@ -1,0 +1,46 @@
+<template>
+    <!--The component to show preview-->
+    <article class="slds-card question-card">
+        <div class="slds-grid slds-wrap">
+
+
+            <div
+                class="slds-col slds-size_7-of-8 slds-p-left_large slds-p-right_x-large slds-p-bottom_small slds-p-top_large">
+
+                <span style="display: inline-block">
+                    <template if:true={question.Required__c}>
+                        <p class="mandatory-question">*</p>
+                    </template>
+                </span>
+                <span style="display: inline-block" class="slds-p-left_x-small">
+                    <lightning-formatted-rich-text value={question.Question_Text__c}>
+                    </lightning-formatted-rich-text>
+                </span>
+
+            </div>
+            <div class="slds-col slds-size_1-of-8 slds-p-left_large slds-p-bottom_small slds-p-top_large">
+                <template if:true={question.Help_Text__c}>
+                    <lightning-helptext content={question.Help_Text__c} icon-name="action:info">
+                    </lightning-helptext>
+                </template>
+                <!-- SFDC-7844 :@nadesai -Start -->
+                &nbsp;&nbsp;
+                <c-chime-audit-trail-wrapper question={question} response={response} chimeid={chimeid}>
+                </c-chime-audit-trail-wrapper>
+                <!-- SFDC-7844 :@nadesai - End -->
+            </div>
+
+            <div
+                class="slds-col slds-size_8-of-8 slds-p-left_large slds-p-right_x-large slds-p-bottom_large slds-p-top_small">
+                <template if:true={refreshTextResponse}>
+                    <lightning-input-rich-text class="text-response" disabled-categories="INSERT_CONTENT"
+                        placeholder="Enter the answer" value={textResponse} onblur={handleUserResponse}
+                        onpaste={pasteEvent} onfocus={savePreviousValue} disabled={responseDisable}>
+                    </lightning-input-rich-text>
+                </template>
+            </div>
+
+        </div>
+    </article>
+    <!--End of Preview template-->
+</template>

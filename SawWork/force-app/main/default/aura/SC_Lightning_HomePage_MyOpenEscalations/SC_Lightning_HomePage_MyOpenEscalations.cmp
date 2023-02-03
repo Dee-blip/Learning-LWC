@@ -1,0 +1,148 @@
+<!--=====================================================================================================+
+    Component name      :   SC_Akatec_HomePage_MyOpenEscalations
+    Author              :   Sumukh SS
+    Created             :   10-Sep-18
+    Purpose             :   Component for lightning Home Page - Showing agent's open escalations
+                            
+    Last Modified Developer           Purpose            
+    ============= ========================  =======
+    10-FEB-18     Sumukh SS   ESESP-1900	 Initial Development
+	15 July 2019  Sumukh SS	  ESESP-2314     Additional Features demoed to Jackson as mentioned in Jira
+    26-FEB-2020   Harshil     ESESP-2917     Added dynamic escalation geo color support  
+
++=====================================================================================================-->
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" controller="SC_Akatec_Lightning_Homepage" access="global" >
+    
+    <aura:attribute name="options" type="List" default="[
+                                                        {'label': '1', 'value': '1'},
+                                                        {'label': '2', 'value': '2'},
+                                                        {'label': '3', 'value': '3'}
+                                                        ]"/>
+    <aura:attribute name="value" type="List" default="1,2,3"/>
+    
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="OpenCount" type="string"/>  
+    <aura:attribute name="spinner" type="Boolean" default="false"/>  
+    <aura:attribute name="OpenEscalation" type="List"/>
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <aura:handler event="force:refreshView" action="{!c.ApplyEscFilters}"/>
+    
+    <aura:handler event="c:SC_Akatec_MyEscalations_Refresher" action="{!c.ApplyEscFilters}"/>
+    
+    
+    <div class="slds-box slds-theme_default">
+        <lightning:accordion allowMultipleSectionsOpen="true" activeSectionName="My Open Escalations">
+            <lightning:accordionSection name="My Open Escalations" label="{!v.OpenCount + ' My Open Escalations'}">
+                
+               
+                
+                <div class="slds-m-around_medium"  style=" margin-left: 0px;margin-right: 0px; margin-top: 5px;
+                                                          margin-bottom: 5px;border: 1px #205675 solid;">
+                    
+                    <div class="slds-form-element">  
+                        <div class="slds-grid slds-gutters">
+                            <div class="slds-col slds-size_2.5-of-12" style="padding-left: 20px;">
+                                
+                                <div class="slds-form-element">
+                                    <label for="picklist" class="FilterClass">STATUS</label> 
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-combobox_container slds-size_small">
+                                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                                
+                                                <ui:inputSelect aura:id="statusidesc" class="slds-input slds-combobox__input" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_7.5-of-12">
+                                <lightning:checkboxGroup name="Checkbox Group"
+                                                         aura:id="EscCheckbox"                       
+                                                         label="Severity"
+                                                         options="{! v.options }"
+                                                         value="{! v.value }"
+                                                         />
+                            </div>
+                            
+                            <div class="slds-col slds-size_2-of-12">
+                                
+                                <button class="slds-button slds-button--brand"  style="float: left;margin-top: 15px;margin-bottom: 15px;" onclick="{!c.ApplyEscFilters}">Apply</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <table id="myopenescalations" class="slds-table slds-table_cell-buffer slds-table_bordered" style="width:100%">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                
+                                <th class="slds-text-title_caps" scope="col">
+                                    <div onclick="{!c.sort}"  id="0" class="slds-truncate pointer" >Escalation Name</div>
+                                </th>
+                                
+                                <th class="slds-text-title_caps" scope="col">
+                                    <div onclick="{!c.sort}"  id="1" class="slds-truncate pointer" >Account</div>
+                                </th>
+                                <th class="slds-text-title_caps" scope="col" style="width:16%;">
+                                    <div onclick="{!c.sort}"  id="2" class="slds-truncate pointer" >Description</div>
+                                </th>
+                                <th class="slds-text-title_caps" scope="col" style="width:6%;">
+                                    <div onclick="{!c.sort}"  id="3" class="slds-truncate pointer" >Status</div>
+                                </th>
+                                <th class="slds-text-title_caps" scope="col">
+                                    <div onclick="{!c.sort}"  id="4" class="slds-truncate pointer" >Support Level</div>
+                                </th>
+                                <th class="slds-text-title_caps" scope="col">
+                                    <div  class="slds-truncate notallowed" >Geography</div>
+                                </th>
+                                <th class="slds-text-title_caps" scope="col" style="width:4.5%;">
+                                    <div onclick="{!c.sort}"  id="6" class="slds-truncate pointer" >Severity</div>
+                                </th>
+                                <th class="slds-text-title_caps" scope="col" style="width:4.5%;">
+                                    <div class="slds-truncate notallowed" >Age</div>
+                                </th>
+                                <th class="slds-text-title_caps" scope="col">
+                                    <div onclick="{!c.sort}"  id="8" class="slds-truncate pointer">Area</div>
+                                </th>
+                                <th class="slds-text-title_caps" scope="col" style="width:10%;">
+                                    <div class="slds-truncate notallowed">AKAM Case ID</div>
+                                </th>
+                                <th class="slds-text-title_caps" scope="col">
+                                    <div onclick="{!c.sort}"  id="10" class="slds-truncate pointer">Case Owner</div>
+                                </th>
+                                <th class="slds-text-title_caps" scope="col" style="width:10.5%;">
+                                    <div onclick="{!c.sort}"  id="11" class="slds-truncate pointer">Case Status</div>
+                                </th>
+                                
+                            </tr>
+                        </thead>
+                        
+                        <tbody id="myTable1">
+                            <aura:iteration items="{!v.OpenEscalation}" var="esc">
+                                <tr class="slds-hint-parent">
+                                    <td><a id="{!esc.EachEscRec.Id}" onclick="{!c.openNewTab}">{!esc.EachEscRec.Name}</a></td>
+                                    <td>{!esc.EachEscRec.Case_Account_Name__c}</td>
+                                    <td style="width:16%;">{!esc.EachEscRec.Description__c}</td>                                
+                                    <td style="width:6%;">{!esc.EachEscRec.Request_Status__c}</td>
+                                    <td>{!esc.EachEscRec.Case__r.Support_Level__c}</td>
+                                    <td style = "{!'color:'+esc.GeoColor}">
+                                        {!esc.EachEscRec.Case__r.Support_Geography__c}
+                                    </td>
+                                    <td style="width:4.5%;">{!esc.EachEscRec.ER_Severity__c}</td>
+                                    <td style="width:4.5%;">{!esc.EachEscRec.Age__c}</td>
+                                    <td>{!esc.EachEscRec.Area__c}</td>
+                                    <td style="width:10%;"><a id="{!esc.EachEscRec.Case__c}" onclick="{!c.openNewTab}" tabindex="-1">{!esc.EachEscRec.Case_AKAM_Case_ID__c}</a></td>    
+                                    <td>{!esc.EachEscRec.Case__r.Case_Owner_Name__c}</td>
+                                    <td style="width:10.5%;">{!esc.EachEscRec.Case__r.Status}</td>                                                    
+                                </tr>
+                            </aura:iteration>  
+                        </tbody>
+                    </table>
+                    
+                    
+                </div>
+            </lightning:accordionSection>
+        </lightning:accordion>
+    </div>
+</aura:component>

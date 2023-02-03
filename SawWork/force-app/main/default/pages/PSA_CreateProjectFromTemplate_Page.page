@@ -1,0 +1,737 @@
+<!-- Modified by ssawhney on 21/05/2014 CR 2576469 - User Profile: Ability to add, modify & remove Project templates-->
+<!-- Modified by Sharath Ravishankar on 21/12/2016 - Added the select list as required by CR 3599741 - Bug: Change CLI Page UI during Project Creation-->
+<!-- Modified by Sandeep Naga on 19/03/2019 - Added a new checkbox "Under Enterprise Setting" while creating projects for FFPSA-950 -->
+<apex:page docType="html-5.0" controller="PSA_CreateProjFromTemp_Controller" action="{!setup}" lightningStylesheets="true">
+    
+    <apex:slds rendered="{! !isClassic}"/>
+    <apex:includeScript value="{!$Resource.JQuery_New}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.PSA_PTSUStyles)}"/>
+    <apex:includeScript value="{!$Resource.PSA_Javascript}"/>
+    <script type="text/javascript">
+          
+             $ = jQuery.noConflict(); 
+            function validateProductValue()
+            {
+                var prodVal = $("[id$='productValue']").val();
+                alert('working' + prodVal + 'Test' );
+                saveProj();
+                return true;
+            }
+
+             $( document ).ready(function() 
+             {
+                    window.onbeforeunload = null;
+                    var isLightning = "{! !isClassic}";
+                    if(isLightning === "true")
+                    {
+                        $('.pbTitle').remove();
+                        $('.pbButton').css('text-align','center');
+                        $('.expandBtn').addClass('btn'); 
+                        $('.collapseBtn').addClass('btn'); 
+                        $('select').each(function() {
+                            if($(this).attr("id") != "calMonthPicker" && $(this).attr("id") != "calYearPicker")
+                            {
+                                $(this).wrap( "<div class='slds-select_container'></div>" );
+                                $(this).parent().wrap( "<div class='slds-form-element__control'></div>" );
+
+                            }
+                        });
+
+                    }
+                    
+            });
+            function showSpinner()
+            {
+                    $("[id$='createProjectBlock']").css( 'pointer-events', 'none' );
+                    $("[id$='createProjectBlock']").css({opacity: 0.1});
+
+
+            }
+            function hideSpinner()
+            {
+
+                $("[id$='createProjectBlock']").css( 'pointer-events', 'auto' );
+                $("[id$='createProjectBlock']").css({opacity: 1});
+            }
+
+            function cancelFunction() 
+            {
+                var accountId = "{!pageAccountId}";
+                var oppId = "{!pageOppId}";
+                var url;
+                console.log("accountId: " + accountId + " oppId: " + oppId);
+                if(oppId != undefined && oppId.length > 2)
+                {
+                    url = "/" + oppId;
+                }
+                else if(accountId != undefined && accountId.length > 2)
+                {
+                    url = "/" + accountId;
+                }
+
+                if(url != undefined)
+                {
+                    window.location.href = url;
+                }
+            }
+
+            function contractSelect()
+            {
+                console.log('cons select ' + document.getElementsByClassName('custommodalpop')[0].style == "display:none;" );
+                document.getElementsByClassName('custommodalpop')[0].style = "display:block;"
+            }
+    </script>
+    
+
+    <apex:pageMessages id="pageMessage"/>
+    <apex:form id="frm1">  
+
+        <div  id="status" style="display: none; width: 100%;height: 100%" class="slds-scope slds-spinner_container" >
+           <div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand"  >
+              <span class="slds-assistive-text">Loading</span>
+              <div class="slds-spinner__dot-a"></div>
+              <div class="slds-spinner__dot-b"></div>
+            </div>
+
+        </div>
+        <div style="display:none;" class="custommodalpop popupBackground">
+            <div class="LightningContractSelect custPopup" >
+                <div id="Con" style=" max-height: 100%; overflow:auto "/>
+            </div>
+        </div>
+        
+
+        <apex:outputPanel >
+            <div id="SubmitPublishClassic" >
+                <apex:actionStatus id="SubmitPublish">
+                    <apex:facet name="start">
+                        <c:P2RenhancedActionStatus BackColor="#ffffff" borderColor="#ffffff" borderSize="2" height="50px" width="150px" ImageUrl="/changemgmt/img/spinner24.gif" Message="Please wait..." messageStyle="color:darkred;font-size:11pt;font-weight:bold;"/>
+                    </apex:facet>   
+                </apex:actionStatus>
+            </div>    
+        </apex:outputPanel>
+
+
+    <!-- NOTE TO DEVELOPERS: Changes to this block  very likely will need to be made in the PSA_ProjectContractSelect_Page as well -->
+    <!-- This is the beginning of the contract line item select block.  -->
+    
+        
+            <script>
+                //var accountId = "{!contractList}";
+                var accountId = "{!pageAccountId}" ;
+
+                $Lightning.use("c:PSA_ProjectContractSelectApp", function() {
+                    $Lightning.createComponent(
+                        "c:PSA_ProjectContractSelectHostAura",
+                        { strParentId  : '{!pageAccountId}' },
+                        "Con",
+                        function(cmp) {
+                            console.log("Component is created!");
+                            console.log(cmp);
+                            // Event - PSA_ProjectContractSelectToVFEvent is fired from the host aura component , for which a listener "retriveEventData" in VF page is 
+                            // present to handle the event and fetch values passed though the custom event
+                            $A.eventService.addHandler({ "event": "c:PSA_ProjectContractSelectToVFEvent", "handler": retriveEventData });
+                        });
+                    });
+                
+                    function retriveEventData(event) {
+                        var recordTypeId = event.getParam("currentRecId");
+                        var productName = event.getParam("productName");
+                        var cliName = event.getParam("cliName");
+
+                        console.log(" rec id ty in VF Page : " + productName );
+
+                        // set the values in the input hidden fields in the layout to fetch those values in apex from the fields
+                        document.querySelectorAll('.inputhiddencli input')[0].value = recordTypeId ;
+                        document.querySelectorAll('.inputhiddencli input')[1].value = cliName ;
+                        document.querySelectorAll('.inputhiddencli input')[2].value = productName ;
+
+                        updatecli(); // trigge an action to call an apex method to utilise the above set field values
+
+                        document.getElementsByClassName('custommodalpop')[0].style = "display:none;"
+                    }
+            </script>
+            <apex:includeLightning />
+            
+        
+
+    
+    
+     <apex:pageBlock id="pb00" title="Select Contract Line Item (Required for Billing)" rendered="{!ShowSelectContractLineItems}">
+
+        <apex:pageBlockSection columns="2" title="Find Contract Line Items" >
+            <!-- <apex:outputPanel >  -->
+            <apex:pageBlockSectionItem >
+                 <apex:selectList value="{!contractFilter}" size="1" styleClass="slds-select" style="margin-bottom: 0rem;">
+                    <apex:selectOptions value="{!contractFilterQueryList}"/>
+                </apex:selectList>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >    
+                <!--<apex:outputLabel value="From" style="font-weight:bold;"/>&nbsp;<apex:inputField value="{!filter.pse__Start_Date__c}"/>
+                &nbsp;<apex:outputLabel value="To" style="font-weight:bold;"/>&nbsp;<apex:inputField value="{!filter.pse__End_Date__c}"/>  -->
+                <apex:outputLabel value="Product" style="font-weight:bold;"/>
+                <apex:inputField value="{!filter.Customer_PO__c}"/>
+            </apex:pageBlockSectionItem>        
+                <!-- </apex:outputPanel> -->
+        </apex:pageBlockSection>
+        <apex:pageBlockButtons location="bottom">
+                <apex:commandButton value="Filter" action="{!filter}"/>
+                <apex:commandButton value="Clear" action="{!clear}"/>
+        </apex:pageBlockButtons>        
+
+    </apex:pageBlock>
+      
+    <apex:pageBlock id="pb01" rendered="{!ShowSelectContractLineItems && contractList != null}">
+        <apex:pageBlockButtons id="pbb1" location="top">   
+            <input type="button" class="expandBtn" id="expandBtnTop" value="Expand All" onclick="expandAll();return false;"/>
+            <input type="button" class="collapseBtn" id="collapseBtnTop" value="Collapse All" onclick="collapseAll();return false;"/>
+            <apex:commandButton value="Add To Project" action="{!saveProjContractData}"/>
+            <apex:commandButton value="Cancel" action="{!cancelReturnToTemplate}"/>
+        </apex:pageBlockButtons>
+                  
+            <apex:sectionHeader id="sectHeader" title="Contracts" description="Only a SINGLE GSS Contract line item that you will be billing hours against should be selected."/>
+              
+                <div class="contractSection">  
+            
+                <table cellspacing="1" width="100%">
+                
+                <tr class="headerRow"> 
+                    <td></td>
+                    <td>{!$ObjectType.Merge_Contract_Header__c.fields.Name.label}</td>    
+                    <td>{!$ObjectType.Merge_Contract_Header__c.fields.Account_Name__c.label}</td>    
+                    <td>{!$ObjectType.Merge_Contract_Header__c.fields.Opportunity_Name__c.label}</td>    
+                    <td>{!$ObjectType.Merge_Contract_Header__c.fields.Revision_Effective_Start_Date__c.label}</td>    
+                    <td>{!$ObjectType.Merge_Contract_Header__c.fields.Effective_Start_Date__c.label}</td>    
+                    <td>{!$ObjectType.Merge_Contract_Header__c.fields.Effective_End_Date__c.label}</td>    
+                    <td>{!$ObjectType.Merge_Contract_Header__c.fields.Active__c.label}</td>    
+                    <td>{!$ObjectType.Merge_Contract_Header__c.fields.Parent_Contract__c.label}</td>   
+                    <td>{!$ObjectType.Merge_Contract_Header__c.fields.Revision_Contract_Id__c.label}</td>    
+                </tr>
+                <apex:repeat value="{!contractList}" var="contractLine" id="theTable">  
+                    <tr class="contractDetail">
+                        <td>        
+                           <apex:outputPanel id="plusimage" styleClass="plusImage" layout="block">
+                                <img src="{!$Resource.Plus_Image}" onclick="switchExpandImage('{!$Component.inlineTbl}','{!$Component.minusimage}','{!$Component.plusimage}')"  title="Expand Contract"/>           
+                            </apex:outputPanel>
+                            <apex:outputPanel id="minusimage" style="display:none;" styleClass="minusImage" layout="block">
+                              <image src="{!$Resource.Minus_image}" onclick="switchExpandImage('{!$Component.inlineTbl}','{!$Component.plusimage}','{!$Component.minusimage}')" title="Collapse Contract"/>
+                            </apex:outputPanel>  
+                        </td>             
+                        <td><a href="/{!contractLine.contract.Id}" target="_blank">{!contractLine.contract.Name}</a></td>                   
+                        <td><apex:outputField value="{!contractLine.contract.Account_Name__c}"/></td>
+                        <td><apex:outputField value="{!contractLine.contract.Opportunity_Name__c}"/></td>
+                        <td><apex:outputField value="{!contractLine.contract.Revision_Effective_Start_Date__c}"/></td>
+                        <td><apex:outputField value="{!contractLine.contract.Effective_Start_Date__c}"/></td>
+                        <td><apex:outputField value="{!contractLine.contract.Effective_End_Date__c}"/></td>
+                        <td><apex:outputField value="{!contractLine.contract.Active__c}"/></td>
+                        <td><apex:outputField value="{!contractLine.contract.Parent_Contract__c}"/></td>
+                        <td><apex:outputField value="{!contractLine.contract.Revision_Contract_Id__c}"/></td>
+                    </tr>  
+                <tr>
+                <td colspan="10">
+                <table cellspacing="1" width="100%">
+                <tr>  
+                <td>
+                    <apex:outputPanel id="inlineTbl" styleClass="inlineTbl" style="display:none;" layout="block">
+                        <apex:pageBlockTable value="{!contractLine.childObjects}" var="detailLine" id="line" columns="12">  
+                            <apex:column >&nbsp;
+                            </apex:column>
+                            <apex:column >
+                                <apex:facet name="header"></apex:facet>
+                                <apex:inputCheckbox value="{!detailLine.selected}" onclick="uncheckOthers(this)" disabled="{!detailLine.disabled}"/>
+                                <apex:inputHidden value="{!detailLine.disabled}"/>  
+                            </apex:column>        
+                            <apex:column >
+                                <apex:facet name="header">{!$ObjectType.Merge_Contract_Detail__c.fields.Product__c.label}</apex:facet>
+                                <apex:outputField value="{!detailLine.contractDetail.Product__c}"/>
+                            </apex:column>                     
+                            <apex:column >
+                                <apex:facet name="header">{!$ObjectType.Merge_Contract_Detail__c.fields.Effective_Start_Date__c.label}</apex:facet>
+                                <apex:outputField value="{!detailLine.contractDetail.Effective_Start_Date__c}"/>
+                            </apex:column>
+                            <apex:column >
+                                <apex:facet name="header">{!$ObjectType.Merge_Contract_Detail__c.fields.Effective_End_Date__c.label}</apex:facet>
+                                <apex:outputField value="{!detailLine.contractDetail.Effective_End_Date__c}"/>                              
+                            </apex:column> 
+                            <apex:column >
+                                <apex:facet name="header">{!$ObjectType.Merge_Contract_Detail__c.fields.Unit_Price__c.label}</apex:facet>
+                                <apex:outputField value="{!detailLine.contractDetail.Unit_Price__c}"/>
+                            </apex:column>      
+                            <apex:column >
+                                <apex:facet name="header">{!$ObjectType.Merge_Contract_Detail__c.fields.Units_High__c.label}</apex:facet>
+                                <apex:outputField value="{!detailLine.contractDetail.Units_High__c}"/>
+                            </apex:column> 
+                            <apex:column >
+                                <apex:facet name="header">{!$ObjectType.Merge_Contract_Detail__c.fields.Units_Low__c.label}</apex:facet>
+                                <apex:outputField value="{!detailLine.contractDetail.Units_Low__c}"/>
+                            </apex:column> 
+                            <apex:column >
+                                <apex:facet name="header">{!$ObjectType.Merge_Contract_Detail__c.fields.Record_Type__c.label}</apex:facet>
+                                <apex:outputField value="{!detailLine.contractDetail.Record_Type__c}"/>
+                            </apex:column> 
+                            <apex:column >
+                                <apex:facet name="header">{!$ObjectType.Merge_Contract_Detail__c.fields.Unit_of_Measure__c.label}</apex:facet>
+                                <apex:outputField value="{!detailLine.contractDetail.Unit_of_Measure__c}"/>
+                            </apex:column>    
+                                <apex:column >
+                                <apex:facet name="header">{!$ObjectType.Merge_Contract_Detail__c.fields.Name.label}</apex:facet>
+                                <a href="/{!detailLine.contractDetail.Id}" target="_blank">{!detailLine.contractDetail.Name}</a>
+                            </apex:column>   
+                        </apex:pageBlockTable>    
+                    </apex:outputPanel>           
+                </td>
+                </tr>
+                </table>   
+                </td>
+                </tr>           
+                </apex:repeat>  
+            </table>
+            </div>  
+          <apex:pageBlockButtons id="pbb2" location="bottom">   
+            <input type="button" class="expandBtn" id="expandBtnBot" value="Expand All" onclick="expandAll();return false;"/>
+            <input type="button" class="collapseBtn" id="collapseBtnBot" value="Collapse All" onclick="collapseAll();return false;"/>
+            <apex:commandButton value="Add To Project" action="{!saveProjContractData}"/>
+            <apex:commandButton value="Cancel" action="{!cancelReturnToTemplate}"/>
+        </apex:pageBlockButtons>
+     </apex:pageBlock>
+     <!-- This is the end of the contract line item select block.  -->
+     
+    <apex:pageBlock id="pb1" title="Select Project Template" rendered="{!showTemplateList}">
+    
+        <apex:pageBlock id="pb2">
+            <apex:pageBlockButtons location="top">
+                    <apex:commandButton value="Filter" action="{!filterProjects}"/>
+                    <apex:commandButton value="Clear" action="{!clearFilter}"/>
+            </apex:pageBlockButtons>
+            
+            <apex:pageBlockSection columns="1" title="Filter">
+            
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Project Template"/>
+                    <apex:inputText value="{!projNameFilter}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>   
+        
+        <apex:pageBlock id="pb3" rendered="{!showTemplateList}">
+            <apex:pageBlockButtons >
+                    <apex:commandButton value="Select" style="left:30% important" action="{!selectProject}" />
+                    <apex:commandButton value="Cancel" style="left:30% important" oncomplete="cancelFunction();" reRender="none"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection columns="1" title="Project Templates" >
+                <apex:variable var="rowNum" value="{!0}"/>
+                <apex:pageBlockTable value="{!templateHolderList}" var="line" id="theTable">  
+                    <apex:variable var="rowNum" value="{!(rowNum + 1)}"/>
+                    <apex:column >
+                        <apex:facet name="header"></apex:facet>
+                        <apex:inputCheckbox id="projCheckbox" value="{!line.Selected}" onclick="uncheckOthers(this)" />  
+                    </apex:column>  
+                    <apex:column >
+                        <apex:facet name="header">Project Template</apex:facet>
+                        <apex:outputField value="{!line.Project.Name}"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$ObjectType.pse__Proj__c.fields.pse__Planned_Hours__c.label}</apex:facet>
+                        <apex:outputField value="{!line.Project.pse__Planned_Hours__c}"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$ObjectType.pse__Proj__c.fields.pse__Account__c.label}</apex:facet>
+                        <apex:outputField value="{!line.Project.pse__Account__c}"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$ObjectType.pse__Proj__c.fields.pse__Region__c.label}</apex:facet>
+                        <apex:outputField value="{!line.Project.pse__Region__c}"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$ObjectType.pse__Proj__c.fields.pse__Practice__c.label}</apex:facet>
+                        <apex:outputField value="{!line.Project.pse__Practice__c}"/>
+                    </apex:column>
+<!--                     <apex:column >
+                        <apex:facet name="header">{!$ObjectType.pse__Proj__c.fields.pse__Group__c.label}</apex:facet>
+                        <apex:outputField value="{!line.Project.pse__Group__c}"/>
+                    </apex:column>
+ -->                </apex:pageBlockTable>    
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        
+    </apex:pageBlock>
+
+    <apex:actionFunction name="saveProj" action="{!saveProject}"/>
+    <apex:pageBlock id="createProjectBlock" title="Create Project" rendered="{!showProjectDetails}">
+            <div class="inputhiddencli" style="display:none" >
+                <apex:actionFunction name="updatecli" action="{!updatecli}"/>
+                <apex:inputText style="display:none" value="{!conDetail}" />
+                <apex:inputText style="display:none" value="{!conDetailName}" />
+                <apex:inputText style="display:none" value="{!conDetailProduct}" />
+                <!-- <apex:inputHidden value="{!conDetail}" id="theHiddenInput"/> --> 
+            </div>
+            <apex:pageBlockButtons >
+                    <apex:commandButton value="Create" onclick="showSpinner();" action="{!saveProject}" status="SubmitPublish"  oncomplete="hideSpinner();" reRender="pageMessage"/>
+                    <!--<apex:commandButton value="Create" onclick="validateProductValue();"  /> -->
+                    <apex:commandButton value="Cancel" oncomplete="cancelFunction();" reRender="none" immediate="true"/>
+            </apex:pageBlockButtons>           
+            <apex:pageBlockSection columns="2" title="Project Details" >
+                <apex:pageBlockSectionItem helpText="{!$ObjectType.pse__Proj__c.fields.Name.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.Name.label}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                        <div class="requiredBlock"></div>
+                        <apex:inputField value="{!newProject.Name}"  style="width:80%"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!$ObjectType.pse__Proj__c.fields.pse__Account__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.pse__Account__c.label}"/>
+                    <apex:outputField value="{!newProject.pse__Account__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!$ObjectType.pse__Proj__c.fields.pse__Project_Manager__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.pse__Project_Manager__c.label}"/>
+                    <apex:inputField value="{!newProject.pse__Project_Manager__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{! opp != null}" helpText="{!$ObjectType.pse__Proj__c.fields.pse__Opportunity__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.pse__Opportunity__c.label}"/>
+                    <apex:outputField value="{!newProject.pse__Opportunity__c}" />
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{! opp == null}" helpText="{!$ObjectType.pse__Proj__c.fields.pse__Opportunity__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.pse__Opportunity__c.label}"/>
+                    <apex:inputField value="{!newProject.pse__Opportunity__c}" />
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!$ObjectType.pse__Proj__c.fields.pse__Project_Type__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.pse__Project_Type__c.label}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                        <div class="requiredBlock"></div>
+                            <apex:actionRegion >                        
+                            <apex:inputField value="{!newProject.pse__Project_Type__c}" styleClass="slds-select" style="margin-bottom: 0rem;">
+                            <apex:actionSupport event="onchange" rerender="pbsbud"/>
+                            </apex:inputField>
+                            </apex:actionRegion>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!$ObjectType.pse__Proj__c.fields.CurrencyIsoCode.inlineHelpText}">
+                    <apex:outputLabel value="Project Currency"/>
+                    <apex:inputField value="{!newProject.CurrencyIsoCode}" styleClass="slds-select" style="margin-bottom: 0rem;"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!$ObjectType.pse__Proj__c.fields.Project_Sub_Type__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.Project_Sub_Type__c.label}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                        <div class="requiredBlock"></div>
+                            <apex:inputField value="{!newProject.Project_Sub_Type__c}" styleClass="slds-select " style="margin-bottom: 0rem;"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.pse__Proj__c.fields.pse__Region__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.pse__Region__c.label}"/>
+                    <apex:outputField value="{!newProject.pse__Region__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!$ObjectType.pse__Proj__c.fields.pse__Start_Date__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.pse__Start_Date__c.label}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                        <div class="requiredBlock"></div>
+                        <!--Start of changes by janantha for CR 2420508-->
+                        <apex:actionRegion >                    
+                            <apex:inputField value="{!newProject.pse__Start_Date__c}">
+                            <apex:actionSupport event="onchange" rerender="pbsbud" action="{!updateBudgetEffectiveDate}"/>
+                            </apex:inputField>                       
+                        </apex:actionRegion>
+                        <!--End of changes by janantha for CR 2420508-->
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!$ObjectType.pse__Proj__c.fields.pse__Practice__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.pse__Practice__c.label}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                        <div class="requiredBlock"></div>
+                        <apex:inputField value="{!newProject.pse__Practice__c}"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <!--18.7 : release hold from business-->
+                <!--18.7 changes by Sujay for FFPSA-443 : To add Tool tip on the Project Templete Page-->
+                <!--<apex:pageBlockSectionItem helpText="{!$ObjectType.pse__Proj__c.fields.pse__End_Date__c.inlineHelpText}">-->
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.pse__End_Date__c.label}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                        <div class="requiredBlock"></div>
+                        <apex:inputField value="{!newProject.pse__End_Date__c}"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                
+                <!-- Start of changes for FFPSA-950 -->
+                <apex:pageBlockSectionItem helpText="{!$ObjectType.pse__Proj__c.fields.Under_Enterprise_Agreement__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.Under_Enterprise_Agreement__c.label}"/>
+                    <apex:inputField value="{!newProject.Under_Enterprise_Agreement__c}"/>       
+                </apex:pageBlockSectionItem>
+                <!-- End of Changes for FFPSA-950 -->
+                
+                
+                
+                <apex:pageBlockSectionItem helpText="{!$ObjectType.pse__Proj__c.fields.pse__Billing_Type__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.pse__Billing_Type__c.label}"/>
+                    <apex:inputField value="{!newProject.pse__Billing_Type__c}" styleClass="slds-select" style="margin-bottom: 0rem;"/>       
+                </apex:pageBlockSectionItem>
+                
+                <!-- Start of changes for CR 2576469 -->
+                <apex:pageBlockSectionItem helpText="{!$ObjectType.pse__Proj__c.fields.pse__Is_Template__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.pse__Is_Template__c.label}"/>
+                    <apex:inputField value="{!newProject.pse__Is_Template__c}"/>       
+                </apex:pageBlockSectionItem>
+                <!-- End of Changes CR 2576469 -->
+              
+                <apex:pageBlockSectionItem helpText="{!$ObjectType.pse__Proj__c.fields.Contract_Closed__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.Contract_Closed__c.label}"/>
+                    <apex:inputField styleclass="select-options slds-select" style="margin-bottom: 0rem;" value="{!newProject.Contract_Closed__c}"/>     
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value=""/>
+                    <apex:outputLabel value=""/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!$ObjectType.pse__Proj__c.fields.pse__Planned_Hours__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.pse__Planned_Hours__c.label}"/>
+                    <apex:inputField value="{!newProject.pse__Planned_Hours__c}"/>      
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value=""/>
+                    <apex:outputLabel value=""/>
+                </apex:pageBlockSectionItem>            
+                <apex:pageBlockSectionItem helpText="{!$ObjectType.pse__Proj__c.fields.Ongoing_Project_Recurring_Planned_Hour__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.Ongoing_Project_Recurring_Planned_Hour__c.label}"/>
+                    <apex:inputField value="{!newProject.Ongoing_Project_Recurring_Planned_Hour__c}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection id="pbspcli" columns="2" title="Project Billing Information" >                
+                <apex:pageBlockSectionItem >
+                    
+                    <!-- <apex:outputLabel value=""/> -->
+                    <apex:commandButton value="Add Project Contract Line Item"  action="{!addProjectContractLineItem}" rendered="{!isClassic}"   immediate="false"  />
+                    <apex:commandButton value="Add Project Contract Line Item"  onclick="contractSelect(); return false;" rendered="{! !isClassic}"  />
+                    
+                    
+                </apex:pageBlockSectionItem>
+                 <apex:pageBlockSectionItem >
+                    <apex:outputLabel value=""/>
+                    <apex:outputLabel value=""/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >      
+                    <apex:outputLabel value="Project Contract Line Item"/>
+                    <apex:outputtext value="{!selectedContractDetailItem.Name}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Product"/>
+                    <apex:outputtext id="productValue" value="{!selectedContractDetailItem.Product__c}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+                       
+            <apex:pageBlockSection id="pbsbud" columns="2" title="Project Budget" >
+                <apex:actionRegion >
+                <apex:outputpanel rendered="{!newProject.pse__Project_Type__c == 'Internal'}">         
+                <apex:outputLabel value="Create Budget"/>&nbsp;
+                <apex:actionRegion >
+                    <apex:inputCheckbox value="{!newBudget.selected}" disabled="{!newProject.pse__Project_Type__c != 'Internal'}">
+                        <apex:actionSupport event="onchange" rerender="pbsbud"/>
+                    </apex:inputCheckbox> 
+                </apex:actionRegion>
+                </apex:outputpanel>
+                </apex:actionRegion>  
+                <apex:outputpanel >
+                <apex:outputLabel value=""/>
+                </apex:outputpanel>
+                <apex:pageBlockSectionItem rendered="{!newBudget.selected}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Budget__c.fields.Name.label}"/>
+                    <apex:outputPanel >
+                        <div class="requiredInput">
+                        <div class="requiredBlock"></div>
+                        <apex:inputField value="{!newBudget.Budget.Name}" style="width:80%"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!newBudget.selected}" helpText="{!$ObjectType.pse__Budget__c.fields.pse__Amount__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Budget__c.fields.pse__Amount__c.label}"/>
+                    <apex:outputPanel >  
+                        <div class="requiredInput">
+                        <div class="requiredBlock"></div>
+                        <apex:inputText value="{!newBudget.Budget.pse__Amount__c}"/>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!newBudget.selected}" helpText="{!$ObjectType.pse__Budget__c.fields.pse__Status__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Budget__c.fields.pse__Status__c.label}"/>
+                    <apex:inputField value="{!newBudget.Budget.pse__Status__c}" styleClass="slds-select" style="margin-bottom: 0rem;"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!$ObjectType.pse__Proj__c.fields.Ongoing_Project_Recurring_Budget_Amt__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Proj__c.fields.Ongoing_Project_Recurring_Budget_Amt__c.label}"/>
+                    <apex:inputField value="{!newProject.Ongoing_Project_Recurring_Budget_Amt__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!newBudget.selected}" helpText="{!$ObjectType.pse__Budget__c.fields.pse__Effective_Date__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Budget__c.fields.pse__Effective_Date__c.label}"/>
+                    <apex:outputPanel >  
+                        <div class="requiredInput">
+                        <div class="requiredBlock"></div>                       
+                        <apex:inputField value="{!newBudget.Budget.pse__Invoice_Date__c}"/>                       
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>  
+                <apex:pageBlockSectionItem rendered="{!newBudget.selected}" helpText="{!$ObjectType.pse__Budget__c.fields.pse__Type__c.inlineHelpText}" >
+                    <apex:outputLabel value="{!$ObjectType.pse__Budget__c.fields.pse__Type__c.label}"/>
+                    <apex:inputField value="{!newBudget.Budget.pse__Type__c}" styleClass="slds-select" style="margin-bottom: 0rem;"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!newBudget.selected}" helpText="{!$ObjectType.pse__Budget__c.fields.pse__Description__c.inlineHelpText}">
+                    <apex:outputLabel value="{!$ObjectType.pse__Budget__c.fields.pse__Description__c.label}"/>
+                    <apex:inputField value="{!newBudget.Budget.pse__Description__c}"  style="width:80%"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection columns="1" title="Template Resource Requests" rendered="{!hasTemplateRequests}" >
+                <apex:pageBlockTable value="{!newResourceRequests}" var="line" id="theTable">  
+                        <apex:column >
+                            <apex:facet name="header" ></apex:facet>  
+                            <apex:inputCheckbox value="{!line.Selected}"/>    
+                        </apex:column>  
+                        <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Resource_Request__c.fields.Name.label}</apex:facet>
+                            <apex:outputField value="{!line.ResourceRequest.Display_Name__c}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Resource_Request__c.fields.pse__Notes__c.label}</apex:facet>
+                            <apex:outputField value="{!line.ResourceRequest.pse__Notes__c}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Resource_Request__c.fields.pse__SOW_Hours__c.label}</apex:facet>
+                            <apex:outputField value="{!line.ResourceRequest.pse__SOW_Hours__c}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Resource_Request__c.fields.pse__Status__c.label}</apex:facet>
+                            <apex:outputField value="{!line.ResourceRequest.pse__Status__c}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">Resource Name</apex:facet>
+                            <apex:outputField value="{!line.ResourceRequest.pse__Staffer_Resource__r.Name}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Resource_Request__c.fields.pse__Start_Date__c.label}</apex:facet>
+                            <apex:outputField value="{!line.ResourceRequest.pse__Start_Date__c}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Resource_Request__c.fields.pse__End_Date__c.label}</apex:facet>
+                            <apex:outputField value="{!line.ResourceRequest.pse__End_Date__c}"/>
+                        </apex:column>
+                </apex:pageBlockTable>  
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" title="Opportunity Resource Requests" rendered="{!HasOppRequests}">
+                <apex:pageBlockTable value="{!oppResourceRequests}" var="line" id="theTable">  
+                        <apex:inputHidden id="reqId" value="{!line.ResourceRequest.Id}"/>
+                        <apex:column >
+                            <apex:facet name="header"></apex:facet>
+                            <apex:inputCheckbox value="{!line.Selected}"/>  
+                        </apex:column>  
+                        <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Resource_Request__c.fields.Name.label}</apex:facet>
+                            <apex:outputField value="{!line.ResourceRequest.Name}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Resource_Request__c.fields.pse__Notes__c.label}</apex:facet>
+                            <apex:outputField value="{!line.ResourceRequest.pse__Notes__c}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Resource_Request__c.fields.pse__SOW_Hours__c.label}</apex:facet>
+                            <apex:outputField value="{!line.ResourceRequest.pse__SOW_Hours__c}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Resource_Request__c.fields.pse__Status__c.label}</apex:facet>
+                            <apex:outputField value="{!line.ResourceRequest.pse__Status__c}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">Resource Name</apex:facet>
+                            <apex:outputField value="{!line.ResourceRequest.pse__Staffer_Resource__r.Name}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Resource_Request__c.fields.pse__Start_Date__c.label}</apex:facet>
+                            <apex:outputField value="{!line.ResourceRequest.pse__Start_Date__c}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Resource_Request__c.fields.pse__End_Date__c.label}</apex:facet>
+                            <apex:outputField value="{!line.ResourceRequest.pse__End_Date__c}"/>
+                        </apex:column>
+                </apex:pageBlockTable>      
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" title="Project Milestones" >
+                <apex:pageBlockTable value="{!newMilestones}" var="line" id="theTable">  
+                        <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Milestone__c.fields.Task_Milestone_Name__c.label}</apex:facet>
+                            <apex:inputField value="{!line.Milestone.Task_Milestone_Name__c}"/>
+                        </apex:column>          
+                        <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Milestone__c.fields.Milestone_Type_List__c.label}</apex:facet>
+                            <apex:outputField value="{!line.Milestone.Milestone_Type_List__c}"/>
+                        </apex:column>
+                         <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Milestone__c.fields.pse__Milestone_Amount__c.label}</apex:facet>
+                            <apex:inputField value="{!line.Milestone.pse__Milestone_Amount__c}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Milestone__c.fields.pse__Planned_Hours__c.label}</apex:facet>
+                            <apex:inputField value="{!line.Milestone.pse__Planned_Hours__c}"/>
+                        </apex:column>
+                    
+                        <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Milestone__c.fields.Start_Date__c.label}</apex:facet>
+                            <apex:inputField value="{!line.Milestone.Start_Date__c}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">{!$ObjectType.pse__Milestone__c.fields.pse__Target_Date__c.label}</apex:facet>
+                            <apex:inputField value="{!line.Milestone.pse__Target_Date__c}"/>
+                        </apex:column>
+                        <apex:column rendered="{!newProject.pse__Project_Type__c != 'Internal'}">
+                            <apex:facet name="header">{!$ObjectType.pse__Milestone__c.fields.Billable__c.label}</apex:facet>
+                            <apex:outputField value="{!line.Milestone.Billable__c}"/>
+                        </apex:column>  
+                        <apex:column rendered="{!newProject.pse__Project_Type__c == 'Internal'}">
+                            <apex:facet name="header">{!$ObjectType.pse__Milestone__c.fields.Internal_Time_Only__c.label}</apex:facet>
+                            <apex:outputField value="{!line.Milestone.Internal_Time_Only__c}"/>
+                        </apex:column>                      
+                </apex:pageBlockTable>      
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" title="Project Tasks" >
+                <apex:pageBlockTable value="{!newProjectTasks}" var="task" id="theTable">
+                    <apex:column >
+                        <apex:facet name="header">{!$ObjectType.pse__Project_Task__c.fields.Name.label}</apex:facet>
+                        <apex:outputField value="{!task.ProjectTask.Name}"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$ObjectType.pse__Project_Task__c.fields.pse__Status__c.label}</apex:facet>
+                        <apex:outputField value="{!task.ProjectTask.pse__Status__c}"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$ObjectType.pse__Project_Task__c.fields.Billable__c.label}</apex:facet>
+                        <apex:outputField value="{!task.ProjectTask.Billable__c}"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$ObjectType.pse__Project_Task__c.fields.pse__Start_Date_Time__c.label}</apex:facet>
+                        <apex:inputField value="{!task.ProjectTask.pse__Start_Date_Time__c}"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">{!$ObjectType.pse__Project_Task__c.fields.pse__End_Date_Time__c.label}</apex:facet>
+                        <apex:inputField value="{!task.ProjectTask.pse__End_Date_Time__c}"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">Milestone</apex:facet>
+                        <apex:outputField value="{!task.ProjectTask.pse__Milestone__r.Name}"/>
+                    </apex:column>
+                </apex:pageBlockTable>
+            </apex:pageBlockSection>
+            
+    </apex:pageBlock>  
+
+    </apex:form>
+
+<script>
+      function setFocusOnLoad() {}
+</script>
+</apex:page>

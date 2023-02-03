@@ -1,0 +1,63 @@
+<template>
+    <article class="slds-card custom_queryintent_article">
+        <div class="slds-card__header slds-grid custom_queryintent_article_header">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__body">
+                <h2 class="slds-card__header-title queryintent_header_title">
+                    <span class="slds-card__header-link slds-truncate queryintent_featured">Featured</span>
+                </h2>
+                </div>
+            </header>
+        </div>
+      <div class="slds-card__body slds-card__body_inner custom_queryintent_article_body">
+        <ul class="slds-grid slds-wrap slds-grid_pull-padded">
+            <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3" if:true={queryintentresult.productinfo.title}>
+                <article class="slds-tile slds-media slds-hint-parent">
+                    <div class="slds-media__body custom_card_body_div">
+                        <div class="custom_card_body_header">
+                            Product Overview:
+                        </div>
+                        <div class="custom_card_mainbody">
+                            <a onclick={redirectToURL} data-value="productinfo" style="color: #006DCC;">{queryintentresult.productinfo.title}</a>
+                        </div>
+                        <div class="custom_card_body_footer">
+                            {queryintentresult.productinfo.type}
+                        </div>
+                    </div>
+                </article>
+            </li>
+            <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3" if:true={queryintentresult.releasenotes.title}>
+                <article class="slds-tile slds-media slds-hint-parent">
+                    <div class="slds-media__body custom_card_body_div">
+                        <div class="custom_card_body_header">
+                            Release Notes:
+                        </div>
+                        <div class="custom_card_mainbody">
+                            <a onclick={redirectToURL} data-value="releasenotes" style="color: #006DCC;">{queryintentresult.releasenotes.title}</a>
+                        </div>
+                        <div class="custom_card_body_footer">
+                            {queryintentresult.releasenotes.type}
+                        </div>
+                    </div>
+                </article>
+            </li>
+            <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-3" if:true={queryintentresult.productfeatures.title}>
+                <article class="slds-tile slds-media slds-hint-parent">
+                    <div class="slds-media__body custom_card_body_div">
+                        <div class="custom_card_body_header">
+                            Product Features:
+                        </div>
+                        <div class="custom_card_mainbody">
+                            <a onclick={redirectToURL} data-value="productfeatures" style="color: #006DCC;">{queryintentresult.productfeatures.title}</a>
+                        </div>
+                        <div class="custom_card_body_footer">
+                            {queryintentresult.productfeatures.type}
+                        </div>
+                    </div>
+                </article>
+            </li>
+        </ul>
+      </div>
+    </article>
+    <br/>
+</template>

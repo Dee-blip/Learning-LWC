@@ -1,0 +1,472 @@
+<apex:page showheader="false" id="dashboardPage" sidebar="false" controller="ChartController"  standardStylesheets="true" >
+  <html lang="en">
+    <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;" />
+      <meta charset="utf-8"/>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1"/>
+      <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+      <meta name="description" content=""/>
+      <meta name="author" content=""/>
+      <apex:includeScript value="{!URLFOR($Resource.JQuery191, '/jquery-1.9.1.min.js')}"/>
+      <title>Dashboard Template for Bootstrap</title>
+      <style>
+        #refreshTime, #folderOptions{
+          color: #999999
+        }
+        #wrapper {
+
+          padding-left: 0;
+          -webkit-transition: all 0.5s ease;
+          -moz-transition: all 0.5s ease;
+          -o-transition: all 0.5s ease;
+          transition: all 0.5s ease;
+        }
+        #wrapper.toggled {
+          
+          padding-left: 0px;
+        }
+        #sidebar-wrapper {
+          
+          z-index: 1000;
+          position: fixed;
+          left: 250px;
+          width: 0;
+          height: 100%;
+          margin-left: -250px;
+          overflow-y: auto;
+          background: #000;
+          -webkit-transition: all 0.5s ease;
+          -moz-transition: all 0.5s ease;
+          -o-transition: all 0.5s ease;
+          transition: all 0.5s ease;
+        }
+        #wrapper.toggled #sidebar-wrapper {
+          width: 250px;
+        }
+        #page-content-wrapper {
+          width: 100%;
+          position: absolute;
+          
+        }
+        #wrapper.toggled #page-content-wrapper {
+          position: absolute;
+          margin-right: -250px;
+        } 
+        /* Sidebar Styles */
+        .sidebar-nav {
+          position: absolute;
+          top: 0;
+          width: 250px;
+          margin: 0;
+          padding: 0;
+          list-style: none;
+        }
+        .sidebar-nav li {
+          text-indent: 20px;
+          line-height: 40px;
+        }
+        .sidebar-nav li a {
+          display: block;
+          text-decoration: none;
+          color: #999999;
+        }
+        .sidebar-nav li a:hover {
+          text-decoration: none;
+          color: #fff;
+          background: rgba(255,255,255,0.2);
+        }
+        .sidebar-nav li a:active,
+        .sidebar-nav li a:focus {
+          text-decoration: none;
+        }
+        .sidebar-nav > .sidebar-brand {
+          height: 65px;
+          font-size: 18px;
+          line-height: 60px;
+        }
+        .sidebar-nav > .sidebar-brand a {
+          color: #999999;
+        }
+        .sidebar-nav > .sidebar-brand a:hover {
+          color: #fff;
+          background: none;
+        }
+        @media(min-width:768px) {
+          #wrapper {
+            padding-left: 250px;
+          }
+          #wrapper.toggled {
+            padding-left: 0;
+          }
+          #sidebar-wrapper {
+            width: 250px;
+          }
+          #wrapper.toggled #sidebar-wrapper {
+            width: 0;
+          }
+          #page-content-wrapper {
+            
+            position: fixed;
+          }
+          #wrapper.toggled #page-content-wrapper {
+            position: relative;
+            margin-right: 0;
+          }
+          .max-width{
+            width: 100%;
+          }
+          .half-width{
+            padding-right: 20px;
+            width: 50%;
+          }
+          .two-third-width{
+            padding-right: 20px;
+            width: 33.33%;
+          }
+          .full-height{
+            height:900px;
+          }
+        }
+        #dash1 .analyticsEmbeddedReportChart.width_medium{
+              width: 461px;
+        }
+        #dash1 .analyticsEmbeddedChart .errorBox, #dash3 .analyticsEmbeddedChart .analyticsCsrPopChart, #dash3 .analyticsEmbeddedChart .analyticsPluginChart, #dash3 .analyticsEmbeddedChart .analyticsCordaChart {
+            width: 100%;
+           }
+        #dash1 .analyticsEmbeddedReportChart img{
+          width:100%;
+        }
+        #dash2 .analyticsEmbeddedReportChart.width_medium{
+              width: 461px;
+        }
+        #dash2 .analyticsEmbeddedChart .errorBox, #dash3 .analyticsEmbeddedChart .analyticsCsrPopChart, #dash3 .analyticsEmbeddedChart .analyticsPluginChart, #dash3 .analyticsEmbeddedChart .analyticsCordaChart {
+            width: 100%;
+           }
+        #dash2 .analyticsEmbeddedReportChart img{
+          width:100%;
+        }
+        #dash3 .analyticsEmbeddedReportChart.width_medium {
+            width: 100%;
+            padding-bottom: 20px;
+            padding-right: 10px;
+            height: 400px;
+          }
+        #dash3  .analyticsEmbeddedReportChart.width_large {
+            width: 100%;
+            padding-bottom: 20px;
+            padding-right: 10px; 
+          }
+        #dash3  .analyticsEmbeddedChart {
+             width: 100%;
+             height:400px;
+           }
+          #dash3 .analyticsEmbeddedChart .errorBox, #dash3 .analyticsEmbeddedChart .analyticsCsrPopChart, #dash3 .analyticsEmbeddedChart .analyticsPluginChart, #dash3 .analyticsEmbeddedChart .analyticsCordaChart {
+            width: 100%;
+            height:400px;
+           }
+          #dash3 .analyticsEmbeddedReportChart img {
+                width: 70%;
+                padding-left: 15%;
+
+           }
+           #dash3 .analyticsEmbeddedReportChart.width_medium {
+            width: 100%;
+            padding-bottom: 20px;
+            padding-right: 10px;
+            height: 400px;
+          }
+
+           #dash4  .analyticsEmbeddedReportChart.width_large {
+            width: 700px;
+          }
+         
+          #dash4 .analyticsEmbeddedChart .errorBox, #dash4 .analyticsEmbeddedChart .analyticsCsrPopChart, #dash4 .analyticsEmbeddedChart .analyticsPluginChart,#dash4 .analyticsEmbeddedChart .analyticsCordaChart {
+            width:100%;
+           }
+          #dash4 .analyticsEmbeddedReportChart img {
+                width:100%;
+           }
+            #dash5  .analyticsEmbeddedReportChart.width_large {
+            width: 700px;
+          }
+         
+          #dash5 .analyticsEmbeddedChart .errorBox, #dash4 .analyticsEmbeddedChart .analyticsCsrPopChart, #dash4 .analyticsEmbeddedChart .analyticsPluginChart,#dash4 .analyticsEmbeddedChart .analyticsCordaChart {
+            width:100%;
+           }
+          #dash5 .analyticsEmbeddedReportChart img {
+                width:100%;
+           }
+
+           .analyticsEmbeddedChart .spacer {
+            display: none;
+          }
+          #dash6  .analyticsEmbeddedReportChart.width_large {
+            width: 700px;
+          }
+          
+          #dash6 .analyticsEmbeddedChart .errorBox, #dash6 .analyticsEmbeddedChart .analyticsCsrPopChart, #dash6 .analyticsEmbeddedChart .analyticsPluginChart,#dash6 .analyticsEmbeddedChart .analyticsCordaChart {
+            width: 100%;
+           }
+          #dash6 .analyticsEmbeddedReportChart img {
+                    width: 100%;
+          }
+           
+        @media(min-height:950px){
+          .analyticsEmbeddedReportChart.width_medium {
+            height: 520px;
+          }
+          .analyticsEmbeddedReportChart.width_large {
+            height: 520px;
+          }
+          .analyticsEmbeddedReportChart .outerbound {
+            height: 480px;
+          }
+          .analyticsEmbeddedChart {
+             height: 480px;
+           }
+           .analyticsEmbeddedChart .errorBox, .analyticsEmbeddedChart .analyticsCsrPopChart, .analyticsEmbeddedChart .analyticsPluginChart, .analyticsEmbeddedChart .analyticsCordaChart {
+            height: 480px;
+           }
+           .analyticsEmbeddedReportChart img {
+            height: 480px;
+           }
+           .half-height{
+            height:480px;
+           }
+           .analyticsEmbeddedChart .spacer {
+            display: none;
+          }
+          .full-height{
+            height:900px;
+          }
+          iframe{
+            padding-bottom: 35px;
+            height:480px;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <div id="wrapper">
+        <apex:form id="dashboardForm" >
+          <!-- Sidebar -->
+          <div id="sidebar-wrapper" class = "toggled" >
+            <ul class="sidebar-nav">
+              <li class="sidebar-brand">
+                <a href="#">Dashboard Menu</a>
+              </li>
+              <li id="chartTemp1">
+                <span style= "float:left"><apex:inputCheckbox value="{!activeA}">R</apex:inputCheckbox></span>
+                <apex:commandLink value="Dashboard 1-1x3" action="{!callA}"  id="link1">
+                </apex:commandLink>
+              </li>
+              <li id="cahrtTemp2">
+                <span style= "float:left"><apex:inputCheckbox value="{!activeB}">R</apex:inputCheckbox></span>
+                <apex:commandLink value="Dashboard 2x3" action="{!callB}" id="link2"  />
+              </li>
+              <li id="cahrtTemp3">
+                <span style= "float:left"><apex:inputCheckbox value="{!activeC}">R</apex:inputCheckbox></span>
+                <apex:commandLink value="Dashboard 2x2" action="{!callC}" id="link3"  />
+              </li>
+              <li id="cahrtTemp3">
+                <span style= "float:left"><apex:inputCheckbox value="{!activeD}">R</apex:inputCheckbox></span>
+                <apex:commandLink value="Dashboard 1x2" action="{!callD}" id="link4" />
+              </li>
+              <li id="cahrtTemp3">
+                <span style= "float:left"><apex:inputCheckbox value="{!activeE}">R</apex:inputCheckbox></span>
+                <apex:commandLink value="Dashboard 1x2" action="{!callE}"  id="link5"/>
+              </li>
+              <li id="cahrtTemp3">
+                <span style= "float:left"><apex:inputCheckbox value="{!activeF}">R</apex:inputCheckbox></span>
+                <apex:commandLink value="Dashboard 1x2" action="{!callF}"  id="link6"/>
+              </li>
+              <li id="folderOptions">
+                <apex:selectList value="{!reportFolder}" multiselect="false" size="1">
+                    <apex:selectOptions value="{!reportFoldersOption}"/>
+                    <apex:actionSupport action="{!changeReportFolder}" event="onchange" />
+                </apex:selectList><span style= "margin-left: 6%">Folder</span>
+              </li>
+              <li id="refreshTime">
+                <apex:selectList value="{!interval}" multiselect="false" size="1">
+                    <apex:selectOptions value="{!refreshInterval}"/>
+                    <apex:actionSupport action="{!test}" event="onchange"  />
+                </apex:selectList><span style= "margin-left: 6%">Refresh Time </span>
+              </li>
+              <li id="saveConfiguration">
+                <apex:commandLink value="Save Configuration" action="{!saveMyConfig}" />
+              </li>
+            </ul>
+          </div>
+          <script type="text/javascript">
+                          
+                           $("#wrapper").toggleClass("toggled");
+          </script>
+          <div id="page-content-wrapper">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-lg-12">
+                <!-- <apex:outputText >{!interval}</apex:outputText> -->
+                  <a href="#menu-toggle" class="btn btn-default " id="menu-toggle">Dashboard Options</a>
+                  <span >
+                    <apex:outputPanel id="chartDisplay" >
+                      <span id="dash2">
+                      <apex:outputPanel rendered="{!boolB}">
+                        <table class = "max-width">
+                          <tr>
+                            <td class = "two-third-width half-height">
+                              <c:HD_Dashboard_Report_Render reports="{!reports}" reportValue="{!report1}" />
+                            </td>
+                            <td class = "two-third-width half-height">
+                              <c:HD_Dashboard_Report_Render reports="{!reports}" reportValue="{!report2}" />
+                            </td>
+                            <td class = "two-third-width half-height">
+                              <c:HD_Dashboard_Report_Render reports="{!reports}" reportValue="{!report3}" />                            
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class = "two-third-width half-height">
+                              <c:HD_Dashboard_Report_Render reports="{!reports}" reportValue="{!report4}" />
+                            </td>
+                            <td class = "two-third-width half-height">
+                              <c:HD_Dashboard_Report_Render reports="{!reports}" reportValue="{!report5}" />
+                            </td>
+                            <td class = "two-third-width half-height">
+                              <c:HD_Dashboard_Report_Render reports="{!reports}" reportValue="{!report6}" />
+                            </td>
+                          </tr>
+                        </table>
+                      </apex:outputPanel>
+                      </span>
+                      <span id ="dash3">
+                      <apex:outputPanel rendered="{!boolC}" id="dashBoard3">
+                        <table class = "max-width">
+                          <tr>
+                            <td class = "half-width half-height">
+                              <c:HD_Dashboard_Report_Render reports="{!reports}" reportValue="{!report7}" />
+                            </td>
+                            <td class = "half-width half-height">
+                              <c:HD_Dashboard_Report_Render reports="{!reports}" reportValue="{!report8}" />
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class = "half-width half-height">
+                              <c:HD_Dashboard_Report_Render reports="{!reports}" reportValue="{!report9}" />
+                            </td>
+                            <td class = "half-width half-height"> 
+                              <apex:outputPanel id="chartblock322" >
+                              <apex:outputPanel >
+                              <span id = "chartIframe"><apex:iframe src="/apex/HD_Pareto_Chart" height="415px"  id="theIframe" width="100%" >
+                              </apex:iframe> </span>
+                              </apex:outputPanel>
+                              </apex:outputPanel>
+                            </td>
+                          </tr>
+                        </table>
+                      </apex:outputPanel>
+                      </span>
+                      <span id ="dash4">
+                      <c:HD_Dashboard_layout1x2 boolValue="{!boolD}" reportID1="{!report14}" reports="{!reports}" reportID2="{!report15}"/>
+                      </span>
+                      <span id ="dash5">
+                      <c:HD_Dashboard_layout1x2 boolValue="{!boolE}" reportID1="{!report16}" reports="{!reports}" reportID2="{!report17}"/>
+                      </span>
+                      <span id ="dash6">
+                      <c:HD_Dashboard_layout1x2 boolValue="{!boolF}" reportID1="{!report18}" reports="{!reports}" reportID2="{!report19}"/>
+                      </span>
+
+
+                      <!-- end 1x2 -->
+                        <span id ="hidePareto">
+                      <apex:panelGrid width="100%" columns="1" id="TEST1" rendered="{!boolA}">
+                        <apex:pageBlock title="Tickets Created By Category"  id="TEST2"> 
+                        <apex:chart resizable="true" animate="true" id="chart1"  height="400px" width="100%" data="{!data}" renderTo="displayChart1">
+                          <apex:axis type="Numeric" position="left" fields="data2"
+                          title="Tickets Raised" grid="true" minimum="0" />
+                          <apex:axis type="Numeric" position="right" fields="data3"
+                          title="Cumulative Percentage" minimum="0" />
+                          <apex:axis type="Category" position="bottom" fields="name" 
+                          title="Category" >
+                            <apex:chartLabel rotate="270" />
+                          </apex:axis>
+                          <apex:barSeries orientation="vertical" axis="left"
+                              xField="name" yField="data2" />
+                          <apex:lineSeries axis="right" xField="name" yField="data3"
+                              markerType="circle" markerSize="4" markerFill="#8E35EF"  /> 
+                          </apex:chart>
+                          <apex:pageMessages />
+                          <apex:selectList value="{!category}" multiselect="false" size="1" onchange="{!HTMLENCODE(test)}" >
+                            <apex:selectOptions value="{!categories}"/>
+                            <apex:actionSupport action="{!test}" event="onchange" reRender="chart1,TEST1" />
+                          </apex:selectList>
+                          <apex:selectList value="{!month}" multiselect="false" size="1" onchange="{!HTMLENCODE(test)}" >
+                            <apex:selectOptions value="{!months}"/>
+                            <apex:actionSupport action="{!test}" event="onchange" reRender="chart1,TEST1" />
+                          </apex:selectList>
+                          <apex:selectList value="{!paretoFilter}" multiselect="false" size="1" onchange="{!HTMLENCODE(test)}" >
+                            <apex:selectOptions value="{!paretoFilters}"/>
+                            <apex:actionSupport action="{!test}" event="onchange" reRender="chart1,TEST1" />
+                          </apex:selectList>
+                          <span id="displayChart1" ></span>
+                          
+                     </apex:pageBlock> 
+                      </apex:panelGrid>
+                        </span>
+                      <span id="dash1">
+                      <apex:outputPanel rendered="{!boolA}">
+                        <table class = "max-width">
+                          <tr>
+                            <td class = "two-third-width half-height">
+                              <c:HD_Dashboard_Report_Render reports="{!reports}" reportValue="{!report11}" />
+                            </td>
+                            <td class = "two-third-width half-height">
+                              <c:HD_Dashboard_Report_Render reports="{!reports}" reportValue="{!report12}" />
+                            </td>
+                            <td class = "two-third-width half-height">
+                              <c:HD_Dashboard_Report_Render reports="{!reports}" reportValue="{!report13}" />
+                            </td>
+                          </tr>
+                        </table>
+                      </apex:outputPanel>
+                      </span>
+                      <apex:outputPanel id="sample">
+                        <script type="text/javascript">
+                           $( document ).ready(function() {
+                          //   console.log( "ready!" );
+                          //  $("#wrapper").toggleClass("toggled");
+                          interval = parseInt('{!JSENCODE(interval)}')*1000;
+                            setInterval(function(){
+                              hideorshow(); 
+                            }, interval);      
+                          });
+                          
+                          function hideorshow(){
+                              console.log('Boola - {!boolA}  Boold  - {!boolD}');
+                              if('{!boolA}' == 'false'){
+                              	console.log('inside if statemnet');
+                              }
+                              jsMethod();   
+                          }
+                          function reload(){
+                            return false;
+                              //window.location.reload();
+                          }
+                          $("#menu-toggle").click(function(e) {
+                            $("#wrapper").toggleClass("toggled");
+                            // #("#sidebar-wrapper").toggle();
+                          });   
+                        </script>
+                      </apex:outputPanel>
+                    </apex:outputPanel>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+            <!-- <apex:actionPoller interval="20" id = "refreshOption" rerender="sample,refreshOption"   oncomplete="hideorshow();"/>
+             --><apex:actionFunction name="jsMethod" action="{!autoRotate}"/>
+        </apex:form>
+      </div>
+    </body>
+  </html>
+</apex:page>

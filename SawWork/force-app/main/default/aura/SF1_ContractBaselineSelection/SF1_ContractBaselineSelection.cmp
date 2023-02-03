@@ -1,0 +1,38 @@
+<!-- SF1_ContractBaselineSelection -->
+<aura:component >
+	
+    <!-- attribs... -->
+    <aura:attribute name="selection" type="String"/>    
+    <aura:attribute name="acc" type="Account"/> 
+    <!--aura:attribute name="withBaseline" type="Boolean"/-->
+    <aura:attribute name="doneLoading" type="Boolean" default="false" />
+    
+    <!-- events... -->
+    <aura:handler event="c:accountChangeEvent" action="{!c.handleAccountChange}" />
+    
+	<aura:registerEvent name="opptyTypeChangeEvent" type="c:opportunityTypeChangeEvent"/>
+	
+    <aura:if isTrue="{!v.doneLoading}">
+        <div class="slds-m-around--large">
+            <div class="slds-form slds-form--inline">
+            	<fieldset class="slds-form-element">
+            		  <!--legend class="slds-form-element__legend slds-form-element__label">Select Contract Baseline</legend-->
+                      <!--legend class="slds-form-element__legend slds-form-element__label slds-section__title">Select Contract Baseline</legend-->
+                      <h3 class="slds-section__title">Select Contract Baseline</h3>
+                        <div aura:id="oppty-flow-type" class="slds-form-element__control">
+                            <span aura:id="oppty-flow-type-sel" class="slds-radio">
+                                <lightning:input aura:id="withContractBaseline" type="radio" label="Create Opportunity with Contract Baseline" name="radio-contractBaseline" value="red" onchange="{!c.onGroup}" />
+                                <lightning:input aura:id="withoutContractBaseline" type="radio" label="New Opportunity without Contract Baseline" name="radio-contractBaseline" value="blue" onchange="{!c.onGroup}"/>
+                                <lightning:input aura:id="contractChange" type="radio" label="Create Contract Change Opportunity" name="radio-contractBaseline" value="red" onchange="{!c.onGroup}"/>
+                            </span>
+                        </div>
+                </fieldset>
+            </div>
+        </div>
+        <!-- style="display:none;" slds-p-top_large -->
+        <!--div>
+            <b>Selected Items:</b>
+            <p><ui:outputText class="result" aura:id="basline-select-result" value="" /></p>
+        </div--> 
+    </aura:if>
+</aura:component>

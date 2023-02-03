@@ -1,0 +1,160 @@
+<apex:page standardController="PS_Overage_Hours__c" tabStyle="PS_Overage_Hours__c" extensions="PSA_OverageController" recordSetVar="overages" lightningStylesheets="true">
+    
+    <apex:slds />
+    
+    <div id="spinner" style="z-index: 10000 !important;" >
+        <div class="slds-spinner_container">
+              <div role="status" class="slds-spinner slds-spinner_large slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+              </div>
+        </div>   
+    </div>
+    
+    
+    <apex:repeat value="{! overages}" var="overage" rendered="false">
+        {! overage.Name}
+        {! overage.CLI_End_Date__c }
+        {! overage.CLI_Start_Date__c }
+        {! overage.Original_Contract_ID__c}
+        {! overage.Project_ID__c }
+        {! overage.CLI_Unit_of_Measure__c}
+        {! overage.Marketing_Product_Id__c}
+        {! overage.RecordTypeId }
+        {! overage.Original_Detail_ID__c}
+        {! overage.CLI_Units_Low__c}
+        {! overage.Overage_Filters__c}        
+        {! overage.Overage_Stage__c}                
+        {! overage.To_be_Billed_Hours__c}
+        {! overage.Overage_Hours__c}   
+        {! overage.Finance_Approver__c}
+        {! overage.GSS_Approver__c}        
+        
+
+        
+    </apex:repeat>
+    <script type="text/javascript">
+    
+     function showToast() {
+            sforce.one.showToast({
+                "title": "Error!",
+                "message": "No records selected!!",
+                "type": "error"
+            });
+        }
+        window.onload = function(){
+            console.log('Page loaded!!');  
+            var recIds = '{! selected}';
+            if(!recIds)
+            {
+                showToast();
+                goToHome();        
+            }
+            else
+            {
+                console.log('Undefined');
+                hideMethod('spinner');
+                showMethod('confirmModel');
+            }
+        };
+        
+        function onSignOff()
+        {            
+            hideMethod('confirmModel');
+            showMethod('spinner');
+            updateRecords();
+        }
+    
+        function hideMethod(id)
+        {
+            document.getElementById(id).style.display = 'none';
+        }
+        function showMethod(id)
+        {
+            document.getElementById(id).style.display = 'block';
+        }
+                
+        function goToHome()
+        {
+            showMethod('spinner');
+            window.location.href = "/" + "{!prefix}" + "/o";
+        }
+    
+    
+    </script>
+    
+    <div id="confirmModel">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" aura:id="Modalbox" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container" style="height: 100% !important; width: 100% !important">
+                <header class="slds-modal__header">
+                    <h2 id="modal-heading-01" class="slds-text-heading_small slds-hyphenate">Sign Off</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_large slds-text-align_center slds-text-heading_medium"  id="modal-content-id-1">
+                    <font size="3" >Are you sure you want to Sign-Off?</font> 
+                </div>
+                
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick="goToHome();">Cancel</button>
+                    <button class="slds-button slds-button_brand" onclick="onSignOff();">Sign-Off</button>
+                </footer>           
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop--open" aura:id="Modalbackdrop"></div>
+    </div>
+    
+    <apex:form >
+        <apex:actionFunction name="updateRecords" action="{! bulkSignOffOverage}" reRender="errors" oncomplete="hideMethod('spinner');"/>
+        <apex:outputPanel id="errors" >
+            <header class="slds-global-header_container">
+                <div class="slds-global-header">
+                    <apex:pageBlock >
+                            <apex:facet name="header">
+                                  <font size="4" >Sign Off</font> 
+                            </apex:facet>                       
+                            <div class="slds-grid" style="overflow:none;" title="Sign Off" >
+                                  <div class="slds-col slds-size_1-of-3 slds-text-align_left">
+                                        <apex:outputText >
+                                            <font size="3" color="green">
+                                                {!successCountSignedOff} Record(s) Signed Off Successfully! <br/>
+                                                {!successCountSubmitted} Record(s) Submitted for Finance Approval Successfully!                                                 
+                                            </font> 
+                                        </apex:outputText>
+                                  </div>    
+                                  <div class="slds-col slds-size_1-of-3 slds-text-align_center">
+                                        <apex:outputText >
+                                            <font size="3" color="red">
+                                                {!errorsKeys.size} Record(s) Errored Out!
+                                            </font>
+                                        </apex:outputText>
+                                  </div>    
+                                  <div class="slds-col slds-size_1-of-3 slds-text-align_right">
+                                        <apex:outputLink onclick="goToHome();" value="#">Back</apex:outputLink>
+                                  </div>    
+                            </div>
+                    </apex:pageBlock> 
+                </div>  
+            </header>  
+            <div class="slds-scrollable" style="position:absolute; top:120px; bottom:0px; left:0px; right:0px; overflow:auto;">
+                <apex:pageBlock rendered="{! errorsKeys.size != 0}">  
+                        <apex:facet name="header">
+                          <font size="4" >Errors</font> 
+                        </apex:facet>                       
+                            
+                        <apex:pageBlockTable value="{!errorsKeys}" var="key" >
+                            <apex:column title="Overage" >
+                                <apex:facet name="header">Overage</apex:facet>
+                                <apex:outputLink value="/{!key}" id="theLink">{!updateErrors[key][1]}</apex:outputLink>
+                            </apex:column>    
+                            <apex:column title="Error">
+                                <apex:facet name="header">Error</apex:facet>
+                                <apex:outputText value="{!updateErrors[key][0]}" escape="false" />
+                            </apex:column>    
+                        </apex:pageBlockTable>
+                 </apex:pageBlock>
+            </div>        
+        </apex:outputPanel>
+    
+    </apex:form>
+        
+</apex:page>

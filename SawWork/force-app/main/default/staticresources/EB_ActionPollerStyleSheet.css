@@ -1,0 +1,225 @@
+<style type="text/css">
+        table {
+            border-width: 0px;
+            border-spacing: 0px;
+            border-collapse: collapse;
+            color: #000000;
+            background-color: #fafafa;
+            font-family: Arial, Verdana, sans-serif;
+            font-size:16px;
+        }
+
+        .trFillerRow{
+            height: 5px;
+        }
+
+        .trRow1{
+            height: 25px;
+        }
+        .tdFieldLabel {
+            border-right: 1px #FFFFFF solid;
+            border-bottom: 1px #6699CC dotted;
+            padding: 5px;
+            color: #404040;
+            background-color: navy-blue;
+            text-align: left;
+            vertical-align: middle;
+            height: 25px;
+            width: 200px;
+            font-family: Arial, Verdana, sans-serif;
+            font-size:12px;
+            
+        }
+
+        .tdFieldValue {
+            border-bottom: 1px #6699CC dotted;
+            padding: 5px;
+            color: #404040;
+            background-color: #FFFFFF;
+            text-align: left;
+            vertical-align: top;
+            width: 180px;
+            height: 25px;
+            font-family: Arial, Verdana, sans-serif;
+            font-size:12px;
+        }
+
+        .tdSmall {
+            padding: 2px;
+            color: #404040;
+            background-color: #FFFFFF;
+            text-align: left;
+            vertical-align: middle;
+            height: 25px;
+            width: 3px;
+            font-family: Arial, Verdana, sans-serif;
+            font-size:12px;
+            
+        }
+
+        .tdMiddle {
+            border-bottom: 1px #6699CC dotted;
+            padding: 2px;
+            color: #404040;
+            background-color: #FFFFFF;
+            text-align: left;
+            vertical-align: middle;
+            height: 25px;
+            width: 37px;
+            font-family: Arial, Verdana, sans-serif;
+            font-size:12px;
+            
+        }
+
+        .pQuestion {
+            padding-top: 7px;
+            padding-bottom: 7px;
+            padding-right: 2px;
+            color: grey;
+            background-color: #FFFFFF;
+            text-align: left;
+            vertical-align: top;
+            font-family: Arial, Verdana, sans-serif;
+            font-size:13px;
+            word-wrap: break-word;
+            list-style-type:none;
+            width:800px; 
+            left: 1px;
+            
+        }
+
+        .pResponse {
+            padding-top: 5px;
+            padding-bottom: 15px;
+            padding-right: 15px;
+            color: #404040;
+            background-color: #FFFFFF;
+            text-align: left;
+            vertical-align: top;
+            font-family: Arial, Verdana, sans-serif;
+            font-weight: normal;
+            list-style-type:none;
+            width:800px; 
+            left: 0px;
+            word-wrap: break-word;    
+        }
+
+        .tdHeaderFieldLabel {
+            border-right: 0px #FFFFFF solid;
+            border-bottom: 1px #003333 dotted;
+            padding: 10px;
+            color: #000000;
+            background-color: #FFFFFF;
+            text-align: left;
+            vertical-align: middle;
+            height: 25px;
+            width: 200px;
+            font-family: Arial, Verdana, sans-serif;
+            font-size:12px;
+            font-weight: normal;
+            
+        }
+        
+        .tdBlueFieldValue {
+            border-right: 1px #6699CC solid;
+            padding: 5px;
+            color: #000000;
+            background-color: #FFFFFF;
+            text-align: left;
+            vertical-align: top;
+            width: 180px;
+            height: 25px;
+            font-family: Arial, Verdana, sans-serif;
+            font-size:12px;
+        }
+
+        .tdInfoArea{
+            border-left: 1px #003333 solid;
+            padding: 10px;
+            color: #000000;
+            background-color: #FFFFFF;
+            text-align: left;
+            vertical-align: middle;
+            font-family: Arial, Verdana, sans-serif;
+            font-size:14px;
+            font-weight: normal;
+        }
+        /*
+        CR 963129 - changing Page layout for Survey Details page. changed background color
+        */
+        .tdHeaderFieldValue {
+            border-bottom: 0px #003333 dotted;
+            padding: 5px;
+            color: #000000;
+            background-color: #F2F2F2;
+            text-align: right;
+            vertical-align: right;
+            width: 180px;
+            height: 25px;
+            font-family: Arial, Verdana, sans-serif;
+            font-size:12px;
+            font-weight: normal;
+            
+        }
+
+        .tdTopHeader {
+            border-bottom: 1px #003333 solid;
+            padding: 7px;
+            color: #FE9A2E;
+            background-color: #FFFFFF;
+            text-align: left;
+            vertical-align: middle;
+            width: 180px;
+            height: 25px;
+            font-family: Arial, Verdana, sans-serif;
+            font-size:18px;
+            font-weight: bold;
+            
+        }
+        
+        .tdFieldBlueBold {
+            border-top: 1px #003333 solid;
+            padding: 10px;
+            color: #2B60DE;
+            background-color: #FFFFFF;
+            text-align: left;
+            vertical-align: middle;
+            height: 50px;
+            font-family: Arial, Verdana, sans-serif;
+            font-size:12px;
+            font-weight: bold;
+        }
+
+        
+        .tdFieldHyperlink {
+            border-bottom: 1px #003333 solid;
+            padding: 10px;
+            color: #2B60DE;
+            background-color: #FFFFFF;
+            text-align: left;
+            vertical-align: middle;
+            width: 180px;
+            height: 50px;
+            font-family: Arial, Verdana, sans-serif;
+            font-size:12px;
+            font-weight: bold;
+        }
+
+        .tdHeaderMiddle {
+            border-bottom: 1px #003333 solid;
+            padding: 1px;
+            color: #404040;
+            background-color: #CEE3F6;
+            text-align: left;
+            vertical-align: middle;
+            height: 25px;
+            width: 37px;
+            font-family: Arial, Verdana, sans-serif;
+            font-size:12px;
+            
+        }
+
+         .apexDataList{
+            list-style-type:none;
+         }
+</style>  

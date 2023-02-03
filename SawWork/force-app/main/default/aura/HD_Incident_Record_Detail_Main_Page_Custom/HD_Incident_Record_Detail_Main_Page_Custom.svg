@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" viewBox="0 0 565 153" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Full-width header above a main column and collapsible right sidebar.</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path id="d"
+            d="m52.919 23.328c1.0531 1.6487 7.4332 2.9429 7.4332 2.9429s1.6838 1.2352-4.5419 1.2352c-4.383-1.2e-6 -17.873-7e-7 -25.475-3e-7 -7.6019-4e-7 -21.092-9e-7 -25.475 3e-7 -6.2257 2.5e-6 -4.5419-1.2352-4.5419-1.2352s6.3801-1.2942 7.4332-2.9429c1.0531-1.6487 2.8854-23.259 2.8854-23.259h39.397s1.8324 21.61 2.8854 23.259z" />
+        <rect id="b" y=".48418" width="200" height="123.57" rx="3.8554" />
+        <path id="c"
+            d="m52.919 23.328c1.0531 1.6487 7.4332 2.9429 7.4332 2.9429s1.6838 1.2352-4.5419 1.2352c-4.383-1.2e-6 -17.873-7e-7 -25.475-3e-7 -7.6019-4e-7 -21.092-9e-7 -25.475 3e-7 -6.2257 2.5e-6 -4.5419-1.2352-4.5419-1.2352s6.3801-1.2942 7.4332-2.9429c1.0531-1.6487 2.8854-23.259 2.8854-23.259h39.397s1.8324 21.61 2.8854 23.259z" />
+        <rect id="a" y=".48418" width="200" height="123.57" rx="3.8554" />
+        <rect id="x" y=".48418" width="50" height="107" rx="3.8554" />
+    </defs>
+    <g fill="none" fill-rule="evenodd">
+        <g transform="translate(-1 -64)">
+            <g transform="translate(140 63)">
+                <g transform="translate(69.6 124.02)">
+                    <path
+                        d="m60.555 26.901v0.77015c0.064783 0.36534-0.49884 0.94111-4.749 0.94111-4.3826-1.2e-6 -17.872-7e-7 -25.473-3e-7 -7.6013-4e-7 -21.091-9e-7 -25.473 3e-7 -4.2501 1.7e-6 -4.8138-0.57576-4.7436-0.94111l-0.005392-0.77015 0.75324 0.33579h58.938l0.75324-0.33579z"
+                        opacity=".5" />
+                    <path
+                        d="m60.555 26.565v0.77015c0.064783 0.36534-0.49884 0.94111-4.749 0.94111-4.3826-1.3e-6 -17.872-8e-7 -25.473-4e-7 -7.6013-4e-7 -21.091-9e-7 -25.473 4e-7 -4.2501 1.6e-6 -4.8138-0.57576-4.7436-0.94111l-0.005392-0.77015 0.75324 0.33579h58.938l0.75324-0.33579z"
+                        fill="#C6C7CA" />
+                    <mask fill="white">
+                        <use xlink:href="#d" />
+                    </mask>
+                    <use fill="#D8D8D8" xlink:href="#d" />
+                </g>
+                <g transform="translate(0 .48418)">
+                    <mask id="f" fill="white">
+                        <use xlink:href="#b" />
+                    </mask>
+                    <use fill="#9B9B9B" fill-opacity=".30016" xlink:href="#b" />
+                    <use fill="#E1E1E1" xlink:href="#b" />
+                    <g fill="#fff" mask="url(#f)">
+                        <g transform="translate(6.747 9.1994)">
+                            <rect width="186.54" height="104.25" />
+                        </g>
+                    </g>
+                </g>
+                <g transform="translate(6.9156 9.3421)">
+                    <rect y="2" x="2" width="182" height="20" fill="#54698D" />
+                    <rect y="24" x="2" width="45" height="79" fill="#54698D" />
+                    <rect y="24" x="49" width="88" height="79" fill="#54698D" />
+                    <rect y="24" x="139" width="45" height="79" fill="#54698D" />
+                </g>
+            </g>
+        </g>
+        <g fill="none" fill-rule="evenodd">
+            <g transform="translate(-1 -64)">
+                <g transform="translate(350 110)">
+                    <g transform="translate(0 .48418)">
+                        <use fill="#9B9B9B" fill-opacity=".30016" xlink:href="#x" />
+                        <g fill="#fff" mask="url(#f)">
+                            <g transform="translate(6.747 9.1994)">
+                                <rect width="36" height="91" />
+                            </g>
+                        </g>
+                    </g>
+                    <g transform="translate(6.9156 9.3421)">
+                        <rect y="2" x="2" width="32" height="25" fill="#54698D" />
+                        <rect y="28" x="2" width="32" height="20" fill="#54698D" />
+                        <rect y="49" x="2" width="32" height="20" fill="#54698D" />
+                        <rect y="70" x="2" width="32" height="20" fill="#54698D" />
+                    </g>
+                </g>
+            </g>
+            </g>
+    </g>
+</svg>

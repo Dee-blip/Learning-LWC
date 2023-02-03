@@ -1,0 +1,34 @@
+<apex:page standardController="Account" extensions="GSSInactiveContractsCon" >
+<apex:outputPanel layout="block" style="overflow:auto;height:260px" >
+       
+<apex:pageBlock title="Inactive Contracts" >
+  <apex:pageBlockButtons location="bottom" rendered="{!cntract.size>0}">
+   <apex:outputPanel id="myButtons">
+     <apex:form >
+        <apex:outputLabel value="Showing Page #{!pageNumber} of {!TotalPages}" ></apex:outputLabel>&nbsp;&nbsp;&nbsp;&nbsp;
+        <apex:commandButton action="{!Beginning}" title="Beginning" value=" << " disabled="{!NOT(hasPrevious)}" />
+        <apex:commandButton action="{!Previous}" title="Previous" value=" <  " disabled="{!NOT(hasPrevious)}" />&nbsp;&nbsp;        
+        <apex:commandButton action="{!Next}" title="Next" value="  > " disabled="{!NOT(hasNext)}" />
+        <apex:commandButton action="{!Last}" title="End" value=" >> " disabled="{!NOT(hasNext)}" />         
+     </apex:form>
+   </apex:outputPanel>
+  </apex:pageBlockButtons>
+ 
+  <apex:outputLabel value="No records to display" rendered="{!cntract.size=0}" styleClass="noRowsHeader"></apex:outputLabel>
+
+  <apex:outputPanel id="myPanel">
+    <apex:pageBlockTable value="{!cntract}" var="c" rendered="{!cntract.size>0}">
+      <apex:column headerValue="Original Contract Id"><apex:outputLink value="/{!c.Id}"  target="_blank">{!c.Name}</apex:outputLink></apex:column>
+      <apex:column value="{!c.Contract_Type__c}" />
+      <apex:column value="{!c.Solution_Set__c}" />
+      <apex:column value="{!c.Revision_Effective_Start_Date__c}" />
+      <apex:column value="{!c.Effective_Start_Date__c}" />
+      <apex:column value="{!c.Effective_End_Date__c}" />
+      <apex:column value="{!c.Parent_Account_Name__c}" />
+      <apex:column value="{!c.Contract_Transferred_To__c }" />
+    </apex:pageBlockTable>
+  </apex:outputPanel>
+</apex:pageBlock>
+
+</apex:outputPanel>
+</apex:page>

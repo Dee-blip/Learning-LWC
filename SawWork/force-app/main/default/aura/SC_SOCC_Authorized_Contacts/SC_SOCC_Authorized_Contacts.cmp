@@ -1,0 +1,159 @@
+<!--
+Author          : Sumukh SS
+Description     : Authorized Contacts along with PassPhrase & Approval  
+
+Date                 Developer             JIRA #          Description  
+==============================================================================                                                     
+27 May 2019     	Sumukh SS		 ESESP-2198     SOCC Lightning Migration
+14 Jan 2020			Sumukh SS		 ESESP-2026		SOCC CAR 2 - RunBooks 
+24 Jan 2021         Tejaswini        ESESP-5066     Adjusting column width
+
+-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" controller="SC_SOCC_Case_LightningUtility" access="global">
+    
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}" />
+    
+    <aura:handler event="force:refreshView" action="{!c.doinit}"/>
+    <!--Refresh authorized contacts table-->
+    <aura:handler event="c:SC_Akatec_MyEscalations_Refresher" action="{!c.doinit}"/>
+    
+    <aura:attribute name="AuthorizedContacts" type="List"/>
+    <aura:attribute name="NumbAuthorizedContacts" type="string"/>
+    <aura:attribute name="IsCaseApproved" type="boolean" default="false"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>   
+    <aura:attribute name="AuthorizedContactDet" type="list"/>
+    
+    <aura:if isTrue="{!v.isOpen}">
+        
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open ">
+            <div class="slds-modal__container">
+                <!-- ###### MODAL BOX HEADER Start ######-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.CloseModal }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Choose the living summary template!</h2>
+                </header>
+                <!--###### MODAL BOX BODY Part Start######-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <c:SC_SOCC_LivingSummaryTemplateSelector recordId="{!v.recordId}" IsChildComponent="true"/>
+                    
+                </div>
+                <!--###### MODAL BOX FOOTER Part Start ######-->
+                <footer class="slds-modal__footer">
+                    
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>            
+    </aura:if>
+    
+    
+    
+    <div class="slds-box slds-theme_default">
+        
+        <b><u>{!v.NumbAuthorizedContacts} AUTHORIZED CONTACTS</u></b> 
+        
+        <aura:if isTrue="{!v.IsCaseApproved }">
+            <button class="slds-button slds-button_success" id="savebtn" style="float: right;margin-right: 10px;" onclick="{!c.OpenLivingSummaryModal}">Authorize?</button>
+        </aura:if>
+        
+        <section aura:id="pop" class="slds-popover slds-popover_walkthrough  slds-hide" role="dialog" aria-labelledby="dialog-heading-id-1" aria-describedby="dialog-body-id-6" style="position: absolute;right: 5rem;">
+            <button class="slds-button slds-button_icon slds-button_icon-small slds-float_right slds-popover__close slds-button_icon-inverse" title="Close dialog" onclick="{!c.closePop}">
+                X
+                <span class="slds-assistive-text">Close dialog</span>
+            </button>
+            <aura:iteration items="{!v.AuthorizedContactDet}" var="det" >
+                <header class="slds-popover__header slds-p-vertical_medium">
+                    <h2 id="dialog-heading-id-1" class="slds-text-heading_medium">{!det.contactdetails.Name}</h2>
+                </header>
+                <div class="slds-popover__body" id="dialog-body-id-6">
+                    <p><b>Email: </b> {!det.contactdetails.Email}</p>
+                    <p><b>Phone: </b> {!det.contactdetails.Phone}</p>
+                    <p><b>Mobile: </b> {!det.contactdetails.MobilePhone}</p>                   
+                    <p><b>PassPhrase: </b> {!det.decryptedPassphrase}</p>
+                </div>
+                <footer class="slds-popover__footer">
+                </footer>
+            </aura:iteration>
+        </section>
+        <div>
+            
+        </div>
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered" style="width:100%" id="authorizedcontactstable">
+            <!--Table Header-->
+            <thead>
+                <tr class="slds-line-height_reset">                
+                    <th class="slds-text-title_caps" scope="col" style="width:200px;">
+                        <div class="slds-truncate" >Name</div>
+                    </th>
+                    <th class="slds-text-title_caps" scope="col" style="width:80px;">
+                        <div class="slds-truncate" >Details</div>
+                    </th>
+                    <th class="slds-text-title_caps" scope="col" style="width:130px;">
+                        <div class="slds-truncate" >Interests</div>
+                    </th>
+                    <th class="slds-text-title_caps" scope="col" style="width:110px;">
+                        <div class="slds-truncate" >Instruct</div>
+                    </th>
+                    <th class="slds-text-title_caps" scope="col" style="width:160px;">
+                        <div class="slds-truncate" >Notification?</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="slds-hint-parent">
+                    <aura:iteration items="{!v.AuthorizedContacts}" var="master" >
+                        <aura:iteration items="{!master.wrapperlist}" var="cont" >
+                            <tr class="slds-hint-parent">
+                                <td style="width:200px;">{!cont.EachAuthContRec.Contact_Name__r.Name}</td>
+                                <aura:if isTrue="{!cont.hasAccess}">
+                                    <td style="width:80px;"><a id="{!cont.EachAuthContRec.Contact_Name__c}"  onclick="{!c.openPop}">Click Here</a></td>
+                                    <aura:set attribute="else">
+                                        <td style="width:80px;">&#128584;</td>
+                                        
+                                    </aura:set>
+                                </aura:if>
+                                <td style="width:130px;">{!cont.EachAuthContRec.Product_Interests__c}</td>
+                                <td style="width:110px;"><aura:if isTrue="{!cont.EachAuthContRec.Instruct__c}"><lightning:icon iconName="utility:answer" size="x-small"/></aura:if></td>
+                                <td style="width:160px;">
+                                    <aura:if isTrue="{!cont.EachAuthContRec.Emergency_Email__c==true}">
+                                        <lightning:helptext
+                                                            content="Emergency Email"
+                                                            iconName="utility:email"
+                                                            />
+                                    </aura:if>
+                                    <aura:if isTrue="{!cont.EachAuthContRec.Emergency_Text__c==true}">
+                                        <lightning:helptext
+                                                            content="Emergency Text"
+                                                            iconName="utility:quick_text"
+                                                            />
+                                    </aura:if>
+                                    <aura:if isTrue="{!cont.EachAuthContRec.Emergency_Voice__c==true}">
+                                        
+                                        <lightning:helptext
+                                                            content="Emergency Call"
+                                                            iconName="utility:questions_and_answers"
+                                                            />
+                                    </aura:if>
+                                    
+                                    <aura:if isTrue="{!cont.EachAuthContRec.Maintenance_Email__c==true}">
+                                        
+                                        <lightning:helptext content="Send Maintenance Email"
+                                                            iconName="utility:report_issue"
+                                                            />
+                                    </aura:if>
+                                    
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </aura:iteration>
+                </tr>
+            </tbody>
+        </table>
+        
+    </div>
+</aura:component>

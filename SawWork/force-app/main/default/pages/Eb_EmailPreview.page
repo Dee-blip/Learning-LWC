@@ -1,0 +1,14 @@
+<!--
+CR 2812593 - Email preview in Mailer not working for HTML templates 
+Created On: 1 January 2016
+Created By: ssawhney
+Description: Page to display the preview for email templates 
+-->
+<apex:page controller="Eb_CntlEmailPreview" standardStylesheets="false" showHeader="false" action="{!FetchEmailBody}">
+	<apex:pageMessages />
+	<apex:outputText value="{!htmlBody}" rendered="{!IF(isTextEmail,false,true)}" escape="false"/>
+	<!--Using repeat for textBody as the line breaks are not displayed in outputText and using escape with textBody causes the template to hide html content if added by user to the template and results in incorrectly formatted emails to be sent to the customer-->
+	<apex:repeat value="{!textBody}" var="body" rendered="{!isTextEmail}">
+		<apex:outputText value="{!body}"/><br/>
+	</apex:repeat>
+</apex:page>

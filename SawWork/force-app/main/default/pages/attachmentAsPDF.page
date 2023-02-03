@@ -1,0 +1,16 @@
+<apex:page standardController="Order_Approval__c" renderAs="PDF">
+<html>
+<head>
+    <style>
+        input.btn {visibility:hidden;}
+        #chatter {visibility:hidden;}
+    </style>
+</head>
+<div id="chatter">
+    <chatter:feedwithFollowers entityId="{!Order_Approval__c.Id}"/>
+</div>
+    <apex:detail id="op" relatedList="false"  subject="{!Order_Approval__c.Id}">
+    </apex:detail>
+    <apex:outputText value="{!NOW()}"></apex:outputText>
+</html>
+</apex:page>

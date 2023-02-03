@@ -1,0 +1,15 @@
+<template>
+    <div class = "slds-align_absolute-center">
+      <template if:true ={arerecipientspresent}>
+       <template if:true={isselected}>
+        <lightning-input  name={mailername} type="checkbox" onchange={handleUncheck} checked> </lightning-input>
+       </template> 
+       <template if:false={isselected}>
+        <lightning-input name={mailername} type="checkbox" onchange={handlecheck}> </lightning-input>
+        </template> 
+    </template>
+         
+          
+            
+    </div> 
+</template>

@@ -1,0 +1,69 @@
+<template>
+    <div data-id="searchbarDIV" class="slds-form-element" >    
+        <div class="slds-form-element__control">
+            <input type="text" placeholder="Search..." data-id="inputsearchbar" class="search slds-input" onkeyup={handleChange} list="autocomplete" if:false={showMargin}/>
+            <input type="text" placeholder="Search..." data-id="inputsearchbar" class="search slds-input searchBarBottomMargin" onkeyup={handleChange} list="autocomplete" if:true={showMargin}/>
+            <button class="btnSrc" onclick={handleClickSearch}>Search</button>
+            <div id="autocomplete" if:true={showAutocompleteDIV} class="slds-dropdown slds-dropdown_fluid autocompletecss">
+                <div class="autocompleteDIV slds-is-relative" if:true={loading_auto_complete} style="height:3rem;">
+                    <div class="slds-spinner_container">
+                        <div role="status" class="slds-spinner slds-spinner_x-small slds-spinner_brand">
+                            <span class="slds-assistive-text">Loading</span>
+                            <div class="slds-spinner__dot-a"></div>
+                            <div class="slds-spinner__dot-b"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="autocompleteDIV" if:false={loading_auto_complete}>
+                    <ul class="slds-has-dividers_bottom-space">
+                        <template for:each={auto_Complete} for:item="item">
+                            <li class="slds-item auto_complete_li" key={item.Id} data-value={item.title} data-url={item.documenturl} onclick={updateinputsearch}>
+                                <span class="custom_title_a_tag">{item.title}</span>
+                                <div class="custom_metadata_tags">
+                                    <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_name" title="Akamai Source" if:true={item.Akamai_Source}>Source: </span>
+                                    <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_value" title="Akamai Source" if:true={item.Akamai_Source}>{item.Akamai_Source}</span>
+
+                                    <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_name" title="Content Type" if:true={item.Content_Type}><span style="padding: 0 5px;">•</span>Content Type: </span>
+                                    <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_value" title="Content Type" if:true={item.Content_Type}>{item.Content_Type}</span>
+
+                                    <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_name" title="Last Updated" if:true={item.modified}><span style="padding: 0 5px;">•</span>Last Updated: </span>
+                                    <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_value" title="Last Updated" if:true={item.modified}>{item.modified}</span>
+
+                                    <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_value" title="Article Number" if:true={item.articleNumber}>
+                                        <span style="padding: 0 5px;">•</span>{item.articleNumber}
+                                    </span>
+
+                                    <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_value" title="Comment Count" if:true={item.commentCount} >
+                                        <span style="padding: 0 5px;">•</span>
+                                        <lightning-icon icon-name="utility:comments" alternative-text="comments" variant="border-filled" size="xx-small" slot="media" style="background: white;"></lightning-icon>&nbsp;{item.commentCount}
+                                    </span>
+
+                                    <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_value" title="Like Count" if:true={item.likeCount}>
+                                        <span style="padding: 0 5px;">•</span>
+                                        <lightning-icon icon-name="utility:like" alternative-text="like" variant="border-filled" size="xx-small" slot="media" style="background: white;"></lightning-icon>&nbsp;{item.likeCount}
+                                    </span>
+
+                                    <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_value" title="Views" if:true={item.viewCount}>
+                                        <span style="padding: 0 5px;">•</span>
+                                        <lightning-icon icon-name="utility:preview" alternative-text="like" variant="border-filled" size="xx-small" slot="media" style="background: white;"></lightning-icon>&nbsp;{item.viewCount}
+                                    </span>
+
+                                    <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_value" title="IsHavingBestAnswer?" if:true={item.hasBestAnswer}>
+                                        <span style="padding: 0 5px;">•</span>
+                                        <lightning-icon icon-name="utility:answer" alternative-text="answered" variant="border-filled" size="xx-small" class="answered_css"></lightning-icon>&nbsp;<span style="font-size: 10px; color: #2E844A; font-weight: bold;">Answered</span>
+                                    </span>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+                <div class="autocomplete-footer" if:true={isCCProfile}>
+                    <span>Don’t see it?   </span><a onclick={redirectToLogin} style="color: #006DCC;">Sign in to ask the community</a>
+                </div>
+                <div class="autocomplete-footer" if:false={isCCProfile}>
+                    <span>Don’t see it?   </span><a onclick={redirectToMyFeed} style="color: #006DCC;">Ask community</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

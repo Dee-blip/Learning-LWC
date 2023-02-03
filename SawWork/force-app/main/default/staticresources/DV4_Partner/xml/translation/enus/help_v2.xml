@@ -1,0 +1,39 @@
+<help>
+		<!-- Timeout message -->
+		<message id="timeout"><![CDATA[Your request has timed out. Please enter the url again.]]></message>
+		<!-- tooltip messages -->
+		<message id="search_panel_help"><![CDATA[Run an instant global performance check of your site! Simply enter the web address below and put it to test. You will see a comparison between the actual performance of your site versus an estimated performance with Akamai's dynamic site and application acceleration capabilities.        
+This version of DV4 provides additional cities and regional views tailored to your target market.]]>
+        </message>
+		<message id="weeklong_graph_help"><![CDATA[Provides a benchmark for expected performance improvement over one week from a given city to the region in which the Origin is based.]]></message>
+		<message id="average_global_performance_help"><![CDATA[Compares estimated performance over Akamai with actual performance direct to Origin. Breaks down total page download time in to connection time, first byte time and download time.]]></message>
+		<message id="performance_by_city_help"><![CDATA[Compares estimated performance between Akamai and Origin, per city.]]></message>
+		<message id="performance_by_region_help"><![CDATA[Compares estimated average performance between Akamai and Origin, per continent.]]></message>
+		<message id="m4"><![CDATA[Dots on the map indicate the locations of Akamai testing agents. Click on these dots to simulate end user connection times from those locations.]]></message>
+		<message id="email_result"><![CDATA[Email the results.]]></message>
+		<message id="print_result"><![CDATA[Print the results.]]></message>
+		<message id="weeklong_performance_benchmark"><![CDATA[Provides a benchmark for expected performance improvement over one week from a given city to the region in which the Origin is based.]]></message>
+		<message id="save_pdf"><![CDATA[Save as PDF]]></message>
+		<!-- Loading messages -->
+		<message id="measure_default_peformance">
+			<![CDATA[Measuring the site's default performance]]>
+		</message>
+		<message id="weeklong_report_request">
+			<![CDATA[Submitting Weeklong Report Request]]>
+		</message>
+		<message id="previous_weeklong_list_loading">
+			<![CDATA[Previous Weeklong Report list loading]]>
+		</message>
+		<message id="weeklong_report_loading">
+			<![CDATA[Weeklong Report loading]]>
+		</message>
+		<message id="additional_site_revenue_per_month">
+			<![CDATA[Based on performance-driven site abandonment rates as captured in Forrester 2009 eCommerce]]>
+		</message>
+		<message id="calculate_improvement">
+			<![CDATA[Calculating performance improvement metrics]]>
+		</message>
+		<message id="present_improvement">
+			<![CDATA[Presenting performance improvement]]>
+		</message>
+	</help>

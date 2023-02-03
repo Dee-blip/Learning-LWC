@@ -1,0 +1,24 @@
+header.flexipageHeader.slds-page-header.uiBlock.oneAnchorHeader { display: none; }
+
+/* body, html {
+    background-color: whitesmoke;
+}  */
+
+.slds-input {
+    border-radius: 0;
+}
+
+.slds-brand-band:before{ /*.slds-brand-band:after {*/
+    background-image: unset;
+}
+
+
+header.slds-global-header_container > div.oneSystemMessage > div.slds-notify.slds-notify_alert.system-message {
+    display: none;
+}
+
+.gssprods .slds-dropdown_length-with-icon-10 {
+  -webkit-overflow-scrolling: touch;
+  max-height: calc((1.5rem + 1rem) * 5);
+  overflow-y: auto;
+}

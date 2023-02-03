@@ -1,0 +1,65 @@
+<apex:page controller="HD_Custom_User_Lookup_controller" showHeader="false">
+<apex:form >
+<apex:outputPanel id="page" layout="block" style="margin:5px;padding:10px;padding-top:2px;">
+<apex:actionRegion >  
+                  <apex:outputPanel id="top" layout="block" style="margin:5px;padding:10px;padding-top:2px;">
+                    <apex:outputLabel value="Search" style="font-weight:Bold;padding-right:10px;" for="txtSearch"/>
+                    <apex:inputText id="txtSearch" value="{!searchString}" />
+                      <span style="padding-left:5px"><apex:commandButton id="btnGo" value="Go" action="{!Search}" rerender="searchResults"></apex:commandButton></span>
+                  </apex:outputPanel>
+       
+                <apex:outputPanel id="pnlSearchResults" style="margin:10px;height:350px;overflow-Y:auto;" layout="block">
+                    <apex:pageBlock id="searchResults"> 
+                      <apex:pageBlockTable value="{!results}" var="a" id="tblResults">
+                      
+                        <apex:column width="45">
+                          <apex:facet name="header">
+                            <apex:outputPanel >Photo</apex:outputPanel>
+                          </apex:facet>
+                           <apex:outputLink value="javascript:lookupPick2('{!FormTag}','{!TextBox}_lkid','{!TextBox}','{!a.Id}','{!a.Name}', false)" rendered="{!NOT(ISNULL(a.Id))}"><img src="https://contacts.akamai.com/photos/{!LOWER(a.alias)}.jpg" height="40"></img></apex:outputLink>     
+                        </apex:column>
+                        
+                         <apex:column >
+                          <apex:facet name="header">
+                            <apex:outputPanel >Name</apex:outputPanel>
+                          </apex:facet>
+                           <apex:outputLink value="javascript:lookupPick2('{!FormTag}','{!TextBox}_lkid','{!TextBox}','{!a.Id}','{!a.Name}', false)" rendered="{!NOT(ISNULL(a.Id))}">{!a.Name}</apex:outputLink>     
+                        </apex:column>
+                        
+                        <apex:column >
+                          <apex:facet name="header">
+                            <apex:outputPanel >Email</apex:outputPanel>
+                          </apex:facet>
+                           <apex:outputLink value="javascript:top.window.opener.lookupPick2('{!FormTag}','{!TextBox}_lkid','{!TextBox}','{!a.Id}','{!a.Name}', false)" rendered="{!NOT(ISNULL(a.Id))}">{!a.email}</apex:outputLink>     
+                        </apex:column>
+                        
+                        <apex:column >
+                          <apex:facet name="header">
+                            <apex:outputPanel >Username</apex:outputPanel>
+                          </apex:facet>
+                           <apex:outputLink value="javascript:top.window.opener.lookupPick2('{!FormTag}','{!TextBox}_lkid','{!TextBox}','{!a.Id}','{!a.Name}', false)" rendered="{!NOT(ISNULL(a.Id))}">{!a.email}</apex:outputLink>     
+                        </apex:column>
+                      </apex:pageBlockTable>
+                   <apex:outputText rendered="{!IF(results.size = 0,true,false )}">&nbsp;&nbsp;<b>No Data to display</b></apex:outputText>
+                    </apex:pageBlock>
+                </apex:outputPanel>
+            </apex:actionRegion>
+            </apex:outputPanel>
+</apex:form>
+<!--- JAVASCRIPT --->
+<script type='text/javascript'>
+function lookupPick2(FormTag,textbox_lkid,textboxid,userid,username,booleanvlaue)
+{
+//alert('popup called '+top.window.opener.document.getElementById("srmdetail:Srmdetailform:srmdetailpageblock:srmdetailpageblock2:clientidsectionitem:userIdVal"));
+if(top.window.opener != null && !top.window.opener.closed)
+{
+var txtName = top.window.opener.document.getElementById("srmdetail:Srmdetailform:srmdetailpageblock:srmdetailpageblock2:clientidsectionitem:userIdVal");
+    txtName.value = username;
+var txtName_id = top.window.opener.document.getElementById("srmdetail:Srmdetailform:srmdetailpageblock:srmdetailpageblock2:clientidsectionitem:userIdVal_lkid");
+    txtName_id.value = userid;
+
+}//(top.window.opener != null && !top.window.opener.closed) {
+window.close();
+}//
+</script>
+</apex:page>

@@ -1,0 +1,11 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:actionOverride,lightning:isUrlAddressable" access="global" controller="SC_SI_PageLayoutButton_Controllor" >
+    
+    <aura:attribute name="showModal" type="Boolean" default='true' />
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="fromSideSection" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <!--<c:sc_SI_Impacted_Products fromSideSection="false" recordId="{!v.recordId}" onrefreshAction="{!c.handleRefresh}"/> -->
+    <c:sc_SI_ImpactedProducts_v2 recordId="{!v.recordId}" fromSideSection = "false" onrefreshAction="{!c.handleRefresh}"/> 
+
+</aura:component>

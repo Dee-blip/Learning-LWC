@@ -1,0 +1,130 @@
+<aura:component controller="HD_IncidentHeaderController"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId"
+                access="global">
+
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="values" type="List" />
+    <aura:attribute name="type" type="String" />
+    <aura:attribute name="number" type="String" />
+    <aura:attribute name="incidentNumber" type="String"/>
+    <aura:attribute name="status" type="String"/>
+    <aura:attribute name="parentId" type="Id"/>
+    <aura:attribute name="parentName" type="String"/>
+
+
+    <aura:handler name="init" action="{!c.fireMe}" value="{!this}" />
+    <aura:dependency resource="markup://force:editRecord"
+                     type="EVENT" />
+    <aura:handler event="force:refreshView" action="{!c.fireMe}" />
+    <aura:handler event="c:HD_EmailReceivedEvent" action="{!c.fireMe}"/>
+    <div >
+        <!--<button class="slds-button" onclick="{!c.fireMe}">Button</button> -->
+        <!--c:HD_Hide_Header /--> <!-- @hemant updated for dev to work on it Aug 6th 2020 -->
+
+        <c:HD_PageAudit incident="{!v.recordId}"  pageName="Incident/Service Detail Page"/>
+        <div class="slds-page-header slds-page-header--object-home custom-header" onmouseout = "{!c.handleMouseOut}">
+            <div class="slds-grid">
+                <div class="slds-col slds-has-flexi-truncate">
+                    <div class="slds-media slds-no-space slds-grow">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container">
+                                <lightning:icon iconName="standard:lead" size="large" alternativeText="lead"/>
+                            </span>
+                        </div>
+                        <div class="slds-media__body" >
+                            <p class="slds-text-title--caps slds-line-height--reset">{!v.type}</p>
+                            <h1 class="slds-page-header__title slds-p-right--x-small">
+                                    <span class="slds-grid slds-has-flexi-truncate slds-grid--vertical-align-center" >
+                                        <input readonly= "true" style = " width : 11%; background-color: rgb(243, 242, 242);border: none;" id = "incNo" class="slds-truncate" onmouseover = "{!c.handleHover}"  value = "{!v.incidentNumber}" />
+                                        <div aura:id = "copyIcon"  class = "slds-hide" onclick = "{!c.copyToClipboard}" onmouseover = "{!c.handleHover}" >
+                                          <lightning:icon iconName="utility:copy" size="x-small" alternativeText="copy to clipboard" />
+                                        </div>
+                                    </span>
+                            </h1>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="slds-align-top slds-p-bottom--xx-small sla-top-margin" style="float:slds-p-right_xx-small">
+                    <c:HD_SLA_GAUGE_Component isEmbedded="true" recordId="{!v.recordId}"/>
+                </div>
+            </div>
+            <div class="slds-grid">
+                <aura:if isTrue="{!v.status == 'CUSTOMER RESPONDED'}">
+                    <c:HD_StatusNotification recordId="{!v.recordId}" />
+        </aura:if>
+                <!-- code for incident type! -->
+
+
+                <br />
+                <!--End of code for incident type! -->
+                <div class="slds-col ">
+                    <div class="slds-align-bottom">
+                        <ul class="slds-text-body--small">
+                            <aura:iteration items="{!v.values}" var="item"
+                                            indexVar="key">
+                                <!-- -->
+                                <li class=" slds-p-right_xx-small tooltip ">
+
+                                  <span class="{!item.value}"  >
+
+                                    <aura:if isTrue="{!and(item.count !=0 , item.count != null)}">
+                                        ({!item.count })
+                                    </aura:if>
+                                    <aura:if isTrue="{! item.key == 'File Attached'}">
+                                        
+                                        
+                                        <a class="custom-link" onclick="{!c.gotoURL}">{!item.key}</a>
+                                        <aura:set attribute="else">
+											{!item.key}
+   	 									</aura:set>
+									</aura:if>
+                                      
+
+                                </span>
+
+
+                                    <!--<div >{!item.label}</div>-->
+                                    <div class="tooltiptext" style="z-index:8000;">
+                                        <div class=" slds-popover slds-popover_tooltip slds-nubbin_top-left" role="tooltip" id="help" style="position:absolute;top:1em;left:-0.5em; ">
+                                            <div class="slds-popover__body">{!item.label}</div>
+                                            <!--Show if metabean is category -->
+                                            <aura:if isTrue="{!item.label == 'Category'}">
+                                                <div class="slds-popover__body">Category Tree: <b>{!item.tree}</b> </div>
+                                            </aura:if>
+                                             <aura:if isTrue="{!item.label == 'Child Ticket'}">
+                                                <!--div class="slds-popover__body"> Ticket is child of <a class = "custom-anchor" data-id="{!v.recordId}"  target="_blank" href="{!'/lightning/r/BMCServiceDesk__Incident__c/'+ v.parentId+ '/view'}" onclick = "">{!v.parentName}</a> </!div-->
+                                                <div class="slds-popover__body"> Ticket is child of <a class = "custom-anchor" data-id="{!v.recordId}" target="_blank" href="javascript:void(0)" onclick = "{!c.gotoParent}">{!v.parentName}</a> </div>
+                                            </aura:if>
+                                            
+                                            <aura:if isTrue="{!item.key == 'CC Users'}">
+                                                <div class="slds-popover__body ">
+
+                                                    <aura:iteration items="{!item.cclist}" var='x'>
+                                                        <p>• {!x}</p>
+                                                    </aura:iteration>
+
+                                                </div>
+                                            </aura:if>
+                                        </div>
+                                    </div>
+                                </li>
+                            </aura:iteration>
+                        </ul>
+
+                    </div>
+
+
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+</aura:component>

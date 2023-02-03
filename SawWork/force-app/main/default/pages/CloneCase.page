@@ -1,0 +1,505 @@
+<apex:page extensions="CloneCaseExtension" standardcontroller="Case" sidebar="false">
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" value="{!URLFOR($Resource.autocompletejs)}"></script>
+    <!--  <apex:stylesheet value="{!$Resource.autocompletecss}"/>-->
+    <apex:sectionHeader subtitle="Clone Case"/>
+    
+    <!-- Include js file for sevice cloud -->
+    <apex:includeScript value="/support/console/25.0/integration.js"/>
+    
+    <script type="text/javascript">
+        var tabId;
+        
+        function openCaseInSubtab(recId)
+        {
+            if (sforce.console.isInConsole()) 
+            {
+                sforce.console.getEnclosingPrimaryTabId(openSubtab);
+            }
+            
+            var openSubtab = function openSubtab(result) {
+                replyViewUrl = '/'+recId;
+                //Now that we have the primary tab ID, we can open a new subtab in it
+                var primaryTabId = result.id;
+                sforce.console.openSubtab(primaryTabId ,replyViewUrl, true, 
+                                          'Community Reply', null, openSuccess, 'salesforceSubtab');
+            };
+        } 
+        
+        
+        var showTabId = function showTabId(result)
+        {
+            tabId = result.id;
+            sforce.console.openPrimaryTab(tabId, ['/{!Case.Id}'], true); 
+        };
+        
+        function populatePickList()
+    	{
+            SearchAccounts_AF();
+        }
+    
+        autoComplete = function(input,suggestions,lookupto,clearfunction,objectn)
+        {
+            //Global Variables
+            
+            var IS_IE = true;
+            var timer;
+            var bgColor = "#b0c4de";
+            var searchColor = "#FFFFCC";
+            var bgColorRGB = "rgb(176,196,222)";
+            var searchString = "Searching...";
+            var searchID = suggestions.id+"tmpsearch";
+            var clearFunction = clearfunction;
+            var noResultsID = suggestions.id+"N_R";
+            
+            //Attach Event Handlers
+            
+            if(input.attachEvent)
+            {
+                input.attachEvent("onkeyup", handleKeyUp);
+                input.attachEvent("onkeydown", handleArrows);
+                input.attachEvent("onblur",handleBlur);
+                input.attachEvent("onfocus",handleFocus);
+                suggestions.attachEvent("onmouseover",initializeMouseOver);
+            }
+            else
+            {
+                IS_IE = false;
+                bgColor= "#a3ceff";
+                bgColorRGB= "rgb(163, 206, 255)";
+                input.onkeyup=handleKeyUp;
+                input.onkeydown=handleArrows;
+                input.onblur=handleBlur; 
+                input.onfocus=handleFocus;
+                suggestions.onmouseover=initializeMouseOver;
+            }
+            
+            function hideAutoComplete()
+            {
+                suggestions.innerHTML = "";
+                suggestions.style.display = "none";    
+            }
+            
+            function getCursor()
+            {
+                if (suggestions.innerHTML.length == 0){
+                    return -1;
+                }
+                else
+                {    
+                    if(suggestions.childNodes[0].id == searchID || suggestions.childNodes[0].id == noResultsID)
+                        return -1;
+                    
+                    for (var i = 0; i < suggestions.childNodes.length; i++)
+                    {
+                        if (suggestions.childNodes[i].style.backgroundColor == bgColor || suggestions.childNodes[i].style.backgroundColor == bgColorRGB)
+                        {
+                            return i;
+                        }
+                    }
+                    return suggestions.childNodes.length;
+                }
+            }
+            
+            function initializeMouseOver(event)
+            {
+                if(suggestions.childNodes.length > 0)
+                {
+                    if(suggestions.childNodes[0].id == searchID || suggestions.childNodes[0].id == noResultsID)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        if(IS_IE)
+                        {    
+                            for (var i = 0; i < suggestions.childNodes.length; i++)
+                            {
+                                suggestions.childNodes[i].attachEvent("onmouseover",handleMouseOver);
+                                suggestions.childNodes[i].attachEvent("onmouseout",handleMouseOut);
+                                suggestions.childNodes[i].attachEvent("onmousedown",handleMouseClick);    
+                            }
+                        }
+                        else
+                        {
+                            for (var i = 0; i < suggestions.childNodes.length; i++)
+                            {
+                                suggestions.childNodes[i].onmouseover = handleMouseOver;
+                                suggestions.childNodes[i].onmouseout = handleMouseOut;
+                                suggestions.childNodes[i].onmousedown = handleMouseClick;   
+                            }
+                            
+                        } 
+                    }
+                }
+            }
+            
+            
+            function handleMouseClick(event){
+                
+                if(IS_IE){
+                    
+                    if(event.srcElement.id)
+                        input.value = event.srcElement.id;
+                    else
+                        input.value = event.srcElement.innerText;   
+                }else{
+                    if(event.target.id)
+                        input.value =  event.target.id;     
+                    else
+                        input.value =  event.target.textContent;
+                    
+                }
+                
+            }
+            
+            function handleMouseOver(event){
+                
+                if(IS_IE){
+                    if(event.srcElement.style.backgroundColor != bgColor)
+                        event.srcElement.style.backgroundColor = searchColor;   
+                }else{
+                    if(event.target.style.backgroundColor != bgColorRGB)
+                        event.target.style.backgroundColor = searchColor;
+                }
+            }
+            
+            function handleMouseOut(event){
+                
+                if(IS_IE){
+                    if(event.srcElement.style.backgroundColor != bgColor)
+                        event.srcElement.style.backgroundColor = "";    
+                }else{
+                    if(event.target.style.backgroundColor != bgColorRGB)  
+                        event.target.style.backgroundColor = "";
+                }
+            }
+            
+            function handleKeyUp(event){
+                
+                jQuery('.autoCompleteBoxScrolling').hide();
+                //if key is not an arrow or enter
+                if (event.keyCode != 40 && event.keyCode != 38 && event.keyCode != 13 && event.keyCode != 37 && event.keyCode != 39 && event.keyCode != 27)
+                {
+                    
+                    if(timer!=null){clearTimeout(timer);timer=null;}
+                    
+                    if (input.value.length == 0){
+                        hideAutoComplete();
+                    }else{     
+                        timer = setTimeout(function(){window[lookupto](input.value,objectn);displayStatus();},350);
+                    }
+                }
+                
+            }
+            
+            function displayStatus(){
+                jQuery('.autoCompleteBoxScrolling').hide();
+                suggestions.innerHTML='';
+                suggestions.style.display='';
+                var myElement = document.createElement('div');
+                myElement.id = searchID;
+                myElement.style.backgroundColor=searchColor;
+                var textNode = document.createTextNode(searchString);
+                myElement.appendChild(textNode);
+                suggestions.appendChild(myElement);
+            }
+            
+            function handleArrows(event){
+                jQuery('.autoCompleteBoxScrolling').hide();
+                if (input.value.length == 0 || event.keyCode == 27){
+                    //make sure autocomplete has no values
+                    hideAutoComplete();
+                    return;
+                    
+                }
+                
+                try{
+                    
+                    var cursor = getCursor();
+                    
+                    if (event.keyCode == 13 || event.keyCode == 9){
+                        
+                        
+                        if (cursor != -1 && cursor < suggestions.childNodes.length)
+                        {
+                            
+                            if (IS_IE){
+                                if(suggestions.childNodes[cursor].id)
+                                    input.value = suggestions.childNodes[cursor].id;
+                                else
+                                    input.value = suggestions.childNodes[cursor].innerText;
+                            }else{
+                                if(suggestions.childNodes[cursor].id)
+                                    input.value = suggestions.childNodes[cursor].id;
+                                else
+                                    input.value = suggestions.childNodes[cursor].textContent;
+                            }
+                            hideAutoComplete();
+                        }
+                        
+                    }else if(event.keyCode == 40 || event.keyCode == 38)
+                    {
+                        if (cursor != -1)
+                        {    
+                            if (event.keyCode == 40)
+                            {
+                                if (cursor == suggestions.childNodes.length){
+                                    suggestions.childNodes[0].style.backgroundColor = bgColor;
+                                }else if (cursor < suggestions.childNodes.length - 1){
+                                    suggestions.childNodes[cursor].style.backgroundColor = "";
+                                    suggestions.childNodes[cursor + 1].style.backgroundColor = bgColor;
+                                }
+                            }
+                            else{
+                                if (cursor > 0){
+                                    suggestions.childNodes[cursor].style.backgroundColor = "";
+                                    suggestions.childNodes[cursor - 1].style.backgroundColor = bgColor;
+                                    
+                                }else{
+                                    hideAutoComplete();
+                                }
+                            }
+                        }
+                    }
+                    
+                }catch(e){}
+                
+            }
+            
+            
+            function handleBlur()
+            {   
+                hideAutoComplete();
+                if(timer!=null){window[clearFunction]();clearTimeout(timer);timer=null;}else{window[clearFunction]();}
+                
+            }
+            
+            function handleFocus(){
+                
+                hideAutoComplete();
+                
+            }
+        }
+        
+        function openPopup() 
+        {    
+            window.open('/apex/CustomLookUpForCloneCasePage?lksrch='+jQuery('.LookUpField').val(),'_blank',width=200,height=200);
+            return false;
+        }
+    
+        function pickLookUpValue(selAcc,selAccName)
+        {
+            pickAF(selAcc,selAccName);
+        }
+    </script>
+    
+    <style>
+        .suggestions
+        {
+        position:relative;
+        top: 1px;
+        _top: 0px;
+        z-index:2800 !important;
+        }
+        
+        .autocomplete
+        {
+        
+        background: #FFFFFF !important;
+        border: solid 2px #8B9CD3 !important;
+        width: 300px !important;
+        font-family: 'Arial','Helvetica',sans-serif !important;
+        font-size: 91% !important;
+        z-index:2900 !important;
+        display:block;
+        }
+        
+        .autocomplete DIV
+        {
+        padding: 2px 4px 2px 10px !important;
+        z-index:3000 !important;
+        display:block;
+        cursor:default; 
+        }
+        .cField{
+        width:200px;
+        }
+    </style>
+    
+    <apex:form id="frm">
+        <apex:actionFunction name="SearchAccounts_AF" action="{!SearchAccounts}" 
+                             status="stat" rerender="resultPanel"/>
+        
+        <apex:actionFunction name="pickAF" action="{!CopyToSelectedAccounts1}" rerender="resultPanel">
+            <apex:param name="selAccount" value="" assignTo="{!tempCon.AccountId}"/>
+            <apex:param name="selAccountName" value="" assignTo="{!accountName}"/>
+        </apex:actionFunction>
+        
+        <apex:pageMessages id="msg"/>
+        
+        <apex:pageBlock id="pBlk" title="Search Accounts" rendered="{!showSearchPanel}">
+            <apex:outputPanel >
+                
+                <apex:outputLabel >
+                    Enter the Account Name you want to search. 
+                </apex:outputLabel>
+                <br/>
+                <table align="center">
+                    <tr>
+                        <td>
+                            <apex:outputLabel value="Account Name : "/>
+                        </td><td>
+                        <apex:inputText value="{!searchKey}" id="acc" styleClass="cField LookUpField">
+                            <!--        value="{!tempCon.AccountId}" id="acc" styleClass="cField">-->
+                            
+                            <!--          <c:autocomplete Width="200" ClassName="autocomplete" InputId="{!$Component.acc}" AutoCompleteId="accAC" ObjectName="Account" />-->
+                        </apex:inputText>
+                        <a href="#" onclick="return openPopup();">
+                            <img title=" Lookup (New Window)" onmouseover="this.className = 'lookupIconOn';this.className = 'lookupIconOn';" 
+                                 onmouseout="this.className = 'lookupIcon';this.className = 'lookupIcon';" onfocus="this.className = 'lookupIconOn';" 
+                                 onblur="this.className = 'lookupIcon';" class="lookupIcon" alt=" Lookup (New Window)" src="/s.gif"/>
+                        </a>
+                        
+                        <div id="suggestions">
+                            <div id="accAC" class="autocomplete" style="position:absolute;display:none;width:200px !important;"></div></div>
+                        
+                        
+                        </td>
+                        
+                        <!--
+                        <td>
+                            <apex:commandbutton value="+" action="{!CopyToSelectedAccounts}" rerender="frm" status="stat"/>
+                        </td>-->
+                        
+                        <td>
+                            <apex:actionstatus id="stat">
+                                <apex:facet name="start">
+                                    <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+                                </apex:facet>
+                            </apex:actionstatus>
+                        </td>
+                    </tr>
+                </table>
+            </apex:outputPanel>
+            <apex:actionstatus id="status">
+                <apex:facet name="start">
+                    <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                                                         height: 100%;opacity:0.65;width:100%;"> 
+                        <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                            <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+                            <span class="waitingDescription">Loading...</span>
+                        </div>
+                    </div>
+                </apex:facet>
+            </apex:actionstatus>
+            <br/>
+            <apex:outputPanel id="resultPanel">
+                <apex:outputPanel layout="block" >
+                    Select Account from the List below and click "Submit" to clone the case for the selected Accounts.
+                    <br/><br/>
+                    <div align="center">
+                        <c:MultiselectPicklist leftLabel="Search Results" leftOptions="{!searchResults}" 
+                                               rightLabel="Selected Accounts" rightOptions="{!selectedAccounts}" 
+                                               size="10" width="200px" id="comp" isEditable="true" />
+                    </div>
+                </apex:outputPanel>
+            </apex:outputPanel>
+            <apex:pageBlockButtons id="pButtons">
+                <apex:commandbutton value="Cancel" action="{!Cancel}" />
+                <apex:commandbutton value="Submit" action="{!CloneCaseForAccounts}" 
+                                    status="status"/>
+            </apex:pageBlockButtons>
+            
+            <!-- Testing  Code -->      
+            
+            <apex:actionFunction name="searchaccAC" action="{!searchSuggestions}" rerender="OP" immediate="true" >
+                <apex:param name="aname" value="" />
+                <apex:param name="objectname" value="" />
+            </apex:actionFunction>
+            
+            <apex:actionFunction name="clearaccAC" action="{!clearValues}" rerender="OP" immediate="true"/>
+            
+            <script>
+            
+            new AutoComplete(document.getElementById('{!$Component.acc}'),document.getElementById('accAC'),'searchaccAC','clearaccAC','Account');</script>                                                                     
+            
+            <apex:outputPanel id="OP" layout="block">
+                
+                <script>
+                var container = document.getElementById('accAC');
+                container.innerHTML = '';
+                var myElement;
+                var textNode;
+                var aIds;   
+                jQuery('.autoCompleteBoxScrolling').hide();
+                </script>  
+                
+                <apex:actionStatus ><apex:facet name="stop">     
+                    <apex:repeat value="{!resultsname}" var="a" rendered="{!hasparams}">
+                        <script>
+                        myElement = document.createElement('div');
+                        
+                        if({!hasnoresults}){
+                            myElement.id = 'accACN_R';
+                            myElement.style.background = "#CCCCFF";
+                            textNode = document.createTextNode('{!a}');                   
+                        }else{          
+                            textNode = document.createTextNode('{!a}');
+                        }
+                        myElement.appendChild(textNode);
+                        container.appendChild(myElement);       
+                        </script>
+                    </apex:repeat>    
+                    </apex:facet></apex:actionStatus>
+                
+                <script>
+                if(document.getElementById('{!$Component.acc}').type == 'hidden'){
+                    var cont=document.getElementById('accAC');cont.innerHTML='';cont.style.display='none';
+                }
+                </script>     
+                
+            </apex:outputPanel> 
+            
+            <!-- Ends here -->
+            
+        </apex:pageBlock>
+        
+        <apex:pageBlock rendered="{!caseCreated}"> 
+            <apex:outputPanel style="text-align: center;">
+                <apex:outputLabel >
+                    Case {!caseObj.AKAM_Case_ID__c} has been cloned for the selected Accounts successfully.
+                    <br/><br/>
+                    
+                    <a onClick="openCaseInSubtab({!newCaseId})" style="cursor: pointer; text-decoration: underline; color:#3597dc;">Click here</a> to go back to the Case detail page.
+                    
+                </apex:outputLabel>
+            </apex:outputPanel>
+        </apex:pageBlock>
+        
+    </apex:form>
+    <script>
+    
+    function disableautocomplete() {
+        var forms = document.getElementsByTagName('form');
+        
+        for (var i = 0; i < forms.length; ++i) {
+            if (forms[i].setAttribute) {
+                forms[i].setAttribute('autocomplete', 'off')
+            } else {
+                forms[i].autocomplete = 'off'
+            }
+        }
+    }
+    
+    if (window.addEventListener) {
+        window.addEventListener('load', disableautocomplete, true)
+    } else if (window.attachEvent) {
+        window.attachEvent('onload', disableautocomplete)
+    } else {
+        window.onload = disableautocomplete
+    }
+    
+    </script>
+</apex:page>

@@ -1,0 +1,36 @@
+.THIS .slds-accordion__list-item {
+    border-top: 1px solid rgb(221, 219, 218);
+}
+
+.THIS .slds-accordion__summary
+{
+    background-color: #274b82; 
+    color:white;    
+    padding-top: 8px;
+    padding-bottom:8px;
+}
+
+.THIS .slds-button:hover, .THIS .slds-button:focus
+{
+    color:white;
+}
+.THIS .slds-icon-text-default
+{
+    fill:white;
+}
+.THIS .c-button:hover{
+    color: unset !important;
+}
+.THIS .summary-editor-modal-container{
+    max-width: 70rem;
+    width: 58%;
+}
+.THIS .summary-editor-modal .slds-rich-text-area__content{
+    min-height: 19rem !important;
+}
+.THIS .c-accordion-section .slds-accordion__summary-heading{
+    color: white;
+}
+.THIS .c-accordion-section:hover .slds-accordion__summary-heading:hover{
+    color: #d2d2d2;
+}

@@ -1,0 +1,17 @@
+<apex:page showHeader="false" sidebar="false">
+    <apex:includeLightning />    
+    <div id="LightningComponentid" />   
+    <script>
+        $Lightning.use("c:HDRedirectApp", function() {
+            $Lightning.createComponent("c:hd_Remedyforce_Redirect",
+            { 
+                message   : 'Simple Message From VF Page', 
+                recordId : '{!$CurrentPage.parameters.id}'
+            },
+            "LightningComponentid",
+            function(cmp) {
+                console.log('Calling the LWC Component');
+            });
+        });
+    </script>
+</apex:page>

@@ -1,0 +1,147 @@
+<!--
+CR 2985554 - Need to prevent case worker collision with activities on SOC cases
+Created On: 24 September 2015
+Created By: ssawhney
+Description: The page will list out all tasks created for a particular case in the service cloud console
+Modification History:                                                                      
+ 
+Date           Developer   CR           Description                                                       
+------------------------------------------------------------------------------------------------------------------
+18-Dec-2015    Sonia       CR 3204831   Added Custom Sort Logic for Tasks                                    
+-->
+<apex:page showheader="true" sidebar="false" standardController="Case" extensions="SC_displayCaseTasks" id="DisplayCaseTasksPage">
+    <apex:includeScript value="/support/console/32.0/integration.js"/> 
+    <apex:includeScript value="{!$Resource.JQuery_New}"/>
+    <style type="text/css">
+        .formClass {
+            margin:0;
+            padding:0;
+            width:100%;
+        }
+        .PanelHeader {
+            background-color:#e7edf4; 
+            color:#16325c; 
+            font-size:16px; 
+            height:30px; 
+            line-height:30px; 
+            padding:0; 
+            display:block; 
+            font-family: Helvetica;
+            width:100%;
+        }
+        .Panel {
+            line-height: 20px;
+            color:#777; 
+            background-color:#fff; 
+            display:block;
+            font-size:12.5px;  
+            font-family: Helvetica;
+            font-style:italic;
+            border-color: #d8ddd6;
+            width:100%;
+        }
+        .tableHeader {
+            background-color:#f2f3f3; 
+            color:#000; 
+            height:20px; 
+            line-height:20px; 
+            border: 1px solid #d8ddd6;
+            text-align: center;
+        }
+        .tableData {
+            color:#000; 
+            height:20px; 
+            line-height:20px; 
+            text-align: center;
+            border:1px dotted #d8ddd6; 
+        }
+        .Filters {
+            display:inline-block; 
+            margin:10px;
+            border:1px solid #d8ddd6;
+            text-align: center;
+            text-decoration: none !important;
+            border-radius: 2px;
+            width:80px;
+        }
+        .UnSelected {
+            background-color:#e7edf4; 
+            color:#333435;
+        }
+        .Selected {
+            color: white;   
+            background-color:grey;      
+        }
+        a.Filters:hover {
+            text-decoration: none !important;
+            color: white;   
+            background-color:grey;  
+        }
+    </style>
+    <apex:form styleClass="formClass"> 
+        <apex:actionFunction action="{!FilterTasks}" name="filterTaskData" rerender="TaskList"/> 
+        <div style="width:100%;">
+            <div class="PanelHeader">
+                <apex:outputText value="Task/Activities" style="padding-left:10px;"/>
+            </div>
+            <div class="Panel">
+                <div style="width:100%;" id="TaskFilters">
+                    <apex:outputText value="Filter: " style="padding-left:10px;"/>
+                    <apex:commandLink value="All" action="{!FilterTasks}" reRender="TaskList" styleClass="Filters Selected" oncomplete="setSelectedTab('{!filter}');">
+                        <apex:param value="All" assignTo="{!filter}"/>
+                    </apex:commandLink>
+                    <apex:commandLink value="In Progress" action="{!FilterTasks}" reRender="TaskList" styleClass="Filters UnSelected" oncomplete="setSelectedTab('{!filter}');" >
+                        <apex:param value="In Progress" assignTo="{!filter}"/>
+                    </apex:commandLink>
+                </div>
+                <apex:dataTable width="100%" columnsWidth="25%,50%,25%" value="{!lstFilteredList}" var="wrapper" id="TaskList" headerClass="tableHeader" columnClasses="tableData">
+                    <apex:facet name="footer">
+                        <apex:outputText value="No Task/Activities Found" rendered="{!lstFilteredList.size==0}" style="width:100%;"/>
+                    </apex:facet>
+                    <apex:column >
+                        <apex:facet name="header">Type</apex:facet>
+                        <apex:outputText value="{!wrapper.tsk.Type__c}"/>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">Assigned To</apex:facet>
+                        <apex:outputText value="{!wrapper.tsk.Owner.Name}"/>
+                    </apex:column>
+                    <apex:column style="{!if((wrapper.tsk.Status =='In Progress'),"background-color: #A80000; color: white;","")}">
+                        <apex:facet name="header">Status</apex:facet>
+                        <apex:outputText value="{!wrapper.tsk.Status}"/>
+                    </apex:column>
+                </apex:dataTable>
+            </div>
+        </div>
+    </apex:form>
+    <script type="text/javascript">
+            function setSelectedTab(selectedValue){
+                jQuery("#TaskFilters > a").each(function(){
+                    var currentValue = $(this).text();
+                    if (currentValue == selectedValue){
+                        $(this).removeClass("UnSelected");
+                        $(this).addClass("Selected");
+                    } else {
+                        $(this).removeClass("Selected");
+                        $(this).addClass("UnSelected");
+                    }
+                });
+            };
+            $(document).ready(function() {
+                /*raise event. There is Listener in custom console component.
+                page Name STREAMINGPUBLISHER is listening to this message. once we throw event ,
+                page will subsribe for streaming topic.
+                */
+                sforce.console.addEventListener('CaseTaskNotification', CaseTaskGlobalNotification);
+                sforce.console.addEventListener('GlobalRefreshStreamingNotify', globalRefreshTaskNotify);  
+             });
+
+            var CaseTaskGlobalNotification = function (result) {
+                filterTaskData();
+            };      
+
+            var globalRefreshTaskNotify = function(result){
+                filterTaskData();
+            };      
+    </script>
+</apex:page>

@@ -1,0 +1,117 @@
+<!--
+Author          : Sumukh SS
+Description     : SOCC Lightning Migration
+Date                 Developer             JIRA #          Description                                                       
+===================================================================================
+05 Aug 2019     	Sumukh SS		 ESESP-2507     SOCC Lightning Migration
+14 Jan 2020			Sumukh SS		 ESESP-2026		SOCC CAR 2 - RunBooks  
+
+-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                controller="SC_SOCC_Case_LightningUtility"  access="global"  >
+    
+    <!-- to check if any case product is available -->
+    <aura:attribute name="haveProducts" type="boolean" default="true"/>
+    <!-- to check if any policy domain is available -->
+    <aura:attribute name="havePD" type="boolean" default="true"/>
+    
+    <!-- for loading spinner -->
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    
+    <!-- for the Case Product picklist values -->
+    <aura:attribute name="options" type="List" />
+    <aura:attribute name="selectedValue" type="String" />
+    
+    <!-- for the Policy Domain picklist values -->
+    <aura:attribute name="optionsPD" type="List" />
+    <aura:attribute name="selectedValuePD" type="String" />
+    
+     <!-- For Situation Selector -->
+    <aura:attribute name="Situationoptions" type="List" />
+    <aura:attribute name="haveSituations" type="boolean" default="true"/>
+    <aura:attribute name="SituationselectedValue" type="String" />
+    
+    <!-- for storing values when called as a child component from a parent lightning component -->
+    <aura:attribute name="CaseRecID" type="String"/>
+    
+    <!-- init method -->
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    
+    
+    <!-- Spinner which gets invoked based on event -->
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.haveProducts}">
+        <div align="left" class="slds-box slds-theme_default">
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_3-of-4">
+                    <lightning:select name="caseProductId" label="Case Product:" aura:id="caseProductId" value="{!v.selectedValue}" onchange="{!c.refreshentireselection}">
+                        <aura:iteration items="{!v.options}" var="option">
+                            <option text="{!option.label}" value="{!option.id}" selected="{!option.selected}"/>
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+                 <div class="slds-col slds-size_1-of-4" style="margin-top: 1.5rem;">
+                            <lightning:button variant="Brand" label="Save"
+                                              title="Save"
+                                              onclick="{!c.saveCaseProductandpd}"/>
+                </div>
+            </div>
+        </div>
+        <aura:set attribute="else">
+            <div class="slds-box slds-theme_default slds-text-heading_small slds-text-align_center slds-text-color_error">No Case Products available!</div>
+        </aura:set>
+    </aura:if> 
+    <aura:if isTrue="{!v.havePD}">
+        
+        <div align="left" class="slds-box slds-theme_default">
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_3-of-4">
+                    <lightning:select name="PolicyDomainId" label="Policy Domain:"
+                                      aura:id="PolicyDomainId" value="{!v.selectedValuePD}" onchange="{!c.refreshSituationselection}" >
+                        <aura:iteration items="{!v.optionsPD}" var="option">
+                            <option text="{!option.label}"
+                                    value="{!option.id}"
+                                    selected="{!option.selected}"  />
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+                
+            </div>
+        </div>
+        <div align="left" class="slds-box slds-theme_default">
+            <div class="slds-grid slds-gutters">
+        <div class="slds-col slds-size_3-of-4">
+                            <aura:if isTrue="{!v.haveSituations}">
+                                <lightning:select name="SituationId" label="Situation:"
+                                                  aura:id="SituationId" value="{!v.SituationselectedValue}"  >
+                                    <aura:iteration items="{!v.Situationoptions}" var="Situationoption">
+                                        <option text="{!Situationoption.label}"
+                                                value="{!Situationoption.id}"
+                                                selected="{!Situationoption.selected}"  />
+                                    </aura:iteration>
+                                </lightning:select>
+                                <aura:set attribute="else">
+                                <div aura:id="SituationId" class="slds-text-heading_small slds-text-align_center slds-text-color_error"
+                                     >No Situation exists!</div><br/>
+                            </aura:set>
+                            </aura:if>
+                        </div>
+            </div>
+        </div>
+
+        <aura:set attribute="else">
+            <div class="slds-box slds-theme_default slds-text-heading_small slds-text-align_center slds-text-color_error">No Policy Domains available!</div>
+        </aura:set>
+        
+    </aura:if> 
+    
+</aura:component>

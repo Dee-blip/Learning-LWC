@@ -1,0 +1,115 @@
+<template>
+    <div style="min-width: 220px;">
+        <div class={formElCss}>
+            <template if:true={showLabel}>
+                <!-- <abbr if:true={required} title="required" class="slds-required">*</abbr> -->
+                <label class="slds-form-element__label" for="form-combo-box">{label}</label>
+            </template>
+            <!-- In edit mode, show input search box  -->
+            <div if:false={isReadMode} role="none">
+                <div class={searchInpCss}>
+                    <lightning-input type="search" variant="label-hidden" placeholder={placeholder} autocomplete="off" onkeyup={handleInpChange} onchange={handleInpChange}>
+                    </lightning-input>
+                </div>
+            </div>
+
+            <!-- In Read Mode, show the count of selected items. If only one item is selected, then show the selected item label -->
+            <template if:true={isReadMode}>
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <div class="slds-combobox_container slds-has-selection">
+                            <div role="combobox" class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+                                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right">
+                                    <lightning-icon if:true={iconName} icon-name={iconName} alternative-text="Icon" size="small" class="slds-combobox__input-entity-icon">
+                                    </lightning-icon>
+
+                                    <input type="text" class="slds-input slds-combobox__input slds-combobox__input-value" role="textbox" readonly disabled={disabled}
+                                        value={displayText} />
+
+                                    <!-- On clicking edit button (pencil icon), edit mode will be triggered -->
+                                    <button if:false={disabled} class="slds-button slds-button_icon slds-input__icon slds-input__icon_right" onclick={handleEdit}>
+                                        <lightning-icon icon-name="utility:edit" alternative-text="Remove selected option" size="x-small" variant="base"></lightning-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+        <!-- This section will appear only in edit mode -->
+        <div style="position: absolute;min-width: 400px; z-index:2;">
+            <div class={comboBoxCss} role="listbox" style="overflow-y: hidden;max-height: 25rem;position: relative; ">
+                <div class="slds-p-horizontal_medium slds-p-top_xx-small" style="display: flex;justify-content: space-between;">
+                    <div>
+                    </div>
+                    <lightning-input type="toggle" label={filteritemsLabel} checked={showOnlySelectedItems} onchange={handleFilterToggle} message-toggle-active="" message-toggle-inactive="">  <!--  message-toggle-active="Selected" message-toggle-inactive="All"  -->
+                    </lightning-input>
+                </div>
+
+                <!-- Options list -->
+                <ul class="slds-listbox slds-listbox_vertical" role="presentation" style="overflow-y: auto; max-height: 280px;" >
+                    <template if:true={noresults}>
+                        <div style="min-height: 100px;"> 
+                            <div class="slds-text-font_monospace error-msg">
+                                <lightning-icon icon-name="utility:info_alt" size="small" class="slds-p-right_small" variant="inverse">
+                                </lightning-icon>
+                                {noResultsMsg}
+                            </div>
+                        </div>
+                    </template>
+                    <template for:each={processedListData} for:item="datum">
+                        <li key={datum.key} role="presentation" class={datum.cssClass}>
+                            <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta slds-p-around_none" role="option">
+                                <div style="display:flex; flex: 1; width: 100%;">
+                                    <div style="width: 100%; flex: 1; padding-top: 2px; padding-bottom: 2px;" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta"
+                                        role="option">
+                                        <span class="slds-media__body slds-m-horizontal_x-small">
+                                            <div style="display:flex; flex:1">
+                                                <div style="transform: scale(.7);">
+                                                    <lightning-input type="checkbox-button" data-group="listoptions" label={datum.text} name={datum.text} data-key={datum.key}
+                                                        value={datum.key} onchange={handleListItemCbClick}></lightning-input>
+                                                </div>
+                                                <div title = "{datum.text}" class="slds-m-left_small" style="flex:1; width: 80%;" onmousedown={handleListItemLabelClick} data-key={datum.key}>
+                                                    <span style="width: 80%;" class="slds-listbox__option-text slds-listbox__option-text_entity">{datum.text}</span>
+                                                    <span if:true={datum.metaText} class="slds-listbox__option-meta slds-listbox__option-meta_entity">{datum.metaText}</span>
+                                                </div>
+                                            </div>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </template>
+                </ul>
+                <!-- List Footer -->
+                <div class="slds-popover__footer slds-popover__footer_form"  >
+                        <!-- Cancel will change selectedItems to priorValue -->
+                        <div style="display: flex; justify-content: space-between;">
+                            <div>                       
+                                <lightning-button-stateful
+                                    label-when-off={selectallLabel}
+                                    label-when-on={unselectallLabel}
+                                    label-when-hover={unselectallLabel}
+                                    icon-name-when-off="utility:check"
+                                    icon-name-when-on="utility:close"
+                                    icon-name-when-hover="utility:close"
+                                    selected={selectAll} 
+                                    onclick={handleSelectAllLabelClick}>
+                                </lightning-button-stateful>
+                            </div>
+                            <div>
+                                <lightning-button variant="neutral" label={cancelLabel} title={cancelLabel} onclick={handleCancel} class="slds-m-left_x-small"></lightning-button>
+                                <!-- Done will save selected items list -->
+                                <lightning-button variant="brand" label={doneLabel} title={doneLabel} onclick={handleDone} class="slds-m-left_x-small">
+                                </lightning-button>
+                            </div>
+                        </div>
+                    <div if:false={selectedItems.length} style="text-align: left; padding-top: 3px;">
+                        <div class="slds-form-element__help invalid-inp">{requiredErrorMessage}</div>
+                    </div>  
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

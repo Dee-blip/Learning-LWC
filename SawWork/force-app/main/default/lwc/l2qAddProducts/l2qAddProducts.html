@@ -1,0 +1,54 @@
+<!-- sldsValidatorIgnore -->
+<!--
+  @description       : Add Products Screen on Opportunity Mange Products
+  @author            :  apyati
+  @group             : 
+  @last modified on  : 10-19-2021
+  @last modified by  : apyati
+  Modifications Log 
+  Ver   Date         Author                               Modification
+  1.0   06-23-2021   apyati                               Initial Version
+-->
+<template>
+
+    <header class="slds-modal__header">
+        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Add Products</h2>
+    </header>
+
+    <div class="slds-card">
+        <template if:true={error}>
+            <div class="slds-modal__content slds-var-p-around_medium" style="overflow: initial;">
+                {error}
+            </div>
+        </template>
+
+        <template if:true={gridData}>
+            <div class="slds-modal__content slds-var-p-around_medium ">
+
+                <div class="slds-p-horizontal_x-small slds-p-bottom_xx-small">
+                    <lightning-input label="" type="search" placeholder="Search Product Name" variant="label-hidden"
+                        onchange={handleChange}></lightning-input>
+                </div>
+
+                <div class="slds-p-horizontal_x-small slds-p-bottom_xx-small slds-scrollable" style="height: 6rem;">
+                    <lightning-pill-container items={items} onitemremove={handleItemRemove}>
+                    </lightning-pill-container>
+                </div>
+
+                <div class="modal-height">
+                    <lightning-tree-grid columns={gridColumns} data={gridData} key-field="Id" class="datatable-height"
+                        onrowselection={updateSelectedRows} selected-rows={selectedRows} expanded-rows={expandedRows}
+                        ontoggle={onRowToggle}>
+                    </lightning-tree-grid>
+                </div>
+            </div>
+
+            <footer class="slds-modal__footer slds-align_absolute-center">
+                <lightning-button label="Cancel" onclick={handleClose} variant="cancel">
+                </lightning-button>
+                <lightning-button label="Confirm" onclick={handleSave} variant="brand">
+                </lightning-button>
+            </footer>
+        </template>
+    </div>
+</template>

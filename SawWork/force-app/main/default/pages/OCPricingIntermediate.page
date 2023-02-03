@@ -1,0 +1,13 @@
+<apex:page standardController="Online_Channel_Package_Pricing__c" extensions="OCPricingIntermediate" action="{!pageRedirect}">
+  <!-- Begin Default Content REMOVE THIS action="{!pageRedirect}" -->
+  <h1>Please Wait.......</h1>
+  <!-- End Default Content REMOVE THIS -->
+  
+  
+  
+  <apex:form >
+           Hi : {!ocpp.Name}   
+  
+</apex:form>
+  
+</apex:page>

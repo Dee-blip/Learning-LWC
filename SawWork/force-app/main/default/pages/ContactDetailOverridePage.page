@@ -1,0 +1,4 @@
+<apex:page standardController="Contact" showHeader="true">
+<chatter:feedWithFollowers entityId="{!Contact.Id}" rendered="{! IF(contains($Label.Partner_Profiles, $Profile.Name), FALSE, TRUE) }" />
+<apex:detail subject="{!Contact.Id}" relatedList="true" title="true" inlineEdit="true"/>
+</apex:page>

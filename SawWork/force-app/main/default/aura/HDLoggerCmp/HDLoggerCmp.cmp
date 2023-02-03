@@ -1,0 +1,10 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="HD_UX_Exception_LoggerCls">
+    <aura:handler event="c:HDLogger"  action="{!c.LogErrorAction}"/>
+
+    <aura:attribute name="ErrorMsg" type="String"/>
+    <!--
+    <aura:attribute name="StackTrace" type="String"/>
+    <aura:attribute name="User" type="Id"/>
+    <aura:attribute name ="ErrorDate" type="DateTime"/> -->
+	<h1></h1>
+</aura:component>

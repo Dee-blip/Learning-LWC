@@ -1,0 +1,34 @@
+/* to adjust padding for pills without with remove button ( Ex: From Email pill )*/
+.pill_without_remove {
+    padding-right: 4px !important;
+}
+
+/* to add scrollbar to docker body */
+.slds-email-composer .slds-rich-text-editor {
+    border: 0;
+    border-top: var(--lwc-borderWidthThin, 1px) solid var(--lwc-colorBorder, rgb(221, 219, 218));
+    border-radius: 0;
+    max-height: 1px !important;
+}
+
+.modal-custom-design {
+    height: 480px;
+    width: 50vw;
+    z-index:60001 !important;
+}
+
+.width-maximize {
+    width: 80vw !important;
+}
+
+.slds-docked-composer.slds-is-open {
+    height: fit-content;
+}
+
+:host {
+    --sds-c-textarea-sizing-min-height: 300px;
+}
+
+.slds-modal__content{
+    overflow: initial !important;
+}

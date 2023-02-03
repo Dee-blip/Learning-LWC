@@ -1,0 +1,9 @@
+<aura:component implements="force:hasRecordId,flexipage:availableForAllPageTypes,lightning:actionOverride,lightning:hasPageReference" controller="SC_SI_Utility">
+    <aura:attribute name="accountRecord" type="Object"/>
+    <aura:attribute name="recordLoadError" type="String"/>
+    <!--Workspace API to support console apps redirection-->
+    <lightning:workspaceAPI aura:id="workspace" />
+	
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+    
+</aura:component>

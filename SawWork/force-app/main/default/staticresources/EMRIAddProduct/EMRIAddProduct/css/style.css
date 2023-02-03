@@ -1,0 +1,192 @@
+ body
+         {
+          font-size : 12px;
+          padding-left: 8%;
+          padding-right: 8%;
+         }
+
+         .page-title-row
+         {
+            text-align: center;
+            background-color: #1c3952;
+            color :white;
+         }
+
+         .product-info-button,.top-button
+         {
+          font-size: 12px;
+          font-weight: bold;
+         }
+
+        .detail-header
+        {
+           background-color: #428bca;
+           color :white;
+           height: 35px;
+           font-size: 14px;
+           padding-left : 30px;
+           padding-top: 8px;
+        }
+
+        .detail-sub-header
+        {
+           background-color: aliceblue;
+           color :black;
+           height: 33px;
+           font-size: 14px;
+           padding-left : 30px;
+
+        }
+             
+        #detail-section-table>tbody>tr>td
+        {
+             width :20%;
+        }
+        
+        #detail-section-table
+        {
+            line-height: 1.8;
+            border: none;
+        }
+
+        .detail-section-field-label
+        {
+          text-align: right;
+          font-weight: bold;
+        } 
+
+        .product-info-button-row,.top-buttons-row
+        {
+          padding-top: 20px;
+          padding-bottom: 20px;
+        }
+
+        .fa-search
+        {
+          padding-left: 4px;
+          font-size: 14px;
+
+        }
+
+        .total-row
+        {
+          font-weight: bold;
+        }
+        
+        .error{
+          color: red;
+        }
+  
+            #loading,#loading-in-table{
+            width: 100%;
+            height: 100%;
+            top: 0px;
+            left: 0px;
+            position: fixed;
+            display: block;
+            opacity: 0.7;
+            background-color: #fff;
+            z-index: 99;
+            text-align: center;
+            }
+ 
+            .resizable-textarea{
+                resize:both;
+            }
+
+            .accountsearchmodal{
+             
+             width : 70%;
+             height: 70%;
+             overflow-y: auto;
+            }
+
+            .invalidfieldLabel{
+              color:red;
+              font-weight:bold;
+            }
+            .invalidfield{
+              border:1px solid #f00;
+            }
+            .noneditcolor{
+              background-color: #f6f9f9;
+              opacity: 0.8;
+            }
+ 
+            .existing{
+              color: green;
+            }
+            .negValue{
+              color: red;
+            }
+
+
+            #lineItemTable>tr>th
+            {
+              color: black;
+            }
+
+            td.detail-section-field-info:hover{
+              background-color: #f6f9f9;
+            }
+            #loading-image {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              z-index: 100;
+            }
+            .alert-danger
+            {
+              color: red;
+            }
+
+            [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-    ng-cloak {
+              display: none !important;
+            }
+
+            .account-search-dialog
+            {
+              width: 80%;
+            }
+
+            /*SFDC-1352*/
+            .modal-dialog{
+                overflow-y: initial !important
+            }
+            .modal-body{
+                height: 350px;
+                overflow-y: auto;
+            }
+            var number_of_columns = 9;
+            .header-fixed {
+                width: 100% 
+            }
+
+            .header-fixed > thead,
+            .header-fixed > tbody,
+            .header-fixed > thead > tr,
+            .header-fixed > tbody > tr,
+            .header-fixed > thead > tr > th,
+            .header-fixed > tbody > tr > td {
+                display: block;
+            }
+
+            .header-fixed > tbody > tr:after,
+            .header-fixed > thead > tr:after {
+                content: ' ';
+                display: block;
+                visibility: hidden;
+                clear: both;
+            }
+
+            .header-fixed > tbody {
+                overflow-y: auto;
+                height: 250px;
+            }
+
+            .header-fixed > tbody > tr > td,
+            .header-fixed > thead > tr > th {
+               /* width: (100% / number_of_columns);*/
+                float: left;
+                border-bottom-width: 0;
+            }

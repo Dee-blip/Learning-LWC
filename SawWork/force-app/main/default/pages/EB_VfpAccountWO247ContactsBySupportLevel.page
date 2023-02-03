@@ -1,0 +1,11 @@
+<!--
+Author: Sharath K
+Description: This page generates a custom report of Accounts without 24X7 contacts according to the Support Level.
+-->
+
+<apex:page controller="EB_CtrlAccountWO247Contacts">
+<apex:form >
+<apex:variable value="{!accountsSans24X7Contacts}" var="a"/> 
+</apex:form>
+    <apex:image url="http://chart.apis.google.com/chart?chs=300x250&cht=p3&chd=t:{!Premiumcount},{!Prioritycount},{!Indirectcount},{!Othercount}&chdl=Premium|Priority|Customer+Direct|Others&chtt=Accounts+Sans+24x7+contacts&chts=B74A4A,11.5" onclick="window.open('{!redirect}')"/>
+</apex:page>

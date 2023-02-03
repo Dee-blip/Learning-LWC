@@ -1,0 +1,76 @@
+<apex:page standardController="SFDC_MDF_Claim__c" extensions="FundClaimCustomAllocationController">   
+<!--  
+<apex:outputText rendered="false" value="{!claim.Id} {!claim.Amount__c} {!claim.CreatedDate} {!claim.Fund_Request__c} {!claim.Fund_Request__r.Account__c} "/>
+    
+    <apex:form id="allocateform">
+        <apex:pageMessages id="messages"/>
+        <apex:pageBlock id="claimblock" title="Fund Claim" tabStyle="SFDC_MDF_Claim__c">
+        
+            <apex:pageBlockSection columns="1">              
+                <apex:outputField value="{!claim.Account__c}"/>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Claim Number" for="claim"/>
+                    <apex:outputLink value="/{!claim.Id}" id="request">{!claim.Name}</apex:outputLink>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Claim Date" for="claimdate"/>
+                    <apex:outputText value="{!claimDateString}" id="claimdate"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Claim Amount" for="fundclmAmtApp"/>
+                    <apex:outputField value="{!claim.Amount_In_Corporate_Currency__c}" id="fundclmAmtApp"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Total Already Allocated" for="totalclaimed"/>
+                    <apex:outputField value="{!totalclaimed.Amount__c}" id="totalclaimed"/>
+                </apex:pageBlockSectionItem>
+                
+                <apex:inputField value="{!claim.Performance_Attached__c}" />
+            
+                <apex:inputField value="{!claim.Performance_Verified__c}" />
+            
+                <apex:inputField value="{!claim.Performance_Verified_Date__c}" />
+                <apex:outputField value="{!claim.Approved_Amount__c}" id="approvedAmt"/>
+                <apex:inputField value="{!claim.Fund_Request_Approved_Amount__c}" />
+                <apex:inputHidden value="{!claim.Fund_Request__r.Account__r.Name}" />
+                
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:pageBlock id="budgetblock" title="Select from one or more Budgets" tabStyle="SFDC_Budget__c">
+            <apex:pageMessages rendered="true" id="messages"/>
+            <apex:pageBlockButtons location="bottom">
+                <apex:actionStatus id="buttonStatus" startText="processing...">
+                    <apex:facet name="start" >
+                        <img src="/apexpages/devmode/img/saveStatus.gif"/>
+                    </apex:facet>
+                    <apex:facet name="stop">
+                        <apex:outputPanel >
+                            <apex:commandButton id="btnSave" value="Save" action="{!validateAllocations}" status="buttonStatus" rerender="messages,blist"/>
+                            <apex:commandButton id="btnCancel" value="Cancel" action="{!cancelAllocations}" status="buttonStatus" rerender="messages,blist"/>
+                        </apex:outputPanel>
+                    </apex:facet>
+                </apex:actionStatus>
+            </apex:pageBlockButtons>
+            <apex:pageBlockTable id="blist" value="{!bwList}" var="bw">
+                <apex:column value="{!bw.b.Account__r.Name}"/>
+                <apex:column value="{!bw.b.Fund_Budget_Name__c}"/>
+                <apex:column headerValue="Earned Period Ending" style="text-align:center;" value="{!bw.b.End_Earned_Date__c}"/>
+                <apex:column headerValue="Total" value="{!bw.b.Amount__c}"/>
+                <apex:column headerValue="Available" value="{!bw.b.Available_Budget__c}"/>
+                <apex:column headerValue="Fund Request Expiration Date" style="text-align:center;" value="{!bw.b.Fund_Request_Deadline__c}"/>
+                <apex:column headerValue="Allocation" headerClass="CurrencyElement" style="text-align:right;">
+                     <apex:actionRegion immediate="true">
+                       <apex:inputText value="{!bw.sAllocation}" >
+                        <apex:actionSupport event="onchange" action="{!updateTotal}" rerender="atotal,approvedAmt"/>
+                    </apex:inputText> 
+                   </apex:actionRegion>
+                </apex:column>
+            </apex:pageBlockTable>
+            <p style="text-align:right;font-weight:bold;">
+                <apex:outputText >Total Allocation&nbsp;&nbsp;</apex:outputText>
+                <apex:outputField value="{!totalallocation.Amount__c}" id="atotal"/>
+            </p>
+        </apex:pageBlock>        
+    </apex:form>
+    -->
+</apex:page>

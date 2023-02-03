@@ -1,0 +1,78 @@
+<template>
+    <div class={itemClass}>
+        <div class="slds-media">
+            <div class="slds-media__figure">
+                <lightning-button-icon icon-name={stateIcon} size="small" variant="bare" onclick={toggleState}>
+                </lightning-button-icon>
+                <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon" title="task">
+                    <lightning-icon icon-name={itemTemplate.icon} size="medium">
+                    </lightning-icon>
+                </div>
+            </div>
+            <div class="slds-media__body">
+                <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                    <div class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                        <h3 class="slds-truncate slds-p-right_x-small">
+                            <template if:false={itemTemplate.email}>
+                                <a href={itemTemplate.whoId}>
+                                    <strong>{itemTemplate.who} </strong>
+                                </a>{itemTemplate.title}
+                            </template>
+                            <template if:true={itemTemplate.email}>
+                                {itemTemplate.title}
+                                <a href={itemTemplate.whoId}>
+                                    <strong> {itemTemplate.who}</strong>
+                                </a>
+                            </template>
+                        </h3>
+                        <span class="slds-badge" style="background-color: rgb(239, 230, 140);">
+                            <template if:true={itemTemplate.duration}>{itemTemplate.duration}</template>
+                        </span>
+                        <span class="slds-p-horizontal_x-small">
+                            <lightning-dynamic-icon if:true={itemTemplate.highlightActivity} type="eq">
+                            </lightning-dynamic-icon>
+                            <lightning-icon if:false={itemTemplate.highlightActivity} icon-name="utility:clock"
+                                size="x-small">
+                            </lightning-icon>
+                        </span>
+                        <b>{itemTemplate.daysAgo}</b>
+                    </div>
+                    <div class="slds-timeline__actions slds-timeline__actions_inline">
+                        <p class="slds-timeline__date">
+                            <lightning-formatted-date-time value={itemTemplate.when} year="numeric" month="short"
+                                day="2-digit" hour="numeric" minute="numeric">
+                            </lightning-formatted-date-time>
+                        </p>
+                        <template if:true={itemTemplate.email}>
+                            <template if:false={isTicketClosed}>
+                                <lightning-button-icon icon-name='utility:reply' size="small" onclick={replyMail}>
+                                </lightning-button-icon>
+                            </template>
+                        </template>
+                        <!-- <lightning-button-icon icon-name='utility:down' size="small">
+                        </lightning-button-icon> -->
+                    </div>
+                </div>
+                <article if:true={isExpanded}
+                    class="slds-box slds-timeline__item_details slds-theme_shade"
+                    aria-hidden="false" style="overflow:auto;">
+
+                    <template if:false={itemTemplate.email}> 
+                        <lightning-formatted-rich-text value={itemTemplate.textBody} style="white-space: pre-wrap;">
+                        </lightning-formatted-rich-text>
+                    </template>
+                    
+                    <template if:true={itemTemplate.email}>
+                        <div style="height:17rem;width:60rem">
+                            <span class="slds-text-body_medium slds-truncate">
+                                <lightning-formatted-rich-text value={itemTemplate.textBody} style="white-space: pre-wrap;">
+                                </lightning-formatted-rich-text>
+                            </span>
+                        </div>
+                    </template>
+                    
+                </article>
+            </div>
+        </div>
+    </div>
+</template>

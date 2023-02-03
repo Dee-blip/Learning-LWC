@@ -1,0 +1,39 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="HD_IncidentDetailController">
+    <aura:registerEvent name="HDLogger" type="c:HDLogger"/>
+    <ltng:require scripts="{!$Resource.HD_Error_Logger}" />
+    <aura:attribute name="recordId" type="String" default="{!recordId}"/>
+    <aura:attribute name="warnings" type="String[]"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:attribute name="record" type="Object"/>
+    <aura:attribute name="lservice_record" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+    <aura:attribute name="incident" type="Object"/>
+
+    <div >
+
+        <force:recordData aura:id="recordLoader"
+          recordId="{!v.recordId}"
+          targetFields="{!v.lservice_record}"
+          targetError="{!v.recordError}"
+          fields="Id, HD_Incident_Group__c"
+          recordUpdated="{!c.handleRecordUpdated}"
+      	/>
+
+
+
+    <div class="slds-form-element">
+      <div class="slds-form-element__control" for="resolution">
+        <ui:inputTextArea aura:id="resolution"  label="Resolution" placeholder="Please enter the resolution" rows="5" required="true"/>
+      </div>
+    </div>
+    <div class="slds-form-element">
+            <div class="slds-form-element__control" for="effort" style = "width:18%">
+                <ui:inputText label="Effort" aura:id="effort"  placeholder="hh:mm" />
+            </div>
+    </div>
+
+        <br />
+    <ui:button label="Close Ticket" press="{! c.closeTicket }" />
+    <ui:inputDefaultError aura:id="warn" value="{!v.warnings}" />
+    </div>
+</aura:component>

@@ -1,0 +1,356 @@
+<!--
+  @description       : 
+  @author            : apyati
+  @team              : GSM
+  @last modified on  : 02-08-2022
+  @last modified by  : apyati
+  Modifications Log
+  Ver   Date         Author   Modification
+  1.0   09-15-2021   apyati   SFDC-8036 added partneraccount
+-->
+<template>
+    <template if:true={isloading}>
+        <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+    </template>
+    <template if:false={isloading}>
+        <div class="slds-grid" style="background-color:white;padding-top:10px;height:550px">
+            <div class={createEditCSS}>
+                <div>
+                    <lightning-input value={chimeFormName} onchange={handleChimeNameChange} label="CHIME Name"
+                        placeholder="Give a name to your CHIME From" required="true">
+                    </lightning-input>
+                    <p style="font-style: italic; font-size: 10px;">**Please ensure to input an appropriate name for the
+                        CHIME form, as this would displayed to the
+                        end customer on Community.</p>
+                </div>
+                <br>
+                <label>Account</label>
+                <div style="pointer-events: none;">
+                    <c-l2qflowlookup iconname="standard:account" object-name="Account" searchfield="Name"
+                        placeholder-text="Search Account" min-searchlen="3" maxtimedelay="300" flowrecid={accountid}
+                        flowrecname={account_name} removecrossicon=true></c-l2qflowlookup>
+                </div>
+                <br>
+                <label>Opportunity</label>
+                <div>
+                    <template if:false={opportunityDisabled}>
+                        <c-l2qflowlookup iconname="standard:opportunity" object-name="Opportunity" searchfield="Name"
+                            placeholder-text="Search Opportunity" min-searchlen="3" maxtimedelay="300"
+                            flowrecid={opportunityid} where-clause={whereclause} flowrecname={opportunity_name}
+                            onselectedrec={getOpportunityId}>
+                        </c-l2qflowlookup>
+                    </template>
+                    <template if:true={opportunityDisabled}>
+                        <div class="slds-combobox__form-element slds-input-has-icon
+                            slds-input-has-icon_left-right" role="none">
+                            <span
+                                class="slds-icon_container slds-icon-standard-account slds-combobox__input-entity-icon"
+                                title="Opportunity">
+                                <lightning-icon icon-name="standard:opportunity"></lightning-icon>
+                            </span>
+                            <input class="slds-input slds-combobox__input slds-combobox__input-value" id="combobox-id-5"
+                                aria-controls="listbox-id-5" autocomplete="off" role="textbox" type="text"
+                                placeholder="Select an Option" readonly="" value={opportunity_name} disabled />
+                        </div>
+                    </template>
+                </div>
+                <br>
+                <label>Partner Involved</label>
+                <div>
+                    <c-l2qflowlookup iconname="standard:account" object-name="Account" searchfield="Name"
+                        placeholder-text="Search Partner Account" min-searchlen="3" maxtimedelay="300"
+                        flowrecid={partneraccountid} flowrecname={partneraccountname}
+                        onselectedrec={getPartnerAccountId}></c-l2qflowlookup>
+                </div>
+                <br>
+                <template if:true={iscreate}>
+                    <label>Implementation Type</label>
+                    <div style="padding-left: 10px;">
+                        <lightning-radio-group onchange={handleImplementationTypeChange} name="radioGroup"
+                            options={options} type="radio" value={implementatonType}
+                            disabled={disableImplementationType}>
+                        </lightning-radio-group>
+                    </div>
+                    <br>
+                </template>
+                <template if:true={showisPoc}>
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col">
+                            <span>
+                                <label>Is POC?</label>
+                                <div style="padding-left: 10px;padding-top: 5px;margin-bottom:10px">
+                                    <div class="slds-form-element">
+                                        <label class="slds-checkbox_toggle slds-grid">
+                                            <input disabled={isPOCDisabled} type="checkbox" value="checkbox-toggle-6"
+                                                checked={ispoc} onchange={handleIsPOCChange} />
+                                            <span class="slds-checkbox_faux_container" aria-live="assertive">
+                                                <span class="slds-checkbox_faux"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </span>
+                        </div>
+                        <div class="slds-col">
+                            <span>
+                                <template if:true={ispoc}>
+                                    <label>POC Type</label>
+                                    <div style="padding-left: 10px;">
+                                        <lightning-radio-group onchange={handlePOCTypeChange} name="radioGroup2"
+                                            options={poctypeoptions} type="radio" value={pocTypeValue}
+                                            disabled={pocTypeDisabled}>
+                                        </lightning-radio-group>
+                                    </div>
+                                </template>
+                            </span>
+                        </div>
+
+                    </div>
+                </template>
+
+                <label>Is Emergency?</label>
+                <div style="padding-left: 10px;padding-top: 5px;margin-bottom:10px">
+                    <div class="slds-form-element">
+                        <label class="slds-checkbox_toggle slds-grid">
+                            <input disabled={isEmergencyDisabled} type="checkbox" name="checkbox-toggle-16"
+                                value="checkbox-toggle-16" aria-describedby="checkbox-toggle-16" checked={isEmergency}
+                                onchange={handleIsEmergencyChange} />
+                            <span id="checkbox-toggle-16" class="slds-checkbox_faux_container" aria-live="assertive">
+                                <span class="slds-checkbox_faux"></span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <label>Is Work At Risk (Investment Work)?</label>
+                <div style="padding-left: 10px;padding-top: 5px;margin-bottom:10px;">
+                    <div class="slds-form-element">
+                        <label class="slds-checkbox_toggle slds-grid">
+                            <input disabled={isWorkAtRiskDisabled} type="checkbox" name="checkbox-toggle-17"
+                                value="checkbox-toggle-17" aria-describedby="checkbox-toggle-17" checked={isWorkAtRisk}
+                                onchange={handleisWorkAtRiskChange} />
+                            <span id="checkbox-toggle-17" class="slds-checkbox_faux_container" aria-live="assertive">
+                                <span class="slds-checkbox_faux"></span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+            <div class="slds-col slds-size_8-of-12" style="padding-left:50px">
+
+                <label>Products</label>
+                <template if:true={iscreate}>
+                    <div style="margin-top:-16px">
+                        <c-l2q_product_search customstyle="height:172px;" showresults=true
+                            placeholdertext="Search Products" onselectedprod={handleProdSelection} poc={ispoc}>
+                        </c-l2q_product_search>
+                    </div>
+                </template>
+                <div style="padding-top:5px;">
+                    <span class='slds-hide'>{isStandard}</span>
+
+                    <template for:each={selectedProducts} for:item="product">
+                        <div key={product.Id} style="float:left;padding-right:8px">
+                            <span key={product.Id} class="slds-badge" style="margin-top:5px;">
+                                {product.Product_Name__c}
+                                <template if:true={isStandard}>
+                                    ({product.Default_LOE_Standard__c})
+                                </template>
+                                <template if:false={isStandard}>
+                                    ({product.Default_LOE_Managed__c})
+                                </template>
+                            </span>
+                            <template if:true={isStandard}>
+                                <template if:true={product.showScope}>
+                                    <lightning-helptext content="View Scope" data-name={product.Product_Name__c}
+                                        data-scope={product.Scope_of_work_Standard__c} onclick={handleProductclick}>
+                                    </lightning-helptext>
+                                </template>
+                                <template if:false={product.showScope}>
+                                    <lightning-helptext content="Scope Not Available"></lightning-helptext>
+                                </template>
+                            </template>
+                            <template if:false={isStandard}>
+                                <template if:true={product.showScope}>
+                                    <lightning-helptext content="View Scope" data-name={product.Product_Name__c}
+                                        data-scope={product.Scope_of_work_Managed__c} onclick={handleProductclick}>
+                                    </lightning-helptext>
+                                </template>
+                                <template if:false={product.showScope}>
+                                    <lightning-helptext content="Scope Not Available"></lightning-helptext>
+                                </template>
+                            </template>
+                        </div>
+                    </template>
+
+                </div>
+
+            </div>
+        </div>
+        <div class="modal-footer slds-modal__footer slds-size_1-of-1">
+            <lightning-button variant="brand" label="Save" onclick={handleSave} class="slds-m-left_x-small">
+            </lightning-button>
+            <lightning-button label="Cancel" onclick={handleCancel} class="slds-m-left_x-small">
+            </lightning-button>
+        </div>
+    </template>
+    <!--template if:false={isloading}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-04" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div style="max-width:60rem;min-width:60rem;" class="slds-modal__container">
+
+                <header class="slds-modal__header">
+                    <lightning-button-icon icon-name="utility:close" size="large" onclick={handleAcceptClose} alternative-text="close" variant="bare-inverse" class="slds-modal__close"></lightning-button-icon>
+                    <h2 style="font-weight:600;color:#514f4D;" id="modal-heading-02" class="slds-modal__title slds-hyphenate">New Chime Form</h2>
+                </header>
+                <div class="slds-modal__content slds-p-horizontal_medium slds-p-bottom_medium" id="modal-content-id-1">      
+                    <div class="slds-grid" style="background-color:white;padding-top:10px;height:340px">
+                        <div class={createEditCSS}>
+                            <div>
+                                <lightning-input value={chimeFormName} onchange={handleChimeNameChange} label="CHIME Name"
+                                    placeholder="Give a name to your CHIME From" required="true">
+                                </lightning-input>
+                                <p style="font-style: italic; font-size: 10px;">**Please ensure to input an appropriate name for the
+                                    CHIME form, as this would displayed to the
+                                    end customer on Community.</p>
+                            </div>
+                            <br>
+                            <label>Account</label>
+                            <div style="pointer-events: none;">
+                                <c-l2qflowlookup iconname="standard:account" object-name="Account" searchfield="Name"
+                                    placeholder-text="Search Account" min-searchlen="3" maxtimedelay="300" flowrecid={accountid}
+                                    flowrecname={account_name} removecrossicon=true></c-l2qflowlookup>
+                            </div>
+                            <br>
+                            <label>Opportunity</label>
+                            <div>
+                                <c-l2qflowlookup iconname="standard:opportunity" object-name="Opportunity" searchfield="Name"
+                                    placeholder-text="Search Opportunity" min-searchlen="3" maxtimedelay="300"
+                                    flowrecid={opportunityid} where-clause={whereclause} flowrecname={opportunity_name} onselectedrec={getOpportunityId}>
+                                </c-l2qflowlookup>
+                            </div>
+                            <br>
+                            <template if:true={iscreate}>
+                                <label>Implementation Type</label>
+                                <div style="padding-left: 10px;">
+                                    <lightning-radio-group onchange={handleImplementationTypeChange} name="radioGroup"
+                                        options={options} type="radio" value={implementatonType}>
+                                    </lightning-radio-group>
+                                </div>
+                                <br>
+                            </template>
+                            <label>Is POC/Demo?</label>
+                            <div style="padding-left: 10px;padding-top: 5px;margin-bottom:10px">
+                                <div class="slds-form-element">
+                                    <label class="slds-checkbox_toggle slds-grid">
+                                        <input type="checkbox"  value="checkbox-toggle-6"
+                                             checked={isEmergency}
+                                            onchange={handleIsEmergencyChange} />
+                                        <span  class="slds-checkbox_faux_container" aria-live="assertive">
+                                            <span class="slds-checkbox_faux"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            <label>Is Emergency?</label>
+                            <div style="padding-left: 10px;padding-top: 5px;margin-bottom:10px">
+                                <div class="slds-form-element">
+                                    <label class="slds-checkbox_toggle slds-grid">
+                                        <input type="checkbox" name="checkbox-toggle-16" value="checkbox-toggle-16"
+                                            aria-describedby="checkbox-toggle-16" checked={isEmergency}
+                                            onchange={handleIsEmergencyChange} />
+                                        <span id="checkbox-toggle-16" class="slds-checkbox_faux_container" aria-live="assertive">
+                                            <span class="slds-checkbox_faux"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_8-of-12" style="padding-left:50px">
+                            
+                                <label>Products</label>
+                                <template if:true={iscreate}>
+                                    <div style="margin-top:-16px">
+                                        <c-l2q_product_search customstyle="height:172px;" showresults=true
+                                            placeholdertext="Search Products" onselectedprod={handleProdSelection}>
+                                        </c-l2q_product_search>
+                                    </div>
+                                </template>
+                                <div style="padding-top:5px;">
+                                    <span class='slds-hide'>{isStandard}</span>
+                                   
+                                        <template for:each={selectedProducts} for:item="product">
+                                            <div key={product.Id} style="float:left;padding-right:8px">
+                                                <span key={product.Id} class="slds-badge" style="margin-top:5px;" >
+                                                    {product.Product_Name__c}
+                                                    <template if:true={isStandard}>
+                                                        ({product.Default_LOE_Standard__c})
+                                                    </template>
+                                                    <template if:false={isStandard}>
+                                                        ({product.Default_LOE_Managed__c})
+                                                    </template>
+                                                </span>
+                                                    <template if:true={isStandard}>
+                                                        <template if:true={product.showScope}>
+                                                            <lightning-helptext content="View Scope"
+                                                                data-name={product.Product_Name__c} 
+                                                                data-scope={product.Scope_of_work_Standard__c}
+                                                                onclick={handleProductclick}
+                                                            ></lightning-helptext>
+                                                        </template>
+                                                        <template if:false={product.showScope}>
+                                                            <lightning-helptext content="Scope Not Available"
+                                                            ></lightning-helptext>
+                                                        </template>
+                                                    </template>
+                                                    <template if:false={isStandard}>   
+                                                        <template if:true={product.showScope}>
+                                                            <lightning-helptext content="View Scope"
+                                                                data-name={product.Product_Name__c} 
+                                                                data-scope={product.Scope_of_work_Managed__c}
+                                                                onclick={handleProductclick}
+                                                            ></lightning-helptext>
+                                                        </template>
+                                                        <template if:false={product.showScope}>
+                                                            <lightning-helptext content="Scope Not Available"
+                                                            ></lightning-helptext>
+                                                        </template>
+                                                    </template>             
+                                            </div>
+                                        </template>
+                                    
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="brand" label="Save" onclick={handleSave} class="slds-m-left_x-small">
+                    </lightning-button>
+                    <lightning-button label="Cancel" onclick={handleCancel} class="slds-m-left_x-small">
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+    </template-->
+    <template if:true={showScopePopUp}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning-button-icon icon-name="utility:close" size="large" onclick={handleCloseScope}
+                        alternative-text="close" variant="bare-inverse" class="slds-modal__close">
+                    </lightning-button-icon>
+                    <div class="slds-text-heading_small">{scopeModalproductName}</div>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_large" id="modal-content-id" style="height:350px">
+                    <p>
+                        {scopeModalText}
+                    </p>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+</template>

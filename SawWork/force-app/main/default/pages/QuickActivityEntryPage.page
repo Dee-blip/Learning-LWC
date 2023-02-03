@@ -1,0 +1,63 @@
+<apex:page standardcontroller="Task" extensions="QuickActivityEntryPageController" >
+<apex:pageMessages id="errorMsgId"/>
+    <apex:form id="formId" >    
+    <apex:actionStatus id="showSpinner">
+<apex:facet name="start">
+<c:enhancedActionStatus BackColor="#ffffff" borderColor="#ffffff" borderSize="2" height="50px" width="150px" ImageUrl="/changemgmt/img/spinner24.gif" Message="Loading..." messageStyle="color:darkred;font-size:11pt;font-weight:bold;"/>
+</apex:facet>
+</apex:actionStatus>
+        <apex:pageBlock id="quickactionId" title="Quick Activity Entry" > 
+           <apex:pageBlockSection id="pageblocksectionid" columns="2"> 
+              <apex:pageBlockSectionItem >
+                   <apex:outputLabel >Quick Action Category</apex:outputLabel>  
+                   <apex:actionregion >
+                   <apex:selectList size="1" value="{!selectedCategory}" id="categoryId" required="true">
+                   <apex:actionSupport event="onchange" reRender="TypeSection" status="showSpinner" action="{!populateType}"/>
+                        <apex:selectOptions value="{!CategoryValues}"/>
+                    </apex:selectList>  
+                    </apex:actionregion>
+                </apex:pageBlockSectionItem>            
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Related To </apex:outputLabel>
+                    <apex:actionregion >
+                        <apex:inputField id="whatid" value="{!taskObj.WhatId}" required="true">
+                            <apex:actionSupport event="onchange" rerender="subjectSection" action="{!populateSubject}" status="showSpinner"/>
+                        </apex:inputField>
+                    </apex:actionregion>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                   <apex:outputLabel >Quick Action Type</apex:outputLabel>
+                   <apex:actionregion >
+                   <apex:outputPanel id="TypeSection">
+                   <apex:selectList size="1" value="{!selectedType}" id="typeId" required="true">
+                   <apex:actionSupport event="onchange" rerender="subjectSection" action="{!populateSubject}" status="showSpinner"/>
+                        <apex:selectOptions value="{!listOfTypeOptions}"/>
+
+                    </apex:selectList>  
+                    </apex:outputPanel>
+                    </apex:actionregion>
+                </apex:pageBlockSectionItem>    
+                <apex:pageblocksectionitem >
+                    <apex:outputLabel > Subject </apex:outputLabel>
+                    <apex:outputPanel id="subjectSection" layout="none">
+                        <apex:inputField id="subject" value="{!taskObj.Subject}" required="true" />
+                    </apex:outputPanel>
+                </apex:pageblocksectionitem>
+
+                <apex:inputField id="whoid" value="{!taskObj.WhoId}"/> 
+                <apex:inputField id="duedate" value="{!taskObj.ActivityDate}" required="true" />
+
+
+                <apex:inputfield id="commentsId" style="width:400px;height:100px;" value="{!taskObj.Description}"/>
+            </apex:pageblockSection>
+             <br></br>
+            <apex:commandButton value="Save" style="margin-left:400px; margin-right:20px;padding:5px;padding-right:20px;padding-left:20px;" action="{!Save}"/>
+            <apex:commandButton value="Save & Followup"  style="margin-right:20px;padding:5px;" action="{!SaveandFollowup}"/>
+            <apex:commandButton value="Cancel" style="padding:5px;padding-right:20px;padding-left:20px;" action="{!Cancel}"/>         
+        </apex:pageBlock>
+        <apex:commandLink value="< Back" action="{!Cancel}"/>
+    </apex:form>
+       
+
+  
+</apex:page>

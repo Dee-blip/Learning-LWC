@@ -1,0 +1,5 @@
+<apex:page controller="EBCInviteeNewController" action="{!pageRedirect}">
+<apex:form >
+Please wait...
+</apex:form>
+</apex:page>

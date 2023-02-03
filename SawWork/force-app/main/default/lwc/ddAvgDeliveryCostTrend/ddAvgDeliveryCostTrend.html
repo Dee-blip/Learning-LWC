@@ -1,0 +1,38 @@
+<template>
+    <div class="slds-p-bottom_x-small flex-container">
+        <div class="slds-wrap">
+            <div class="title slds-p-horizontal_x-small " slot="title">
+                Average Delivery Costs
+            </div>
+        </div>
+        <div class="slds-grid slds-grid_align-spread slds-p-horizontal_medium trend-item ">
+            <div class="slds-grid slds-grid_vertical-align-center trend-item-label">
+                PS per hour cost
+            </div>
+            <div class="trend-item-value">
+                <lightning-formatted-number value={deal.PS_per_hour_cost__c} format-style="currency" currency-code="USD"
+                    minimum-fraction-digits="0"></lightning-formatted-number>
+            </div>
+        </div>
+
+        <div class="slds-grid slds-grid_align-spread slds-p-horizontal_medium trend-item ">
+            <div class="slds-grid slds-grid_vertical-align-center trend-item-label">
+                SOCC per hour cost
+            </div>
+            <div class="trend-item-value">
+                <lightning-formatted-number value={deal.SOCC_per_hour_cost__c} format-style="currency"
+                    currency-code="USD" minimum-fraction-digits="0"></lightning-formatted-number>
+            </div>
+        </div>
+
+        <div class="slds-grid slds-grid_align-spread slds-p-horizontal_medium trend-item ">
+            <div class="slds-grid slds-grid_vertical-align-center trend-item-label">
+                AkaTec per hour cost
+            </div>
+            <div class="trend-item-value">
+                <lightning-formatted-number value={deal.AkaTec_per_hour_cost__c} format-style="currency"
+                    currency-code="USD" minimum-fraction-digits="0"></lightning-formatted-number>
+            </div>
+        </div>
+    </div>
+</template>

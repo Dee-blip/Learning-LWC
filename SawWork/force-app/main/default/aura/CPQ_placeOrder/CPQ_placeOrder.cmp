@@ -1,0 +1,100 @@
+<aura:component
+    implements="flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:hasRecordId"
+    access="global"
+    controller="QuoteExtController"
+>
+    <aura:attribute
+        name="hasPlaceOrderPermission"
+        type="Boolean"
+        default="false"
+        description="logged in user has CPQ_Partner_Place_Order or not"
+    />
+    <aura:attribute
+        name="showButton"
+        type="Boolean"
+        default="false"
+        description="to show/hide button"
+    />
+    <aura:attribute
+        name="enableLock"
+        type="Boolean"
+        default="false"
+        description="to disable button or not"
+    />
+
+    <aura:attribute
+        name="showCard"
+        type="Boolean"
+        default="false"
+        description="to show the card"
+    />
+
+    <aura:attribute
+        name="message"
+        type="string"
+        default="Hello World!"
+        description="message to show in card"
+    />
+
+    <aura:attribute name="fileId" type="String" />
+    <aura:attribute name="quoteRecord" type="Object" />
+    <aura:attribute name="recordLoadError" type="String" />
+
+    <force:recordData
+        aura:id="recordLoader"
+        recordId="{!v.recordId}"
+        fields="Name,CPQ_Locked__c,SBQQ__Status__c,CPQ_CustomerType__c,Account_Name__c"
+        targetFields="{!v.quoteRecord}"
+        targetError="{!v.recordLoadError}"
+        recordUpdated="{!c.handleRecordUpdated}"
+    />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <aura:if isTrue = "{!v.showCard}">
+        <lightning:card >  <p class="slds-align_absolute-center"><lightning:formattedRichText value = "{!v.message}" />
+        </p></lightning:card>
+    </aura:if>
+    
+    <div class="slds-float_right">
+        <lightning:layout>
+            <aura:if isTrue="{!v.enableLock}">
+                <!--lightning:layoutItem>
+                    <c:CPQ_flowButton
+                        buttonLabel="Add Reseller Contract"
+                        variant="NEUTRAL"
+                        class="slds-size_12-of-12"
+                        buttonClass="slds-button_neutral"
+                        flowToLaunch="CPQ_Partner_Contract_Selection"
+                        recordId="{!v.recordId}"
+                        showFlowInModal="true"
+                    />
+                </lightning:layoutItem-->
+                <lightning:layoutItem>
+                    <c:CPQ_flowButton
+                        buttonLabel="Lock Quote"
+                        variant="NEUTRAL"
+                        class="slds-size_12-of-12"
+                        buttonClass="slds-button_neutral"
+                        flowToLaunch="CPQ_Quote_Lock"
+                        recordId="{!v.recordId}"
+                        showFlowInModal="true"
+                    />
+                </lightning:layoutItem>
+            </aura:if>
+            <lightning:layoutItem>
+                <aura:if isTrue="{!v.showButton}">
+                    <c:CPQ_flowButton
+                        buttonLabel="Place Order"
+                        variant="NEUTRAL"
+                        class="slds-size_12-of-12"
+                        buttonClass="akaBrand"
+                        flowToLaunch="CPQ_Place_Order_Partner"
+                        recordId="{!v.recordId}"
+                        showFlowInModal="true"
+                    />
+                </aura:if>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+</aura:component>

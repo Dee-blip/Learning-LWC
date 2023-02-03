@@ -1,0 +1,8 @@
+<aura:event type="APPLICATION">
+    <aura:attribute name="numRecords" type="String"/>
+    <aura:attribute name="fltrId" type="Id"/>
+    <aura:attribute name="searchVal" type="String"/>    
+    <aura:attribute name="pageNum" type="String"/>  
+    <aura:attribute name="sortBy" type="String"/>
+    <aura:attribute name="sortDirection" type="String"/>
+</aura:event>

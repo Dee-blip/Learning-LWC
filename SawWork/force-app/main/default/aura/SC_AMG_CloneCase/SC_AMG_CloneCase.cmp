@@ -1,0 +1,73 @@
+<aura:component controller="SC_AMG_Lightning" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:isUrlAddressable" extends="c:AuraUtils"  access="global" >
+    
+    <!-- Handlers -->
+    <aura:handler name="Loading" event="c:Loading" action="{!c.spinnerShow}" />
+    <aura:handler name="DoneLoading" event="c:DoneLoading" action="{!c.spinnerHide}" />
+    
+    <!-- Attributes -->
+    <aura:attribute name="caserecId" type="Id" />
+    <aura:attribute name="showSpinner" type="boolean" default="false" />
+    <aura:attribute name="showClone" type="boolean" default="false" />
+    <aura:attribute name="confirmationModal" type="boolean" default="true" />
+    
+    
+    <aura:if isTrue="{!v.showSpinner}">
+        <div class="demo-only demo-only demo-only_viewport demo--inverse" style="height:6rem">
+            <div class="slds-spinner_container slds-is-fixed">
+                <div role="status" class="slds-spinner slds-spinner_large slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    
+    
+    <aura:if isTrue="{!v.showClone}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <aura:if isTrue="{!v.showSpinner}">
+                    <div class="demo-only demo-only demo-only_viewport demo--inverse" style="height:6rem">
+                        <div class="slds-spinner_container slds-is-fixed">
+                            <div role="status" class="slds-spinner slds-spinner_large slds-spinner_brand">
+                                <span class="slds-assistive-text">Loading</span>
+                                <div class="slds-spinner__dot-a"></div>
+                                <div class="slds-spinner__dot-b"></div>
+                            </div>
+                        </div>
+                    </div>
+                </aura:if>
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeModal }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Confirmation Required</h2>
+                </header>
+                <!--Modal/Popup Box Body Starts here-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p><b>Are you sure you want to clone this Case?
+                        </b>
+                    </p>
+                </div>
+                <!--Modal/Popup Box Footer Starts here-->
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral"
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closeModal }"/>
+                    <lightning:button variant="brand"
+                                      label="OK"
+                                      title="OK"
+                                      onclick="{!c.cloneSingleCase}"/>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    
+    
+</aura:component>

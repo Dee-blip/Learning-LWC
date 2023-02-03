@@ -1,0 +1,144 @@
+<aura:component controller="SC_CommunityGroupDocumentListCont" implements="forceCommunity:availableForAllPageTypes,force:hasRecordId" access="global" >    
+    <aura:attribute name="doc" type="Customer_Community_Document__c" default="{'sobjectType': 'Customer_Community_Document__c',
+                                                                    'Title__c': '',
+                                                                    'Description__c': ''
+                                                                    }"/>
+    <!--<aura:attribute name="documentList" type="Customer_Community_Document__c[]"/>-->
+    <aura:attribute name="documentList" type="SC_CommunityWrapper[]"/>
+    <aura:attribute name="documentGroupId" type="String" access="global"/>
+    <aura:attribute name="listName" type="String" access="global"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="pageNumber" type="String" default="1" />
+    <aura:attribute name="currentPagesCount" type="String" default="10" />
+    <aura:attribute name="currentPageNumber" type="String"/>
+    <aura:attribute name="pageCounterInfo" type="PGN_PageInfo"/>
+    <aura:attribute name="showNoRows" type="boolean" default="false"/>
+    <aura:attribute name="showTable" type="boolean" default="false"/>
+    <aura:attribute name="isEditDel" type="boolean" default="true"/>
+    <aura:attribute name="showDocumentEdit" type="boolean" default="false"/>
+    <aura:attribute name="isEdit" type="boolean" default="false"/>
+    <aura:attribute name="isDelete" type="boolean" default="false"/>
+    <aura:attribute name="isEditForm" type="boolean" default="false"/>
+    <aura:attribute name="isDeleteForm" type="boolean" default="false"/>
+    <aura:attribute name="isConfirmSave" type="boolean" default="false"/>
+    <aura:attribute name="isConfirmDelete" type="boolean" default="false"/>
+    <aura:attribute name="showSearch" type="boolean" default="false"/>
+    <aura:attribute name="searchKeyword" type="String"/>
+    <aura:attribute name="totalDocuments" type="Integer" default="0"/>
+    <aura:attribute name="delDocRec" type="String"/>
+    <aura:attribute name="communityId" type="String"/>
+    <aura:handler event="c:CommunityBlogPageChangeEvt" action="{!c.pageChange}" />
+    
+        <div class="slds-page-header" style="height:46px;display: inline-flex;width:100%;background-color: #2574a9;padding-top: 6px;" role="banner">
+        <div style="width: 85%;padding-top: 7px;">
+            <b><p style="color:white;" class="slds-text-heading_label">{!v.listName}&nbsp;({!v.totalDocuments})</p></b>
+        </div>
+        <aura:if isTrue="{!v.showSearch}">
+            <div class="input-group" style="float: left;width: 200px;padding-bottom: 10px; margin-top: -1px;">
+                <ui:inputText aura:id="searchId" class="slds-input" value="{!v.searchKeyword}" required="true" placeholder="{!$Label.c.Jarvis_CustomerCommunityDocuments_SearchPlaceholderText}" keyup="{!c.searchDocumentEnt}"/><!--Search here...-->
+                <lightning:buttonIcon class="searchBtnCls" iconName="utility:search" variant="bare" onclick="{!c.searchDocument}"/>
+            </div>
+                <div style="float: right;width: 15%;">
+                <div class="slds-form slds-form_horizontal">
+                    <lightning:select name="selectItem" aura:id="selectItem" label="{!$Label.c.Jarvis_CustomerCommunityDocuments_RecordsPicklistLabel}" variant="label-hidden" onchange="{!c.changeRecordNumber}"><!--Records-->
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                    </lightning:select>
+                </div>
+            </div>  
+        </aura:if>
+    </div>
+    <aura:if isTrue="{!v.showNoRows}">
+        <p>{!$Label.c.Jarvis_CustomerCommunityDocuments_NoDocumentsText}</p><!--No document available.-->
+    </aura:if>
+    <aura:if isTrue="{!v.showTable}">
+
+        <div style="margin-left:20px;">
+            <aura:iteration items="{!v.documentList}" var="Document">
+               <div class="slds-truncate" style="font-size: 1rem;margin-top: 21px;" title="{!Document.communityDocument.Id}"><a href="{!'/customers/s/customer-community-document/'+Document.communityDocument.Id}">{!Document.communityDocument.Title__c}</a>
+                <!--<div class="slds-truncate" style="font-size: 1rem;margin-top: 21px;" title="{!Document.communityDocument.Id}" onclick="{!c.NavigateToComponent2}" data-index="{!Document.communityDocument.Id}">{!Document.communityDocument.Title__c}   -->
+                    <!--<aura:if isTrue="{!Document.Edit_Document__c}">
+                        <div style="float:right;font-size: 0.82rem"><a onclick="{!c.editDocument}" id="{!Document.Id}">Edit</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a onclick="{!c.showDelForm}" id="{!Document.Id}">Del</a></div>
+                    </aura:if>-->
+                    <div style="float:right;font-size: 0.82rem">
+                        <aura:if isTrue="{!Document.hasEdit}"><a onclick="{!c.editDocument}" id="{!Document.communityDocument.Id}">{!$Label.c.Jarvis_CustomerCommunityDocuments_EditLink}</a></aura:if><!--Edit-->
+                        <aura:if isTrue="{!Document.hasDel}">&nbsp;&nbsp;|&nbsp;&nbsp;
+                            <a onclick="{!c.showDelForm}" id="{!Document.communityDocument.Id}">{!$Label.c.Jarvis_CustomerCommunityDocuments_DeleteLink}</a><!--Delete-->
+                        </aura:if>
+                    </div>
+                </div>
+                <div class="slds-truncate" style="margin-top: 5px;color: #696969;font-size: .75rem; border-bottom: 1px solid #d4d4d4;padding-bottom: 9px;" title="{!Document.communityDocument.CreatedBy.Name}">{!Document.communityDocument.CreatedBy.Name}&nbsp;&nbsp;|&nbsp;&nbsp;{!Document.communityDocument.CreatedDate}</div>
+            </aura:iteration>
+        </div>
+        <div class="slds-global-header slds-grid slds-grid_align-spread">
+            <div class="slds-global-header__item">
+                <legend class="slds-form-element__label slds-text-title_caps" style="color:white;">{!v.pageCounterInfo.currentPageNumber} / {!v.pageCounterInfo.totalPages}</legend><!--{!v.pageCounterInfo.currentPageNumber} of Total {!v.pageCounterInfo.totalPages} Pages-->
+            </div>
+            <div class="slds-button-group" role="group" >
+                <!--<lightning:buttonIcon iconName="utility:left" disabled="{!v.pageCounterInfo.currentPageNumber == 1}" variant="border" alternativeText="Left" iconClass="dark" onclick="{!c.goPreviousPage}" />-->
+                <lightning:buttonIcon class="icnCls" iconName="utility:left" variant="border" alternativeText="{!$Label.c.Jarvis_CustomerCommunityDocuments_FirstPageAltText}" iconClass="dark" onclick="{!c.goPreviousPage}" /><!--First Page-->
+                <aura:iteration items="{!v.pageCounterInfo.pageCounter}" var="pgn">
+                    <c:CommunityBlogPageCount pageNumber="{!pgn}" currentPageNumber="{!v.pageCounterInfo.currentPageNumber}" currnetPagesCount="{!v.currnetPagesCount}" />
+                    <!--<lightning:button variant="{!v.pageNumber == v.currentPageNumber ? 'brand' : 'neutral' }" label="{!pgn}" onclick="{!c.openthePage}" />-->
+                </aura:iteration>
+                <lightning:buttonIcon iconName="utility:right" variant="border" alternativeText="{!$Label.c.Jarvis_CustomerCommunityDocuments_LastPageAltText}" iconClass="dark" onclick="{!c.goNextPage}"/><!--Last Page-->
+                <!--<lightning:buttonIcon iconName="utility:right" variant="border" alternativeText="Right" iconClass="dark" onclick="{!c.goNextPage}" disabled="{!v.pageCounterInfo.currentPageNumber == v.pageCounterInfo.totalPages}" />-->
+            </div>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.showDocumentEdit}">
+        <!--###### MODAL BOX Start From Here ######--> 
+        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+            <div class="slds-modal__container">
+                <!-- ###### MODAL BOX HEADER Part Start From Here ######-->
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="{!$Label.c.Jarvis_CustomerCommunityDocuments_ModalCloseButtonTitle}" onclick="{!c.closeModel}"> <!--Close - title-->
+                        X
+                        <span class="slds-assistive-text">{!$Label.c.Jarvis_CustomerCommunityDocuments_ModalCloseButtonTitle}</span><!--Close-->
+                    </button>
+                    <aura:if isTrue="{!v.isEdit}">
+                        <h2 id="header99" class="slds-text-heading--medium">{!$Label.c.Jarvis_CustomerCommunityDocuments_ModalHeadingEditDocument}</h2><!--Edit Document-->
+                    </aura:if>
+                    <aura:if isTrue="{!v.isDelete}">
+                        <h2 id="header99" class="slds-text-heading--medium">{!$Label.c.Jarvis_CustomerCommunityDocuments_ModalHeadingDeleteDocument}</h2><!--Delete Document-->
+                    </aura:if>
+                </div>
+                <!--###### MODAL BOX BODY Part Start From Here ######-->
+                <div class="slds-modal__content slds-p-around--medium">
+                    <aura:if isTrue="{!v.isEditForm}">
+                        <div class="slds-form_stacked">
+                            <lightning:input aura:id="docTitleField" name="Title" label="{!$Label.c.Jarvis_CustomerCommunityDocuments_ModalTitleField}" value="{!v.doc.Title__c}" required="true"/><!--Title-->
+                            <br/>{!$Label.c.Jarvis_CustomerCommunityDocuments_ModalBodyDescription}<br/><lightning:inputRichText aura:id="blogDescField" value="{!v.doc.Description__c}" shareWithEntityId="{!v.communityId}">
+                            <lightning:insertImageButton></lightning:insertImageButton>
+                            </lightning:inputRichText>
+                            <div class="slds-text-body_small slds-text-color--error">{!$Label.c.Jarvis_CustomerCommunityDocuments_ImageSizeRestriction}</div><!--*Image with size more than 1MB cannot be added in the Description-->
+                        </div>
+                    </aura:if> 
+                    <aura:if isTrue="{!v.isDeleteForm}">
+                        <div class="slds-form_stacked">
+                            <h2 id="header99" >{!$Label.c.Jarvis_CustomerCommunityDocuments_ModalDeleteConfirmation}</h2><!--Are you sure ?-->
+                        </div>
+                    </aura:if> 
+                </div>
+                
+                <!--###### MODAL BOX FOOTER Part Start From Here ######-->
+                <aura:if isTrue="{!v.isConfirmSave}">
+                    <div class="slds-modal__footer">
+                        <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >{!$Label.c.Jarvis_CustomerCommunityDocuments_ModalFooterCancelButton}</button><!--Cancel-->
+                        <button class="slds-button slds-button--brand" onclick="{!c.saveDocument}">{!$Label.c.Jarvis_CustomerCommunityDocuments_ModalFooterSaveButton}</button><!--Save Document-->
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.isConfirmDelete}">
+                    <div class="slds-modal__footer">
+                        <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >{!$Label.c.Jarvis_CustomerCommunityDocuments_ModalFooterNoButton}</button><!--No-->
+                        <button class="slds-button slds-button--brand" onclick="{!c.delDocument}">{!$Label.c.Jarvis_CustomerCommunityDocuments_ModalFooterYesButton}</button><!--Yes-->
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+        <!--###### MODAL BOX Part END Here ######-->
+    </aura:if>
+</aura:component>

@@ -1,0 +1,16 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+    <aura:attribute name="overlayText" type="String"/>
+    <aura:attribute name="imageURL" type="String"/>
+    <aura:attribute name="textColor" type="String"/>
+    <aura:attribute name="textSize" type="String"/>
+    <aura:attribute name="borderColor" type="String"/>
+    <aura:attribute name="height" type="String" />
+    <aura:attribute name="opacity" type="String" />
+    
+    <div class="banner-image" style = "{!'background-image: linear-gradient(rgba(0, 0, 0, ' + v.opacity + '), rgba(0, 0, 0, ' + v.opacity + ')), url(' + $Resource.SC_Akatec_LightningMigration  + v.imageURL + '); height: ' + v.height + '; border-color: ' + v.borderColor + ';'}">
+      <div class="banner-text" style = "{!'color: ' + v.textColor}">
+        <h1 style = "{!'font-size: ' + v.textSize}">{!v.overlayText}</h1>
+      </div>
+    </div>
+    
+</aura:component>

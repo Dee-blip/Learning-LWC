@@ -1,0 +1,5 @@
+<design:component >
+    <!--<design:attribute name="topicName" label="Topic name" datasource="All, Web Performance, News + Events, Media_Delivery" />-->
+    <design:attribute name="documentGroupId" label="Group Id" default="{!recordId}"/>
+    <design:attribute name="listName" label="Name of the List" default="DOCUMENT"/>
+</design:component>

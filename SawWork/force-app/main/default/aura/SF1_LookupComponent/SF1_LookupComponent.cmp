@@ -1,0 +1,64 @@
+<aura:component controller="GsmLite_AuraInputLookupController" implements="force:lightningQuickAction,force:hasRecordId">
+
+  <ltng:require scripts="/resource/SF1_jQuery,
+                           /resource/SF1_BootStrapMinJS,
+                           /resource/SF1_Typeahead,
+                           /resource/SF1_Handlebars" afterScriptsLoaded="{!c.initTypeahead}"/>
+
+  <aura:registerEvent name="SF1_InputLookupEvent" type="c:SF1_InputLookupEvent"/>
+  <aura:handler name="SF1_InputLookupEvent" action="{!c.handleInputLookupEvt}"/>
+
+  <aura:attribute name="whereClause" type="String" description="Where Clause Extender for query" default=""/>
+
+  <aura:attribute name="type" type="String" description="Sobject Type" required="true" default="Opportunity"/>
+  <aura:attribute name="value" type="String" description="Source / Destination value"/>
+  <aura:attribute name="valueSObject" type="SObject" description="Source / Destination value"/>
+  <aura:attribute name="className" type="String" description="class name of the input object" default="form-control"/>
+  <aura:attribute name="placeholderText" type="String" description="placeholder in the search box"/>
+  <aura:attribute name="fieldsToShowInSuggestion" type="String" description="fields to show in lookup suggestion,give fields exact API name , case sensitive" default=""/>
+  <aura:attribute name="requiredField" type="Boolean" default="false" description="filed to make lookup field mandatory"/>
+
+  <!-- PRIVATE ATTRS -->
+  <aura:attribute name="nameValue" type="String" description="Name of the current lookup 'name' field: loaded by controller" access="PUBLIC"/>
+  <aura:attribute name="isLoading" type="Boolean" description="Loading component" default="true" access="PRIVATE"/>
+  <aura:attribute name="SObjectIcon" type="String" default="custom15" description="field to capture icon for SObject" access="PRIVATE" />
+
+  <div class="has-feedback">
+    <div
+      class="slds-grid slds-wrap"
+      style="background-color: rgb(255, 255, 255);color: rgb(22, 50, 92);
+    				border: 1px solid rgb(216, 221, 230);border-radius: 0.25rem;
+    				width: 100%;
+    				transition: border .1s linear,background-color .1s linear;
+    				line-height: 1.875rem;
+    				min-height: calc(1.875rem + (1px * 2));">
+      <div class="slds-size_7-of-8">
+        <input
+          id="{!globalId+'_typeahead'}"
+          type="text"
+          class="{!v.className}"
+          readonly="{!v.isLoading}"
+          placeholder="{!'Search ' + v.placeholderText}"
+          required="{!v.requiredField}"
+          style="border: 0px solid rgb(216, 221, 230);
+                              width: 100%;
+                              -webkit-transition: border .1s linear,
+                              background-color .1s linear;
+                              transition: border .1s linear,background-color .1s linear;
+                              display: inline-block;padding: 0 1rem 0 .75rem;
+                              line-height: 1.875rem;
+                              min-height: calc(1.875rem + (1px * 2));"/>
+
+      </div>
+      <div class="slds-size_1-of-8">
+        <div class="slds-clearfix">
+          <div class="slds-float_right">
+            <div class="sortFooter">
+              <lightning:icon iconName="utility:search" size="xx-small" alternativeText="icon"></lightning:icon>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</aura:component>

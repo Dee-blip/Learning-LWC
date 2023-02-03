@@ -1,0 +1,42 @@
+<template>
+    <ul class="slds-timeline slds-card slds-p-vertical_medium commentslist">
+        <li for:each={comments} for:item="cmt" key={cmt.Id}>
+            <div class="slds-timeline__item_expandable slds-timeline__item_task slds-p-vertical_small comments">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                        <div if:true={cmt.CreatedBy} class="slds-icon_container" style="margin-left: 25px;">
+                            <span  class="slds-avatar slds-avatar_medium slds-timeline__icon">
+                                <img alt={cmt.CreatedBy} src={cmt.SmallPhotoUrl} title="User Photo" />
+                            </span>
+                        </div>
+                        <lightning-icon class="user-icon" if:false={cmt.CreatedBy} icon-name="standard:avatar_loading" size="small"></lightning-icon>
+
+                    </div>
+                    <div class="slds-media__body">
+                        <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                            <div class="slds-grid slds-grid_vertical-align-center slds-no-space">
+
+                                <h3>
+                                    <div class="slds-text-body_regular slds-text-color_weak">
+                                        <lightning-formatted-url if:true={cmt.CreatedBy} value={cmt.CreatedByUrl} label={cmt.CreatedBy}
+                                            target="_blank"></lightning-formatted-url>
+                                        <div if:false={cmt.CreatedBy} style="display: inline-block; color:#006dcd;">System</div>
+                                        <span class="slds-text-body_small">&nbsp; ({cmt.Commented_By__c}) - {cmt.Evaluation_Action__c} </span>
+                                        <br />
+                                        <lightning-formatted-date-time value={cmt.CreatedDate} time-zone={timezone}
+                                            class="slds-timeline__date" year='numeric' month="short" day="2-digit"
+                                            hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                    </div>
+                                </h3>
+                            </div>
+                        </div>
+                        <p class="slds-m-horizontal_xx-small"
+                            style="margin-left:-10px; font-style:italic; padding-top:5px;">
+                            <lightning-formatted-text value={cmt.Comments__c}></lightning-formatted-text>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+</template>

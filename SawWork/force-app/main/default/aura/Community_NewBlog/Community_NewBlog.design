@@ -1,0 +1,5 @@
+<design:component >
+    <design:attribute name="action" label="Action" datasource="Create, Edit" />
+    <design:attribute name="topicId" label="Topic Id" default="{!topicId}" description="Enter if you are on a topic detail page"/>
+    <design:attribute name="recordId" label="Record Id" default="{!recordId}" description="Enter if you are on a article detail page"/>
+</design:component>

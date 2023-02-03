@@ -1,0 +1,122 @@
+<!--  
+    PLM_PLUHomePage
+    @author : Chandra Lohani(clohani@akamai.com)
+       
+    @History
+    --Developer             --Date          --Change
+    Chandra Mohan Lohani   04-10-2011       Created the class.
+    Hitesh Chawda          09-03-2012       CR 1541368 PLM: Ordering of Launch Items on the PLM Tracking home page.
+                                                                                                                                                                            
+                                                                                           
+-->
+<apex:page Controller="PLM_PLUViewController">
+
+
+<apex:pageBlock id="pluBlock" >
+<apex:form id="pluform">
+<apex:outputLabel style="font-size:20px;font-weight:bold;">Activations Home</apex:outputLabel>
+   <apex:actionStatus id="PLUstatus">
+    <apex:facet name="start">
+    <c:enhancedActionStatus BackColor="#ffffff" borderColor="#ffffff" borderSize="2" height="50px" width="150px" ImageUrl="/changemgmt/img/spinner24.gif" Message="Loading..." messageStyle="color:darkred;font-size:11pt;font-weight:bold;"/>
+    </apex:facet>   
+    </apex:actionStatus>
+
+    <apex:panelGroup >
+        <center>
+            <apex:commandButton value="Create New Activation" action="{!createNewPLU}" rendered="{!isCreateNewButtonVisible}"/>
+            <apex:commandButton value="Define/Update Approval Team" action="{!setFunctionalApprovers}" rendered="{!isCreateNewButtonVisible && islaunchItemApprovalEnabled}"/>
+        </center>
+    </apex:panelGroup>
+
+<apex:pageBlockSection columns="1">
+    <apex:pageBlockTable value="{!paginatedPLUList}" var="plu">
+      <apex:column >
+      <apex:facet name="header">Activation Name</apex:facet>
+      <a href="/{!plu.Id}" target="_parent">{!plu.Name}  </a>
+      </apex:column> 
+    </apex:pageBlockTable>
+ 
+   <!--   <apex:pageBlockSectionItem >
+       <apex:panelGrid columns="2" style="float:right;">
+          <apex:outputLabel value="No. of PLU per page: " />
+          <apex:selectList value="{!pluPageSize}"  multiselect="false" size="1" id="activePageSizeList" onchange="callApexAction(this.value);">
+          <apex:selectOptions value="{!defaultPageSizeOptionsList}" >
+          <apex:actionFunction name="callApexAction" action="{!changePLUPageSize}" reRender="pluBlock" status="PLUstatus">
+          <apex:param name="activePageSize" value="{!pluPageSize}"/>
+          </apex:actionFunction>
+          </apex:selectOptions>
+          </apex:selectList>
+      </apex:panelGrid>
+    </apex:pageBlockSectionItem>
+ -->
+    <apex:pageBlockSection columns="2">
+     <apex:pageBlockSectionItem >
+        <apex:panelGrid columns="4" style="align=center;">
+        <apex:commandLink action="{!activeFirst}" rendered="{!hasActivePLUPrevious}" value="First"></apex:commandlink>
+        <apex:commandLink action="{!activePrevious}" rendered="{!hasActivePLUPrevious}" value="<<Previous"></apex:commandlink>
+        <apex:commandLink action="{!activeNext}" rendered="{!hasActivePLUNext}" value="Next>>"></apex:commandlink>
+        <apex:commandLink action="{!activeLast}" rendered="{!hasActivePLUNext}" value="Last"></apex:commandlink>
+        </apex:panelGrid>
+     </apex:pageBlockSectionItem>
+    </apex:pageBlockSection>
+  
+ </apex:PageBlockSection>
+ </apex:form>
+</apex:pageBlock>
+
+<!-- Page block for the archived PLUs.div tags for Hide and Show link.Logic remains the same as of Active PLUs -->
+
+<apex:outputPanel style="font-size:15px;font-weight:bold;" >Archived Activations ></apex:outputPanel>
+<div id="showDiv" style="display:inline;"><a href="#" onclick="document.getElementById('showDiv').style.display='none';document.getElementById('hideDiv').style.display='inline';document.getElementById('archiveid').style.display='';return false;">Show</a> </div>
+<div id="hideDiv" style="display:none"><a href="#" onclick="document.getElementById('hideDiv').style.display='none';document.getElementById('showDiv').style.display='inline';document.getElementById('archiveid').style.display='none';">Hide</a> </div>
+
+<div id ="archiveid" style="display: none;">
+    <apex:pageBlock id="ArchivedPLUBlock">
+     
+    <apex:form id="archivedPluform" >
+        <apex:pageBlockSection columns="1" >
+            <apex:pageBlockTable value="{!paginatedArchivedPLUList}" var="archivedPlu">
+              <apex:column >
+              <apex:facet name="header">Activation Name</apex:facet>
+              <a href="/{!archivedPlu.Id}" target="_parent">{!archivedPlu.Name}  </a>
+              </apex:column> 
+            </apex:pageBlockTable>
+        <apex:pageBlockSectionItem >
+        <apex:panelGrid columns="2" style="float:right;">
+          <apex:outputLabel value="No. of Activations per page: " />
+          <apex:selectList value="{!archivedPluPageSize}"  multiselect="false" size="1" id="archivedPageSizeList" onchange="callArchivedAction(this.value);" >
+          <apex:selectOptions value="{!defaultAPageSizeOptionsList}" >
+          <apex:actionFunction name="callArchivedAction" action="{!changeArchivedPLUPageSize}" reRender="ArchivedPLUBlock" status="PLUstatus">
+          <apex:param name="pageSize" value="{!archivedPluPageSize}"/>
+          </apex:actionFunction>
+          </apex:selectOptions>
+          </apex:selectList>
+        </apex:panelGrid>
+        </apex:pageBlockSectionItem>
+ 
+     <apex:pageBlockSection columns="2">
+     <apex:pageBlockSectionItem >
+        <apex:panelGrid columns="4" style="align=center;">
+        <apex:commandLink action="{!first}"    rendered="{!hasArchivedPLUPrevious}" value="First"></apex:commandlink>
+        <apex:commandLink action="{!previous}" rendered="{!hasArchivedPLUPrevious}" value="<<Previous"></apex:commandlink>
+        <apex:commandLink action="{!next}"     rendered="{!hasArchivedPLUNext}"     value="Next>>"></apex:commandlink>
+        <apex:commandLink action="{!last}"     rendered="{!hasArchivedPLUNext}"     value="Last"></apex:commandlink>
+        </apex:panelGrid>
+     </apex:pageBlockSectionItem>
+     </apex:pageBlockSection>
+  
+   </apex:PageBlockSection>  
+   </apex:form>
+   </apex:pageBlock>
+</div>
+<script>
+
+    if({!isArchivedVisible})
+        {
+         document.getElementById('showDiv').style.display='none';
+         document.getElementById('hideDiv').style.display='inline';
+         document.getElementById('archiveid').style.display='';
+        }
+
+</script>
+</apex:page>

@@ -1,0 +1,7 @@
+<aura:component implements="flexipage:availableForAllPageTypes" access="global">
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="lightningComponentName" type="String" />
+    <aura:attribute name="lightningFlowName" type="String" />
+    {!v.body}
+</aura:component>

@@ -1,0 +1,18 @@
+<apex:page showHeader="true" sidebar="true" standardController="SFDC_MDF_Claim__c" extensions="FundClaimAddPrivateNoteController" lightningStylesheets="true">
+   
+  <apex:form id="addPrivateNote" >
+    <apex:pageBlock id="PrivateNoteMain" mode="edit" title="Private Note">
+             <apex:pageBlockButtons location="bottom">
+                <apex:commandButton value="Save" action="{!savePrivateNote}"/>
+                 <apex:commandButton value="Cancel" action="{!redirectToFundClaim}"/>
+            </apex:pageBlockButtons>
+            <apex:pageMessages />
+            <apex:pageBlockSection id="PrivateNoteArea" columns="1">
+                <apex:pageBlockSectionItem >
+                    <font>This note will not be visible to the Partner</font>
+                </apex:pageBlockSectionItem>                    
+                <apex:inputTextarea richtext="true" style="width:300px;height:450px" id="PrivateNote" value="{!pageObject.Private_Note__c}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+  </apex:form>
+</apex:page>

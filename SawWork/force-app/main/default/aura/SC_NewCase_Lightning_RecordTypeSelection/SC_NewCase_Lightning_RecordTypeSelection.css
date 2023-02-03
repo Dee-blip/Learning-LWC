@@ -1,0 +1,138 @@
+.THIS .forceChangeRecordType {
+    padding: 0 1rem !important;
+  
+}
+
+
+.THIS .slds-radio{
+    
+    margin-top:20px !important;
+}
+
+
+.THIS .inlinePanel {
+    padding-bottom: calc(32px + 1.875rem)!important;
+    
+    min-width: 40rem !important;
+    background-color: rgb(255, 255, 255) !important;
+    height: 100% !important;
+    margin: auto !important;
+    
+}
+
+
+.THIS .forceChangeRecordType .changeRecordTypeLeftBody {
+    text-align: left !important;
+    padding-left: 1rem !important;
+}
+
+
+.THIS .changeRecordTypeCenter {
+    text-align: left !important;
+}
+
+
+.THIS .forceChangeRecordType .changeRecordTypeRow {
+    margin-top: 1.5rem !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.THIS .forceChangeRecordType .changeRecordTypeTopDownOneColumn {
+    text-align: left !important;
+    width: 100% !important;
+}
+
+.THIS .slds-no-space {
+    min-width: 0 !important;
+}
+.THIS .slds-form-element {
+    position: relative !important;
+}
+
+
+
+.THIS .forceChangeRecordType .changeRecordTypeLegendTopDown {
+    padding-bottom: 1rem !important;
+}
+
+.THIS .forceChangeRecordType legend {
+    width: 100% !important;
+    text-align: left !important;
+}
+.THIS .slds-form-element__label {
+    display: inline-block !important;
+    color: rgb(62, 62, 60) !important;
+    font-size: .75rem !important;
+    margin-right: .5rem !important;
+    padding-top: .25rem !important;
+    margin-bottom: .125rem !important;
+}
+
+
+.THIS .forceChangeRecordType .changeRecordTypeLabel {
+    font-size: .8125rem !important;
+    color: rgb(62, 62, 60) !important;
+}
+
+
+.THIS .forceChangeRecordType .topdown-radio-container {
+    float: left !important;
+    width: 100% !important;
+}
+
+.THIS .slds-form-element__control ,.THIS .slds-radio, .THIS .slds-form-element__control,.THIS .slds-checkbox {
+    display: block !important;
+}
+
+
+.THIS .actionBody {
+margin: 0 1rem !important;
+}
+
+
+.THIS .inlineFooter {
+    min-width: inherit !important;
+    position: fixed !important;
+    
+    width: inherit !important;
+}
+
+
+.THIS .forceChangeRecordTypeFooter {
+    margin: auto !important;
+    text-align: center !important;
+    padding: 1rem 0 !important;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+
+.THIS .forceChangeRecordType  {
+float: left;
+width: calc(100% - 2.3rem);
+overflow-wrap: break-word;
+word-wrap: break-word;
+}
+
+
+.THIS .slds-template_default{
+     padding: 0rem !important; 
+
+}
+
+.THIS.oneWorkspace.hasFixedFooter>.oneConsoleTabset .oneConsoleTab .slds-brand-band:not(.brand-band_magnetic)>.slds-template__container>*:last-child:not(.slds-template_iframe), .THIS.oneWorkspace.hasFixedFooter>.oneConsoleTabset .oneConsoleTab .slds-brand-band:not(.brand-band_magnetic)>.slds-template__container>.oneRecordHomeFlexipage
+{
+     background: rgb(221, 219, 218) !important; 
+}
+
+.THIS .changeChrome {
+    bottom: 80px !important;
+    
+    
+}
+
+.THIS .changeSafari {
+    bottom: 40px !important;
+    
+}

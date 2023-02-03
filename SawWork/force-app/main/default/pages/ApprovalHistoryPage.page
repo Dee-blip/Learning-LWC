@@ -1,0 +1,268 @@
+<apex:page StandardController="Opportunity" extensions="ApprovalHistoryPageController" sidebar="false" showHeader="false">
+ 
+    <script src="/soap/ajax/10.0/connection.js" />
+    <script src="/soap/ajax/10.0/apex.js" />
+    <style type = "text/css">
+    .bgHeader {background-color: #D0FFFF;}
+    .bgColour { background-color: #DDB929; color: #FFFFFF !important; }
+    .Stat { background-color: #FFD74B; }
+    .bgColourGreen { background-color: #00FF00; }
+    .bgColourRed { background-color: #FF6633; }
+    .bgColourGrey { background-color: #909090; }
+    </style>
+    <script>
+        function checkError(rebate)
+        {
+
+            document.getElementById('loadingimg').style.display='block';  
+            document.getElementById('pageButton').style.visibility='hidden';  
+            var res = "{!AccStr}";
+            /** Begin Rajesh Kumar SFDC-5781 **/
+            var issrRequired = "{!issrRequired}";
+           /** End Rajesh Kumar SFDC-5781 **/
+            var oId = "{!opp.Id}";
+            var dealRegOpptyStatus = "{!dealRegOpptyStatus}";
+            var dealRegAccountStatus = "{!dealRegAccountStatus}";
+            var isPAEStepCheck =  "{!isPAEStep}";
+            var result= "0:Error";
+            var resultOpptyCheck = "";
+            /** Begin Rajesh Kumar SFDC-5781 **/
+             if(issrRequired == "true" )
+            {
+                var noSubresellerErrorurl = "/apex/ErrorPage?ErrorType=9&retURL=/" + oId;
+                parent.window.location=noSubresellerErrorurl;
+                return false;
+            }
+            /** End Rajesh Kumar SFDC-5781 **/
+        
+            if(res=="" || dealRegAccountStatus=="" || !dealRegAccountStatus || !dealRegAccountStatus.length )
+            {
+                var noAccountErrorURL= "/apex/ErrorPage?ErrorType=5&retURL=/" + oId;
+                parent.window.location=noAccountErrorURL;
+                return false;
+            }
+
+
+            resultOpptyCheck = sforce.apex.execute("ApprovalHistoryPageController","redirectErrorURL",{
+                                oppid:oId,
+                                isPAEStepNameCheck:isPAEStepCheck,
+                                dealRegOpptyStatusCheck:dealRegOpptyStatus
+
+            }) + "";
+            if(resultOpptyCheck !="")
+            {
+                parent.window.location=resultOpptyCheck;
+                return false;
+            }
+
+            result= sforce.apex.execute("ApprovalHistoryPageController","redirectURL", 
+            { 
+                oppid:oId,
+                rebateType:rebate,
+                isPAEStep1:isPAEStepCheck
+                }
+                ) + "";
+                
+            var resultFlag = result.substr(0, result.indexOf(":")); 
+            var resultMessage = result.substr(result.indexOf(":")+1, result.length); 
+            
+            if(resultFlag == "1")
+                {
+                   parent.frames.location.replace(resultMessage); 
+                    }
+            else 
+            {
+                window.alert(resultMessage);
+                window.alert(resultflag);
+                document.getElementById("loadingimg").style.visibility ="hidden"; 
+                document.getElementById('pageButton').style.visibility='visible';
+            }
+            
+             
+            return false;
+        }
+        
+        function checkErrorReject(rebate)
+        {
+            document.getElementById('loadingimg').style.display='block';  
+            document.getElementById('pageButton').style.visibility='hidden';  
+            var oId = "{!opp.Id}";
+            var result= "0:Error";
+            var isPAEStepCheck = false;
+
+
+            result= sforce.apex.execute("ApprovalHistoryPageController","redirectURL", 
+            { 
+                oppid:oId,
+                rebateType:rebate,
+                isPAEStep1:isPAEStepCheck
+            } 
+            ) + ""; 
+                
+            var resultFlag = result.substr(0, result.indexOf(":")); 
+            var resultMessage = result.substr(result.indexOf(":")+1, result.length); 
+            
+            if(resultFlag == "1") 
+                parent.frames.location.replace(resultMessage); 
+            else 
+            {
+                window.alert(resultMessage);
+                document.getElementById("loadingimg").style.visibility ="hidden"; 
+                document.getElementById('pageButton').style.visibility='visible';
+            }
+            
+             
+            return false;
+        }
+    </script>
+    <apex:pageBlock rendered="{!!showTable}">
+        <apex:pageBlockSection >
+            No records to display.
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+    <apex:pageBlock rendered="{!$User.UIThemeDisplayed == 'Theme4d'}" >
+        <apex:outputText value="Please refer Approval History related list for more information"  style="font-weight:inherit;font-family: 'Salesforce Sans',Arial,sans-serif;"/>
+    </apex:pageBlock>
+    <apex:pageBlock rendered="{!showTable && $User.UIThemeDisplayed == 'Theme3'}">
+        <table cellpadding="5">
+            <th width="41%" class = "bgHeader">Action</th><th class = "bgHeader">Date</th><th class = "bgHeader">Status</th><th class = "bgHeader">Approver</th><th class = "bgHeader">Actual Approver</th><th class = "bgHeader">Comments</th><th class = "bgHeader">Overall Status</th>
+            <apex:repeat value="{!displayList}" var="d" id="display">
+                <tr>    
+                    <apex:outputPanel rendered="{!if(d[0]!=' ' && d[1]==' ',TRUE,FALSE)}">
+                        <td class = "bgColour">
+                            <b>{!d[0]}</b>
+                        </td>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!if(d[0]!=' ' && d[2]== 'Pending',TRUE,FALSE)}">
+                        <td>
+                            <apex:form >
+                            <div id="pageButton">
+                            <!--rendered="{!AND(isApprover,!isPAEStep)}"-->
+                                <apex:outputPanel rendered="{!isPAEStep}" ><a href="/apex/SelectFcmFromPartnerInvolved?oppty={!opp.Id}" target="_parent" >Reassign</a></apex:outputPanel>                                
+                                <apex:outputText value=" | " rendered="{!isApprover && isPAEStep}"/>
+                                <apex:outputPanel rendered="{!showLink}"><a href="#" onClick="return checkError('approveXPercent')" target="_parent" >Approve</a> </apex:outputPanel>
+                                <apex:outputText value=" | " rendered="{!showLink && mode == 1}" />
+                                <apex:outputPanel rendered="{!showLink && mode == 1}"><a href="#" onClick="return checkError('approvePublicSector')" target="_parent">{!publicSectorLinkName}</a> </apex:outputPanel>
+                                <apex:outputText value=" | " rendered="{!showLink}" />
+                                <apex:outputPanel rendered="{!showLink}"><a href="#" onClick="return checkErrorReject('reject')" target="_parent" >Reject</a> </apex:outputPanel>
+                             </div>
+                            </apex:form>
+                            <div id="loadingimg" style="display:none;"><img src="/changemgmt/img/spinner24.gif"/></div>
+                        </td>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!if(d[0]==' ' ,TRUE,FALSE)}">
+                        <td>
+                            {!d[0]}
+                        </td>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!if(d[0]=='Approve / Reject',TRUE,FALSE)}">
+                        <td>
+                            {!d[1]}
+                        </td>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!if(d[0]==' ' ,TRUE,FALSE)}">
+                        <td>
+                            {!d[1]}
+                        </td>
+                    </apex:outputPanel>    
+                    <apex:outputPanel rendered="{!if(d[0]!=' ' && d[0]!= 'Approve / Reject',TRUE,FALSE)}">
+                        <td class = "bgColour">
+                            {!d[1]}
+                        </td>
+                    </apex:outputPanel>            
+                    <apex:outputPanel rendered="{!if(d[0]!=' ' && d[0]!= 'Approve / Reject',TRUE,FALSE)}">
+                        <td class = "bgColour">
+                            {!d[2]}
+                        </td>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!if(d[0]=='Approve / Reject',TRUE,FALSE)}">
+                        <td>
+                            {!d[2]}
+                        </td>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!if(d[0]==' ',TRUE,FALSE)}">
+                        <td>
+                            {!d[2]}
+                        </td>
+                    </apex:outputPanel>  
+                                 
+                    <apex:outputPanel rendered="{!if(d[0]!=' ' && d[0]!= 'Approve / Reject',TRUE,FALSE)}">
+                        <td class = "bgColour">
+                            <a href="/{!d[7]}" target="_parent">{!d[3]}</a>
+                        </td>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!if(d[0]=='Approve / Reject',TRUE,FALSE)}">
+                        <td>
+                            <a href="/{!d[7]}" target="_parent">{!d[3]}</a>
+                        </td>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!if(d[0]==' ',TRUE,FALSE)}">
+                        <td>
+                            <a href="/{!d[7]}" target="_parent">{!d[3]}</a>
+                        </td>
+                    </apex:outputPanel>                
+                    <apex:outputPanel rendered="{!if(d[0]!=' ' && d[0]!= 'Approve / Reject',TRUE,FALSE)}">
+                        <td class = "bgColour">
+                             <a href="/{!d[8]}" target="_parent">{!d[4]}</a>
+                        </td>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!if(d[0]=='Approve / Reject',TRUE,FALSE)}">
+                        <td>
+                            <a href="/{!d[8]}" target="_parent">{!d[4]}</a>
+                        </td>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!if(d[0]==' ',TRUE,FALSE)}">
+                        <td>
+                            <a href="/{!d[8]}" target="_parent">{!d[4]}</a>
+                        </td>
+                    </apex:outputPanel>                
+                    <apex:outputPanel rendered="{!if(d[0]!=' ' && d[0]!= 'Approve / Reject',TRUE,FALSE)}">
+                        <td class = "bgColour">
+                            {!d[5]}
+                        </td>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!if(d[0]=='Approve / Reject',TRUE,FALSE)}">
+                        <td>
+                            {!d[5]}
+                        </td>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!if(d[0]==' ',TRUE,FALSE)}">
+                        <td>
+                            {!d[5]}
+                        </td>
+                    </apex:outputPanel>                
+                    <apex:outputPanel rendered="{!if(d[0]!=' ' && d[6] == ' ' && d[0] != 'Approve / Reject',TRUE,FALSE)}">
+                        <td class = "bgColour">
+                            {!d[6]}
+                        </td>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!if(d[0]!=' ' && d[6] == 'Pending',TRUE,FALSE)}">
+                        <td class = "Stat">
+                            <img src = "/img/icon/pending12.gif" />{!d[6]}
+                        </td>
+                    </apex:outputPanel>                
+                    <apex:outputPanel rendered="{!if(d[0]==' ',TRUE,FALSE)}">
+                        <td>
+                            {!d[6]}
+                        </td>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!if(d[0]!=' ' && d[6] == 'Approved',TRUE,FALSE)}">
+                        <td class = "bgColourGreen">
+                            <img src = "/img/icon/approve12.gif" />{!d[6]}
+                        </td>
+                    </apex:outputPanel>                                
+                    <apex:outputPanel rendered="{!if(d[0]!=' ' && d[6] == 'Rejected',TRUE,FALSE)}">
+                        <td class = "bgColourRed">
+                            <img src = "/img/icon/reject12.gif" />{!d[6]}
+                        </td>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!if(d[0]!=' ' && d[6] == 'Recalled',TRUE,FALSE)}">
+                        <td class = "bgColourGrey">
+                            <img src = "/img/icon/recall12.gif" />{!d[6]}
+                        </td>
+                    </apex:outputPanel>                                
+                </tr>                
+            </apex:repeat>
+        </table>
+    </apex:pageBlock>
+</apex:page>

@@ -1,0 +1,9 @@
+<apex:page showHeader="false" sidebar="false" standardController="Order_Approval__c"  lightningStylesheets="true">
+    <apex:form >
+
+        <p style="color:red; font-weight: bold;">This account may require Swiss Signature. Please note all SLAs and <apex:outputLink style="" value="https://collaborate.akamai.com/confluence/pages/viewpage.action?spaceKey=SFDC&title=DocuSign+Upgrade+-+Sales+Process" target="_parent"> 
+                click here</apex:outputLink> to learn more details.</p>
+        <br/>
+        
+    </apex:form>
+</apex:page>

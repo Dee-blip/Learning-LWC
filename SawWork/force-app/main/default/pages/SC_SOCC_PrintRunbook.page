@@ -1,0 +1,23 @@
+<apex:page controller="SC_SOCC_RUNBOOK_Print_PDF" lightningStylesheets="true">
+    <script>
+    var urlParams = new URLSearchParams(window.location.search);
+    var recordId = urlParams.get("recordId");
+    var activeSections = JSON.parse(urlParams.get('active'));
+    var print = urlParams.get("isPrint");
+    var pdfwin;
+    if(window.location.href.includes('/customers/')){
+        pdfwin = window.open('/customers/apex/SC_SOCC_Print_PDF_VF?id='+recordId+'&activeSections='+activeSections);
+        if(print == 'true')
+        	pdfwin.print();
+        
+        window.parent.postMessage("false",'{!communityBaseURL}');
+    }
+    else{
+        pdfwin = window.open('/apex/SC_SOCC_Print_PDF_VF?id='+recordId+'&activeSections='+activeSections);
+        if(print == 'true')
+        	pdfwin.print();
+        
+        window.parent.postMessage("false",'{!lightningBaseURL}');
+    }
+    </script>
+</apex:page>

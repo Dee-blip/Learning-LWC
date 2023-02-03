@@ -1,0 +1,16 @@
+<!--=====================================================================================================+
+    Component name      :   SC_Community_QualtricsIntercept
+    Author              :   Sumukh SS
+    Created             :   6-JAN-2021
+    Purpose             :   Component for Qualtrics Feedback for Runbooks program
+                            
+    Last Modified Developer           Purpose            
+    ============= ===============================
+    6-JAN-2021     Sumukh SS 	Initial Development
++=====================================================================================================-->
+<aura:component implements="forceCommunity:availableForAllPageTypes" controller = "SC_SOCC_CommunityController" access="global" >
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<div id="testQualtrics"></div>
+
+</aura:component>

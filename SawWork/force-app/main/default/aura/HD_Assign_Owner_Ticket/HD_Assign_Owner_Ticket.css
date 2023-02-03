@@ -1,0 +1,13 @@
+.THIS .custom-show-modal{
+    display:block;
+}
+.THIS .custom-hide-modal{
+    display:none;
+}
+
+.THIS .block{
+    display:block;
+}
+.THIS .none{
+    display:none;
+}

@@ -1,0 +1,33 @@
+.THIS .greyBadge{
+    background-color : darkgrey;
+}
+
+.THIS .green{
+    background-color : green;
+}
+
+.THIS .grey{
+    background-color : darkgrey;
+}
+
+.unclickable {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/*.THIS .tableInnerClass
+{
+    overflow-y: auto;
+    height: 100px;
+}
+
+.THIS .tableInnerClass thead th
+{
+    position: sticky;
+      top: 0;
+}
+
+.THIS table {
+    border-collapse: collapse;        
+    width: 100%;
+  }*/

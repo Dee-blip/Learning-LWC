@@ -1,0 +1,24 @@
+<apex:page standardController="Contact" showHeader="false" sidebar="false">
+    <style>
+        .WarningRed {
+        	text-align:center;
+        	font-size:14px; 
+        	background-color:red;
+        	width:100%;
+        	color:white;
+        }
+        .WarningOrange {
+        	text-align:center;
+        	font-size:14px; 
+        	background-color:orange;
+        	width:100%;
+        	color:white;
+        }
+    </style> 
+    <div class="WarningRed">
+        <apex:outputLabel rendered="{!NOT(Contact.Active_Portal_Login__c)}" value="WARNING: User does NOT have an active portal login.  Check with Control Center admin or account team before contacting."/>
+    </div>
+    <div class="WarningOrange">
+        <apex:outputLabel rendered="{!Contact.No_Longer_with_Company__c}" value="WARNING: User has been flagged No Longer with Company"/>
+    </div>
+</apex:page>

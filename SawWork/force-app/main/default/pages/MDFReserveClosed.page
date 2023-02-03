@@ -1,0 +1,17 @@
+<apex:page standardController="SFDC_MDF__c" extensions="MDFReserveClosedController" >
+    <apex:sectionHeader title="Fund Request" subtitle="{!SFDC_MDF__c.Name}"/>
+    <apex:pageMessages id="messages"/>
+    <apex:form id="theForm">
+        <!-- <apex:outputLink value="/{!SFDC_MDF__c.Id}">Back to Request: {!SFDC_MDF__c.Name}</apex:outputLink>-->
+        
+          <apex:pageBlock id="CancelFRForm">
+               <apex:pageblockButtons location="bottom" >
+                    <apex:commandButton action="{!ReserveClosedRequest}" value="Continue" id="cancelButton" rendered="{! !HasError }"  />
+                    <apex:commandButton action="{!back}" value="Back" id="backButton"  />
+                </apex:pageblockButtons>
+                <apex:pageBlockSection columns="1" rendered="{! !HasError }">
+                    <apex:pageMessage summary="Are you sure you want to Reserve Close the fund request?" severity="info" strength="3" />  
+                </apex:pageBlockSection> 
+           </apex:pageBlock>        
+    </apex:form>
+</apex:page>

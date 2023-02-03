@@ -1,0 +1,88 @@
+<aura:component controller="SF1_EMRIOpportunity">
+
+  <aura:attribute name="opportunityID" type="String" description="Opportunity Id" access="PUBLIC"/>
+  <aura:attribute name="contractID" type="String" description="Opportunity Id" access="PUBLIC"/>
+
+  <aura:attribute name="isRefreshable" type="Boolean" default="true" access="PRIVATE"/>
+  <aura:attribute name="errorOccured" type="Boolean" default="false" access="PRIVATE"/>
+  <aura:attribute name="successful" type="Boolean" default="false" access="PRIVATE"/>
+  <aura:attribute name="initialMessage" type="String" access="PRIVATE"/>
+  <aura:attribute name="returnMessage" type="String" access="PRIVATE"/>
+  <aura:attribute name="title" type="String" access="PRIVATE"/>
+  <aura:attribute name="severity" type="String" access="PRIVATE"/>
+
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+  <header class="slds-docked-composer__header slds-shrink-none" aria-live="assertive">
+    <article class="slds-tile slds-tile_board ">
+      <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-8">
+          <lightning:icon iconName="standard:contract" size="small" alternativeText="Opportunity"/>
+        </div>
+        <div class="slds-col slds-size_6-of-8 slds-has-flexi-truncate">
+          <h1 class="slds-text-heading--small ">
+            <div class="slds-has-flexi-truncate" style="text-align:center; ">Refresh Contract Baseline</div>
+          </h1>
+        </div>
+        <div class="slds-col slds-size_1-of-8"></div>
+      </div>
+    </article>
+  </header>
+
+  <ui:scrollerWrapper class="scrollerSize">
+
+    <ul class="slds-has-dividers_around-space ">
+
+      <li>
+        &nbsp;
+      </li>
+
+      <aura:if isTrue="{! v.successful == v.errorOccured }">
+        <!-- <aura:if isTrue="{! v.isRefreshable }"> -->
+        <!-- initial confirmation message -->
+        <div>
+          <ui:message title="{! v.title }" severity="{! v.severity }" closable="false">
+            {! v.initialMessage }
+          </ui:message>
+        </div>
+
+      </aura:if>
+
+      <aura:if isTrue="{! v.errorOccured }">
+        <!-- error message when refresh isn't successful -->
+        <div>
+          <ui:message title="Error" severity="error" closable="false">
+            {! v.returnMessage }
+          </ui:message>
+        </div>
+      </aura:if>
+
+      <aura:if isTrue="{! v.successful }">
+        <!-- success message when refresh successful -->
+        <div>
+          <ui:message title="Confirmation" severity="confirm" closable="false">
+            {! v.returnMessage }
+          </ui:message>
+        </div>
+      </aura:if>
+
+      <li>
+        &nbsp;
+      </li>
+
+    </ul>
+
+  </ui:scrollerWrapper>
+
+  <c:SF1_CustomLoader />
+
+  <footer class="slds-docked-composer__footer slds-shrink-none">
+    <button type="button" class="slds-button slds-button_neutral" onclick="{!c.moveBack}">Back</button>
+    <div class="slds-col_bump-left slds-text-align_right">
+      <!-- enable button only if one of the two available ways to create an opportunity is selected -->
+      <button type="button" class="slds-button slds-button_brand" disabled="{! v.errorOccured || v.successful ||  !v.isRefreshable}" onclick="{!c.refreshContractBL}">Confirm</button>
+      <!-- <button type="button" class="slds-button slds-button_destructive" onclick="{!c.dontRefreshContractBL}">No</button> -->
+
+    </div>
+  </footer>
+</aura:component>

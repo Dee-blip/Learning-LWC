@@ -1,0 +1,70 @@
+<template>
+    <div style="position: relative;">
+        <div class="slds-notify slds-notify_alert slds-alert_error" role="alert" if:true={isError}>
+            <h2>{errorMessage}</h2>
+        </div>
+        <lightning-spinner variant="brand" if:true={isLoading}></lightning-spinner>
+        <lightning-layout multiple-rows
+            class="slds-panel slds-panel slds-p-left_medium slds-p-right_medium slds-p-top_xx-small slds-p-bottom_small slds-grid slds-wrap">
+            <lightning-layout-item size="12">
+                <div class="slds-section slds-is-open slds-var-p-bottom_x-small">
+                    <div
+                        class="slds-button-section__buttons slds-text-align_center slds-var-m-bottom_x-small slds-is-relative slds-float_right">
+                        <a class="testonly-refreshTimeline slds-button" role="button" href="javascript:void(0);"
+                            onclick={onRefreshClicked}>Refresh</a>
+                        <span> • </span>
+                        <template if:true={isExpandCollapseAll}>
+                            <a class="testonly-expandAll slds-button" role="button" href="javascript:void(0);"
+                                onclick={onExpandCollapseAllClicked}>Collapse All</a>
+                        </template>
+                        <template if:false={isExpandCollapseAll}>
+                            <a class="testonly-expandAll slds-button" role="button" href="javascript:void(0);"
+                                onclick={onExpandCollapseAllClicked}>Expand All</a>
+                        </template>
+                        <span> • </span>
+                        <a class="slds-button" target="_blank" role="button" onclick={onViewAllClicked}
+                            title="Show all past activities in a new tab">View All</a>
+                    </div>
+                </div>
+            </lightning-layout-item>
+            <lightning-layout-item size="12">
+                <!-- <c-lwc-incident-record-page-place-holder type="timeline" if:true={isLoading}>
+                </c-lwc-incident-record-page-place-holder> -->
+                <ul class="slds-timeline slds-panel" if:false={isloading}>
+                    <template if:true={displayTimeline}>
+                        <template iterator:it={firstFewActivites}>
+                            <li key={it.value.incident_History_ID}>
+                                <template if:true={it.value.isHistoryActivity}>
+                                    <c-hd_-history_-activity data-id="timelineItem" when={it.value.when}
+                                        item={it.value.activity} is-expanded={it.value.isExpanded}>
+                                    </c-hd_-history_-activity>
+                                </template>
+                                <template if:true={it.value.isActionHistoryActivity}>
+                                    <c-hd_action_history_activity data-id="timelineItem" when={it.value.when}
+                                        item={it.value.activity} is-expanded={it.value.isExpanded} is-ticket-closed={isTicketClosed}>
+                                    </c-hd_action_history_activity>
+                                </template>
+                                <template if:true={it.value.isApprovalHistoryActivity}>
+                                    <c-hd_-approval_-history_-activity data-id="timelineItem" record-id={recordId}
+                                        onerror={handleErrorFromChild} when={it.value.when} item={it.value.activity}
+                                        is-expanded={it.value.isExpanded}>
+                                    </c-hd_-approval_-history_-activity>
+                                </template>
+                                <template if:true={it.value.isSNoteActivity}>
+                                    <c-hd_-s-note_-activity data-id="timelineItem" record-id={recordId}
+                                        when={it.value.when} item={it.value.activity} is-expanded={it.value.isExpanded}>
+                                    </c-hd_-s-note_-activity>
+                                </template>
+                            </li>
+                        </template>
+                    </template>
+                </ul>
+            </lightning-layout-item>
+            <lightning-layout-item size="12">
+                <div class="slds-text-align_center">
+                    <button class="slds-button slds-button_neutral" data-id="ViewMore" disabled={isAllItemsLoaded}
+                        onclick={onViewMoreClicked} type="button">View More({pendingActivities})</button></div>
+            </lightning-layout-item>
+        </lightning-layout>
+    </div>
+</template>

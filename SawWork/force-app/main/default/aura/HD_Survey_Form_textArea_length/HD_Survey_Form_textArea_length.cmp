@@ -1,0 +1,6 @@
+<aura:component >
+    <aura:attribute name="value" type="String"/>
+    <div class="slds-form-element">
+        <span class="floatToRight">{!240-v.value.length} characters remaining</span>
+    </div>
+</aura:component>

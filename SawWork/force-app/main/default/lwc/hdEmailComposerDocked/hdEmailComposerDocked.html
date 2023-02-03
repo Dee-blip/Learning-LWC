@@ -1,0 +1,138 @@
+<template>
+
+    <section role="dialog" tabindex="-1" class={classForModalViewSection} aria-labelledby="dialog-heading-id-1"
+        aria-describedby="dialog-content-id-1" aria-modal="true" >
+        <!-- Css class 'classForModalViewSection', 'classForModalViewDiv1', 'classForModalViewDiv2' for modal view whenever user clicks on maximize button. -->
+        <div class={classForModalViewDiv1}>
+            <div class={classForModalViewDiv2} id="modal-content-id" if:true={isEmailComposerOpen}>
+
+                <!-- Css class 'minimizeClass' to toggle between minmize and expand rhe Email Docker View -->
+                <section class={minimizeClass} data-my-id="section2" role="dialog" aria-labelledby="dialog-heading-id-1"
+                    aria-describedby="dialog-content-id-1">                  
+
+                    <!-- Email Header Section Starts -->
+                    <header class="slds-docked-composer__header slds-grid slds-shrink-none" aria-live="assertive">
+                        <div class="slds-media slds-media_center slds-no-space">
+                            <div class="slds-media__figure slds-m-right_x-small">
+                                <span class="slds-icon_container">
+                                    <lightning-icon icon-name="standard:email" size="x-small" alternative-text="Email"
+                                        title="Email"></lightning-icon>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <h2 class="slds-truncate" id="dialog-heading-id-1" title="New Email">Email</h2>
+                            </div>
+                        </div>
+
+                        <!-- Action buttons to Minimize, Maximize and Close the Email Section -->
+                        <div class="slds-col_bump-left slds-shrink-none">
+                            <lightning-button-icon icon-name="utility:minimize_window" onclick={minimizeAction}
+                                variant="bare" alternative-text={minimizeActionBtnTitle} title={minimizeActionBtnTitle}></lightning-button-icon>
+                            <lightning-button-icon if:true={emailComposerMax} icon-name="utility:contract_alt"
+                                onclick={maximizeAction} class="slds-p-left_xx-small" variant="bare"
+                                alternative-text="Restore" title="Restore"></lightning-button-icon>
+                            <lightning-button-icon if:false={emailComposerMax} icon-name="utility:expand_alt"
+                                onclick={maximizeAction} class="slds-p-left_xx-small" variant="bare"
+                                alternative-text="Expand" title="Expand"></lightning-button-icon>
+                            <lightning-button-icon icon-name="utility:close" onclick={closeEmail}
+                                class="slds-p-left_xx-small" variant="bare" alternative-text="Close" title="Close">
+                            </lightning-button-icon>
+                        </div>
+
+                    </header>
+                    <!-- Email Header Section Ends -->
+
+                    <!-- Error Section -->
+                    <div class="pageLevelErrors" tabindex="-1" data-aura-rendered-by="4:2341;a" if:true={errorMsg}>
+                        <div class="desktop forcePageError" role="alert" data-aura-rendered-by="3:3368;a"
+                            data-aura-class="forcePageError">
+                            <div class="genericNotification" data-aura-rendered-by="5:3368;a">
+                                <span class="genericError uiOutputText" data-aura-rendered-by="8:3368;a"
+                                    data-aura-class="uiOutputText">Review the errors on this page.</span>
+                            </div>
+                            <ul class="errorsList" data-aura-rendered-by="9:3368;a">
+                                <li data-aura-rendered-by="11:3368;a">{errorMsg}</li>
+                            </ul>
+                        </div>
+                    </div>
+                   
+                    <div class={modalBody} id="dialog-content-id-1">
+                         <!-- From Email Section -->
+                         <div
+                         class="slds-form-element slds-email-composer__combobox slds-p-bottom_xx-small slds-p-top_xx-small">
+                         <label class="slds-form-element__label" for="recipients-to">From</label>
+                         <div class="slds-form-element__control">
+                             <div class="slds-combobox_container slds-has-inline-listbox">
+
+                                 <span class="slds-pill slds-pill_link">
+                                     <span class="slds-avatar slds-avatar_x-small slds-pill__icon_container">
+                                         <lightning-avatar variant="circle" src="/bad/image/url.jpg" initials="HD"
+                                             fallback-icon-name="standard:groups" alternative-text="Helpdesk Email">
+                                         </lightning-avatar>
+                                     </span>
+
+                                     <a href="#" class="slds-pill__action pill_without_remove"
+                                         title=""
+                                         style="padding-right:5px !important">
+                                         <span class="slds-pill__label">{fromEmail}</span>
+                                     </a>
+
+                                 </span>
+                             </div>
+                         </div>
+                     </div>
+
+                    
+                    </div>
+
+                     <!-- To Email Section -->
+                     <div
+                         class="slds-form-element slds-email-composer__combobox slds-wrap slds-p-bottom_xx-small slds-p-top_xx-small">
+                         <label class="slds-form-element__label" for="recipients-to">To</label>
+
+                         <!-- custom lookup component to handle searched user emails ( To Emails )-->
+                         <c-hd-email-lookup obj-name="User" search-placeholder="Search Users"
+                             search-field="Email,SmallPhotoUrl,Username,Name" additional-filters="Email,Name" icon-name=""
+                             email-type="to" onlookupselected={handleEmailSelection} onerror={handleError}>
+                         </c-hd-email-lookup>
+                     </div>
+
+                     <!-- Cc Email Section -->
+                     <div
+                         class="slds-form-element slds-email-composer__combobox slds-wrap slds-p-bottom_xx-small slds-p-top_xx-small">
+                         <label class="slds-form-element__label" for="recipients-to">Cc</label>
+
+                         <!-- custom lookup component to handle searched user emails ( Cc Emails )-->
+                         <c-hd-email-lookup obj-name="User" search-placeholder="Search Users"
+                             search-field="Email,SmallPhotoUrl,Username,Name" additional-filters="Email,Name" icon-name=""
+                             email-type="cc" onlookupselected={handleEmailSelection} onerror={handleError}>
+                         </c-hd-email-lookup>
+
+                     </div>
+
+                     <!-- Email Subject -->
+                     <div class="slds-form-element">
+                         <label class="slds-form-element__label slds-assistive-text" for="input-subject-01">
+                             Enter subject</label>
+                             <input type="text" id="input-subject-01" data-source="subject" value={subject}
+                                 class="slds-input slds-input_bare" onkeypress={handleOnChangeOfEmailData}
+                                 placeholder="Subject" />
+                     </div>
+                     <lightning-input-rich-text class="docker-height" data-source="emailBody"
+                     value={emailBody} onchange={handleOnChangeOfEmailData}>
+                 </lightning-input-rich-text>
+                      
+                    <!-- Action button to send Email Response -->
+                    <footer class="slds-docked-composer__footer slds-shrink-none">
+                        <div class="slds-col_bump-left slds-grid slds-grid_vertical-align-center">
+                            <button class="slds-button slds-button_brand" onclick={validateBeforeSubmit}>Send</button>
+                        </div>
+                    </footer>
+                    
+                </section>
+            </div>
+        </div>
+    </section>
+    <!-- To blur out the background whenever Maximize button is clicked -->
+    <div if:true={emailComposerMax} class="slds-backdrop slds-backdrop_open"></div>
+</template>

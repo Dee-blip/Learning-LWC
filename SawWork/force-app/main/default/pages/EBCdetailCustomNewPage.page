@@ -1,0 +1,44 @@
+<!--Page used to overide the Standard EBC_Request_Detail__c page
+    created as part of request to attach multiple opportunities 
+    with the single EBC_Request Object
+ -->
+<apex:page standardController="EBC_Request_Detail__c" extensions="EBCRequestDetailController"  label="EBC Request Detail"  >
+<script type="text/javascript">
+        function selectAllCheckboxes(obj,receivedInputID){
+            var inputCheckBox = document.getElementsByTagName("input");                  
+            for(var i=0; i<inputCheckBox.length; i++){          
+                if(inputCheckBox[i].id.indexOf(receivedInputID)!=-1){                                     
+                    inputCheckBox[i].checked = obj.checked;
+                }
+            }
+        }
+    </script>
+    <apex:form >
+    <apex:pageMessages id="pgMsg"></apex:pageMessages>
+     <apex:pageBlock id="EbcPageBlock" title="EBC Request Opportunity">
+     <apex:pageBlockSection title="Opportunity -Result Set # {!pageNumber}" ></apex:pageBlockSection>
+        <apex:pageBlockTable value="{!opptyWrapperList}" var="oppWrapper" >
+              <apex:column headerValue="Select">
+              <apex:facet name="header">
+                        <apex:inputCheckbox onclick="selectAllCheckboxes(this,'inputId')"/>
+                    </apex:facet>
+              <apex:inputCheckbox value="{!oppWrapper.CheckBox}" id="inputId"/>
+              </apex:column>
+              <apex:column headerValue="Opportunity Name" >
+               <apex:outputLink value="/{!oppWrapper.opp.Id}" target="_blank">{!oppWrapper.opp.Name}</apex:outputLink>
+              </apex:column>
+              <apex:column value="{!oppWrapper.opp.StageName}"/>
+               <apex:column value="{!oppWrapper.opp.Closedate}"/>
+               <apex:column value="{!oppWrapper.opp.MRR__c}"/>
+           </apex:pageBlockTable>
+           
+             <apex:panelGrid columns="4">
+           <!-- <apex:commandLink action="{!first}" >First |</apex:commandlink>-->
+            <apex:commandLink action="{!previous}" rendered="{!hasPrevious}">Previous|</apex:commandlink>
+            <apex:commandLink action="{!next}" rendered="{!hasNext}">Next|</apex:commandlink>
+           <!-- <apex:commandLink action="{!last}">Last |</apex:commandlink>-->
+            </apex:panelGrid>
+         </apex:pageBlock>
+          <apex:commandButton action="{!SaveOppty}" value="Attach Opportunities With EBC Request"/>
+    </apex:form>
+</apex:page>

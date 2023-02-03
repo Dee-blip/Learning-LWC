@@ -1,0 +1,6 @@
+<apex:page Controller="OpenByAKAMid" action="{!autoRun}">
+<apex:form >
+<br></br>
+Sorry, this record was not found.
+ </apex:form>
+</apex:page>

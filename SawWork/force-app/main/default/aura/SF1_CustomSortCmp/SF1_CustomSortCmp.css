@@ -1,0 +1,34 @@
+.THIS.forceSortFilterMenuItem a.selected .stateIndicator {
+    display: block;
+}
+
+.THIS.forceSortFilterMenuItem .stateIndicator {
+    float: left;
+    display: none;
+    width: 40%;
+}
+
+.THIS.forceSortFilterMenuItem .indicatorBox {
+    float: right;
+    padding-bottom: 3px;
+    padding-left: 7px;
+    padding-right: 7px;
+    background-color: white;
+    border-radius: 20px;
+}
+
+.THIS.forceIcon.slds-button__icon .slds-icon {
+    fill: currentColor;
+    vertical-align: middle;
+}
+.THIS.forceIcon .slds-icon--xx-small {
+    width: .875rem;
+    height: .875rem;
+    vertical-align: middle;
+}
+.THIS.slds-icon_xx-small, .THIS.slds-icon--xx-small {
+    width: .875rem;
+    height: .875rem;
+    line-height: 1;
+    vertical-align: middle;
+}

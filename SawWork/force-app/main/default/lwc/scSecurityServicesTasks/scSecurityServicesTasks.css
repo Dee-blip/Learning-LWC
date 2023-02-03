@@ -1,0 +1,14 @@
+.datatableStyle
+{
+    overflow: auto;
+    padding-top: 1.5vh;
+}
+
+.rightAlign{
+    text-align: right;
+}
+
+.modalZIndex
+{
+    z-index: 10010;
+}

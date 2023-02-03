@@ -1,0 +1,107 @@
+<template>
+    <div class="slds-is-relative">
+        <div if:true={isUpdating} class="">
+            <lightning-spinner alternative-text="Loading Cases..." size="medium" variant="brand"></lightning-spinner>
+        </div>
+        <center><h1 class="slds-text-heading_large">Search existing cases by entering AKAM Case Ids or Case Numbers</h1>
+            <h3 class="">For AKAM Case Id : {AkamIdOfCase}, Case Number : {CaseNumberOfCase}</h3></center>
+            <c-custom-toast-cmp ></c-custom-toast-cmp>
+        <hr></hr>
+        <div>
+            <div class="slds-grid slds-gutters slds-align_absolute-center" style="width: 46%;">
+                <div class="slds-col slds-size_1-of-3 slds-p-around_medium">
+                    <p style="float : right;"><b>AKAM Case Ids/Case Numbers</b>
+                    </p>
+                </div>
+                <div class="slds-col slds-size_2-of-3">
+                    <lightning-textarea label="" class="idVals" placeholder="Use delimiter comma, semicolon, space or new line"></lightning-textarea>
+                </div>
+            </div>
+            <div class="slds-grid slds-gutters slds-wrap slds-align_absolute-center slds-m-top_x-small buttonDiv">
+                <lightning-button 
+                    label="Search Cases" 
+                    variant="brand"
+                    class=""
+                    onclick={searchCase}>
+                </lightning-button>
+                <button class="slds-button slds-button_brand slds-m-left_x-small" onclick={cancelThePage}>Cancel</button>
+            </div>
+        </div>
+        <hr></hr>
+        <template if:true={inputCaseIds}>
+            <div>
+                <lightning-layout>
+                    <lightning-layout-item flexibility="auto">
+                        <div if:true={casesSpinner} class="backgroundInverse">
+                            <lightning-spinner alternative-text="Loading Cases..." size="small" variant="inverse"></lightning-spinner>
+                        </div>
+                        <template if:true={recordsFound}>
+                            <div>
+                                <div class="slds-grid slds-gutters slds-align_absolute-center slds-p-bottom_medium">
+                                    <div class="slds-col slds-size_1-of-3 slds-p-around_medium slds-align_absolute-center">
+                                        <span class="dotSameCaseBg slds-m-right_x-small"></span>
+                                        <span>This case is parented by a case that is also its child</span>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-3 slds-p-around_medium slds-align_absolute-center">
+                                        <span class="dotHasParentAlready slds-m-right_x-small"></span>
+                                        <span>This case already has a parent</span>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-3 slds-p-around_medium slds-align_absolute-center">
+                                        <span class="dotAlreadyClosed slds-m-right_x-small"></span>
+                                        <span>This case is already closed</span>
+                                    </div>
+                                </div>
+                                <!--div class="slds-grid slds-grid_vertical slds-p-bottom_medium">
+                                    <div class="slds-col">
+                                        <span>The cases with the following colors cannot be selected to be updated - </span>
+                                    </div>
+                                    <div class="slds-col">
+                                        <span class="dotSameCaseBg"></span>
+                                        <span>This case is parented by a case that is also its child</span>
+                                    </div>
+                                    <div class="slds-col">
+                                        <span class="dotHasParentAlready"></span>
+                                        <span>This case already has a parent</span>
+                                    </div>
+                                    <div class="slds-col">
+                                        <span class="dotAlreadyClosed"></span>
+                                        <span>This case is already closed</span>
+                                    </div>
+                                </div-->
+                                <div style="height: 100%;max-height: 400px;overflow-y: auto;border: 1px solid #dddbda;">
+                                    <lightning-datatable
+                                            key-field="Id"
+                                            data={casesWrap}
+                                            columns={columns}
+                                            selected-rows={selectedRows}
+                                            onrowselection={handleRowSelection}
+                                            sorted-direction={sortDirection}
+                                            sorted-by={sortedBy}
+                                            onsort={onHandleSort}
+                                            class = "slds-table_bordered slds-table_col-bordered testTable">
+                                    </lightning-datatable>
+                                </div>
+                                <div class="slds-clearfix slds-p-around_medium">
+                                    <lightning-button 
+                                        label="Update Cases" 
+                                        variant="brand"
+                                        class="slds-align_absolute-center"
+                                        onclick={handleUpdate}>
+                                    </lightning-button>
+                                </div>
+                            </div>
+                        </template>
+                        <template if:true={noRecordsFound}>
+                            <div class="slds-align_absolute-center slds-p-top_medium slds-text-color_error lgc-bg">
+                                <h2 class="slds-text-heading_small">No Cases Found</h2>
+                            </div>
+                            <div class="slds-align_absolute-center lgc-bg">
+                                <h3>Please check the AKAM Case Id or Case Number that you have entered.</h3>
+                            </div>
+                        </template>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </div>
+        </template>
+    </div>
+</template>

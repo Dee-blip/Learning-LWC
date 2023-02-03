@@ -1,0 +1,22 @@
+<apex:page standardController="Case_Transition__c"  standardStylesheets="true" id="caseTransitionHistory" >
+    <apex:includeScript value="{!$Resource.JQuery_New}"/>
+    <apex:form id="transitionHistoryForm" >
+         <apex:pageBlock mode="detail" id="transitionPageBlock" title="Case Transition "   >
+                <apex:pageBlockSection collapsible="true" showHeader="true" title="{!Case_Transition__c.name}" columns="2" id="transitionPageBlockSection">
+                     <apex:repeat value="{!$ObjectType.Case_Transition__c.FieldSets.CaseTransitionReadView }" var="f"> 
+        				<apex:outputField value="{!Case_Transition__c[f]}" /><br/>
+    				</apex:repeat>
+                </apex:pageBlockSection>
+        </apex:pageBlock>         
+      </apex:form>
+    <Script>
+   		$( document ).ready(function() {
+    		$("span[id*=transitionHistoryForm\\:transitionPageBlock]").each(function(){
+                if ($(this).text().length > 400){
+                    $(this).attr('style','display:block;height:100px;width:450px;overflow:auto;');
+                }
+			});
+		});
+    </Script>
+    
+</apex:page>

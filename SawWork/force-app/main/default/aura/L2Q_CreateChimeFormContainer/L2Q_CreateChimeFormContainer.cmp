@@ -1,0 +1,16 @@
+<aura:component implements="lightning:isUrlAddressable,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+    <aura:attribute name="opportunityId" type="String" />
+    <aura:attribute name="accountId" type="String" /> 
+    <aura:html tag="style">
+        .slds-modal__container{
+        width: 65% !important;
+        max-width: 65% !important;
+        }
+    </aura:html>
+    <div class="modal-header slds-modal__header slds-size_1-of-1" style="font-size:20px">
+        <h4 class="title slds-text-heading–medium">New Chime Form</h4>
+    </div>
+    <div>
+        <c:l2Q_CreateChimeForm iscreate="true" parentrecid="{!v.recordId}" onclose="{!c.closeQA}"/>
+    </div>
+</aura:component>

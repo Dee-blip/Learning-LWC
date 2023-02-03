@@ -1,0 +1,294 @@
+<template>
+    <hr style="margin: 0">
+    <div class="c-container" if:false={error} style="font-family: Roboto;">
+        <lightning-layout vertical-align="stretch" multiple-rows="true" class="x-large row" if:false={noresultfound}>
+            <lightning-layout-item flexibility="auto" padding="around-small" size="2" class="col-2" if:true={results}>
+                <h3 id="filter-header" class="slds-nav-vertical__title custom_filter_headers">Filters <span class="custom_clearAllFilter" onclick={handleMessage} if:false={allPage}>Clear All</span></h3>
+                <hr class="filter_hr" />
+
+                <div class="source-only" if:true={sourceType.show}>
+                    <nav class="slds-nav-vertical" aria-label="source category">
+                        <div class="slds-nav-vertical__section">
+                            <h2 id="source-header" class="slds-nav-vertical__title custom_filter_subheaders">Source</h2>
+                            <ul aria-describedby="source-header">
+                                <template for:each={sourceType.items} for:item="box">
+                                    <li class="slds-nav-vertical__item" key={box.Value} onclick={handleSourceSelect} data-name={box.Name}>
+                                        <a class="slds-nav-vertical__action" style="padding:1px;" aria-current="true">{box.Name}
+                                            <span class="slds-badge slds-col_bump-left">
+                                                <span class="slds-assistive-text">:</span>{box.Count}
+                                            </span>
+                                        </a>
+                                    </li>
+                                </template>  
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+                <hr class="filter_hr" if:true={sourceType.show}/>
+
+                <div class="contentType-only" if:true={contentType.show}>
+                    <nav class="slds-nav-vertical" aria-label="content type category">
+                        <div class="slds-nav-vertical__section">
+                            <h2 id="content-type-header" class="slds-nav-vertical__title custom_filter_subheaders">Content Type</h2>
+                            <ul aria-describedby="content-type-header">
+                                <template for:each={contentType.modifiedItems} for:item="type">
+                                    <li class="slds-nav-vertical__item" key={type.Value} onclick={handleContentTypeSelect} data-name={type.Name}>
+                                        <a class="slds-nav-vertical__action" style="padding:1px;" aria-current="true">{type.Name}
+                                            <span class="slds-badge slds-col_bump-left">
+                                                <span class="slds-assistive-text">:</span>{type.Count}
+                                            </span>
+                                        </a>
+                                    </li>
+                                </template>  
+                            </ul>
+                        </div>
+                    </nav>
+                    <div style="text-align:center;" if:true={contentType.action}><a onclick={showContentType} style="color: #006DCC;">{contentType.action}</a></div>
+                </div>
+                <hr class="filter_hr" if:true={contentType.show}/>
+
+                <div class="solution-only" if:true={solutionBox.show}>
+                    <nav class="slds-nav-vertical" aria-label="solution category">
+                        <div class="slds-nav-vertical__section">
+                            <h2 id="solution-header" class="slds-nav-vertical__title custom_filter_subheaders">Related Solutions</h2>
+                            <ul aria-describedby="solution-header">
+                                <template for:each={solutionBox.items} for:item="solution">
+                                    <li class="slds-nav-vertical__item" key={solution.Value} onclick={handleSolutionSelect} data-name={solution.Name}>
+                                        <a class="slds-nav-vertical__action" style="padding:1px;" aria-current="true">{solution.Name}
+                                            <span class="slds-badge slds-col_bump-left">
+                                                <span class="slds-assistive-text">:</span>{solution.Count}
+                                            </span>
+                                        </a>
+                                    </li>
+                                </template>  
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+                <hr class="filter_hr" if:true={solutionBox.show}/>
+
+                <div class="product-only" if:true={productsBox.show}>
+                    <nav class="slds-nav-vertical" aria-label="product category">
+                        <div class="slds-nav-vertical__section">
+                            <h2 id="product-header" class="slds-nav-vertical__title custom_filter_subheaders">Related Products</h2>
+                            <ul aria-describedby="product-header">
+                                <template for:each={productsBox.modifiedItems} for:item="product">
+                                    <li class="slds-nav-vertical__item" key={product.Value} onclick={handleProductSelect} data-name={product.Name}>
+                                        <a class="slds-nav-vertical__action" style="padding:1px;" aria-current="true">{product.Name}
+                                            <span class="slds-badge slds-col_bump-left">
+                                                <span class="slds-assistive-text">:</span>{product.Count}
+                                            </span>
+                                        </a>
+                                    </li>
+                                </template>  
+                            </ul>
+                        </div>
+                    </nav>
+                    <div style="text-align:center;" if:true={productsBox.action}><a onclick={showProducts} style="color: #006DCC;">{productsBox.action}</a></div>
+                </div>
+                <hr class="filter_hr" if:true={productsBox.show}/>
+
+            </lightning-layout-item>
+            <lightning-layout-item flexibility="auto" padding="around-small" class="custom-box col-10" size="10">
+                <div if:true={isLoaded}>
+                    <div if:true={results}>
+                        <!-- Query intent results-->
+                        <div if:true={allPage}>
+                            <c-search-akamai-query-intent-results if:true={showQueryIntent} queryintentresult={queryIntentResult} keyword={keyword} userdetails={userdetails} captureaudit={captureAudit}></c-search-akamai-query-intent-results>
+                        </div>
+
+                        <h1>Showing <b>{count}</b> results for <span class="keywordStyling">{keyword}</span> match by
+                        <span style="position:relative;">
+                            <lightning-button-menu onselect={handlePrecisionMenuSelect} title="Advanced Search" alternative-text="Advanced Search" variant="border-filled" label={precision.label} style="padding-left: 3px;" icon-size='xx-small'>
+                                <template for:each={precisionOptions} for:item="option"> 
+                                    <lightning-menu-item key={option.label} label={option.label} value={option.value} checked={option.checked} ></lightning-menu-item>
+                                </template>
+                            </lightning-button-menu>
+                            <button class="slds-button slds-button_icon slds-button__icon_large btn_top custom_btn_info" title="info" aria-describedby="info" onmouseover={show_popup} onmouseleave={hide_popup}>
+                                <lightning-icon icon-name="utility:info" alternative-text="info" variant="border-filled" size="xx-small"></lightning-icon>
+                                <span class="slds-assistive-text">info</span>
+                            </button>
+                            <span style="position:relative;top:-184px;">
+                                <div if:true={showpopup} class="slds-popover slds-popover_tooltip slds-nubbin_bottom-right custom_info_tooltip" role="tooltip" id="info">
+                                    <div class="slds-popover__body" style="text-align: left;">
+                                        <div class="slds-media">
+                                            <div class="slds-media__body">
+                                                <ul class="slds-list_ordered slds-has-inline-block-links_space" style="list-style: disc;">
+                                                    <li><i>Exact Expression:</i> Ensures that the exact expression appears as it is in the answers.<br/></li>
+                                                    <li><i>Same Phrase:</i> Different words entered in the search field must appear within a same sentence in the answers.<br/></li>
+                                                    <li><i>Every Word:</i> All the words of the query must appear in each document returned.<br/></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </span>
+                        </span>
+                        <span if:true={spellCheck}> and spell-corrected terms.</span></h1>
+                        <div if:true={spellCheck}>
+                            <h1> Did you mean <b><a href={spellCheck.link}>{spellCheck.CorrectedText}</a></b>?</h1>
+                        </div>
+                        <br/>
+
+                        <!--Sorting Options-->
+                        <div style="padding: 0px;height:25px;">
+                            <!-- <lightning-button-menu onselect={handleLanguageMenuSelect} title="Language" alternative-text="Select Language" variant="border-filled" label='Language'>
+                                <template for:each={languageOptions} for:item="option"> 
+                                    <lightning-menu-item key={option.label} label={option.label} value={option.value} checked={option.checked} ></lightning-menu-item>
+                                </template>
+                            </lightning-button-menu>
+                            <lightning-helptext content="Select Language for your search-key. This will help you get better result if your search-key is in specific language."></lightning-helptext> -->
+                            <div >
+                                <div style="float: left;" >
+                                <b>
+                                    <span for:each={selectedSource} for:item="source" key={source}>
+                                        <lightning-pill label={source} name={source} onremove={handleRemoveSource} class="custom_lightning_pill"></lightning-pill>
+                                    </span>
+                                    <span for:each={selectedContentTypes} for:item="contentType" key={contentType}>
+                                        <lightning-pill label={contentType} name={contentType} onremove={handleRemoveContentTypes} class="custom_lightning_pill"></lightning-pill>
+                                    </span>
+                                    <span for:each={selectedSolutions} for:item="solution" key={solution}>
+                                        <lightning-pill label={solution} name={solution} onremove={handleRemoveSolutions} class="custom_lightning_pill"></lightning-pill>
+                                    </span>
+                                    <span for:each={selectedProducts} for:item="product" key={product}>
+                                        <lightning-pill label={product} name={product} onremove={handleRemoveProducts} class="custom_lightning_pill"></lightning-pill>
+                                    </span>
+                                </b>
+                                </div>
+                            </div>
+                            <div style="float: right;" >
+                                Sort By:
+                                <lightning-button-menu onselect={handleSortMenuSelect} title="Sort by" alternative-text="Sort by " variant="border-filled" label={selectedSortOption.label} style="padding: 0 15px 0 5px;">
+                                    <template for:each={sortOptions} for:item="option"> 
+                                        <lightning-menu-item key={option.label} label={option.label} value={option.value} checked={option.checked} if:true={option.show}></lightning-menu-item>
+                                    </template>
+                                </lightning-button-menu>
+                            </div>
+                        </div>
+                        <hr style="margin: 5px;">
+
+                        <!--Sponsored Links-->
+                        <div if:true={allPage}>
+                            <template for:each={sponsoredLinks} for:item="link" if:true={sponsoredLinks}>
+                                <div class="slds-p-around_medium lgc-bg panel" key={link.Id}>
+                                    <lightning-tile type="media" title={link.Title} data-attribute={link.Id}>
+                                        <lightning-icon icon-name="action:web_link" alternative-text="link" title="link" size="xx-small"></lightning-icon>
+                                        <a href={link.Url} target="_blank" style="padding-left: 15px;">{link.Title}</a>
+                                    </lightning-tile>
+                                </div>
+                            </template>
+                        </div>
+                        
+                        <!--Display results-->
+                        <template for:each={results} for:item="doc">
+                            <div key={doc.docid} class="slds-p-around_medium lgc-bg panel" style="position: relative;" data-attribute={doc.docid}>
+                                <lightning-tile type="media" title={doc.title} data-attribute={doc.docid}>
+                                    <a onclick={captureInAudit} data-title={doc.title} data-url={doc.resulturl} data-rank={doc.rank} data-source={doc.Akamai_Source} class="custom_title_a_tag">{doc.title}</a>
+                                        <div class="custom_metadata_tags">
+                                            <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_name" title="Akamai Source" if:true={doc.Akamai_Source}>Source: </span>
+                                            <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_value" title="Akamai Source" if:true={doc.Akamai_Source}>{doc.Akamai_Source}</span>
+                                            <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_name" title="Content Type" if:true={doc.Content_Type}>Content Type: </span>
+                                            <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_value" title="Content Type" if:true={doc.Content_Type}>{doc.Content_Type}</span>
+                                            <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_name" title="Content Type" if:true={doc.sourcestr7}>Article Number: </span>
+                                            <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_value" title="Content Type" if:true={doc.sourcestr7}>{doc.sourcestr7}</span>
+                                            <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_name" title="Last Updated" if:true={doc.modified}>Last Updated: </span>
+                                            <span class="slds-tile__detail slds-text-body--small slds-var-p-bottom_xxx-small custom_metadata_tag_value" title="Last Updated" if:true={doc.modified}>{doc.modified}</span>
+                                        </div>
+                                        <div class="summary_limit" if:false={doc.isFeed}><lightning-formatted-rich-text value={doc.summaryhtml}></lightning-formatted-rich-text></div>
+                                        <div class="summary_limit" if:true={doc.isFeed}><lightning-formatted-rich-text value={doc.Description}></lightning-formatted-rich-text></div>
+                                        <div>
+                                            <span if:true={doc.sourceint2} style="padding-right:10px;">
+                                                <lightning-icon icon-name="utility:comments" alternative-text="comments" variant="border-filled" size="xx-small" slot="media" style="background: white;"></lightning-icon>&nbsp;{doc.sourceint2}
+                                            </span>
+                                            <span if:true={doc.sourceint3} style="padding-right:10px;">
+                                                <lightning-icon icon-name="utility:like" alternative-text="like" variant="border-filled" size="xx-small" slot="media" style="background: white;padding-left:5px;"></lightning-icon>&nbsp;{doc.sourceint3}
+                                            </span>
+                                            <span if:true={doc.sourceint4} style="padding-right:10px;">
+                                                <lightning-icon icon-name="utility:preview" alternative-text="views" variant="border-filled" size="xx-small" slot="media" style="background: white;"></lightning-icon>&nbsp;{doc.sourceint4}
+                                            </span>
+                                            <span if:true={doc.sourcestr38} style="padding-right:10px;">
+                                                <lightning-icon icon-name="action:check" alternative-text="verified" size="xx-small" style="background: green;padding: 1px;"></lightning-icon>&nbsp;<span style="font-size: small; color: green; font-weight: 700;">Answered</span>
+                                            </span>
+                                        </div>
+                                </lightning-tile>
+                            </div>
+                        </template>
+                        <br/>
+                        <!--Pagination-->
+                        <div style="padding: 15px;">
+                            <p class="pageSize-position">Page size: <strong style= "color:#0C0705;">{documentsThisPage}</strong></p>
+                            <lightning-button-group class="btn-grp-right" style="color: #006DCC;">
+                                <lightning-button label="Previous" onclick={handlePrevPageSearch} disabled={disablePrev} ></lightning-button>
+                                <lightning-button label="Next" onclick={handleNextPageSearch} disabled={disableNext} ></lightning-button>
+                            </lightning-button-group>
+                            <p class="pageInfo-position">Page <strong style= "color:#0C0705;">{currentPage}</strong> of <strong style= "color:#0C0705;">{pageCount}</strong></p>
+                        </div>
+                    </div>  
+                     
+                    <div if:false={results}>
+                        <div if:true={spellCheck}>
+                            <h1> Did you mean <b><a href={spellCheck.link}>{spellCheck.CorrectedText}</a></b> ? </h1>
+                        </div>
+                    </div>
+                </div>                    
+                <div if:false={isLoaded} class="exampleHolder">
+                    <lightning-spinner alternative-text="Loading..." size="medium" style="text-align: center;"></lightning-spinner>
+                </div>         
+            </lightning-layout-item>
+        </lightning-layout>
+        <lightning-layout vertical-align="stretch" multiple-rows="true" class="x-large slds-theme_alert-texture" if:true={noresultfound}>
+            <lightning-layout-item flexibility="auto" padding="around-small" class="custom-box" size="12">
+                <br><br>
+                <h1> No results found for <b>{keyword}</b> match by 
+                    <span style="position:relative;">
+                        <lightning-button-menu onselect={handlePrecisionMenuSelect} title="Advanced Search" alternative-text="Advanced Search" variant="border-filled" label={precision.label} style="padding-left: 3px;" icon-size='xx-small'>
+                            <template for:each={precisionOptions} for:item="option"> 
+                                <lightning-menu-item key={option.label} label={option.label} value={option.value} checked={option.checked} ></lightning-menu-item>
+                            </template>
+                        </lightning-button-menu>
+                        <button class="slds-button slds-button_icon slds-button__icon_large btn_top custom_btn_info" title="info" aria-describedby="info" onmouseover={show_popup} onmouseleave={hide_popup}>
+                            <lightning-icon icon-name="utility:info" alternative-text="info" variant="border-filled" size="xx-small"></lightning-icon>
+                            <span class="slds-assistive-text">info</span>
+                        </button>
+                        <span style="position:relative;top:-184px;">
+                            <div if:true={showpopup} class="slds-popover slds-popover_tooltip slds-nubbin_bottom-right custom_info_tooltip" role="tooltip" id="infomatch">
+                                <div class="slds-popover__body" style="text-align: left;">
+                                    <div class="slds-media">
+                                        <div class="slds-media__body">
+                                            <ul class="slds-list_ordered slds-has-inline-block-links_space" style="list-style: disc;">
+                                                <li><i>Exact Expression:</i> Ensures that the exact expression appears as it is in the answers.<br/></li>
+                                                <li><i>Same Phrase:</i> Different words entered in the search field must appear within a same sentence in the answers.<br/></li>
+                                                <li><i>Every Word:</i> All the words of the query must appear in each document returned.<br/></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </span>
+                    </span>
+                </h1>
+                <br>
+                <div style="text-align: left;padding-left: 43%;">
+                    <h1>Did not get the expected results?</h1>
+                    <ul style="list-style: square;margin-left: 15px;">
+                        <li>Try different filters post your searches,</li>
+                        <li>Or search with other keywords</li>
+                        <li>Or <a onclick={handleMessage} style="color: #006DCC;">Clear All Applied Filters</a></li>
+                    </ul>
+                </div>
+                <br><br>
+            </lightning-layout-item>
+        </lightning-layout>
+    </div>
+    <div class="c-container" if:true={error} style="font-family: Roboto;">
+        <lightning-layout vertical-align="stretch" multiple-rows="true" class="x-large slds-theme_alert-texture">
+            <lightning-layout-item flexibility="auto" padding="around-small" class="custom-box" size="12">
+                <br><br>
+                <lightning-icon icon-name="utility:error" alternative-text="Error!" title="Error" size="large"></lightning-icon>
+                <h6><br>{error}</h6>
+                <br><br>
+            </lightning-layout-item>
+        </lightning-layout>
+    </div>
+    <hr>
+</template>

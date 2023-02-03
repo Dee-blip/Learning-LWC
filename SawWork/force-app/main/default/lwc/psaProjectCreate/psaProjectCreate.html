@@ -1,0 +1,283 @@
+<template>
+    <template if:false={showSpinner}>
+        <lightning-card>
+            <div class="slds-align_absolute-center">
+                <lightning-layout vertical-align="center">
+                    <lightning-layout-Item padding="around-small" flexibility="auto">
+                        <lightning-button label="Create" title="Create" onclick={handlecreate} class="slds-m-left_x-small">
+                        </lightning-button>
+                        <lightning-button label="Cancel" title="Cancel" onclick={handlecancel} class="slds-m-left_x-small">
+                        </lightning-button>
+                    </lightning-layout-Item>
+                </lightning-layout>
+            </div>
+            <template if:true={data}>
+                <lightning-accordion allow-multiple-sections-open active-section-name={activeSections} class="accordiancls">
+                    <lightning-accordion-section name="A" label="Project Details">
+                        <lightning-record-edit-form object-api-name="pse__Proj__c" onsuccess={handleProjectCreated} class="parent">
+                            <lightning-messages></lightning-messages>
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col slds-m-horizontal_xx-large">
+                                    <lightning-input-field field-name="Name" value={projName} data-group="projfield" onchange={handleNamechange} required>
+                                    </lightning-input-field>
+                                    <lightning-input-field field-name="pse__Project_Manager__c"
+                                        value={data.prorec.pse__Project_Manager__c} data-group="projfield">
+                                    </lightning-input-field>
+                                    <lightning-input-field field-name="pse__Project_Type__c"
+                                        value={data.prorec.pse__Project_Type__c} data-group="projfield" required>
+                                    </lightning-input-field>
+                                    <lightning-input-field field-name="Project_Sub_Type__c"
+                                        value={data.prorec.Project_Sub_Type__c} data-group="projfield" required>
+                                    </lightning-input-field>
+                                    <lightning-input-field field-name="pse__Start_Date__c" value={data.prorec.pse__Start_Date__c}
+                                        data-group="projfield" required>
+                                    </lightning-input-field>
+                                    <lightning-input-field field-name="pse__End_Date__c" value={completionDate}
+                                        data-group="projfield" onchange={handlecompletionDatechange} required >
+                                    </lightning-input-field>                                
+                                    <lightning-input-field field-name="pse__Billing_Type__c" value={feeschedule}
+                                        data-group="projfield" onchange={handlefeeschedulechange}>
+                                    </lightning-input-field>
+                                    <lightning-input-field field-name="Contract_Closed__c" value={data.prorec.Contract_Closed__c}
+                                        data-group="projfield" onchange={handlecontractClosedchange}>
+                                    </lightning-input-field>
+                                    <lightning-input-field field-name="pse__Planned_Hours__c"
+                                        value={plannedhrs} data-group="projfield" onchange={handleplannedhrschange}>
+                                    </lightning-input-field>
+                                    <lightning-input-field field-name="Ongoing_Project_Recurring_Planned_Hour__c" value={recurringPlannedHrs}
+                                        data-group="projfield" onchange={handlerecurringPlannedHrschange}>
+                                    </lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-m-horizontal_xx-large">
+                                    
+                                    <lightning-input-field field-name="pse__Account__c" value={data.prorec.pse__Account__c}
+                                        disabled="true" data-group="projfield">
+                                    </lightning-input-field>
+
+                                    <lightning-input-field field-name="pse__Opportunity__c" value={data.prorec.pse__Opportunity__c}
+                                        data-group="projfield">
+                                    </lightning-input-field>
+
+                                    <lightning-input-field field-name="CurrencyIsoCode" value={data.prorec.CurrencyIsoCode}
+                                        data-group="projfield" required>
+                                    </lightning-input-field>
+
+                                    <lightning-input-field field-name="pse__Region__c" value={data.prorec.pse__Region__c}
+                                        data-group="projfield" disabled>
+                                    </lightning-input-field>
+
+                                    <lightning-input-field field-name="pse__Practice__c" value={data.prorec.pse__Practice__c}
+                                        data-group="projfield" required>
+                                    </lightning-input-field>
+
+                                    <lightning-input-field field-name="Under_Enterprise_Agreement__c"
+                                        value={data.prorec.Under_Enterprise_Agreement__c} data-group="projfield">
+                                    </lightning-input-field>
+
+                                    <lightning-input-field field-name="Project_Template__c" value={data.prorec.Project_Template__c}
+                                        data-group="projfield">
+                                    </lightning-input-field>
+
+                                    <lightning-input-field field-name="Ongoing_Project_Recurring_Budget_Amt__c" value={recurringBudgetAmt}
+                                        data-group="projfield" onchange={handlerecurringBudgetAmtchange}>
+                                    </lightning-input-field>  
+                                    
+                                    <!-- <lightning-input-field field-name="Account_Department__c" value={data.prorec.Account_Department__c}
+                                        data-group="projfield">
+                                    </lightning-input-field>  
+                                    	 -->
+                                </div>
+                            </div>
+                        </lightning-record-edit-form>
+                    </lightning-accordion-section>
+
+                    <lightning-accordion-section name="B" label="Project Billing Information">
+                        <lightning-button label="Add Project Contract Line Item" title="pcli" onclick={callCliScreen} class="slds-m-left_x-small"></lightning-button>
+                        <div class="slds-grid slds-gutters slds-m-around_x-small">
+                            <div class="slds-col slds-m-horizontal_xx-large">
+                                <p>Project Contract Line Item: &nbsp;<lightning-formatted-text value={pcliValue} label="Project Contract Line Item"></lightning-formatted-text></p>
+                            </div>
+                            <div class="slds-col slds-m-horizontal_xx-large">
+                                <p>Product: &nbsp;<lightning-formatted-text value={productValue} label="Product"></lightning-formatted-text></p>
+                            </div>
+                        </div>
+                    </lightning-accordion-section>
+
+                    <lightning-accordion-section name="C" label="Project Budget">
+                        <lightning-record-edit-form object-api-name="pse__Budget__c">
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col slds-m-horizontal_xx-large">
+                                    <lightning-input-field field-name="Name" value={data.budgetrec.Name} data-group="budgetfield" required>
+                                    </lightning-input-field>
+                                    <lightning-input-field field-name="pse__Status__c" value={data.budgetrec.pse__Status__c}
+                                        data-group="budgetfield">
+                                    </lightning-input-field>
+                                    <lightning-input-field field-name="pse__Effective_Date__c" value={data.budgetrec.pse__Effective_Date__c}
+                                        data-group="budgetfield">
+                                    </lightning-input-field>
+                                    <lightning-input-field field-name="pse__Description__c" value={budgetDescription}
+                                        data-group="budgetfield" onchange={handlebudgetDescriptionchange}>
+                                    </lightning-input-field>
+
+                                </div>
+                                <div class="slds-col slds-m-horizontal_xx-large">
+                                    <lightning-input-field field-name="pse__Amount__c" value={data.budgetrec.pse__Amount__c}
+                                        data-group="budgetfield" required>
+                                    </lightning-input-field>
+
+                                    <lightning-input-field field-name="pse__Type__c" value={data.budgetrec.pse__Type__c}
+                                        data-group="budgetfield" required>
+                                    </lightning-input-field>
+
+                                </div>
+                            </div>
+                        </lightning-record-edit-form>
+                    </lightning-accordion-section> 
+
+                    <div data-id="resource">
+                        <template if:true={showRR}>
+                            <lightning-datatable key-field="id"
+                                data={data.newResourceRequests}
+                                columns={columns}>
+                            </lightning-datatable>
+                        </template>
+                    </div>
+
+                    <lightning-accordion-section name="D" label="Project Milestones">
+                        <table class="slds-table slds-table_cell-buffer slds-no-row-hover slds-table_bordered">
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate" title="Name">Name</div>
+                                    </th>
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate" title="MILESTONE TYPE">MILESTONE TYPE</div>
+                                    </th>
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate" title="MILESTONE AMOUNT"> MILESTONE AMOUNT</div>
+                                    </th>
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate" title="PLANNED HOURS">PLANNED HOURS</div>
+                                    </th>
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate" title="START DATE">START DATE</div>
+                                    </th>
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate" title="TARGET DATE">TARGET DATE</div>
+                                    </th>
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate" title="BILLABLE">BILLABLE</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={data.milestonesrecs} for:item="milestone">   
+                                    <tr key={milestone.Id}>                                    
+                                        <td data-label="Name">
+                                            <lightning-input type="text" class="testhiddenclass" data-fieldapi="Task_Milestone_Name__c" value={milestone.Task_Milestone_Name__c} data-group={milestone.Id} > </lightning-input>
+                                        </td>
+                                        <td data-label="MILESTONE TYPE">
+                                            <lightning-input type="text" class="testhiddenclass" data-fieldapi="Milestone_Type_List__c" value={milestone.Milestone_Type_List__c} data-group={milestone.Id} disabled> </lightning-input>
+                                        </td>
+                                        <td data-label="MILESTONE AMOUNT">
+                                            <lightning-input type="number" class="testhiddenclass" data-fieldapi="pse__Milestone_Amount__c" value={milestone.pse__Milestone_Amount__c} data-group={milestone.Id} required> </lightning-input>
+                                        </td>
+                                        <td data-label="PLANNED HOURS">
+                                            <lightning-input type="number" class="testhiddenclass" data-fieldapi="pse__Planned_Hours__c" value={milestone.pse__Planned_Hours__c} data-group={milestone.Id}> </lightning-input>
+                                        </td>
+                                        <td data-label="START DATE">
+                                            <lightning-input type="date" class="testhiddenclass" data-fieldapi="Start_Date__c" value={milestone.Start_Date__c} data-group={milestone.Id}> </lightning-input>
+                                        </td>
+                                        <td data-label="TARGET DATE">
+                                            <lightning-input type="date" class="testhiddenclass" data-fieldapi="pse__Target_Date__c" value={milestone.pse__Target_Date__c} data-group={milestone.Id} required> </lightning-input>
+                                        </td>
+                                        <td data-label="BILLABLE">
+                                            <lightning-input type="checkbox" class="testhiddenclass" data-fieldapi="Billable__c" checked={milestone.Billable__c} data-group={milestone.Id} disabled> </lightning-input>
+                                        </td>
+                                    </tr>                               
+                                </template>
+                            </tbody>
+                        </table>
+                    </lightning-accordion-section>
+
+                    <lightning-accordion-section name="E" label="Project Tasks">
+                        
+                        <table class="slds-table slds-table_cell-buffer slds-no-row-hover slds-table_bordered">
+                            <thead>
+                            <tr class="slds-line-height_reset">
+                                <th class="" scope="col">
+                                <div class="slds-truncate" title="PROJECT TASK NAME">PROJECT TASK NAME</div>
+                                </th>
+                                <th class="" scope="col">
+                                <div class="slds-truncate" title="STATUS">STATUS</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="BILLABLE"> BILLABLE</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="STARTDATE">START DATE & TIME</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="ENDDATE">END DATE & TIME</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="MILESTONE">MILESTONE</div>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={data.taskrecs} for:item="task">   
+                                    <tr key={task.Id}>                                    
+                                        <td data-label="Name">
+                                            <lightning-input type="text" class="testhiddenclass" data-fieldapi="Name" value={task.Name} data-group={task.Id} disabled> </lightning-input>
+                                        </td>
+                                        <td data-label="STATUS">
+                                            <lightning-input type="text" class="testhiddenclass" data-fieldapi="pse__Status__c" value={task.pse__Status__c} data-group={task.Id} disabled> </lightning-input>
+                                        </td>
+                                        <td data-label="BILLABLE">
+                                            <lightning-input type="checkbox" class="testhiddenclass" data-fieldapi="Billable__c" checked={task.Billable__c} data-group={task.Id} disabled> </lightning-input>
+                                        </td>
+                                        <td data-label="STARTDATE">
+                                            <lightning-input type="date" class="testhiddenclass" data-fieldapi="pse__Start_Date_Time__c" value={task.pse__Start_Date_Time__c} data-group={task.Id}> </lightning-input>
+                                        </td>
+                                        <td data-label="ENDDATE">
+                                            <lightning-input type="date" class="testhiddenclass" data-fieldapi="pse__End_Date_Time__c" value={task.pse__End_Date_Time__c} data-group={task.Id}> </lightning-input>
+                                        </td>
+                                        <!-- <td data-label="MILESTONE">
+                                            <lightning-input type="text" class="testhiddenclass" data-fieldapi="pse__Milestone__c" value={task.pse__Milestone__r.Name} data-group={task.Name}> </lightning-input>
+                                        </td> -->
+                                    </tr>                         
+                                </template>
+                            </tbody>
+                        </table>
+
+                    </lightning-accordion-section>
+                </lightning-accordion>
+            </template>
+                    
+            <template if:true={showPCLIComponent}>
+                <div class="custommodalpop popupBackground">
+                    <div class="LightningContractSelect custPopup" >
+                        <c-psa-project-contract-select rec-id={parentid} onclose={handleoncloseEvent} onparentclose={handleparentcloseEvent} ></c-psa-project-contract-select>
+                    </div>
+                </div>
+            </template>
+
+            <div class="slds-align_absolute-center slds-m-bottom_xx-large">
+                <lightning-layout vertical-align="center">
+                    <lightning-layout-Item padding="around-small" flexibility="auto">
+                        <lightning-button label="Create" title="Create" onclick={handlecreate} class="slds-m-left_x-small">
+                        </lightning-button>
+                        <lightning-button label="Cancel" title="Cancel" onclick={handlecancel} class="slds-m-left_x-small">
+                        </lightning-button>
+                    </lightning-layout-Item>
+                </lightning-layout>
+            </div>
+        </lightning-card>
+    </template> 
+    <template if:true={showSpinner}>
+        <div class="slds-spinner_container">
+            <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+        </div>
+    </template>
+</template>

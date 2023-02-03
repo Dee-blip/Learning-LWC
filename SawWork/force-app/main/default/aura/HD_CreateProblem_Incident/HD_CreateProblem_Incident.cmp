@@ -1,0 +1,9 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="HD_Problem_Incident_Clone_Extension">
+    <aura:registerEvent name="HDLogger" type="c:HDLogger"/>
+	<ltng:require scripts="{!$Resource.HD_Error_Logger}" /> 
+    <aura:attribute name="recordId" type="Id" default="{!recordId}"/>
+    
+		<div >
+    		 <ui:button aura:id="createProblem" label="Create Problem" press="{!c.createProblem}"/>
+    	</div>	
+</aura:component>

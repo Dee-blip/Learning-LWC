@@ -1,0 +1,107 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="HD_IncidentDetailController">
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="attachments" type="Attachment[]" />
+    <aura:attribute name="files" type="List" />
+    <aura:registerEvent name="HDLogger" type="c:HDLogger"/>
+    <ltng:require scripts="{!$Resource.HD_Error_Logger}" />
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:handler event="c:HD_RefreshEvent" action="{!c.doInit}"/>
+    <!-- adding spinner technique -->
+    <aura:attribute name="loadingFlag" type="boolean" default="true" />
+    <!-- added this for auto refresh event -->
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+    
+    
+    <lightning:card title="Attachments" iconName="standard:file">
+        <aura:set attribute="actions">
+           <lightning:buttonIcon iconName="utility:refresh"  variant="bare" alternativeText="Refresh" onclick="{!c.doInit}" class="rotate" />
+        </aura:set>
+        
+        <lightning:layout multipleRows="true" class="slds-box">
+            
+            <aura:if isTrue="{!v.loadingFlag}"> 
+                <!-- this layout item is for spinner -->   
+                <lightning:layoutItem size="12"  padding="around-small">
+                    <div class="align-spinner">
+                        <lightning:spinner alternativeText="Loading" size="medium" />
+                    </div>     
+                </lightning:layoutItem>
+                <!-- END this layout item is for spinner -->   
+                
+                <aura:set attribute="else">
+              
+            <!-- this layout item is for Showing No Files -->
+              <aura:if isTrue="{! (v.attachments.length || v.files.length) == 0 }">   
+                <lightning:layoutItem size="12"  padding="around-small">
+                    <div class="align-spinner">
+                      <div class="slds-text-body_regular  slds-text-align_center slds-text-heading_small">No Files To Display.</div>
+                    </div>     
+                </lightning:layoutItem>
+               </aura:if>
+             <!-- END this layout item is for Showing No Files -->     
+                    
+                    <aura:iteration items="{!v.attachments}" var="attachment">
+                        <lightning:layoutItem size="6" padding="around-small">
+                            <div class="custom-box">
+                                <lightning:tile label="{!attachment.Name}" href="{!'/servlet/servlet.FileDownload?file='+attachment.Id+'&amp;operationContext=S1'}">
+                                    <aura:set attribute="media">
+                                        <lightning:icon iconName="doctype:attachment"/>
+                                    </aura:set>
+                                    <p>
+                                        <lightning:formattedNumber value="{!(attachment.BodyLength>1024*1024)?attachment.BodyLength/(1024*1024):(attachment.BodyLength>1024)?attachment.BodyLength/1024:attachment.BodyLength}" 
+                                                                   maximumFractionDigits ="0"/>
+                                        {!(attachment.BodyLength>1024*1024)?'MB':(attachment.BodyLength>1024)?'KB':'B'}
+                                        • 
+                                        <ui:outputDate value="{!attachment.CreatedDate}" />
+                                    </p>
+                                    <!-- adding this section for delete functionality -->
+                                    <p>
+                                        <lightning:buttonIcon class="button-width shake-anim" iconName="utility:delete" variant="border-filled" onclick="{! c.deleteFileAction }" alternativeText="Delete" value="{!attachment.Id}"/>
+                                        <lightning:spinner aura:id="{!attachment.Id}" variant="brand" class="align-spinner-delete slds-hide" alternativeText="Loading" size="small" />
+                                        
+                                    </p>
+                                    <!-- END adding this section for delete functionality -->
+                                    
+                                </lightning:tile>
+                            </div>
+                        </lightning:layoutItem>
+                    </aura:iteration>
+                    
+                    <aura:iteration items="{!v.files}" var="file">
+                        <lightning:layoutItem size="6" padding="around-small">
+                            <div class="custom-box">
+                                <lightning:tile label="{!file.ContentDocument.Title}" href="{!'/sfc/servlet.shepherd/document/download/'+file.ContentDocument.Id+'?operationContext=S1'}">
+                                    
+                                    <aura:set attribute="media">
+                                        <lightning:icon iconName="doctype:attachment"/>
+                                    </aura:set>
+                                    <p>
+                                        <lightning:formattedNumber value="{!(file.ContentDocument.ContentSize>1024*1024)?file.ContentDocument.ContentSize/(1024*1024):(file.ContentDocument.ContentSize>1024)?file.ContentDocument.ContentSize/1024:file.ContentDocument.ContentSize}" 
+                                                                   maximumFractionDigits ="0"/>
+                                        {!(file.ContentDocument.ContentSize>1024*1024)?'MB':(file.ContentDocument.ContentSize>1024)?'KB':'B'}
+                                        • 
+                                        <ui:outputDate value="{!file.ContentDocument.CreatedDate}" />
+                                        • 
+                                        {!file.ContentDocument.FileType}
+                                    </p>
+                                    <!-- adding this section for delete functionality -->
+                                    <p>
+                                        <lightning:buttonIcon class="button-width shake-anim" iconName="utility:delete" variant="border-filled" onclick="{! c.deleteFileAction }" alternativeText="Delete" value="{!file.ContentDocument.Id}" />
+                                        <lightning:spinner  id="{!file.ContentDocument.Id}"  aura:id="{!file.ContentDocument.Id}" variant="brand" class="align-spinner-delete slds-hide" alternativeText="Loading" size="small" />
+                                    </p>
+                                    <!-- END adding this section for delete functionality -->
+                                    
+                                    
+                                </lightning:tile>
+                            </div>
+                        </lightning:layoutItem>
+                    </aura:iteration>
+                </aura:set>
+            </aura:if>  
+        </lightning:layout>
+        <!-- selecting This place for action indicator -->
+             <lightning:spinner aura:id="delete_action" variant="brand" class="align-spinner-bottom slds-hide" alternativeText="Loading" size="small" />
+        <!-- END selecting This place for action indicator -->
+    </lightning:card>
+    
+</aura:component>

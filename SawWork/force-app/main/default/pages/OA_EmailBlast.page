@@ -1,0 +1,90 @@
+<apex:page controller="OA_EmailBlast_Controller" title="RSM Signature Request" id="TopPage" tabStyle="Order_Approval__c">
+<!-- 
+    <script>
+        function CheckAll(checkval)
+        {      
+            var val=checkval.checked;
+            for (var j=0;j < document.forms['TopPage:EBForm'].elements.length;j++)
+            {
+                var e = document.forms['TopPage:EBForm'].elements[j];
+                if (e.type == 'checkbox')
+                {
+                    e.checked = val;
+                }
+            }          
+        }
+    </script>
+    <style type='text/css'>
+    .betaLink {
+    background-color:#F8F8F8;
+    border:1px solid #D4DADC;
+    display:inline-block;
+    font-weight:bold;
+    line-height:25px;
+    margin-bottom:15px;
+    padding:0 7px;
+    }
+    </style>
+    <apex:form id="EBForm">
+        <apex:pageBlock title="RSM Signature Request for {!oa.Name}" id="EBPageBlock">
+            <apex:pageMessages />
+            <br></br>
+            <apex:commandLink action="{!cancel}" value="<< Return to Order Approval" rendered="{!(emptyOAId)}"/>
+            <apex:pageBlockSection title="Order Approval Summary" collapsible="true" rendered="{!showPage}">
+                <apex:outputField value="{!oa.Name}"/>                
+                <apex:outputField value="{!oa.Approvals_Required__c}"/>
+                <apex:outputField value="{!oa.Associated_Opportunity__c}"/>
+                <apex:outputField value="{!oa.Associated_Account__c}"/>
+                <apex:outputField value="{!oa.Associated_Opportunity_Sales_Stage__c}"/>
+                <apex:outputField value="{!oa.Account_Territory__c}"/>                                                
+                <apex:outputField value="{!oa.Opportunity_Owner__c}"/>
+                <apex:outputField value="{!oa.Type__c}"/> 
+                <apex:outputField value="{!oa.Customer_Status__c}"/>                 
+                <apex:outputField value="{!oa.AKAM_OrderApproval_ID__c}"/>             
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Email Content" columns="1" rendered="{!showPage}">          
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Send To :"/>
+                    <apex:inputField value="{!oa.Send_To_Contact__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >                    
+                    <apex:outputLabel value="Email Subject :"/>
+                    <apex:inputTextarea value="{!emailTask.Subject}" cols="70" rows="1"/>  
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Email Body :"/>                                            
+                    <apex:inputTextarea value="{!emailTask.Description}" cols="70" rows="10"/>                  
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Default Attachments" collapsible="false" rendered="{!showPage}">
+                <apex:panelGroup id="attachments">
+                    <left>             
+                        <apex:commandLink value="{!oaPDFName}" onclick="window.open('/apex/attachmentAsPDF?id={!oa.Id}');"/>
+                    </left>
+                </apex:panelGroup>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Attachments" collapsible="false" id="attachmentPageBlockSection" columns="1" rendered="{!showPage}">
+                <apex:pageBlockTable value="{!oaAttachment}" var="atw" id="attachmentPageBlockTable" align="center">
+                    <apex:column width="10px" style="align:center" >
+                            <apex:facet name="header"><input type="checkbox" Name="AttachAll" value="" onClick="CheckAll(this);" /></apex:facet>
+                        <apex:panelGroup rendered="true">
+                        <apex:inputCheckbox value="{!atw.checked}" id="new"/>
+                        </apex:panelGroup>          
+                    </apex:column>
+                    <apex:column headerValue="Object" value="{!atw.parentType}"/>                         
+                    <apex:column headerValue="Name" value="{!atw.attach.Name}"/>  
+                    <apex:column headerValue="Last Modified" value="{!atw.attach.LastModifiedDate}"/>
+                    <apex:column headerValue="Created By" value="{!atw.attach.CreatedBy.Name}"/>                      
+                    <apex:column >
+                      <apex:facet name="header"><b>Action</b></apex:facet>
+                      <apex:commandLink value="View" onclick="window.open('{!viewfilePath}={!atw.attach.id}');"/>
+                    </apex:column>                    
+                </apex:pageBlockTable> 
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons >  
+               <apex:commandButton id="OAEmailBlastSend"  onclick="return delrows()" value="Send Email" action="{!sendEmail}" rendered="{!showPage}"/>
+               <apex:commandButton id="Cancel" value="Cancel" action="{!cancel}" rendered="{!showPage}"/>
+            </apex:pageBlockButtons>
+    </apex:pageBlock>    
+</apex:form> -->
+</apex:page>

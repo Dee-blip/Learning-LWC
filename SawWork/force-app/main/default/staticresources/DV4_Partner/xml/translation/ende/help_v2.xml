@@ -1,0 +1,40 @@
+<help>
+		<!-- Timeout message -->
+		<message id="timeout"><![CDATA[Ihre Anfrage wurde aufgrund einer Zeitüberschreitung beendet. Bitte geben Sie die URL erneut ein. ]]></message>
+		<!-- tooltip messages -->
+		<message id="search_panel_help"><![CDATA[Führen Sie eine sofortige globale Überprüfung der Leistung Ihrer Website durch. Geben Sie einfach die Webadresse ein und führen Sie den Test durch. Sie werden einen Vergleich zwischen der eigentlichen Leistung Ihrer Website und einer geschätzten Leistung mit der Funktion der dynamischen Website- und Anwendungsbeschleunigung von Akamai sehen.
+        
+Diese Version von DV4 umfasst zusätzliche Städte und Regionen speziell für Ihren Zielmarkt.]]>
+        </message>
+		<message id="weeklong_graph_help"><![CDATA[Bietet einen Orientierungswert für die erwartete Leistungsverbesserung über eine Woche von einer genannten Stadt zu der Region, in der sich der Ausgangsserver befindet.]]></message>
+		<message id="average_global_performance_help"><![CDATA[Vergleicht geschätzte Leistung über Akamai mit eigentlicher Leistung direkt zum Ausgangsserver. Schlüsselt die gesamte Download-Dauer einer Seite in Verbindungszeit, Dauer des ersten Byte und Download-Dauer auf.]]></message>
+		<message id="performance_by_city_help"><![CDATA[Vergleicht geschätzte Leistung zwischen Akamai und Ausgangsserver pro Stadt. ]]></message>
+		<message id="performance_by_region_help"><![CDATA[Vergleicht geschätzte, durchschnittliche Leistung zwischen Akamai und Ausgangsserver pro Kontinent. ]]></message>
+		<message id="m4"><![CDATA[Punkte auf der Karte zeigen die Standorte von Testpunkten von Akamai. Klicken Sie auf diese Punkte, um die Verbindungszeiten der Endbenutzer von diesen Standorten zu simulieren.]]></message>
+		<message id="email_result"><![CDATA[Ergebnisse per E-Mail versenden.]]></message>
+		<message id="print_result"><![CDATA[Ergebnisse ausdrucken.]]></message>
+		<message id="weeklong_performance_benchmark"><![CDATA[Bietet einen Orientierungswert für die erwartete Leistungsverbesserung über eine Woche von einer genannten Stadt zu der Region, in der sich der Ausgangsserver befindet. ]]></message>
+		<message id="save_pdf"><![CDATA[Als PDF speichern]]></message>
+		<!-- Loading messages -->
+		<message id="measure_default_peformance">
+			<![CDATA[Messung der Standardleistung der Website]]>
+		</message>
+		<message id="weeklong_report_request">
+			<![CDATA[Wochenbericht anfordern]]>
+		</message>
+		<message id="previous_weeklong_list_loading">
+			<![CDATA[Vorheriger Wochenbericht lädt]]>
+		</message>
+		<message id="weeklong_report_loading">
+			<![CDATA[Wochenbericht lädt ]]>
+		</message>
+		<message id="additional_site_revenue_per_month">
+			<![CDATA[Basiert auf dem Anteil der Besucher, die laut Forrester 2009 eCommerce die Website aus Leistungsgründen (vorzeitig) verlassen]]>
+		</message>
+		<message id="calculate_improvement">
+			<![CDATA[Metriken zur Leistungsverbesserung berechnen]]>
+		</message>
+		<message id="present_improvement">
+			<![CDATA[Leistungsverbesserung präsentieren]]>
+		</message>
+	</help>

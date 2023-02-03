@@ -1,0 +1,31 @@
+<apex:page controller="WYWYNActivitiesController" title="WYWYN Activity" id="TopPage" tabStyle="Contact" sidebar="false">
+    <!--apex:pageMessages /-->
+    <apex:form id="WYWYNForm">
+        <apex:pageBlock title="WYWYN-Email for Contact: {!ct.Name}" id="EBPageBlock">
+            <apex:pageMessages />
+            <br></br>
+            <apex:commandLink action="{!cancel}" value="<< Return to Lead/Contact" rendered="{!(emptyOAId)}"/>
+            <apex:pageBlockSection title="Contact Information" collapsible="false" rendered="{!showPage}">
+                <apex:outputField value="{!ct.Name}"/>                
+                <apex:outputField value="{!ct.Account.Name}"/>
+                <apex:outputField value="{!ct.Email}"/>
+                <apex:outputField value="{!ct.Phone}"/>         
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Email Content" columns="1" collapsible="false" rendered="{!showPage}">          
+                <apex:outputField value="{!ct.Email}"/>
+                <apex:pageBlockSectionItem >                    
+                    <apex:outputLabel value="Email Subject :"/>
+                    <apex:inputTextarea value="{!emailTask.Subject}" cols="70" rows="1"/>  
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Email Body :"/>                                            
+                    <apex:inputTextarea value="{!emailTask.Description}" cols="70" rows="10"/>                  
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons >  
+               <apex:commandButton id="btnWYWYNSendEmail" value="Send Email" action="{!sendEmail}" rendered="{!showPage}"/>
+               <apex:commandButton id="btnCancel" value="Cancel" action="{!cancel}" rendered="{!showPage}"/>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>    
+    </apex:form>
+</apex:page>

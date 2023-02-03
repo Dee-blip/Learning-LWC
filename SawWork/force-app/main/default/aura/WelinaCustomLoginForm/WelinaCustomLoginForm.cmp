@@ -1,0 +1,134 @@
+<!--Customer Community Component add implements="forceCommunity:availableForAllPageTypes" to surface the component in community builder -->
+<aura:component controller="WelinaLoginFormController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes" access="global">
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <aura:attribute name="showError" type="Boolean" required="true" description="" default="false" access="private"/>
+    <aura:attribute name="errorMessage" type="String" required="false" description="" access="private"/>
+    <aura:attribute name="startUrl" type="String" required="false" description="The url you go to after a successful login" />
+    <aura:attribute name="usernameLabel" type="String" required="false" default="Email"/>
+    <aura:attribute name="passwordLabel" type="String" required="false" default="Password"/>
+    <aura:attribute name="loginButtonLabel" type="String" required="false" default="Log in"/>
+    <aura:attribute name="expid" type="String" required="false" description="The branding experience ID" />        
+    
+    <aura:attribute name="forgotPasswordLabel" type="String" required="false" default="Forgot your password?"/>
+    <aura:attribute name="selfRegisterLabel" type="String" required="false" default="Sign up"/>
+    <aura:attribute name="forgotPasswordUrl" type="String" required="false" default="/ForgotPassword"/>
+    <aura:attribute name="selfRegisterUrl" type="String" required="false" default="/s/login/SelfRegister"/>
+    
+    <aura:attribute name="isUsernamePasswordEnabled" type="Boolean" access="private"/>
+    <aura:attribute name="isSelfRegistrationEnabled" type="Boolean" access="private"/>
+    <aura:attribute name="communityForgotPasswordUrl" type="String" access="private"/>
+    <aura:attribute name="communitySelfRegisterUrl" type="String" access="private"/>
+    <aura:attribute name="isSSOloginPage" type="Boolean" access="private"/>
+    <aura:attribute name="goToRegisterPage" type="Boolean" access="private"/>
+    <aura:registerevent name="sitePropagatedStartUrl" type="c:setStartUrl"/>
+    <aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
+    <aura:dependency resource="c:setStartUrl" type="EVENT"/>
+    <!--Un Commented-->
+    <aura:dependency resource="siteforce:registerQueryEventMap" type="EVENT"/>
+    
+    <aura:handler event="c:setStartUrl" action="{!c.setStartUrl}"/>
+    <aura:handler event="c:setExpId" action="{!c.setExpId}"/>    
+    <aura:dependency resource="c:setExpId" type="EVENT"/> 
+    
+<!--
+    <article class="slds-card main-article slds-clearfix" aura:id="mainArticle">
+        <aura:renderIf isTrue="{!v.isSSOloginPage}">
+            <div class="slds-clearfix slds-scope login-option" aura:id="loginOption">
+                <a class="anchor" onclick="{!c.SSOInitiation}">
+                    <div class="slds-float_left login-link" style="margin-right:2%;">
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-text-heading_medium">
+                                Akamai Control Center Users
+                            </div>
+                        </div>
+                        <div class="slds-text-body_regular">
+                            Customers, partners, and Akamai employees, click here to use your Akamai Control Center account to login. If this is your first visit to Welina Playground, your membership will be automatically confirmed upon your first login.
+                        </div>                
+                    </div>
+                </a>
+            </div>
+            <div style="margin-top:10%" class="slds-clearfix slds-scope login-option">
+                <a  class="anchor" onclick="{!c.displayLogin}">
+                    <div class="slds-float_left login-link" style="margin-left:0%;">
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-text-heading_medium">
+                                Welina-Only Users and Guests
+                            </div>
+                        </div>
+                        <div class="slds-text-body_regular">
+                            If you don't have a login to the Akamai Control Center, but have a Welina user name and password, click here to login.
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </aura:renderIf>
+    </article>
+    
+    -->
+    
+    <div>
+        <aura:renderIf isTrue="{!v.isUsernamePasswordEnabled}">
+            <span>
+                <aura:renderIf isTrue="{!v.showError}">
+                    <div id="error">
+                        <ui:outputRichText value="{!v.errorMessage}"/>
+                    </div>
+                </aura:renderIf>
+            </span>
+             <br></br>
+                <br></br>
+            <aura:renderIf isTrue="{!v.goToRegisterPage}">
+                <div style="text-align: center; font-size:1.5rem; ">Log in to Hello Akamai</div>
+                <br></br>
+                <div style="background:#252A2F;border-radius:2%">
+                    <br></br><br></br>
+                    <div style="color:black;padding-left:20%;padding-right:20%;margin:2%">
+                        <span style="display:none" id="sfdc_user" class="login-icon" data-icon="a"></span>
+                        <ui:inputText value="" aura:id="username" placeholder="{!v.usernameLabel}" keyup="{!c.onKeyUp}" class="input sfdc_usernameinput sfdc" label="{!v.usernameLabel}" labelClass="assistiveText"/>
+                    </div>
+                    
+                    <div style="color:black;padding-left:20%;padding-right:20%;margin:2%">
+                        <span style="display:none" id="sfdc_lock" class="login-icon sfdc" data-icon="c"></span>
+                        <ui:inputSecret value="" aura:id="password" placeholder="{!v.passwordLabel}" keyup="{!c.onKeyUp}" class="input sfdc_passwordinput sfdc" label="{!v.passwordLabel}" labelClass="assistiveText"/>
+                    </div>
+                    
+                    <div class="sfdc" style="text-align:center; margin:2%"><br></br>
+                        <lightning:button variant="brand" class="slds-button loginButton" aura:id="submitButton" label="{!v.loginButtonLabel}" onclick="{!c.handleLogin}"/>
+                    </div>
+                    <div style="text-align:center; margin:2%">
+                        <span><a class="frgt-password" href="/welinaplaygroundlogin/s/login/ForgotPassword">{!v.forgotPasswordLabel}</a></span>
+                    </div>
+                    <br></br>
+                    <div class="sfdc" style="text-align:center;margin-bottom:2%"><br></br>
+                        <lightning:button variant="brand" class="slds-button luna-button" aura:id="submitButton" label="Log in with Akamai Control Center"  onclick="{!c.SSOInitiation}"/>
+                    </div>
+                    <br></br>
+                </div>
+                <br></br>
+                <div style="background:#252A2F; border-radius: 10px; text-align:center">
+                     <br></br>
+                     <div style="font-weight: bold;font-size:medium">
+                        New to the Hello Akamai playground?
+                     </div>
+                      <br></br>
+                    <div>
+                        <span style="background:#F79D49;border-color:#F79D49;padding:1.5%;border-radius:4px;"><a style="color:white" href="{!if(v.communitySelfRegisterUrl == null, '/welinaplaygroundlogin/s/login/SelfRegister','/welinaplaygroundlogin/s/login/SelfRegister')}">{!v.selfRegisterLabel}</a></span>
+                    </div>
+                     <br></br>
+                </div>
+               
+               <!-- <div id="sfdc_forgot" class="sfdc">
+                  <span><a class="frgt-password" style="" href="/welinaplaygroundlogin/s/login/ForgotPassword">{!v.forgotPasswordLabel}</a></span>
+                    <aura:renderIf isTrue="{!v.isSelfRegistrationEnabled}">
+                        <span style="float:right" ><a class="frgt-password" href="{!if(v.communitySelfRegisterUrl == null, '/welinaplaygroundlogin/s/login/SelfRegister','/welinaplaygroundlogin/s/login/SelfRegister')}">{!v.selfRegisterLabel}</a></span>
+                    </aura:renderIf>                            
+                </div> -->
+                <!--<div class="sfdc" style="text-align:center;margin-bottom:2%"><br></br>
+                    <lightning:button variant="brand" class="slds-button" aura:id="submitButton" label="Log in with Akamai Control Center"  onclick="{!c.SSOInitiation}"/>
+                </div>-->
+            </aura:renderIf>
+        </aura:renderIf>
+    </div>
+    
+</aura:component>

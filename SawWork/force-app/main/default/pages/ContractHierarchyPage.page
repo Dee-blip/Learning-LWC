@@ -1,0 +1,13 @@
+<apex:page standardController="Merge_Contract_Header__c" readOnly="true">
+  <apex:includeScript value="/lightning/lightning.out.js" />
+
+  <div id="lightning" />
+  <script>
+    $Lightning.use("c:L2Q_ContractHirarchyApp", function () {
+      $Lightning.createComponent("c:L2Q_ContractHirarchyComponent", {
+        "contractId": "{!$CurrentPage.parameters.Id}"
+      }, "lightning", function (cmp) {
+      });
+    });
+  </script>
+</apex:page>

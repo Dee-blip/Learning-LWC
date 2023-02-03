@@ -1,0 +1,127 @@
+<aura:component controller="LicenseChart" implements="flexipage:availableForAllPageTypes">
+	<ltng:require scripts="{!join(',',$Resource.Highcharts,
+                           $Resource.highchart3d,
+                           $Resource.Highchartsexport
+                           )}" afterScriptsLoaded="{!c.afterScriptsLoaded}"/>
+    
+    <!-- create 2 aura handler with waiting and donewaiting events--> 
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+    
+    <!--aura:registerEvent name = "evt" type = "c:License_ChartToTable" /--> <!-- This is used for updating the table when clicked on particular pie chart value -->
+  
+    <aura:attribute name="chartType" type="string"/>
+    <aura:attribute name="chartTitle" type="string" default="Users by Profiles"/>
+    <aura:attribute name="chartSubTitle" type="string" default="Users Grouped By Profiles"/>
+    <aura:attribute name="xAxisCategories" type="string[]" default=""/>
+    <aura:attribute name="yAxisParameter" type="string" default=""/>
+    <aura:attribute name="data" type="string"/>
+
+    <!-- This is header for buttons -->
+    <div class="slds-page-header slds-page-header_record-home">
+        <div class="slds-page-header__row">
+            <div class="slds-page-header__col-title">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                    </div>
+                    <div class="slds-media__body">
+                        <div class="slds-page-header__name">
+                            <div class="slds-page-header__name-title">   
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-page-header__col-actions">
+                <div class="slds-page-header__controls">
+                    <div class="slds-page-header__control">
+                        <button class="slds-button slds-button_neutral slds-button_stateful slds-not-selected" aria-live="assertive" disabled="{!v.Likedisable}" onclick="{!c.gotoURL}">
+                            <span class="slds-text-not-selected">
+                                <lightning:icon iconName="utility:graph" alternativeText="Graph" size="X-Small"/>Usage of Users</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<div class="slds-card">
+        <br/>
+        <center><b><h1 class="slds-page-header__title slds-truncate slds-align-middle">
+            Graphical Representation of Users Vs Profiles</h1></b></center>
+        <br/>
+                 <div aura:id="chart" style="height: 400px"></div>
+    </div>
+    
+    <!-- This is Table Component, here the initAction is called inside afterScriptsLoaded -->
+    
+    <aura:attribute name="userlist" type="List"/>
+    <aura:handler name="init" value="{!this}" action="{!c.initAction}"/>
+    
+    <!--aura:attribute name="test" type="String"/>
+    <aura:handler event = "c:License_ChartToTable" action="{!c.initActionOnProfile}"/> 
+    Result is {!v.test}-->    
+    
+    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+        <thead>
+            <tr class="slds-line-height_reset">
+                <th class="" scope="col">
+                    <div class="slds-truncate" title="Name">Name</div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate" title="Username">Username</div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate" title="Profile">Profile</div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate" title="Active">Active</div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate" title="ServiceDesk Staff">ServiceDesk Staff</div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate" title="Last Login">Last Login</div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.userlist}" var="lis">
+            <tr class="slds-hint-parent">
+                <td data-label="Name">
+                    <div class="slds-truncate" title="Name" onclick="{!c.callRecord}" id="{!lis.Id}">{!lis.Name}</div>
+                </td>
+                <td data-label="Username">
+                    <div class="slds-truncate" title="Username" onclick="{!c.callRecord}" id="{!lis.Id}">{!lis.Username}</div>
+                </td>
+                <td data-label="Profile">
+                    <div class="slds-truncate" title="Profile" onclick="{!c.callRecord}" id="{!lis.Id}">{!lis.Profile.Name}</div>
+                </td>
+                <td data-label="IsActive">
+                    <div class="slds-truncate" title="IsActive" onclick="{!c.callRecord}" id="{!lis.Id}">{!lis.IsActive}</div>
+                </td>
+                <td data-label="BMCServiceDesk__IsStaffUser__c">
+                    <div class="slds-truncate" title="BMCServiceDesk__IsStaffUser__c" onclick="{!c.callRecord}" id="{!lis.Id}">{!lis.BMCServiceDesk__IsStaffUser__c}</div>
+                </td> 
+                <td data-label="LastLoginDate">
+                    <div class="slds-truncate" title="LastLoginDate" onclick="{!c.callRecord}" id="{!lis.Id}">{!lis.LastLoginDate}</div>
+                </td>
+            </tr>
+           </aura:iteration>
+        </tbody>
+    </table>
+    
+    
+    
+</aura:component>

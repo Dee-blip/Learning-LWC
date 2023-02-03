@@ -1,0 +1,627 @@
+function EB_jsSendMail(MailerId, WarningCount, WarningMessage)
+{
+	if(WarningCount > 0) 
+	{ 
+		alert(WarningMessage); 
+	} 
+	else 
+	{
+		var PreviousBatchesProcessed = "{!EB_AkaMailer__c.EB_OperationProcessedCount__c}";
+		alert(PreviousBatchesProcessed);
+		var PreviousTotalCount = "{!EB_AkaMailer__c.EB_CountToAddresses__c}";
+		var PreviousOperation = "{!EB_AkaMailer__c.EB_Operation__c}";
+		var PreviousRemaining = PreviousTotalCount - PreviousBatchesProcessed;
+		if(PreviousOperation!='SendMails' && PreviousBatchesProcessed!=0)
+		{
+			//var result = confirm("The "+PreviousOperation+" operation is not yet complete. There are "+ PreviousRemaining +" records to be processed. Do you want to proceed with Send Mails?");
+			//if(result == true)
+			//{
+			alert("The "+PreviousOperation+" operation is not yet complete. There are "+ PreviousRemaining +" records to be processed. Please Click on Send Mails again.");
+		}
+		else
+		{
+			alert('Sending Email Notifications To Selected Contacts...'); 
+			var TotalCount = '{!EB_AkaMailer__c.EB_CountToAddresses__c}'; 
+			alert(TotalCount);
+			if(TotalCount > 1000)
+			{
+				var exceptionMessage=sforce.apex.execute("EB_UtilEmailNotification", "sendMails", 
+				{ 
+					strMailerId:MailerId
+				} 
+				); 
+				var BatchesProcessed = "{!EB_AkaMailer__c.EB_OperationProcessedCount__c}";
+				var BatchesRemaining = TotalCount - BatchesProcessed;
+				if(exceptionMessage=='End') 
+				{ 
+					alert('Email Notifications sent to selected contacts '); 
+					window.location.reload(true); 
+				} 
+				else if(exceptionMessage=='The Mailer has validation errors')
+				{ 
+					alert(exceptionMessage); 
+					window.location.reload(true); 
+				}
+				else if(exceptionMessage != '')
+				{
+					alert('Batch has errors: '+exceptionMessage+' There are '+ BatchesRemaining+' more batches to be processed. Please click on Send Emails button again');
+					window.location.reload(true);
+				}
+				else 
+				{ 
+					alert('Batch of '+ BatchesProcessed+' has been successfully processed. There are '+ BatchesRemaining+' more batches to be processed. Please click on Send Emails button again');
+					window.location.reload(true); 
+				}
+			}
+			else
+			{
+				var exceptionMessage=sforce.apex.execute("EB_UtilEmailNotification", "sendMails", 
+				{ 
+					strMailerId:MailerId
+				} 
+				); 
+				if(exceptionMessage=='End') 
+				{ 
+					alert('Email Notifications sent to selected contacts '); 
+					window.location.reload(true); 
+				} 
+				
+				else 
+				{ 
+					alert(exceptionMessage);
+					window.location.reload(true); 
+				}
+			}
+			//}
+		}
+			/*else
+			{
+				alert('Operation cancelled.');
+			}*/
+	
+		/*else
+		{
+			alert('Sending Email Notifications To Selected Contacts...'); 
+			var TotalCount = "{!EB_AkaMailer__c.EB_CountToAddresses__c}"; 
+			alert(TotalCount);
+			if(TotalCount > 1000)
+			{
+				var exceptionMessage=sforce.apex.execute("EB_UtilEmailNotification", "sendMails", 
+				{ 
+					strMailerId:MailerId
+				} 
+				); 
+				var BatchesProcessed = "{!EB_AkaMailer__c.EB_OperationProcessedCount__c}";
+				var BatchesRemaining = TotalCount - BatchesProcessed;
+				if(exceptionMessage=='End') 
+				{ 
+					alert('Email Notifications sent to selected contacts '); 
+					window.location.reload(true); 
+				} 
+				else if(exceptionMessage=='The Mailer has validation errors')
+				{ 
+					alert(exceptionMessage); 
+					window.location.reload(true); 
+				}
+				else if(exceptionMessage != '')
+				{
+					alert('Batch has errors: '+exceptionMessage+' There are '+ BatchesRemaining+' more batches to be processed. Please click on Send Emails button again');
+					window.location.reload(true);
+				}
+				else 
+				{ 
+					alert('Batch of '+ BatchesProcessed+' has been successfully processed. There are '+ BatchesRemaining+' more batches to be processed. Please click on Send Emails button again');
+					window.location.reload(true); 
+				}
+			}
+			
+			else
+			{
+				var exceptionMessage=sforce.apex.execute("EB_UtilEmailNotification", "sendMails", 
+				{ 
+					strMailerId:MailerId
+				} 
+				); 
+				if(exceptionMessage=='End') 
+				{ 
+					alert('Email Notifications sent to selected contacts '); 
+					window.location.reload(true); 
+				} 
+				
+				else 
+				{ 
+					alert(exceptionMessage);
+					window.location.reload(true); 
+				}
+			}
+		}*/
+	}
+}
+
+function EB_jsClone(MailerId,PreviousBatchesProcessed,PreviousTotalCount,PreviousOperation,PreviousRemaining)
+{
+	
+		alert('This operation would clone the Mailer record. Please do not interrupt the operation, you would be notified, upon successful completion.');
+		if(!Array.indexOf){
+  Array.prototype.indexOf = function(obj){
+   for(var i=0; i<this.length; i++){
+    if(this[i]==obj){
+     return i;
+    }
+   }
+   return -1;
+  }
+}
+
+		if(PreviousBatchesProcessed!=0)
+		{
+			alert("The "+PreviousOperation+" operation is not yet complete. There are "+ PreviousRemaining +" records to be processed. Please Click on "+PreviousOperation+" again.");
+		}
+		else
+		{
+			var mailerId = sforce.apex.execute("EB_UtilMailer", "deepClone",
+			{
+				strMailerId:MailerId
+				//batchSize:1000
+				
+			}
+			);
+		
+		var strReturnVal = new String(mailerId);
+		if (strReturnVal.indexOf("-1") == -1){
+		
+				alert('Mailer, along with all its associated Mailer Accounts and Mailer Contacts have been successfully cloned.');
+				var url = sforce.apex.execute("EB_UtilMailer", "getUrl",{}); 
+				window.location = url+strReturnVal;
+		}
+		else{
+		
+				alert(strReturnVal.substring(2));
+		}
+    }
+}
+
+function EB_jsCloneFailed(MailerId,Status)
+{
+	if(!Array.indexOf){
+  Array.prototype.indexOf = function(obj){
+   for(var i=0; i<this.length; i++){
+    if(this[i]==obj){
+     return i;
+    }
+   }
+   return -1;
+  }
+}
+	if(Status != 'Failed')
+	{
+		alert('This operation is available only if the Mailer is in Failed status');
+	}
+	
+	else
+	{
+		alert('This operation would clone the records in the failed status. Please do not interrupt the operation, you would be notified, upon successful completion.');
+		var mailerId = sforce.apex.execute("EB_UtilMailer", "cloneFailedRecords",
+		{
+			strMailerId:MailerId
+			
+		}
+	);
+	var strReturnVal = new String(mailerId);
+	if (strReturnVal.indexOf("-1") == -1){
+	
+			alert('Mailer, along with all its associated Mailer Accounts and Mailer Contacts have been successfully cloned.');
+			var url = sforce.apex.execute("EB_UtilMailer", "getUrl",{}); 
+			window.location = url+strReturnVal;
+	}
+	else{
+	
+			alert(strReturnVal.substring(2));
+	}
+	}
+     
+}
+
+function EB_jsCloneProcessed(MailerId,Status,ProcessedCount)
+{
+	if(!Array.indexOf){
+  Array.prototype.indexOf = function(obj){
+   for(var i=0; i<this.length; i++){
+    if(this[i]==obj){
+     return i;
+    }
+   }
+   return -1;
+  }
+}
+
+
+	if( ((ProcessedCount> 0) && (Status == 'Failed')) || (Status == 'Processed') )
+	{
+		alert('This operation would clone the records in the Processed status. Please do not interrupt the operation, you would be notified, upon successful completion.');
+		var mailerId = sforce.apex.execute("EB_UtilMailer", "cloneProcessedRecords",
+		{
+			strMailerId:MailerId
+			
+		}
+	);
+	var strReturnVal = new String(mailerId);
+	if (strReturnVal.indexOf("-1") == -1){
+	
+			alert('Mailer, along with all its associated Mailer Accounts and Mailer Contacts have been successfully cloned.');
+			var url = sforce.apex.execute("EB_UtilMailer", "getUrl",{}); 
+			window.location = url+strReturnVal;
+	}
+	else{
+	
+			alert(strReturnVal.substring(2));
+	}	
+	}
+
+	else
+	{
+		alert('This operation is available only if the Mailer is in Processed status or if the number of Processed records is greater than zero.');
+	}
+     
+}
+
+function EB_jsEmailBounce(mailerName)
+{
+	if(!Array.indexOf){
+  Array.prototype.indexOf = function(obj){
+   for(var i=0; i<this.length; i++){
+    if(this[i]==obj){
+     return i;
+    }
+   }
+   return -1;
+  }
+}
+	var reportId = sforce.apex.execute("EB_UtilMailer", "parameter_report", 
+	{ 
+	mailerName:mailerName, 
+	reportName:"Email Bounce Report" 
+	} 
+	); 
+	var strReturnVal = new String(reportId); 
+	if (strReturnVal.indexOf("null") == -1){ 
+	
+	var url = sforce.apex.execute("EB_UtilMailer", "getUrl",{}); 
+	window.open (url+strReturnVal,'EmailBounceReport'); 
+	} 
+	else{ 
+	
+	alert("Report could not be retrieved "); 
+	}
+}
+
+function EB_jsMailerException(mailerName1)
+{
+	if(!Array.indexOf){
+  Array.prototype.indexOf = function(obj){
+   for(var i=0; i<this.length; i++){
+    if(this[i]==obj){
+     return i;
+    }
+   }
+   return -1;
+  }
+}
+	var reportId = sforce.apex.execute("EB_UtilMailer", "parameter_report", 
+	{ 
+	mailerName:mailerName1, 
+	reportName:"Mailer Exception Report" 
+	} 
+	); 
+	var strReturnVal = new String(reportId); 
+	if (strReturnVal.indexOf("null") == -1 ){ 
+	
+	var url = sforce.apex.execute("EB_UtilMailer", "getUrl",{}); 
+	window.open (url+strReturnVal,'Report'); 
+	} 
+	else{ 
+	
+	alert("Report could not be retrieved " ); 
+	}
+}
+
+function EB_jsMailerWarning(mailerName1)
+{
+	if(!Array.indexOf){
+  Array.prototype.indexOf = function(obj){
+   for(var i=0; i<this.length; i++){
+    if(this[i]==obj){
+     return i;
+    }
+   }
+   return -1;
+  }
+}
+	var reportId = sforce.apex.execute("EB_UtilMailer", "parameter_report", 
+	{ 
+	mailerName:mailerName1, 
+	reportName:"Mailer Warning Report" 
+	} 
+	); 
+	var strReturnVal = new String(reportId); 
+	if (strReturnVal.indexOf("null") == -1 ){ 
+	
+	var url = sforce.apex.execute("EB_UtilMailer", "getUrl",{}); 
+	window.open (url+strReturnVal,'Report'); 
+	} 
+	else{ 
+	
+	alert("Report could not be retrieved " ); 
+	}
+}
+
+function EB_jsSendMassMail(MailerId, WarningCount, WarningMessage)
+{
+	if(WarningCount > 0) 
+	{ 
+		alert(WarningMessage); 
+	} 
+	else 
+	{
+		var PreviousBatchesProcessed = "{!EB_AkaMailer__c.EB_OperationProcessedCount__c}";
+		alert(PreviousBatchesProcessed);
+		var PreviousTotalCount = "{!EB_AkaMailer__c.EB_CountToAddresses__c}";
+		var PreviousOperation = "{!EB_AkaMailer__c.EB_Operation__c}";
+		var PreviousRemaining = PreviousTotalCount - PreviousBatchesProcessed;
+		if(PreviousOperation!='SendMails' && PreviousBatchesProcessed!=0)
+		{
+			//var result = confirm("The "+PreviousOperation+" operation is not yet complete. There are "+ PreviousRemaining +" records to be processed. Do you want to proceed with Send Mails?");
+			//if(result == true)
+			//{
+			alert("The "+PreviousOperation+" operation is not yet complete. There are "+ PreviousRemaining +" records to be processed. Please Click on Send Mails again.");
+		}
+		else
+		{
+			alert('Sending Email Notifications To Selected Contacts...'); 
+			var TotalCount = '{!EB_AkaMailer__c.EB_CountToAddresses__c}'; 
+			alert(TotalCount);
+			if(TotalCount > 1000)
+			{
+				var exceptionMessage=sforce.apex.execute("EB_UtilEmailNotification", "sendMassEmails", 
+				{ 
+					strMailerId:MailerId
+				} 
+				); 
+				var BatchesProcessed = "{!EB_AkaMailer__c.EB_OperationProcessedCount__c}";
+				var BatchesRemaining = TotalCount - BatchesProcessed;
+				if(exceptionMessage=='End') 
+				{ 
+					alert('Email Notifications sent to selected contacts '); 
+					window.location.reload(true); 
+				} 
+				else if(exceptionMessage=='The Mailer has validation errors')
+				{ 
+					alert(exceptionMessage); 
+					window.location.reload(true); 
+				}
+				else if(exceptionMessage != '')
+				{
+					alert('Batch has errors: '+exceptionMessage+' There are '+ BatchesRemaining+' more batches to be processed. Please click on Send Emails button again');
+					window.location.reload(true);
+				}
+				else 
+				{ 
+					alert('Batch of '+ BatchesProcessed+' has been successfully processed. There are '+ BatchesRemaining+' more batches to be processed. Please click on Send Emails button again');
+					window.location.reload(true); 
+				}
+			}
+			else
+			{
+				var exceptionMessage=sforce.apex.execute("EB_UtilEmailNotification", "sendMassEmails", 
+				{ 
+					strMailerId:MailerId
+				} 
+				); 
+				if(exceptionMessage=='End') 
+				{ 
+					alert('Email Notifications sent to selected contacts '); 
+					window.location.reload(true); 
+				} 
+				
+				else 
+				{ 
+					alert(exceptionMessage);
+					window.location.reload(true); 
+				}
+			}
+			//}
+		}
+			/*else
+			{
+				alert('Operation cancelled.');
+			}*/
+	
+		/*else
+		{
+			alert('Sending Email Notifications To Selected Contacts...'); 
+			var TotalCount = "{!EB_AkaMailer__c.EB_CountToAddresses__c}"; 
+			alert(TotalCount);
+			if(TotalCount > 1000)
+			{
+				var exceptionMessage=sforce.apex.execute("EB_UtilEmailNotification", "sendMails", 
+				{ 
+					strMailerId:MailerId
+				} 
+				); 
+				var BatchesProcessed = "{!EB_AkaMailer__c.EB_OperationProcessedCount__c}";
+				var BatchesRemaining = TotalCount - BatchesProcessed;
+				if(exceptionMessage=='End') 
+				{ 
+					alert('Email Notifications sent to selected contacts '); 
+					window.location.reload(true); 
+				} 
+				else if(exceptionMessage=='The Mailer has validation errors')
+				{ 
+					alert(exceptionMessage); 
+					window.location.reload(true); 
+				}
+				else if(exceptionMessage != '')
+				{
+					alert('Batch has errors: '+exceptionMessage+' There are '+ BatchesRemaining+' more batches to be processed. Please click on Send Emails button again');
+					window.location.reload(true);
+				}
+				else 
+				{ 
+					alert('Batch of '+ BatchesProcessed+' has been successfully processed. There are '+ BatchesRemaining+' more batches to be processed. Please click on Send Emails button again');
+					window.location.reload(true); 
+				}
+			}
+			
+			else
+			{
+				var exceptionMessage=sforce.apex.execute("EB_UtilEmailNotification", "sendMails", 
+				{ 
+					strMailerId:MailerId
+				} 
+				); 
+				if(exceptionMessage=='End') 
+				{ 
+					alert('Email Notifications sent to selected contacts '); 
+					window.location.reload(true); 
+				} 
+				
+				else 
+				{ 
+					alert(exceptionMessage);
+					window.location.reload(true); 
+				}
+			}
+		}*/
+	}
+}
+
+function EB_jsUpdateTemplate(MailerId, TemplateId)
+{
+	if((TemplateId)== ''){
+		alert('Update template operation cannot be performed when Template Field is Null');
+		}
+	else{
+			var PreviousBatchesProcessed = "{!EB_AkaMailer__c.EB_OperationProcessedCount__c}";
+			var PreviousTotalCount = "{!EB_AkaMailer__c.EB_CountToAddresses__c}";
+			var PreviousOperation = "{!EB_AkaMailer__c.EB_Operation__c}";
+			var PreviousRemaining = PreviousTotalCount - PreviousBatchesProcessed;
+			if(PreviousOperation!='UpdateTemplate' && PreviousBatchesProcessed!=0)
+			{
+				alert("The "+PreviousOperation+" operation is not yet complete. There are "+ PreviousRemaining +" records to be processed. Please Click on "+PreviousOperation+" again.");
+			}
+			else
+			{
+				//var result = confirm("The "+PreviousOperation+" operation is not yet complete. There are "+ PreviousRemaining +" records to be processed. Do you want to proceed with Update Templates?");
+				//if(result == true)
+				//{
+				var TotalCount = "{!EB_AkaMailer__c.EB_CountToAddresses__c}"; 
+				if(TotalCount > 1000)
+				{
+				   alert('This operation would update the Email Templates of all the Mailer Accounts & Mailer Contacts associated with the Mailer. Please do not interrupt the operation, you would be notified, upon successful completion.');
+				   var exceptionMessage = sforce.apex.execute("EB_UtilMailer", "updateTemplate", 
+					{
+					   ID:MailerId,
+					   TemplateName:TemplateId
+					 }
+				   );
+				   var BatchesProcessed = "{!EB_AkaMailer__c.EB_OperationProcessedCount__c}";
+				   var BatchesRemaining = TotalCount - BatchesProcessed;
+				   if(exceptionMessage == 'End')
+				   {
+						alert('Email Templates of all the Mailer Accounts & Mailer Contacts associated with the Mailer have been successfully updated.');
+						window.location.reload(true);
+					}
+					else if(exceptionMessage != '')
+					{
+						alert('Batch has errors: '+exceptionMessage+' There are '+ BatchesRemaining+' more batches to be processed. Please click on Update Templates button again');
+						window.location.reload(true);
+					}
+					else
+					{
+						 alert('Batch of '+ BatchesProcessed+' has been successfully processed. There are '+ BatchesRemaining+' more batches to be processed. Please click on Update Templates button again');
+						 window.location.reload(true);
+					}
+				}
+				else
+				{
+					alert('This operation would update the Email Templates of all the Mailer Accounts & Mailer Contacts associated with the Mailer. Please do not interrupt the operation, you would be notified, upon successful completion.');
+				   var exceptionMessage = sforce.apex.execute("EB_UtilMailer", "updateTemplate", 
+					{
+					   ID:MailerId,
+					   TemplateName:TemplateId
+					 }
+				   );
+				   if(exceptionMessage=='End') 
+					{ 
+						alert('Email Templates of all the Mailer Accounts & Mailer Contacts associated with the Mailer have been successfully updated.'); 
+						window.location.reload(true); 
+					} 
+				
+					else 
+					{ 
+						alert(exceptionMessage);
+						window.location.reload(true); 
+					}
+				}
+			}
+				
+				/*else
+				{
+					alert('Operation cancelled.');
+				}*/
+			
+			/*else
+			{
+				var TotalCount = "{!EB_AkaMailer__c.EB_CountToAddresses__c}"; 
+				if(TotalCount > 1000)
+				{
+				   alert('This operation would update the Email Templates of all the Mailer Accounts & Mailer Contacts associated with the Mailer. Please do not interrupt the operation, you would be notified, upon successful completion.');
+				   var exceptionMessage = sforce.apex.execute("EB_UtilMailer", "updateTemplate", 
+					{
+					   ID:MailerId,
+					   TemplateName:TemplateId
+					 }
+				   );
+				   var BatchesProcessed = "{!EB_AkaMailer__c.EB_OperationProcessedCount__c}";
+				   var BatchesRemaining = TotalCount - BatchesProcessed;
+				   if(exceptionMessage == 'End')
+				   {
+						alert('Email Templates of all the Mailer Accounts & Mailer Contacts associated with the Mailer have been successfully updated.');
+						window.location.reload(true);
+					}
+					else if(exceptionMessage != '')
+					{
+						alert('Batch has errors: '+exceptionMessage+' There are '+ BatchesRemaining+' more batches to be processed. Please click on Update Templates button again');
+						window.location.reload(true);
+					}
+					else
+					{
+						 alert('Batch of '+ BatchesProcessed+' has been successfully processed. There are '+ BatchesRemaining+' more batches to be processed. Please click on Update Templates button again');
+						 window.location.reload(true);
+					}
+				}
+				else
+				{
+					alert('This operation would update the Email Templates of all the Mailer Accounts & Mailer Contacts associated with the Mailer. Please do not interrupt the operation, you would be notified, upon successful completion.');
+				   var exceptionMessage = sforce.apex.execute("EB_UtilMailer", "updateTemplate", 
+					{
+					   ID:MailerId,
+					   TemplateName:TemplateId
+					 }
+				   );
+				   if(exceptionMessage=='End') 
+					{ 
+						alert('Email Templates of all the Mailer Accounts & Mailer Contacts associated with the Mailer have been successfully updated.'); 
+						window.location.reload(true); 
+					} 
+				
+					else 
+					{ 
+						alert(exceptionMessage);
+						window.location.reload(true); 
+					}
+				}*/
+			
+	}
+}
+

@@ -1,0 +1,138 @@
+<template>
+  <div style="background-color:grey;height:50px;font-size:15px;font-weight:600;" class="slds-align_absolute-center">Forward email to Customers</div>
+    <template if:true={showSpinner}>
+        <!--<div class="slds-is-relative" style="height:1100px;">-->
+        <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+       <!-- </div>-->
+      </template>
+
+    <template if:true={showError}>
+      <div class="slds-notify_container slds-is-relative">
+        <div class="slds-notify slds-notify_toast slds-theme_warning" role="status">
+          <span class="slds-assistive-text">warning</span>
+          <span class="slds-icon_container slds-icon-utility-warning slds-m-right_small slds-no-flex slds-align-top" title="Description of icon when needed">
+            <lightning-icon size="medium" icon-name="utility:warning" alternative-text="Utility image" title="Image"></lightning-icon>
+          </span>
+          <div class="slds-notify__content">
+            <h2 class="slds-text-heading_small "> You are not authorized to forward email to customers or customer mailer is disabled.</h2>
+              
+          </div>
+          
+        </div>
+      </div>
+      
+
+    </template>
+  <template if:false={showError}>
+    <div style="margin-top:30px;" class="slds-p-top_large  slds-form-element slds-form-element_horizontal slds-form-element_1-col">
+        <lightning-input  type="text" label="Instructions" disabled value={instructions}></lightning-input>
+        <lightning-input disabled={isMailSent} class="slds-m-top_large" type="text" label="Subject" required value={subject} onchange={handleSubjectChange}></lightning-input>
+       <!-- <div class="slds-grid slds-m-top_large">
+          <div class="slds-col slds-size_1-of-6 slds-p-top_large">
+            <label class="slds-m-top_large" style="font-size:12px;color:#444444;" for="cc">To</label>
+           </div>
+           <div class="slds-col slds-size_5-of-6">
+            <template if:true={showToField}>
+              <div class="slds-form-element__control" style="margin-left:40px;">
+                <c-email-input selected-default-values1={defaultRecipients} onselection={handleCcAddressChange}></c-email-input>
+              </div>
+            </template>
+          </div>  
+        </div>  -->
+        
+          
+          
+      <div class="slds-grid slds-m-top_large">
+        <div class="slds-col slds-size_1-of-6">
+          <label class="slds-text-title">To</label>
+        </div>
+        <div class="slds-col slds-size_5-of-6">
+          <div class="slds-pill_container">
+            <template for:each={dlList} for:item="itrDL">
+            <span key={itrDL} class="slds-pill">
+              <a href="#" class="" title="Full pill label verbiage mirrored here">
+                <span class="slds-pill__label">{itrDL}</span>
+              </a>
+              <button class="slds-button slds-button_icon slds-button_icon slds-pill__remove" title="Remove">
+                <svg class="slds-button__icon" aria-hidden="true">
+                  <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                </svg>
+                <span class="slds-assistive-text">Remove</span>
+              </button>
+            </span>
+            </template>
+            
+            
+          </div>
+          <div>
+            <a style="font-size:13px;margin-right:20px;" class="slds-float_right" onclick={handleManageRecipients}>Manage Recipients</a>
+          </div>  
+        </div>
+     
+   
+
+</div>
+
+<div class="slds-grid slds-m-top_large">
+  <div class="slds-col slds-size_1-of-6">
+    <label class="slds-text-title">Attachments</label>
+  </div>
+  <div class="slds-col slds-size_5-of-6">
+    <i>(Please refer Files section to manage attachments.)</i>
+  </div>
+
+
+
+</div>
+    
+    <lightning-input-rich-text value={body} onchange={handleBodyChange}
+    class="slds-m-top_large" label-visible="true"
+    label = "Content" disabled={isMailSent} 
+    
+    ></lightning-input-rich-text>
+  <!--  <div class="slds-m-top_large">
+      <lightning-icon icon-name="utility:attach" alternative-text="Attachment" size="small" title="Attachment"></lightning-icon>
+      <template for:each={attachListFromParent} for:item="itrAttach">
+        <span key={itrAttach.value} class="slds-pill slds-pill_link">
+          <a href={itrAttach.value} target="_blank" class="slds-pill__action" title="Full pill label verbiage mirrored here">
+            <span class="slds-pill__label">{itrAttach.label}</span>
+          </a>
+          <lightning-button-icon icon-name="utility:close" name={itrAttach.label} onclick={handleFileRemove} variant="bare" alternative-text="remove" title="remove"></lightning-button-icon>
+          
+        </span>
+        
+      </template>
+    </div>-->
+    <div style="margin-left:-670px">
+    <lightning-button variant="brand" disabled={isMailSent}  label="Send Email" title="Send Email" onclick={handleConfirm} class="slds-m-top_large slds-align_absolute-center"></lightning-button>
+</div>
+    </div>
+  </template> 
+
+    <template if:true={showConfirmPopUp}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="customModal">
+              <div class="slds-modal__container">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse">
+                  <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                    <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                  </svg>
+                  <span class="slds-assistive-text">Cancel and close</span>
+                </button>
+                
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                  <p class="slds-align__absolute-center slds-m-vertical_medium slds-m-left_large"><b>Please confirm sending emails to selected recipients / contacts.</b></p>
+                  
+                </div>
+                <div class="slds-modal__footer">
+                  <span>
+                    <button onclick={handleSend} class="slds-button  slds-button_brand">Confirm</button>
+                    <button onclick={handleCancel} class="slds-button  slds-button_brand">Cancel</button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </section>
+          <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+</template>

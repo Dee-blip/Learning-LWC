@@ -1,0 +1,135 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false" controller="HD_FeedbackSurveyController" cache="false"  language="{!$CurrentPage.parameters.lang}" >
+  
+  <link rel="Stylesheet" type="text/css" href="{!$Resource.BMCServiceDesk__SSThemes}/SSDefaultTheme/SSLandingPage.css" />
+  <link rel="Stylesheet" type="text/css" href="{!$Resource.BMCServiceDesk__SDEFStyles}/SurveyPage.css" />
+    
+
+    <apex:form >
+          <div>
+            <apex:outputPanel styleClass="rf-top-banner-div" layout="block">
+                 <a onclick="openWindow();" title="Akamai" style ="cursor:pointer" id="bmcLink" target="_blank">               
+                  <apex:image url="{!URLFOR($Resource.HDscriptcss,'akamlogo.png')}" />
+                </a>   
+                             
+           </apex:outputPanel>  
+         </div> 
+   
+         <apex:outputPanel title="Survey Form" id="surveyForm" rendered="{!NOT(isSubmitted)}">
+         
+                        <div >
+                                <table id="rf-ticker"  class="rf-ticker-div tableWidth">
+                                    <tr><td class="rf-banner-link description" >
+                                       Akamai Helpdesk Customer Satisfaction Survey
+                                    </td></tr>
+                                </table>
+                                <div class = "verticalDistance15px"></div>
+                                   Please take a moment and provide feedback about your recent request to help us improve.
+                                <div class = "verticalDistance10px"></div>
+                        </div> 
+               <apex:pageBlock title="" id="mainpage">
+                     <apex:messages style="color:red"></apex:messages>
+                    
+                             <apex:variable var="index" value="{!0}" />
+                             <apex:repeat value="{!$ObjectType.HD_Survey__c.FieldSets.Incident_Survey}" var="survey" id="fieldset">
+                             
+                                
+                                     <apex:variable var="index" value="{!index+1}"/>  
+                                 <!--    
+                                      <apex:outputPanel layout="block"  rendered="{!AND(CONTAINS($ObjectType.HD_Survey__c.fields[survey].type,'picklist'),sizeList[index-1]>3,survey<>'NPS__c',survey<>'Discuss__c')}">
+                                           <apex:outputText value="{!FLOOR(index)}"/>.
+                                           {!JSENCODE($ObjectType.HD_Survey__c.fields[survey].InlineHelpText)}
+                                           <apex:selectRadio layout="lineDirection" id="q1" value="{!response[survey]}"> 
+                                            <apex:selectOptions value="{!optionLists[survey]}"/>
+                                           </apex:selectRadio>
+                                       </apex:outputPanel> 
+                                   -->  
+                                      <apex:outputPanel rendered="{!AND(CONTAINS($ObjectType.HD_Survey__c.fields[survey].type,'picklist'),sizeList[index-1]<=3,survey<>'NPS__c',survey<>'Discuss__c')}">
+                                           <apex:outputText value="{!FLOOR(index)}"/>.
+                                          {!JSENCODE($ObjectType.HD_Survey__c.fields[survey].InlineHelpText)}
+                                           <apex:selectRadio layout="pageDirection" id="q2" value="{!response[survey]}"> 
+                                                 <apex:selectOptions value="{!optionLists[survey]}"/>
+                                           </apex:selectRadio> 
+                                      </apex:outputPanel>
+                                    
+                                      <apex:outputPanel rendered="{!CONTAINS($ObjectType.HD_Survey__c.fields[survey].type,'textarea')}">
+                                            <apex:outputText value="{!FLOOR(index)}"/>.
+                                           {!JSENCODE($ObjectType.HD_Survey__c.fields[survey].InlineHelpText)}
+                                           <p> <apex:inputTextarea id="experience" rows="8" cols="80" value="{!response[survey]}"/>  </p>
+                                            <p></p>
+                                      </apex:outputPanel>
+                             
+                                      <apex:outputPanel layout="block"  rendered="{!survey=='Communication_Followup__c'}">
+                                           <apex:outputText value="{!FLOOR(index)}"/>.
+                                           {!JSENCODE($ObjectType.HD_Survey__c.fields[survey].InlineHelpText)}
+                                           <apex:selectRadio layout="lineDirection" id="comm" value="{!response[survey]}"> 
+                                            <apex:selectOptions value="{!optionLists[survey]}"/>
+                                           </apex:selectRadio>
+                                       </apex:outputPanel>
+     
+                                       <apex:outputPanel layout="block"  rendered="{!survey=='Satisfaction_To_Experience__c'}">
+                                           <apex:outputText value="{!FLOOR(index)}"/>.
+                                           {!JSENCODE($ObjectType.HD_Survey__c.fields[survey].InlineHelpText)}
+                                           <apex:selectRadio layout="lineDirection" id="sat" value="{!response[survey]}"> 
+                                            <apex:selectOptions value="{!optionLists[survey]}"/>
+                                           </apex:selectRadio>
+                                       </apex:outputPanel>
+                                      
+                                       <apex:outputPanel layout="block"  rendered="{!survey=='NPS__c'}">
+                                           <apex:outputText value="{!FLOOR(index)}"/>.
+                                           {!JSENCODE($ObjectType.HD_Survey__c.fields[survey].InlineHelpText)}
+                                           <apex:selectRadio layout="lineDirection" id="nps" value="{!response[survey]}" onchange="display(this,'{!$Component.thePanel}');" > 
+                                            <apex:selectOptions value="{!optionLists[survey]}"/>
+                                           </apex:selectRadio>
+                                          
+                                       </apex:outputPanel>  
+                                        
+                                       
+                                      
+                             
+                    </apex:repeat>
+                    
+                                      <apex:outputPanel id="thePanel" layout="block">
+                                           <apex:outputText value="8"/>.
+                                           {!JSENCODE($ObjectType.HD_Survey__c.fields['Discuss__c'].InlineHelpText)}
+                                           <apex:selectRadio layout="pageDirection" id="q4" value="{!response['Discuss__c']}">  
+                                               <apex:selectOptions value="{!optionLists['Discuss__c']}"/>
+                                           </apex:selectRadio>
+                                       </apex:outputPanel>
+                
+                    <hr width="50%" align="left"></hr>
+                  <div class = "verticalDistance15px"></div>
+               
+                     <apex:commandButton action="{!save}" value="Submit"  style="background-color:#999999;background-image:none;font-weight:bold;padding:2px;margin-left:60px"/>
+                     <apex:commandButton value="Close" action="{!closeSurvey}" style="background-color:#999999;background-image:none;font-weight:bold;padding:2px;margin-left:20px"/>  
+                    
+                  
+                      <p></p>
+          </apex:pageBlock> 
+                 
+         </apex:outputPanel>
+          
+          
+          <apex:outputPanel rendered="{!isSubmitted}" >
+               <apex:pageBlock >
+              <p>
+               <apex:outputText value="{!message}" id="msg" />
+                </p><p>
+                <apex:commandButton value="Close" action="{!closeSurvey}" style="background-color:#999999;background-image:none;font-weight:bold;padding:2px;margin-left:20px"/>  
+                    
+                </p>
+               </apex:pageBlock>                        
+         </apex:outputPanel> 
+    </apex:form>
+    
+<!-- JAvascript --->        
+ <script type="text/javascript">
+      function display(t,id) {
+       
+        if(t.value<=6)
+          document.getElementById(id).style.display='block';
+        else
+           document.getElementById(id).style.display='none';
+        return true; 
+       }
+ </script> 
+</apex:page>

@@ -1,0 +1,4 @@
+<apex:page controller="genericButtonPageController" action="{!init}" >
+    <apex:outputLink value="/{!recordId}" style="padding: 10px;"> Back  </apex:outputLink>
+    <apex:pageMessages escape="false"/>
+</apex:page>

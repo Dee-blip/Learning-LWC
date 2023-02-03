@@ -1,0 +1,61 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="HD_IncidentDetailController">
+    <aura:registerEvent name="HDLogger" type="c:HDLogger"/>
+	<ltng:require scripts="{!$Resource.HD_Error_Logger}" /> 
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="success" type="String"/>
+    <aura:attribute name="ccList" type="String[]"/>
+    <aura:attribute name="cc_count" type="Integer" />
+    <aura:attribute name="savedcc" type="String"/>
+    
+    <aura:method name="reShow" action="{!c.doInit}"/>
+
+    <aura:attribute name="warnings" type="String[]"/>
+    <aura:attribute name="incident" type="BMCServiceDesk__Incident__c" />
+    <aura:attribute name="fld_count" type="Integer" default="1"/>
+    <aura:attribute name="id_count" type="Integer" default=""/>
+    <aura:attribute name="cctext" type="String" default=''/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:dependency resource="markup://force:editRecord" type="EVENT" />
+    <div>
+        <div aura:id="Accspinner" class="slds-spinner_container slds-hide">
+		<div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+			<span class="slds-assistive-text">Processing</span>
+			<div class="slds-spinner__dot-a"></div>
+			<div class="slds-spinner__dot-b"></div>
+		</div>
+	</div>       
+ 
+   <div class="slds-form-element">
+       <br/>
+       Email notification CC address
+       <br/>
+       <div class="slds-form-element__control" aura:id='ar_ccdiv' id='ccdiv_11'>
+        <!--textarea aura:id="resolution" class="slds-textarea" placeholder="Please enter the resolution."></textarea-->
+           <!-- ui:inputTextArea aura:id="auraemailCC"  placeholder="expample@akamai.com" rows="2" required="true" value="{!v.incident.CCText__c}" -->
+           <!--input type='text' size='30' id='cc_txtfield_1' class=" cc_input" onkeydown="{!c.enableUpdateBttn}" aura:id='ar_cc_txtfield_1' placeholder='example@akamai.com'/>&nbsp;<button class="slds-button slds-button_neutral slds-button_small sldsbtn-style" onclick='{!c.clear_cc}' >clear</button -->
+           <!--span id="addccspn_1"><span id='add_cc_btn'>&nbsp;<button class="slds-button slds-button_neutral slds-button_small" style="line-height:1rem;min-height:1.6rem;padding-left:10px;padding-right:10px;" aura:id="AddCC" label="+" onclick="{!c.addCC}"> + </button></span></span -->
+         
+           
+           <aura:iteration items="{!v.ccList}" var="cc_addr" indexVar="idx">
+               <span>
+                   <span id="{!'cc_row_'+idx}" class = " ccbox">
+				   <br/>
+                   <input type='text' size='30' id="{!'cc_txtfield_'+idx}" class=" cc_input" onkeydown="{!c.enableUpdateBttn}" aura:id="{!'ar_cc_txtfield_'+idx}" placeholder='example@akamai.com' value="{!cc_addr}"/>
+                   &nbsp;<button class="slds-button slds-button_neutral slds-button_small sldsbtn-style" onclick="{!c.removeCC}" data-value="{!idx}" >-</button>
+                   <aura:if isTrue="{! idx == v.cc_count-1 }">
+                    <span id="addccspn"><span id="cc_btn_spn">&nbsp;<button class="slds-button slds-button_neutral slds-button_small" style="line-height:1rem;min-height:1.6rem;padding-left:10px;padding-right:10px;" aura:id="AddCC" label="+" onclick="{!c.addCC}"> + </button></span></span>
+                   </aura:if>
+                   </span>   
+              </span>
+           </aura:iteration>
+           
+       </div> 
+       <br/>
+          <ui:button aura:id="upbtn" label="Update Email CC" press="{!c.updateCC}" disabled="true" />
+           
+          <ui:inputDefaultError aura:id="warn" value="{!v.warnings}" />
+        
+        
+   </div>
+   </div>
+</aura:component>

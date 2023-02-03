@@ -1,0 +1,26 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="HD_Edit_ServiceRequest">
+    
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="success" type="String"/>
+    <aura:attribute name="ccList" type="String[]"/>
+    <aura:attribute name="cc_count" type="Integer" />
+    <aura:attribute name="savedcc" type="String"/>
+    <aura:attribute name="ffi_details" type="Map"/>
+    <aura:attribute name="input_values" type="Map"/>
+    
+    <aura:registerEvent name="SR_Edit" type="c:Update_SR_Edit" />
+
+
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+   <lightning:spinner aura:id="mySpinner_body" /> 
+    <form id = 'sredit'>
+        <div id="error_div">
+        </div>
+        <div  id='input_details' >
+        </div> 
+        <br></br>
+        &nbsp;&nbsp;<button class="slds-button  slds-button_brand" onclick="{!c.saveSR}"> Submit</button>
+        &nbsp;&nbsp;<button class="slds-button slds-button_neutral" onclick="{!c.cancel_edit_sr}"> Cancel</button>
+    </form>
+
+</aura:component>

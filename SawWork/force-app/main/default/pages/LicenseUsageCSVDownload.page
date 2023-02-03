@@ -1,0 +1,48 @@
+<!--=====================================================================================================+
+
+|  HISTORY  |                                                                            
+
+|  DATE           DEVELOPER   CR          DESCRIPTION                                                       
+
+|  ===========    =========   =======     =========== 
+                                                       
+|  03-Oct-2016    Kunal,Akhila      3527281     Apex Page to download the CSV in the second version of Automating License Usage Report
++=====================================================================================================-->
+<apex:page standardController="License_Report_Run_Logger__c" extensions="LicenseUsageReportController" readOnly="true" contentType="application/vnd.ms-excel#LicenseUsage_{!usageStartDate}.csv">User Name,Email,Profile,Department,Manager Name,Manager Email,Last Used Object,Last Used Date,Exempted User
+    <apex:repeat value="{! lAllRecordsToDisplay}" var="varWrappedUser">
+       {!varWrappedUser.userName},{!varWrappedUser.userEmail},{!varWrappedUser.profileName},{!varWrappedUser.department},{!varWrappedUser.manager},{!varWrappedUser.managerEmail},{!varWrappedUser.objectAccessed},{!varWrappedUser.lastUsedDate},{!varWrappedUser.exemptedUser}
+  	</apex:repeat>        
+    <!--apex:form>
+        <apex:pageBlock >                	
+            <apex:pageBlockTable id="reportTableId" var="varWrappedUser" rendered="{! lAllRecordsToDisplay.size >0}" value="{! lAllRecordsToDisplay}" >                          
+                <apex:column headerValue="User Name" value="{! varWrappedUser.userName}" style="{! IF(varWrappedUser.isUserIdle,'background-color:#FFF0F0;width:20%;','background-color:#bcffce;width:20%;')}"/>
+                <apex:column headerValue="Email" value="{! varWrappedUser.userEmail}" style="{! IF(varWrappedUser.isUserIdle,'background-color:#FFF0F0;width:20%;align:left;','background-color:#bcffce;width:20%;align:left;')}"/>
+                <apex:column headerValue="Profile Name" value="{! varWrappedUser.profileName}" style="{! IF(varWrappedUser.isUserIdle,'background-color:#FFF0F0;width:20%;align:left;','background-color:#bcffce;width:20%;align:left;')}"/>                        
+                <apex:column headerValue="Last Used Object" value="{! varWrappedUser.objectAccessed}" style="{! IF(varWrappedUser.isUserIdle,'background-color:#FFF0F0;width:20%;align:left;','background-color:#bcffce;width:20%;align:left;')}"/>
+                <apex:column headerValue="Last Used Date" value="{!varWrappedUser.lastUsedDate}" style="{! IF(varWrappedUser.isUserIdle,'background-color:#FFF0F0;align:left;width:20%;','background-color:#bcffce;align:left;width:20%;')}"/>
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+    </apex:form-->
+    <!--table id="userLicensDetail" style="width:100%;" border="0" cellspacing="0" cellpadding="1" >
+        <thead>
+            <tr>
+                <th class="tableHeader">User Name</th>
+                <th class="tableHeader">Email</th>
+                <th class="tableHeader">Profile</th>
+                <th class="tableHeader">Last Used Object</th>
+                <th class="tableHeader">Last Used Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <apex:repeat value="{! lAllRecordsToDisplay}" var="varWrappedUser">
+                <tr style="{! IF(varWrappedUser.isUserIdle,'background-color:#FFF0F0;','background-color:#bcffce;')};">
+                    <td class="tableContent">{!varWrappedUser.userName}</td>
+                    <td class="tableContent">{!varWrappedUser.userEmail}</td>
+                    <td class="tableContent">{!varWrappedUser.profileName}</td>
+                    <td class="tableContent">{!varWrappedUser.objectAccessed}</td>
+                    <td class="tableContent">{!varWrappedUser.lastUsedDate}</td>
+                </tr>
+            </apex:repeat>
+        </tbody>
+    </table-->
+</apex:page>

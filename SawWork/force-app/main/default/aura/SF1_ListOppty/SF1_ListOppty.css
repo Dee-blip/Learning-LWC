@@ -1,0 +1,15 @@
+.THIS .scrollSize{
+    height: 50vh;
+}
+
+.THIS.toggleOff {
+	display: none;
+}
+
+.THIS.toggleOn {
+	display: block;
+}
+
+.THIS.changeMe {
+	display: block;
+}

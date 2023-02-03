@@ -1,0 +1,618 @@
+<!----------------------------------------------------------------------------------------
+ * Page Name            : SC_AddAuthorizedContacts
+ * Controller           : SC_AddAuthorizedContactsCtrl
+ * Developer Name       : Vamsee Surya
+ * Date                 : 25th Oct,2017
+ * JIRA                 : ESESP-767 (SOCC)
+ * Purpose              : This page is used to add multiple Authorized Contacts to Policy Domain
+------------------------------------------------------------------------------------------
+    Last Modified   |   Developer   |   Purpose
+    21st Nov 2017   |   Vamsee S    |   Delete Authorized Contacts functionality (ESESP-768)
+    25th Jul 2018   |   Vamsee S    |   Associate Policy domain to the contact (ESESP-1498)
+------------------------------------------------------------------------------------------>
+<apex:page standardController="Authorized_Contact__c" extensions="SC_AddAuthorizedContactsCtrl" title="{!title}" docType="HTML-5.0">
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+    <style>
+        .AddButton{
+            background: #4a90e2 !important; 
+            padding: 7px;
+            border-color: #4a90e2;
+            color: #fff !important;
+            font-size:12px;
+            width:5%;
+            margin-left: 43% !important;
+            cursor: pointer;
+        }
+        .CancelButton{
+            background-color: #f4f5f7;
+            padding: 7px;
+            font-size:12px;
+            width:10%;
+            border: 1px solid #e0e5ee;
+            cursor: pointer;
+        }
+        
+        .ReturnButton{
+            position: absolute; 
+            left: 90%;
+            background-color: #4a90e2;
+            padding: 6px !important;
+            cursor: pointer;
+        }
+    </style>
+    
+    <!--For Spinner-->
+    <div  id="status" style="display: none;position: fixed;" class="slds-scope slds-spinner_container" >
+        <div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand"  >
+            <span class="slds-assistive-text">Loading</span>
+             <div class="slds-spinner__dot-a"></div>
+             <div class="slds-spinner__dot-b"></div>
+       </div>
+    </div>
+  <div id="overlay">      
+    <apex:form id="FormStart">
+        
+        <!--Associate Policy Domain-->
+        <apex:outputPanel rendered="{!!isDelete && !fromPD}">
+            
+            <div style="text-align: center;padding-top:20px;">
+                <h1 Style="font-size:30px;">
+                 Associate Policy Domain(s)
+                </h1><br/><br/>
+            </div>
+                <!--Buttons-->
+                <button class = "AddButton" onclick="return processSelectedRecordsjS();" title ="Associate Policy Domain">Associate</button>
+                <button class = "CancelButton" onclick="return unSelectAll();" type="button" title ="Deselect Policy Domain">Clear Selections</button>
+                <!-- Return to Contact button-->
+                <span class="slds-icon_container ReturnButton"   title="Return to Contact"  onclick="return returnToContact();">
+                    <svg class="slds-icon slds-icon--small" aria-hidden="true" style="width:30px; height:20px; fill:#fff;position:absolute; top:15%;">
+                        <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#redo')}"></use>
+                    </svg>
+                    <label style="font-size :14px !important;color:#fff;cursor: pointer;padding-left:30px; ">Return to Contact</label>   
+                </span>            
+            
+        </apex:outputPanel>
+        
+       
+        <!--Remove Policy Domain Association -->
+        <apex:outputPanel rendered="{!isDelete && !fromPD}">
+            
+            <div style="text-align: center;padding-top:20px;">
+                <h1 Style="font-size:30px;">
+                 Remove Policy Domain(s) Association
+                </h1><br/><br/>
+            </div>
+                <!--Buttons-->
+                <button class = "AddButton" onclick="return processSelectedRecordsjS();" title ="Remove Policy Domain">Remove</button>
+                <button class = "CancelButton" onclick="return unSelectAll();" type="button" title ="Deselect Policy Domain">Clear Selections</button>
+                <!-- Return to Contact button-->
+                <span class="slds-icon_container ReturnButton"   title="Return to Contact"  onclick="return returnToContact();">
+                    <svg class="slds-icon slds-icon--small" aria-hidden="true" style="width:30px; height:20px; fill:#fff;position:absolute; top:15%;">
+                        <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#redo')}"></use>
+                    </svg>
+                    <label style="font-size :14px !important;color:#fff;cursor: pointer;padding-left:30px; ">Return to Contact</label>   
+                </span>   
+            
+        </apex:outputPanel>
+        
+        
+        <!--Add Authorized Contacts-->
+        <apex:outputPanel rendered="{!!isDelete && fromPD}">
+            
+            <div style="text-align: center;padding-top:20px;">
+                <h1 Style="font-size:30px;">
+                 Authorized Contacts - Add Contacts
+                </h1><br/><br/>
+            </div>
+                <!--Buttons-->
+                <button class = "AddButton" onclick="return processSelectedRecordsjS();" title ="Add Selected Contacts">Add</button>
+                <button class = "CancelButton" onclick="return unSelectAll();" type="button" title ="Deselect Contacts">Clear Selections</button>
+                <!-- Return to PD button-->
+                <span class="slds-icon_container ReturnButton"   title="Return to PD"  onclick="return returnToPD();">
+                    <svg class="slds-icon slds-icon--small" aria-hidden="true" style="width:30px; height:20px; fill:#fff;position:absolute; top:15%;">
+                        <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#redo')}"></use>
+                    </svg>
+                    <label style="font-size :14px !important;color:#fff;cursor: pointer;padding-left:30px; ">Return to PD</label>   
+                </span>            
+            
+        </apex:outputPanel>
+        
+        <!--Delete Authorized Contacts-->
+        <apex:outputPanel rendered="{!isDelete && fromPD}">
+            <div style="text-align: center;padding-top:20px;">
+                <h1 Style="font-size:30px;">
+                 Authorized Contacts - Delete Contacts
+                </h1><br/><br/>
+            </div>
+            <!--Buttons-->
+            <button class = "AddButton" onclick="return processSelectedRecordsjS();" title ="Delete Selected Contacts">Delete</button>
+            <button class = "CancelButton" onclick="return unSelectAll();" type="button" title ="Deselect Contacts">Clear Selections</button>
+            <!-- Return to PD button-->
+            <span class="slds-icon_container ReturnButton"   title="Return to PD"  onclick="return returnToPD();">
+                <svg class="slds-icon slds-icon--small" aria-hidden="true" style="width:30px; height:20px; fill:#fff;position:absolute; top:15%;">
+                    <use xlink:href="{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#redo')}"></use>
+                </svg>
+                <label style="font-size :14px !important;color:#fff;cursor: pointer;padding-left:30px; ">Return to PD</label>   
+            </span> 
+            
+        </apex:outputPanel>
+        
+        <apex:slds />  
+        
+        <head>
+            <!--Required Libraries-->
+            <apex:includescript value="//code.jquery.com/jquery-1.11.1.min.js" />
+            <apex:includeScript value="/support/console/41.0/integration.js"/>
+            <apex:includescript value="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js" />
+            <apex:stylesheet value="//cdn.datatables.net/1.10.4/css/jquery.dataTables.css" />
+            
+            <div style ="text-align: center;padding-top:20px;">
+                <h4 style="Display:none;color:green;" id="successMessage">
+                    <apex:outputText id="successMessageText" value="{!successMessageText}"/>
+                </h4>
+                <h4 style="Display:none;color:red;" id="errorMessage">
+                    <apex:outputText id="errorMessageText" value="{!errorMessageText}"/> 
+                </h4>
+            </div>
+            <apex:inputHidden value="{!recordListjson}" id="recordListjson"/>     
+        </head>
+        
+        <!--Add/Delete Authorized Contacts-->
+        <apex:outputPanel rendered="{!fromPD}">
+            <body>
+                <!--Action Functions--> 
+                <apex:actionFunction name="getContactList" action="{!getContactList}" reRender="recordListjson" onComplete="constructRecordsTable()"/>
+                <apex:actionFunction name="processSelectedRecords" action="{!processSelectedRecords}" reRender="successMessageText,recordListjson,errorMessageText" onComplete="getContactList();showMessage();">
+                    <apex:param name="selectedRecords" value="" assignTo="{!selectedRecords}"/>
+                </apex:actionFunction>
+                
+                <!--Table-->
+                <table id="recordstable" class="display table table-striped table-responsive">
+                    <thead>
+                        <tr>
+                            <th style="width:3%;"><input type="checkbox" id ="selectAll"/></th>
+                            <th style="width:22%;">NAME</th>
+                            <th style="width:10%;">CONTACT ID</th>
+                            <th style="width:19%;">TITLE</th>
+                            <th style="width:22%;">EMAIL</th>
+                            <th style="width:22%;">ACCOUNT NAME</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                    </tbody>
+                </table>
+                <br/><br/>
+                <apex:outputPanel rendered="{!!isDelete}">
+                    <button class = "AddButton" onclick="return processSelectedRecordsjS();" title ="Add Selected Contacts">Add</button>
+                    <button class = "CancelButton" onclick="return unSelectAll();" type="button" title ="Deselect Contacts">Clear Selections</button>
+                    
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!isDelete}">
+                        <button class = "AddButton" onclick="return processSelectedRecordsjS();" title ="Delete Selected Contacts">Delete</button>
+                        <button class = "CancelButton" onclick="return unSelectAll();" type="button" title ="Deselect Contacts">Clear Selections</button>
+                </apex:outputPanel>
+                
+            </body>
+        </apex:outputPanel>
+        
+        
+        <!-- Associate/Remove Policy Domain-->
+        <apex:outputPanel rendered="{!!fromPD}">
+            <body>
+                <!--Action Functions--> 
+                <apex:actionFunction name="getPolicyDomainList" action="{!getPolicyDomainList}" reRender="recordListjson" onComplete="constructRecordsTable()"/>
+                <apex:actionFunction name="processSelectedRecords" action="{!processSelectedRecords}" reRender="successMessageText,recordListjson,errorMessageText" onComplete="getPolicyDomainList();showMessage();">
+                    <apex:param name="selectedRecords" value="" assignTo="{!selectedRecords}"/>
+                </apex:actionFunction>
+                <!--Table-->
+                <table id="recordstable" class="display table table-striped table-responsive">
+                    <thead>
+                        <tr>
+                            <th style="width:3%;"><input type="checkbox" id ="selectAll"/></th>
+                            <th style="width:25%;">POLICY DOMAIN NAME</th>
+                            <th style="width:22%;">POLICY DOMAIN STATE</th>
+                            <th style="width:23%;">ACCOUNT NAME</th>
+                            <th style="width:23%;">SERVICE ACCOUNT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                    </tbody>
+                </table>
+                <br/><br/>
+                <apex:outputPanel rendered="{!!isDelete}">
+                    <button class = "AddButton" onclick="return processSelectedRecordsjS();" title ="Associate Policy Domain">Associate</button>
+                    <button class = "CancelButton" onclick="return unSelectAll();" type="button" title ="Deselect Policy Domain">Clear Selections</button>
+                    
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!isDelete}">
+                        <button class = "AddButton" onclick="return processSelectedRecordsjS();" title ="Remove Policy Domain">Remove</button>
+                        <button class = "CancelButton" onclick="return unSelectAll();" type="button" title ="Deselect Policy Domain">Clear Selections</button>
+                </apex:outputPanel>
+                
+            </body>
+        </apex:outputPanel>
+        <script>
+            j$ = jQuery.noConflict();
+            j$(document).ready( function () {
+                if('{!fromPD}' == 'false')
+                    getPolicyDomainList();
+                else
+                    getContactList();
+            });
+        
+            //Function to populate Contact Table
+            function constructRecordsTable() {
+                var contactData = JSON.parse(document.getElementById('{!$Component.recordListjson}').value);
+                
+                //Associate Policy Domains
+                if('{!fromPD}' == 'false'){
+                
+                    //Construct Datatable for Add
+                    mTable=  j$('#recordstable').DataTable( {
+                    
+                    "data": contactData,
+                        
+                    //Check Box
+                    "columns":[
+                    {
+                        "data": "Id",
+                        "type": "html",
+                        "bSortable": false,
+                        "mRender" : function(data,type,full) {
+                            return '<input value = "'+ data + '" type="checkbox">';
+                        }
+                    },  
+                    //Policy Domain Name
+                    {
+                        "data": "Name",
+                        "type": "text",
+                        "mRender" : function(data,type,full) {
+                            return data;
+                        }
+                    },
+                    //Policy Domain State
+                    {
+                        "data": "Policy_Domain_State__c",
+                        "type": "text",
+                        "mRender" : function(data,type,full) {
+                            return data;
+                        }
+                    },
+                    //Account Name
+                    {
+                        "data": "Account_Name__r.Name",
+                        "type": "text",
+                        "mRender" : function(data,type,full) {
+                            if(data == null)
+                            {
+                                return '';
+                            }
+                            return data;
+                        }
+                    },
+                    //Service Account Name
+                    {
+                        "data": "Service_Account__r.Name",
+                        "type": "text",
+                        "mRender" : function(data,type,full) {
+                            if(data == null)
+                            {
+                                return '';
+                            }
+                            return data;
+                        }                
+                    },
+                    
+                    ],
+                    "destroy": true,                       
+                    "oLanguage": {
+                        "sLengthMenu": "Show _MENU_ Policy Domains",
+                        "sInfo": "Showing _START_ to _END_ of _TOTAL_ Policy Domain(s)",
+                        "sInfoEmpty": "Showing 0 Policy Domains",
+                        "sEmptyTable": "No Policy Domains Available"
+                    }
+                    });
+                    stopSpinner();
+              
+                }else if('{!isDelete}' == 'false' && '{!fromPD}' == 'true'){
+                
+                    //Construct Datatable for Add
+                    mTable=  j$('#recordstable').DataTable( {
+                    
+                    "data": contactData,
+                        
+                    //Check Box
+                    "columns":[
+                    {
+                        "data": "Id",
+                        "type": "html",
+                        "bSortable": false,
+                        "mRender" : function(data,type,full) {
+                            return '<input value = "'+ data + '" type="checkbox">';
+                        }
+                    },  
+                    //Contact Name
+                    {
+                        "data": "Name",
+                        "type": "text",
+                        "mRender" : function(data,type,full) {
+                            return data;
+                        }
+                    },
+                    //Akam Contact Id
+                    {
+                        "data": "AKAM_Contact_ID__c",
+                        "type": "text",
+                        "mRender" : function(data,type,full) {
+                            return data;
+                        }
+                    },
+                    //Title
+                    {
+                        "data": "Title",
+                        "type": "text",
+                        "mRender" : function(data,type,full) {
+                            if(data == null)
+                            {
+                                return '';
+                            }
+                            return data;
+                        }
+                    },
+                    //Email Address
+                    {
+                        "data": "Email",
+                        "type": "text",
+                        "mRender" : function(data,type,full) {
+                            if(data == null)
+                            {
+                                return '';
+                            }
+                            return data;
+                        }                
+                    },
+                    //Account Name
+                    {
+                        "data": "Account.Name",
+                        "type": "text",
+                        "mRender" : function(data,type,full) {
+                            return data;
+                        }
+                    }
+                
+                    ],
+                    "destroy": true,                       
+                    "oLanguage": {
+                        "sLengthMenu": "Show _MENU_ Contacts",
+                        "sInfo": "Showing _START_ to _END_ of _TOTAL_ Contact(s)",
+                        "sInfoEmpty": "Showing 0 contacts",
+                        "sEmptyTable": "No Contacts Available"
+                    }
+                    });
+                    stopSpinner();
+              }
+              //Delete Contacts
+              else{
+                    //Construct Datatable for Delete
+                    mTable=  j$('#recordstable').DataTable( {
+                    
+                    "data": contactData,
+                    
+                    //Check Box
+                    "columns":[
+                    {
+                        "data": "Id",
+                        "type": "html",
+                        "bSortable": false,
+                        "mRender" : function(data,type,full) {
+                            return '<input value = "'+ data + '" type="checkbox">';
+                        }
+                    },  
+                    //Contact Name
+                    {
+                        "data": "Contact_Name__r.Name",
+                        "type": "text",
+                        "mRender" : function(data,type,full) {
+                            return data;
+                        }
+                    },
+                    //Akam Contact Id
+                    {
+                        "data": "Contact_Name__r.AKAM_Contact_ID__c",
+                        "type": "text",
+                        "mRender" : function(data,type,full) {
+                            return data;
+                        }
+                    },
+                    //Title
+                    {
+                        "data": "Contact_Name__r.Title",
+                        "type": "text",
+                        "mRender" : function(data,type,full) {
+                            if(data == null)
+                            {
+                                return '';
+                            }
+                            return data;
+                        }
+                    },
+                    //Email Address
+                    {
+                        "data": "Contact_Name__r.Email",
+                        "type": "text",
+                        "mRender" : function(data,type,full) {
+                            if(data == null)
+                            {
+                                return '';
+                            }
+                            return data;
+                        }                
+                    },
+                    //Account Name
+                    {
+                        "data": "Contact_Name__r.Account.Name",
+                        "type": "text",
+                        "mRender" : function(data,type,full) {
+                            return data;
+                        }
+                    }
+                
+                    ],
+                    "destroy": true,  
+                    "oLanguage": {
+                        "sLengthMenu": "Show _MENU_ Authorized Contacts",
+                        "sInfo": "Showing _START_ to _END_ of _TOTAL_ Authorized Contact(s)",
+                        "sInfoEmpty": "Showing 0 Authorized contacts",
+                        "sEmptyTable": "No Authorized Contacts Available"
+                        }
+                    });
+                    stopSpinner();
+              
+                }
+        }
+                 
+                
+        //Function to show the spinner
+        function showSpinner()
+        {
+            //Spinner behaves differently inside console
+            if(sforce.console.isInConsole()) {
+                    j$('#status').css('left','50%').css("z-index", "2000").css('top','50%');
+                    j$('#overlay').css("opacity","0.2");
+                    j$('body').css('pointer-events','none');
+                }
+            else
+                {
+                    j$('#status').css('width','100%').css('height','100%');
+                }
+            j$('#status').show();
+        }
+        
+        //Function to hide the Spinner
+        function stopSpinner()
+        {
+            j$('body').css('pointer-events','auto');  
+            j$('#overlay').css("opacity","1");
+            j$('#status').hide();            
+        }
+        
+        //This function is to display the Save results
+        function showMessage(){
+           if(j$("[id$='errorMessageText']").html() != undefined && j$("[id$='errorMessageText']").html() != '')
+           {
+                j$('#successMessage').hide();
+                j$('#errorMessage').show();
+           }
+           else
+           {
+                j$('#errorMessage').hide();
+                j$('#successMessage').show();
+           }
+        }
+        
+        //This function will send list of selected records to Controller method
+        function processSelectedRecordsjS()
+        { 
+            var selectedRecords="";
+            mTable.$('input[type=checkbox]',{"page": "all"}).each(
+                                        function () 
+                                        {
+                                            selectedRecords += (this.checked ? this.value + "," : "");
+                                        });
+            //If atleast one contact is selected
+            if(selectedRecords.length > 14){
+                if('{!isDelete}' == 'true'){
+                    if('{!fromPD}' == 'true')
+                        var isConfirmed = confirm("Are you sure you want to delete?");
+                    else
+                        var isConfirmed = confirm("Are you sure you want to remove?");
+                    if(isConfirmed == true){
+                        showSpinner();
+                        processSelectedRecords(selectedRecords);
+                    }
+               }
+                else{
+                    showSpinner();
+                    processSelectedRecords(selectedRecords);
+                }
+            }
+            else{
+                if('{!fromPD}' == 'true')
+                    alert("Please Select a Contact");
+                else
+                    alert("Please Select a Policy Domain");
+            }
+            return false;
+        }
+        //This function is to goto PD details page
+        function returnToPD(){
+            if(sforce.console.isInConsole()) {
+                sforce.console.getEnclosingTabId(closeSubtab);
+            }
+            else{
+               window.location.href='/{!policyDomainId}';
+            }
+            
+        }
+        
+        //This function is to goto Contact details page
+        function returnToContact(){
+            if(sforce.console.isInConsole()) {
+                sforce.console.getEnclosingTabId(closeSubtab);
+            }
+            else{
+               window.location.href='/{!contactId}';
+            }
+            
+        }
+        
+        //This function Unchecks all the seleted contacts
+        function unSelectAll(){
+            j$('#selectAll').prop("checked", false);
+            mTable.$('input[type=checkbox]',{"page": "all"}).each(
+                                        function () 
+                                        {
+                                            if(this.checked){
+                                                this.checked = false;
+                                                }
+                                        });
+        }
+        
+            
+        var closeSubtab = function closeSubtab(result) {
+            var tabId = result.id;
+            sforce.console.closeTab(tabId);
+        };
+        
+        //If Select all checkbox is true then all the check boxes on the page will be true.
+        j$("#selectAll").on('click',function(){
+            j$('input[type=checkbox]').not(j$('#selectAll')).prop("checked",this.checked);
+        });
+        
+        //if page length is changed then make selectAll = false
+        j$('#recordstable').on('length.dt', function () {
+            j$('#selectAll').prop("checked", false);
+        });
+        
+        //if sort is applied then make selectAll = false
+        j$('#recordstable').on('order.dt', function () {
+            j$('#selectAll').prop("checked", false);
+        });
+        
+        //if page is changed then make selectAll = false
+        j$('#recordstable').on('page.dt', function () {
+            j$('#selectAll').prop("checked", false);
+        });
+        
+        //if searched then make selectAll = false
+        j$('#recordstable').on('search.dt', function () {
+            j$('#selectAll').prop("checked", false);
+        });
+        
+        </script>
+        </apex:form>
+  </div>  
+  </html>
+</apex:page>

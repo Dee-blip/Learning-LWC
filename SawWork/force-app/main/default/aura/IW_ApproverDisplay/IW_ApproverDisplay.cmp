@@ -1,0 +1,18 @@
+<aura:component controller="IW_getRequestWatchers" implements="force:hasRecordId,flexipage:availableForRecordHome" access="global" >
+    <!-- 19.4 Sujay Adding a CSS Style-->
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="selectedLookUpRecords" type="sObject[]" default="[]"/>
+    <aura:attribute name="requestorId" type="String"/>
+    <aura:attribute name="submitterId" type="String"/>
+    <aura:attribute name="wachersId" type="String"/>
+    <aura:attribute name="saveAccess" type="Boolean"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <lightning:card iconName="standard:user" title="Approver(s)">
+        <c:IW_reUsableMultiSelectLookup objectAPIName="User"
+                                        IconName="standard:user"
+                                        lstSelectedRecords="{!v.selectedLookUpRecords}"
+                                        label=""
+                                        lookup="false"/>
+    </lightning:card>
+</aura:component>

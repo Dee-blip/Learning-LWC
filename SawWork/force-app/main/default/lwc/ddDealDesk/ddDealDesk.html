@@ -1,0 +1,114 @@
+<template>
+    <!-- Start of Layout -->
+    <div class="container">
+        <div class="slds-grid" style="max-width: 1800px; margin: auto;">
+            <!-- Deal Evaluation Form -->
+            <div class={formCss}>
+                <div class="slds-p-right_x-small form-cont" >
+                    <!-- style=""> -->
+                    <c-dd-evaluation-form deal={deal} mode={mode} 
+                                        onsubmitotherproduct={handleOtherProduct}
+                                        onevaluate={handleEvaluate} 
+                                        style="height:100%;"></c-dd-evaluation-form>
+                </div>
+            </div>
+            <!-- Dashboard -->
+            <template if:true={rightPanelTransition}>
+                <div class={dashBoardCss}>
+                    <div style="max-height: 100%;">
+                        <lightning-layout>
+                            <lightning-layout-item size="12">
+                                <div class="slds-notify slds-notify_alert slds-theme_alert-texture alert-success slds-m-bottom_xx-small"
+                                    if:true={dealEvalutionMessage}>
+                                    <lightning-icon icon-name="utility:info_alt" size="small" variant="inverse" class="slds-p-horizontal_small">
+                                    </lightning-icon>
+                                    <h2>{dealEvalutionMessage}</h2>
+                                </div>
+                            </lightning-layout-item>
+                        </lightning-layout>
+                        <lightning-layout class="slds-p-bottom_x-small" style="height:33vh;">
+                            <!-- Layout: Dashboard Top Left -->
+                            <lightning-layout-item size="6" class="slds-p-right_x-small">
+                                <!-- Revenue Trend  -->
+                                <div class="card pop">
+                                    <c-dd-revenue-trend deal={deal}></c-dd-revenue-trend>
+                                </div>
+                            </lightning-layout-item>
+                            <!-- Layout: Dashboard Top Right -->
+                            <lightning-layout-item size="6">
+                            <!-- Utilization Trend -->
+                                <div class="card pop">
+                                    <c-dd-hours-utilization-trend deal={deal}></c-dd-hours-utilization-trend>
+                                </div>
+                            </lightning-layout-item>
+                        </lightning-layout>
+
+                        <lightning-layout style="height:40vh;">
+                            <lightning-layout-item size="6" class="slds-p-right_x-small">
+                                <!-- Layout: Dashboard Middle Left -->
+                                <lightning-layout style="height: 70%; ">
+                                    <lightning-layout-item size="6" class="slds-p-right_x-small slds-p-bottom_x-small">
+                                        <!-- Average Delivery Cost -->
+                                        <div class="card pop">
+                                            <c-dd-avg-delivery-cost-trend deal={deal}> </c-dd-avg-delivery-cost-trend>
+                                        </div>
+                                    </lightning-layout-item>
+                                    <lightning-layout-item size="6" class="slds-p-bottom_x-small">
+                                        <!-- Average Consumption -->
+                                        <div class="card pop">
+                                            <c-dd-avg-consumption-trend deal={deal}></c-dd-avg-consumption-trend>
+                                        </div>
+                                    </lightning-layout-item>
+                                </lightning-layout>
+                                <!-- Layout: Dashboard Bottom Left -->
+                                <lightning-layout style="height: 30%;">
+                                    <lightning-layout-item size="12">
+                                        <!-- Hours Overview -->
+                                        <div class="card pop">
+                                            <c-dd-hours-overview-trend deal={deal}></c-dd-hours-overview-trend>
+                                        </div>
+                                    </lightning-layout-item>
+                                </lightning-layout>
+                            </lightning-layout-item>
+                            <!-- Layout: Dashboard Bottom Right -->
+                            <lightning-layout-item size="6">
+                                <div class="card" style="overflow:hidden;">
+                                    <lightning-tabset active-tab-value={defaultTab}>
+                                        <!-- EPS Trend -->
+                                        <lightning-tab label="Based on EPS" value="eps" class="tab" end-icon-name="">
+                                            <c-dd-eps-trend deal={deal}></c-dd-eps-trend>
+                                        </lightning-tab>
+                                        <!-- ESR Trend -->
+                                        <lightning-tab label="Based on ESR" value="esr" class="tab" end-icon-name="">
+                                            <div class="esr-trend">
+                                                <c-dd-esr-trend deal={deal} prod-name={prodSelected} ontoggleesr={toggleEsr}></c-dd-esr-trend>
+                                            </div>
+                                        </lightning-tab>
+                                    </lightning-tabset>
+                                </div>
+                            </lightning-layout-item>
+                        </lightning-layout>
+                        <!-- <lightning-layout>
+                            <lightning-layout-item size="12">
+                                 Approval Options 
+                                <div if:true={showApprovalOptions} class="slds-m-vertical_x-small slds-p-vertical_x-small footer-btns">
+                                    <c-dd-approval-buttons record={deal} onaction={handleEvalAction} ></c-dd-approval-buttons>
+                                </div>
+                            </lightning-layout-item>
+                        </lightning-layout> -->
+                        
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Bottom Padding fix -->
+    <div if:true={isEditMode} style="padding-bottom:70px">
+
+    </div>
+    <!-- Approval Options -->
+    <div if:true={showApprovalOptions} >
+        <c-dd-approval-buttons record={deal} onaction={handleEvalAction} css-class="slds-docked-form-footer footer-btns" ></c-dd-approval-buttons>
+    </div>
+</template>

@@ -1,0 +1,48 @@
+<aura:component controller="SF1_ChangeCurrencyController" 
+                implements="force:hasRecordId,force:lightningQuickAction" 
+                access="global">
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="opportunityObj" type="Opportunity"/>
+    <aura:attribute name="currencyValues" type="String[]"/>
+    <aura:attribute name="ErrorMessage" type="String"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <div>
+    <center><lightning:spinner variant="brand" size="large" aura:id="ltngSpinner" class="slds-hide"/></center>
+    </div>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <div class="slds-hide" style="color:red;" aura:id="ErrorMessageId">
+    	<p>     Error: </p>
+        <p> {!v.ErrorMessage}</p>
+    </div>
+    <div class="slds-panel slds-grid slds-grid_vertical slds-nowrap slds-show"
+             aura:id="changeCurrencyDetailsId">
+        <div class="slds-form slds-form_stacked slds-grow slds-scrollable_y">
+        	<div class="slds-panel__section">
+                <h3 class="slds-text-heading_small slds-m-bottom_medium">
+                    Select Currency
+                </h3>
+            	
+                <ul>
+                    <lightning:select aura:id="currencyNameId"
+                                      value="{!v.opportunityObj.CurrencyIsoCode}"
+                                      label="Currency"
+                                      required="true">
+                    	<aura:iteration items="{!v.currencyValues}" var="currency"
+                                        indexVar="key">
+                        	<option text="{!currency}" label="{!currency}"/>
+                        </aura:iteration>
+                	</lightning:select>
+                    <br/>
+                    <lightning:button variant="brand" label="Change Currency" 
+                              iconName="utility:approval" iconPosition="center" 
+                              onclick="{!c.confirm }" />
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    
+	
+</aura:component>

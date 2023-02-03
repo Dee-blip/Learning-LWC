@@ -1,0 +1,10 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="inputValue" type="String"/>
+    <aura:attribute name="productName" type="String"/>
+    <aura:attribute name="cliName" type="String"/>
+    <aura:attribute name="strParentId" type="String"/>
+
+    <aura:registerEvent name="PSA_ProjectContractSelectToVFEvent" type="c:PSA_ProjectContractSelectToVFEvent"/>
+
+    <c:psaProjectContractSelect recId="{!v.strParentId}" onparentclose="{!c.getValueFromLwc}" />
+</aura:component>

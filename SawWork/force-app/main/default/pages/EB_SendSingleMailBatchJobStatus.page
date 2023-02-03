@@ -1,0 +1,267 @@
+<apex:page controller="EB_SendSingleMailBatchJobStatusCtrl" sidebar="false" showHeader="true" id="pageBlock">
+    <script src="{!URLFOR($Resource.EBMailerStatusUI, '/bootstrap-3.3.2-dist/js/bootstrap.min.js')}"></script>
+    <apex:stylesheet value="{!URLFOR($Resource.EBMailerStatusUI, '/bootstrap-3.3.2-dist/css/bootstrap.min.css')}"/>
+    
+    <style>
+        .green-ok{
+            
+            padding: .1em .2em .0em .2em;
+            //font-weight: bolder;
+            color: green;
+            font-size: 30px;
+           // padding-left: 50px;
+        }
+        .grey-ok{
+            
+            padding: .1em .2em .1em .2em;
+            //font-weight: bolder;
+            color: grey;
+            font-size: 30px;
+         //   padding-left: 50px;
+        }
+        .red-remove{
+            
+            padding: .1em .2em .1em .2em;
+            //font-weight: bolder;
+            color: red;
+            font-size: 30px;
+           // padding-left: 50px;
+        }
+        
+        .text-style{
+            font-style: normal;
+            font-size: 1.40em;
+            //font-weight: bolder;
+            color: black;
+            //padding-bottom: ;
+        }
+    </style>
+    
+    <apex:messages />
+    <!--apex:variable value="{!akamMailer}" var="akamMailerFromPage"/-->
+    <div width="100%">    
+    <div class="page-header" >
+        <center> <h1>Single Mail Progress Tracker </h1> </center>
+    </div>
+    <apex:outputPanel id="queueAlertMessage">
+        <apex:outputPanel rendered="{! !(isBatchSubmitted) && !isRetryFail && !isSubmitAttemptFailed}" id="op">
+            <div class="alert alert-warning" role="alert">
+                <h3> Your Mailer is not yet submitted. Please wait. </h3>
+            </div>
+        </apex:outputPanel>
+    </apex:outputPanel>
+
+    <apex:outputPanel id="batchJobNotSubmitted">
+        <apex:outputPanel rendered="{! isSubmitAttemptFailed}" id="errorMessageSubmit">
+            <div class="alert alert-danger" role="alert">
+                <h3><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span></h3>
+                <h3>There are more than 5 Jobs in the queue. Please contact EAE-Ops team.</h3><br/>
+                <h3> &nbsp; &nbsp; Please click&nbsp;<apex:outputLink value="/{!mailerIdForPage}">here </apex:outputLink> to go back to mailer. </h3>
+            </div>
+        </apex:outputPanel>
+        
+        <apex:outputPanel rendered="{!isRetryFail}" id="errorMessageRetry">
+            <div class="alert alert-danger" role="alert">
+                <h3><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span></h3>
+                <h3> Retry attempt to Submit the Batch job failed again. Please contact EAE-Ops Team.</h3><br/>
+                <h3> &nbsp; &nbsp; Please click&nbsp;<apex:outputLink value="/{!mailerIdForPage}">here </apex:outputLink> to go back to mailer. </h3>
+            </div>
+        </apex:outputPanel>
+        
+        <apex:form >
+        
+            <apex:commandButton action="{!retrySubmitingJob}" title="Retry Submitting Job" value="Retry Submitting Job" style="background:#91EDA9" rendered="{! isRetryFail || isSubmitAttemptFailed}"/>
+                
+        </apex:form>
+    </apex:outputPanel>
+
+    <apex:actionStatus id="actQStatusId" >
+        <apex:facet name="start">
+        <img src="/img/loading.gif" />
+        </apex:facet>
+    </apex:actionStatus>
+
+    <apex:outputPanel id="progressBarId">
+        <div class="progress">
+            <apex:outputPanel rendered="{! !isBatchFailed && isBatchSubmitted && !isBatchInProgress && !isRetryFail && !isSubmitAttemptFailed}">
+                <div class="progress-bar progress-bar-info progress-bar-striped active" style="width: 33%">
+                    <span class="sr-only"></span>
+                    <b>Job Submitted</b>
+               </div>
+            </apex:outputPanel>
+            <apex:outputPanel rendered="{! !isBatchFailed && isBatchInProgress && !isBatchCompleted}">
+                <div class="progress-bar progress-bar-warning progress-bar-striped active" style="width: 66%">
+                    <span class="sr-only"></span>
+                    <b>Job In Progress</b>
+                </div>
+            </apex:outputPanel>
+            <apex:outputPanel rendered="{! !isBatchFailed && isBatchCompleted}">
+                <div class="progress-bar progress-bar-success progress-bar-striped" style="width: 100%">
+                    <span class="sr-only"></span>
+                    <b>Job Run Complete</b>
+                </div>
+            </apex:outputPanel>
+            <apex:outputPanel rendered="{! isBatchFailed }">
+                <div class="progress-bar progress-bar-danger progress-bar-striped active" style="width: 100%">
+                    <span class="sr-only"></span>
+                    <b>Job Failed</b>
+                </div>
+            </apex:outputPanel>
+        </div>
+    </apex:outputPanel>
+        
+    
+
+    <div>
+        <apex:outputPanel rendered="{! IF(akamMailer==null, true,false)}">
+           <center> <h3 style="color:red"> Please Select a Valid Mailer Id </h3> </center>
+        </apex:outputPanel> <br/>
+    </div>
+    </div>
+    <table class="table" width="100%">
+        
+        <tr><td  width="20%">
+        <div class="panel panel-primary">
+        <div class="panel-heading"><center><h4>Current Status</h4></center></div>
+        <apex:outputPanel id="statusMessages">
+        <table>
+        
+    
+        
+        <tr><td> 
+            <apex:outputPanel >
+                <apex:outputPanel rendered="{! !isBatchFailed && isBatchSubmitted && !isRetryFail && !isSubmitAttemptFailed}">
+                    <span class="glyphicon glyphicon-ok green-ok" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{! !isBatchFailed && !isBatchSubmitted && !isBatchInProgress && !isBatchPreparing && !isBatchCompleted && !isRetryFail && !isSubmitAttemptFailed}">
+                    <span class="glyphicon glyphicon-arrow-right green-ok" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{! isRetryFail || isSubmitAttemptFailed}">
+                    <span class="glyphicon glyphicon-ok grey-ok" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{! isBatchFailed}">
+                    <span class="glyphicon glyphicon-remove red-remove" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <span class = "text-style">Submitting Job</span>
+            </apex:outputPanel> 
+        </td></tr>
+        <tr><td> 
+            <apex:outputPanel >
+                <apex:outputPanel rendered="{! !isBatchFailed && isBatchPreparing && isBatchInProgress }">
+                    <span class="glyphicon glyphicon-ok green-ok" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{! !isBatchFailed && !isBatchSubmitted && (!isRetryFail || !isSubmitAttemptFailed)}">
+                    <span class="glyphicon glyphicon-ok grey-ok" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{! !isBatchFailed && isBatchSubmitted && !isBatchInProgress && !(isRetryFail || isSubmitAttemptFailed)}">
+                    <span class="glyphicon glyphicon-arrow-right green-ok" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{! isBatchFailed}">
+                    <span class="glyphicon glyphicon-remove red-remove" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <span class = "text-style">Preparing</span>
+            </apex:outputPanel> 
+        </td></tr>
+        <tr><td> 
+            <apex:outputPanel >
+                <apex:outputPanel rendered="{! !isBatchFailed && isBatchSubmitted && isBatchInProgress && isBatchPreparing && isBatchCompleted}">
+                    <span class="glyphicon glyphicon-ok green-ok" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{! !isBatchFailed && !isBatchCompleted && !isBatchInProgress}">
+                    <span class="glyphicon glyphicon-ok grey-ok" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{! !isBatchFailed && isBatchPreparing && isBatchInProgress && !isBatchCompleted && isBatchSubmitted}">
+                    <span class="glyphicon glyphicon-arrow-right green-ok" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{! isBatchFailed}">
+                    <span class="glyphicon glyphicon-remove red-remove" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <span class = "text-style">Processing</span>
+            </apex:outputPanel> 
+        </td></tr>
+        <tr><td> 
+            <apex:outputPanel style="padding-bottom: 50px">
+                <apex:outputPanel rendered="{! !isBatchFailed && isBatchCompleted}">
+                    <span class="glyphicon glyphicon-ok green-ok" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="false">
+                    <span class="glyphicon glyphicon-ok grey-ok" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{! !isBatchFailed && !isBatchCompleted}">
+                    <span class="glyphicon glyphicon-ok grey-ok" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{! isBatchFailed}">
+                    <span class="glyphicon glyphicon-remove red-remove" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <span class = "text-style">Complete</span>
+            </apex:outputPanel> 
+        </td></tr>
+        <tr><td> 
+            <apex:outputPanel rendered="{! isBatchFailed}">
+                <apex:outputPanel rendered="{! isBatchFailed}">
+                    <span class="glyphicon glyphicon-ok red-remove" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="false">
+                    <span class="glyphicon glyphicon-ok grey-ok" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="false">
+                    <span class="glyphicon glyphicon-arrow-right green-ok" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="false">
+                    <span class="glyphicon glyphicon-remove red-remove" aria-hidden="true"></span>
+                </apex:outputPanel>
+                <span class = "text-style">Failed</span>
+            </apex:outputPanel> 
+        </td></tr>
+        <tr>
+        </tr>
+        
+        </table>
+        </apex:outputPanel>
+        </div>
+        </td>
+        <td>
+        
+        <div class="panel panel-primary">
+            <div class="panel-heading"><center><h4>Mailer Details</h4></center></div>
+            <apex:outputPanel id="pageBlockTable">
+                <table class="table" height = '140px' >
+                <tr>
+                    <td width="20%" align = 'left'><h4>Mailer Name :     </h4></td>
+                    <td><h4>{! IF(akamMailer != null,akamMailer.Name, 'N/A')}</h4></td>
+                    <td  width="20%" align = 'left'><h4>Total Contacts :     </h4></td>
+                    <td><h4>{! IF(akamMailer != null,akamMailer.EB_CountToAddresses__c, 'N/A')}</h4></td>
+                </tr>
+                <tr>
+                    <td  width="20%" align = 'left'><h4>Created By :    </h4></td>
+                    <td><h4> {! IF(akamMailer != null,akamMailer.CreatedBy.Name, 'N/A')} </h4> </td>
+                    <td  width="20%" align = 'left'><h4>Processed Contacts :    </h4></td>
+                    <td><h4> {! IF(akamMailer != null,akamMailer.EB_ProcessedCountFormula__c, 'N/A')} </h4> </td>
+                </tr>
+                <tr>
+                    <td  width="20%" align = 'left'><h4>Total Accounts :   </h4></td>
+                    <td><h4> {! IF(akamMailer != null,akamMailer.EB_TotalAccounts__c, 'N/A')} </h4></td>
+                    <td  width="20%" align = 'left'><h4>Failed Contacts :  </h4></td>
+                    <td><h4> {! IF(akamMailer != null,akamMailer.EB_FailedCountFormula__c, 'N/A')} </h4> </td>
+                </tr>
+                <tr>
+                    <td  width="20%" align = 'left'><!--h4># Attempts :   </h4--></td>
+                    <td><!--h4> {! IF(akamMailer != null,batchSubmitTryCount, 'N/A')} </h4--></td>
+                    <td  width="20%" align = 'left'><!--h4># Retry :  </h4--></td>
+                    <td> <!--h4>{! IF(akamMailer != null, totalRetryCount, 'N/A')} </h4--></td>
+                </tr>
+                
+             </table>
+        
+            </apex:outputPanel>
+        </div>
+        </td>
+        </tr>
+
+    </table>
+    <apex:form >
+    <apex:actionPoller action="{! fetchMailerDetails}" interval="15" reRender="queueAlertMessage,pageBlockTable,
+                       progressBarId,batchJobNotSubmitted,statusMessages,testId,errorMessageRetry" status="actQStatusId" enabled="{! !(isBatchFailed || isRetryFail || isSubmitAttemptFailed)}"/>
+    </apex:form>
+
+</apex:page>

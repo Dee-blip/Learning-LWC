@@ -1,0 +1,256 @@
+<!--
+  @description       : 
+  @author            : Vishnu Vardhan
+  @group             : 
+  @last modified on  : 03-22-2022
+  @last modified by  : Vishnu Vardhan
+  Modifications Log
+  Ver   Date         Author           Modification
+  1.0   03-22-2022   Vishnu Vardhan   Initial Version
+-->
+<template>
+  <template if:true={hideComponent}>
+    <div class="chatheight slds-text-align_center" 
+         style="background-color: white; padding: 50px 5px 50px 5px;">
+        <h2 style="color:#848684;">
+          {hideComponentMessage}
+        </h2>
+    </div>
+  </template>
+
+  <template if:false={hideComponent}>
+
+    <template if:true={showImageCommentInModal}>
+      <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-2"
+        class="slds-modal slds-fade-in-open slds-modal_large">
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+
+            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+              <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small">
+              </lightning-icon>
+            </button>
+
+            <h2 class="slds-text-heading_medium slds-hyphenate">
+              {labels.COMMMENT_DETAILS}</h2>
+          </header>
+          <div class="slds-modal__content slds-p-around_medium">
+
+            <lightning-formatted-rich-text value={commentBody}>
+            </lightning-formatted-rich-text>
+
+          </div>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <template if:true={showFileUploadModal}>
+      <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+
+            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+              <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small">
+              </lightning-icon>
+            </button>
+
+            <h2 class="slds-text-heading_medium slds-hyphenate">
+              {labels.FILE_UPLOAD}</h2>
+          </header>
+          <div class="slds-modal__content slds-p-around_medium">
+
+            <lightning-file-upload label={labels.UPLOAD_FILE} name="fileUploader" accept={acceptedFormats} record-id={recordId} file-field-name="customvisibility_fileupload__c" file-field-value="AllUsers" onuploadfinished={handleUploadFinished} multiple>
+            </lightning-file-upload>
+
+          </div>
+          <footer class="slds-modal__footer">
+            <div class="slds-align_absolute-center"> {labels.ATTACHMENT_WARNING_MSG} </div>
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <template if:true={showEmailInModal}>
+      <section role="dialog" tabindex="-1" aria-modal="true"
+        class="slds-modal slds-fade-in-open slds-modal_large">
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+
+            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+              <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small">
+              </lightning-icon>
+            </button>
+
+            <h2 class="slds-text-heading_medium slds-hyphenate">
+              {labels.EMAIL_CHAT_ITEM}</h2>
+          </header>
+          <div class="slds-modal__content slds-p-around_medium show-email-modal">
+            <c-sc-view-email-message email-message-id={emailId}></c-sc-view-email-message>
+          </div>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!-- Community Comments Chat UI -->
+    <div style="position: relative">
+      <!-- Poller - If user is switches to another tab, polling will pause
+                  - If User returns from another tab, polling will resume -->
+      <c-sc-poller if:true={enablePolling} onpoll={getComments} smartpoll interval={pollingInterval}> </c-sc-poller>
+
+      <!-- Spinner -->
+      <template if:true={loadSpinner}>
+        <div style="opacity: 0.7;" class="slds-spinner_container">
+          <lightning-spinner alternative-text="Loading" variant="brand" size="medium">
+          </lightning-spinner>
+        </div>
+      </template>
+
+      <div style="border: none;background-color: #FFFFFF;">
+
+        <lightning-card class="commentsJarvisCard">
+          <div class="slds-text-heading_small" slot="title" if:false={hideHeader}>
+            <!-- <b>{labels.COMMENT_HEADER}</b> -->
+            <b>{HeaderName}</b>
+          </div>
+
+          <lightning-button-menu menu-alignment="right" alternative-text="Show menu" slot="actions" variant="border-filled" icon-name="utility:sort"
+            >
+            <lightning-menu-item for:each={actionOptions} for:item="act" key={act.value} value={act.value} data-orderby={act.sortOrder} data-filter={act.filter} label={act.label} onclick={handleCommentMenuSelect}></lightning-menu-item>
+          </lightning-button-menu>
+        </lightning-card>
+
+        <template if:true={showCommentTextBox}>
+
+          <template if:true={showsmallCommentTextBox}>
+            <div class="slds-publisher" style="padding-left: 1.5%;">
+              <label for="comment-text-input2" class="slds-publisher__toggle-visibility slds-m-bottom_small">
+              </label>
+              <textarea onclick={handleTexboxFocus} class="slds-publisher__input slds-textarea slds-text-longform" placeholder={WRITE_COMMENT}></textarea>
+              <div class="slds-publisher__actions slds-grid slds-grid_align-spread" style="padding-right: 1.5%;">
+                <button class="slds-button slds-button_brand" >{labels.SHARE_BUTTON}</button>
+              </div>
+            </div>
+            <div class="slds-has-divider_top-space" role="separator"></div>
+
+          </template>
+
+          <template if:false={showsmallCommentTextBox}>
+
+            <lightning-input-rich-text formats={inputFormats} message-when-bad-input={inpErrorMessage} valid={isInpValid} class="border fullCommentInputJarvis">
+              <lightning-rich-text-toolbar-button-group slot="toolbar" style="background-color: #F4F5F4;" aria-label="First group" class="commentsJarvisToolBar">
+
+                <template if:true={isFileUpload}>
+                  <lightning-rich-text-toolbar-button icon-name="utility:attach" tooltip="Upload files" onclick={handleUploadButtonClick}>
+                  </lightning-rich-text-toolbar-button>
+                </template>
+              </lightning-rich-text-toolbar-button-group>
+            </lightning-input-rich-text>
+
+            <!-- <button class="slds-button slds-button_brand" style="width:100%;margin-top:10px;" -->
+            <button if:true={showShareTooltip} class="slds-button slds-button_brand" style="width: 97%;margin-top: 10px;left: 1.5%;" onclick={handleSaveButtonClick} data-tooltip={labels.SHARE_MSG_EXTERNAL}>{labels.SHARE_BUTTON}</button>
+            <button if:false={showShareTooltip} class="slds-button slds-button_brand" style="width: 97%;margin-top: 10px;left: 1.5%;" onclick={handleSaveButtonClick} >{labels.SHARE_BUTTON}</button>
+            <div class="slds-text-body_small slds-p-left_medium" style="width: 97%;margin-top: 10px;left: 1.5%;" if:true={showShareGuidanceText}> {labels.SHARE_MSG_INTERNAL} </div>
+            <div class="slds-has-divider_top-space" role="separator"></div>
+
+          </template>
+
+        </template>
+
+        <template if:true={showCaseClosedMessage}>
+            <div class="slds-text-align_center" style="background-color: white; padding: 20px;">
+                <h2 style="color:#848684;">
+                    {labels.COMMENT_CASE_CLOSED}
+                </h2>
+              </div>
+        </template>
+
+        <div class="chatheight">
+
+          <template if:false={chatlist.length}>
+            <br />
+            <div class="slds-text-align_center" role="alert">
+              <template if:true={showCommentTextBox}>
+                <h2 style="color:#848684;"> {labels.NO_COMMENTS_ACCESS}</h2>
+              </template>
+              <template if:false={showCommentTextBox}>
+                <h2 style="color:#848684;"> {labels.NO_COMMENTS_NO_ACCESS}</h2>
+              </template>
+            </div>
+          </template>
+
+          <section role="log" class="slds-chat">
+            <ul class="slds-chat-list">
+              <template for:each={chatlist} for:item="eachcomment">
+                <div key={eachcomment.commentId} data-commid={eachcomment.commentId}>
+                  <c-sc-community-comments-item data-commid={eachcomment.commentId} comment={eachcomment} key={eachcomment.commentId}  >
+
+                    <!-- Text Comment -->
+                    <template if:true={eachcomment.isText}>
+                      <div class="grey">
+                        <lightning-formatted-rich-text value={eachcomment.commentBody} disable-linkify >
+                        </lightning-formatted-rich-text>
+                      </div>
+                    </template>
+
+                    <!-- Image Comment -->
+                    <template if:true={eachcomment.isImage}>
+                      <span data-value={eachcomment.commentId} onclick={openImage}>
+                        <lightning-formatted-rich-text value={eachcomment.commentBody} class={eachcomment.styleOverride} disable-linkify>
+                        </lightning-formatted-rich-text>
+                      </span>
+                    </template>
+
+                    <!-- File Comment -->
+                    <template if:true={eachcomment.isFile}>
+                      <span>
+                        <div class="comment-item-header">{labels.FILE_UPLOADED}</div>
+                        <div class={eachcomment.styleOverride} style="display: grid; grid-template-columns: auto auto;">
+                        <template for:each={eachcomment.relatedRecords} for:item="eachFile" >
+
+                          <span key={eachFile.id} class="slds-icon_container slds-icon-doctype-attachment slds-chat-icon" title="Attachment">
+
+                            <lightning-icon icon-name="doctype:attachment" size="small"></lightning-icon>
+
+                          </span>
+                          <a title = "Download" onclick={showFileDetails} data-value={eachFile.id} key={eachFile.id}>{eachFile.name}</a>
+                          <div key={eachFile.id} class="file-details">{eachFile.fileExtension} &bull; {eachFile.fileSize}</div>
+
+                        </template>
+                      </div>
+                      </span>
+                    </template>
+
+                    <!-- Email Comment -->
+                    <template if:true={eachcomment.isEmail}>
+                      <div class="comment-item-header">{labels.EMAIL_CHAT_ITEM}</div>
+                      <template for:each={eachcomment.relatedRecords} for:item="eachEmail">
+                        <div key={eachEmail.id} class={eachcomment.styleOverride} style="display: grid; grid-template-columns: auto auto; cursor: pointer;" onclick={openEmail} data-emailid={eachEmail.id} data-emailsubject={eachEmail.name}>
+                          <span class="slds-icon_container slds-icon-doctype-attachment slds-chat-icon" title="Email">
+                            <template if:true={eachcomment.isCustomerComment}>
+                              <lightning-icon icon-name="utility:email" size="small" variant="inverse"></lightning-icon>
+                            </template>
+                            <template if:false={eachcomment.isCustomerComment}>
+                              <lightning-icon icon-name="utility:email" size="small"></lightning-icon>
+                            </template>
+                          </span>
+                          <a>{eachEmail.name}</a>
+                          <div class="email-preview">{eachEmail.preview}</div>
+                        </div>
+                      </template>
+                    </template>
+                  </c-sc-community-comments-item>
+                </div>
+              </template>
+
+              <li class="slds-chat-listitem slds-chat-listitem_bookend">
+              </li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </div>
+  </template>
+</template>

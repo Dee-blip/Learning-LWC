@@ -1,0 +1,76 @@
+<!--=====================================================================================================+
+
+|  HISTORY  |                                                                            
+
+|  DATE           DEVELOPER   CR          DESCRIPTION                                                       
+
+|  ===========    =========   =======     =========== 
+                                                       
+|  03-Oct-2016    Akhila      3527281     Apex Page for the first version of Automating License Usage Report
++=====================================================================================================-->
+<apex:page standardController="License_Job_Logger__c" extensions="LicenseUsageReporterController" id="myPage">
+    <apex:form id="myForm">
+        <apex:actionRegion >
+        <!--Action poller to refresh the submit button, so that it gets enabled when there are no pending batch jobs.-->
+        <apex:actionPoller reRender="SaveButtonStatus,jobLogsOpPanel" interval="15"/>
+    	<apex:pageBlock title="License Usage Reporter" id="myPB">
+            <apex:pageMessages id="apexMsg"/>
+            <apex:pageBlockSection id="myPBS">
+                <apex:inputField value="{!License_Job_Logger__c.License_Type__c}" required="true">
+                	<!--apex:actionSupport event="onchange" reRender="apexMsg"/-->
+                </apex:inputField>
+                <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >               
+                    <apex:outputLabel value="Start Date" for="strDate"/> 
+                    <apex:actionRegion >
+                        <apex:inputField value="{!License_Job_Logger__c.Start_Date_Time__c}" required="true" id="strDate">
+                            <!--apex:actionSupport event="onchange" action="{!validateStartDate}" reRender="apexMsg"/-->
+                        </apex:inputField>
+                    </apex:actionRegion>
+                </apex:pageBlockSectionItem>     
+                <apex:inputField value="{!License_Job_Logger__c.End_Date_Time__c}" required="true">
+                	<!--apex:actionSupport event="onchange" reRender="apexMsg"/-->
+                </apex:inputField>
+                <apex:inputField value="{!License_Job_Logger__c.Email__c}" required="true">
+                	<!--apex:actionSupport event="onchange" reRender="apexMsg"/-->
+                </apex:inputField>
+            </apex:pageBlockSection> 
+            
+            <apex:pageBlockButtons location="bottom">    
+                <apex:actionStatus id="SaveButtonStatus">
+                    <apex:facet name="stop">
+                        <apex:outputPanel >
+                            <apex:commandButton action="{!submit}" value="Submit" status="SaveButtonStatus" reRender="apexMsg,SaveButtonStatus,jobLogsOpPanel" disabled="{!disableSubmitBtn}"/>
+                        </apex:outputPanel>
+                    </apex:facet>
+                    <apex:facet name="start">
+                        <apex:outputPanel >
+                            <apex:commandButton value="Submitting..." disabled="true" />
+                        </apex:outputPanel>
+                    </apex:facet>
+                </apex:actionStatus>
+                <input class="btn" type="button" value="Reset" onClick="window.location.href=window.location.href"/>    		
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+		</apex:actionRegion>
+        <apex:actionRegion >
+            <apex:outputPanel id="jobLogsOpPanel">
+                    <apex:pageBlock title="Previous Run Information">                        
+                        
+                        <apex:outputLabel value="No records to display" rendered="{!licJobLogs.size=0}" styleClass="noRowsHeader"></apex:outputLabel>
+                        
+                        <apex:pageBlockTable value="{!licJobLogs}" var="j" rendered="{!licJobLogs.size>0}"  >
+                            <apex:column headerValue="Id">
+                                <a href="/{!j.id}" target="_new">{!j.Id}</a>
+                            </apex:column>
+                            <apex:column value="{!j.CreatedDate}"/>
+                            <apex:column value="{!j.License_Type__c}"/>
+                            <apex:column value="{!j.Email__c}"/>
+                            <apex:column value="{!j.Submitted_By__c}"/>
+                            <apex:column value="{!j.Status__c}"/>
+                        </apex:pageBlockTable>  
+                    </apex:pageBlock>
+            </apex:outputPanel>
+        </apex:actionRegion>    
+    </apex:form>
+</apex:page>

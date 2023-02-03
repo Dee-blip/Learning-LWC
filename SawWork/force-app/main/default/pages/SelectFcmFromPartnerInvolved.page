@@ -1,0 +1,36 @@
+<apex:page name="PAE selection from partner involved" controller="FcmSelectFromPartnerInvolved" showHeader="true" sidebar="true" standardStylesheets="false" >
+  <apex:pageMessages />
+  <apex:form >
+  	<apex:commandLink action="{!cancel}" value=" « Back to Opportunity"/>
+  </apex:form>
+    <apex:form rendered="{!showPage}">
+        <apex:pageBlock title="Select PAE" mode="edit" >
+        
+            <apex:pageBlockButtons location="bottom" >
+                <apex:commandButton action="{!search}" value="Search"/>
+            </apex:pageBlockButtons>
+             <apex:pageBlockSection columns="1">
+               <apex:pageBlockSectionItem > PAE:<apex:inputText value="{!FCM}"/>  </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+    <apex:form rendered="{!showPage}">
+<apex:pageBlock >
+ <apex:PageblockTable value="{!fcmIds}" var="fcmvalue" width="100%" >
+ <apex:column >
+ <apex:commandLink value="Select" action="{!AddFCM}" styleClass="btn">
+                                    <apex:Param name="pid" value="{!fcmvalue.PAE_ID__c}" />
+  </apex:commandLink>
+  </apex:column>    
+  <apex:column >
+              <apex:facet name="header"><b>Partner Involved</b></apex:facet>
+                {!fcmvalue.Partner_Name__r.Name}
+   </apex:column>
+   <apex:column >
+              <apex:facet name="header"><b>PAE</b></apex:facet>
+                {!fcmvalue.PAE_ID__r.Name}
+   </apex:column>
+  </apex:PageblockTable>
+  </apex:pageBlock>
+ </apex:form>
+</apex:page>

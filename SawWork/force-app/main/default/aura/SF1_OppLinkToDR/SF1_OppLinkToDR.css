@@ -1,0 +1,54 @@
+.THIS .button {
+  margin:0;
+  margin-bottom:5vh;
+  padding:0;
+  position: center;
+  height:28px;
+  width:40%;
+}
+.THIS.oppDetail {
+    height: 40%;
+    width : 100%;
+    margin-bottom : 5%;
+    background : white;
+    border : 0;
+    border-bottom:1;
+    border-bottom-color:black;
+    border-style: groove;
+    border-radius:4px;
+}
+.THIS.table-display {
+	float: left;
+	width: 100%;
+    background-color:#eaebed;
+	margin: 1em 0;
+	padding: 0;
+	border-bottom: 1px solid #999;
+}
+
+.THIS.table-display dt {
+	clear: left;
+	float: left;
+	width: 30%;
+	margin: 0;
+	padding: 5px;
+	font-weight: bold;
+}
+
+.THIS.table-display dd {
+	float: left;
+	width: 70%;
+	margin: 0;
+	padding: 5px;
+	word-break : break-all;
+}
+
+/*.THIS.uibutton {
+      padding:0;
+      position: center;
+      height:28px;
+      background : red;
+      width:40%;
+      border:1;
+      z-index: 15;
+}*/

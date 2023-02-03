@@ -1,0 +1,82 @@
+<aura:component implements="force:appHostable,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" 
+                controller="L2Q_PAEOverrideController"
+                access="global" >
+    
+    <!--<aura:attribute name="recordId" type="String" />-->
+    <!-- Component Attributes-->
+    <aura:attribute name="disabled" type="Boolean" default="false" />
+    <aura:attribute name="saved" type="Boolean" default="false" />
+    <aura:attribute name="showSpinner" type="Boolean" default="true" />
+    <aura:attribute name="pmaRec" type="Object"/>
+    <aura:attribute name="PAE_Forecast_DR" type="Integer" />
+    <aura:attribute name="PAE_Forecast_Closed_Deals" type="Integer" />
+    <aura:attribute name="PAE_Forecast_Monthly_Bookings" type="Double" />
+    <aura:attribute name="PAE_Forecast_Total_Contract_Value" type="Double" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+    <aura:attribute name="errorMessage" type="String"/>
+    <aura:attribute name="hasError" type="Boolean" default="false"/>
+    
+    
+    <!-- Spinner -->
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner />
+    </aura:if>
+    
+    <!-- Record Edit Form -->
+    <aura:if isTrue="{!!v.saved}">
+        <aura:if isTrue="{!v.hasError}">
+            <ui:message title="Error" severity="error" closable="false">
+                <b>
+                    <aura:unescapedHtml value="{!v.errorMessage}" />
+                </b>
+            </ui:message>
+        </aura:if>
+        <force:recordData aura:id="recordLoader"
+                          layoutType="FULL"
+                          recordId="{!v.recordId}"
+                          targetFields="{!v.pmaRec}"
+                          targetError="{!v.recordError}"
+                          />
+        <lightning:recordEditForm
+                                  aura:id = "recEdit"
+                                  onload="{!c.handleLoad}"
+                                  onsubmit="{!c.handleSubmit}"
+                                  onsuccess="{!c.handleSuccess}"
+                                  recordId="{!v.recordId}"
+                                  onerror="{!c.handleError}"
+                                  objectApiName="Partner_Marketing_Activity__c">
+            <lightning:messages />
+            <div class="main-container">
+                <b class="header-text">Edit Partner MDF Activity</b>
+                <br></br><br></br>
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-col slds-size_1-of-1">
+                        <lightning:inputField class="customRequired" aura:id="paeForecastOverride" fieldName="PAE_Forecast_Override__c" value="{!v.pmaRec.PAE_Forecast_Override__c}"/>
+                    </div>
+                </div>
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-col slds-size_1-of-1">
+                        <lightning:inputField class="customRequired" aura:id="paeForecastOverrideField" fieldName="PAE_Forecast_DR__c" value="{!v.PAE_Forecast_DR}"/>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1">
+                        <lightning:inputField class="customRequired" aura:id="paeForecastOverrideField" fieldName="PAE_Forecast_Monthly_Bookings__c" value="{!v.PAE_Forecast_Monthly_Bookings}"/>
+                    </div>
+                </div>
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-col slds-size_1-of-1">
+                        <lightning:inputField class="customRequired" aura:id="paeForecastOverrideField" fieldName="PAE_Forecast_Closed_Deals__c" value="{!v.PAE_Forecast_Closed_Deals}"/>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1">
+                        <lightning:inputField class="customRequired" aura:id="paeForecastOverrideField" fieldName="PAE_Forecast_Total_Contract_Value__c" value="{!v.PAE_Forecast_Total_Contract_Value}"/>
+                    </div>
+                </div>
+                <div class="slds-m-top_medium">
+                    <lightning:button variant="neutral" name="cancel" label="Cancel" onclick="{!c.handleCancel}"/>
+                    <lightning:button disabled="{!v.disabled}" variant="brand" type="submit" name="save" label="Save" />
+                </div>
+            </div>
+        </lightning:recordEditForm>
+    </aura:if>
+    
+</aura:component>

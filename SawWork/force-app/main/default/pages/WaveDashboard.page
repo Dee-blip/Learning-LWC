@@ -1,0 +1,14 @@
+<apex:page >
+
+    <apex:outputPanel rendered="{!$CurrentPage.parameters.id != ''}">
+        <wave:dashboard dashboardId="{!$CurrentPage.parameters.id}" showTitle="true" height="1000px" width="1400px" openLinksInNewWindow="true"
+        />
+    </apex:outputPanel>
+    <div style="Width:100%, height:100%">
+        <apex:outputPanel rendered="{!$CurrentPage.parameters.id == ''}">
+            <!-- SFDC-7653 - @nadesai -->
+            Please use the Report Links on {! $Label.NapRebrand_Label2 } Portal, to access the Analytics Dashboard.
+        </apex:outputPanel>
+    </div>
+
+</apex:page>

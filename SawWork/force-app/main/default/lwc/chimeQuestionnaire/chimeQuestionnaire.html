@@ -1,0 +1,48 @@
+<template>
+    <template if:true={showIllustration}>
+        <c-lwc-illustrations illustrations-heading="Nothing here"
+            illustrations-text="Please select a product from left hard side list">
+        </c-lwc-illustrations>
+    </template>
+
+    <template if:false={iscustomerfacing}>
+        <template if:false={showIllustration}>
+            <div data-id="questionnaireblock" class="">
+                <template if:true={isGating}>
+                    <c-questioannaire-component productid={productid} class="questionComponent" stage="Gating"
+                        chimeid={chimeid} previewmode={previewmode} response-disable={responseDisable}
+                        ispoc={ispoc}>
+                    </c-questioannaire-component>
+                </template>
+                <template if:false={isGating}>
+                    <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}>
+                        <lightning-accordion-section name="Gating" label="Gating">
+                            <c-questioannaire-component productid={productid} class="questionComponent" stage="Gating"
+                                chimeid={chimeid} previewmode={previewmode} chime-stage={chimeStage} chime-status={chimeStatus} 
+                                response-disable={responseDisable} ispoc={ispoc}>
+                            </c-questioannaire-component>
+                        </lightning-accordion-section>
+
+                        <lightning-accordion-section name="Scoping" label="Scoping">
+                            <c-questioannaire-component productid={productid} class="questionComponent2" stage="Scoping"
+                                chimeid={chimeid} previewmode={previewmode} chime-stage={chimeStage} chime-status={chimeStatus}
+                                response-disable={responseDisable} ispoc={ispoc}>
+                            </c-questioannaire-component>
+                        </lightning-accordion-section>
+
+                    </lightning-accordion>
+                </template>
+            </div>
+        </template>
+    </template>
+    <template if:true={iscustomerfacing}>
+        <c-questioannaire-component productid={productid} class="questionComponent3" chimeid={chimeid}
+            previewmode={previewmode} ispoc={ispoc}>
+        </c-questioannaire-component>
+    </template>
+
+    <!--<template if:false={showIllustration}>
+        
+    </template>-->
+
+</template>

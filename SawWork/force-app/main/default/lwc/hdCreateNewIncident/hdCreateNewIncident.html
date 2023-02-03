@@ -1,0 +1,232 @@
+<template>
+  <c-hd-modal-popup
+    name="Create New Incident"
+    title="Create New Incident"
+    style-class="slds-modal_small"
+    ><div class="slds-is-relative">
+      <template if:true={showSpinner}>
+        <lightning-spinner
+          alternative-text="Loading"
+          size="medium"
+        ></lightning-spinner>
+      </template>
+      <lightning-record-edit-form
+        data-id="newIncident"
+        object-api-name={objectApiName}
+        record-type-id={recordTypeId}
+        onsuccess={handleSuccess}
+        onerror={handleError}
+        density="comfy"
+      >
+        <!-- <lightning-messages></lightning-messages> -->
+        <lightning-accordion
+          allow-multiple-sections-open
+          active-section-name={activeSections}
+        >
+          <lightning-accordion-section
+            name="INCIDENT_DETAILS"
+            label="INCIDENT DETAILS"
+          >
+            <div class="slds-grid slds-grid_vertical">
+              <div class="slds-col">
+                <span>
+                  <div class="slds-grid slds-gutters">
+                    <div class="slds-col">
+                      <span
+                        ><lightning-input-field
+                          field-name="BMCServiceDesk__FKCategory__c"
+                          required
+                        ></lightning-input-field
+                      ></span>
+                    </div>
+                    <div class="slds-col">
+                      <span
+                        ><lightning-input-field
+                          field-name="HD_Ticket_Priority__c"
+                          onchange={handlePicklistChange}
+                          required
+                        ></lightning-input-field
+                      ></span>
+                      <template if:true={pageSupport}>
+                        <span
+                          ><lightning-input-field
+                            field-name="HD_High_Customer_Impact__c"
+                            variant="standard"
+                          ></lightning-input-field
+                        ></span>
+                      </template>
+                    </div>
+                  </div>
+                </span>
+              </div>
+              <div class="slds-col">
+                <span>
+                  <div class="slds-grid slds-gutters">
+                    <div class="slds-col">
+                      <span
+                        ><lightning-input-field
+                          field-name="CCText__c"
+                        ></lightning-input-field
+                      ></span>
+                    </div>
+                    <div class="slds-col">
+                      <span
+                        ><lightning-input-field
+                          field-name="BMCServiceDesk__shortDescription__c"
+                        ></lightning-input-field
+                      ></span>
+                    </div>
+                  </div>
+                </span>
+              </div>
+              <div class="slds-col">
+                <span
+                  ><lightning-input-field
+                    field-name="BMCServiceDesk__incidentDescription__c"
+                    required
+                  ></lightning-input-field
+                ></span>
+              </div>
+            </div>
+          </lightning-accordion-section>
+
+          <lightning-accordion-section
+            name="OTHER_DETAILS"
+            label="OTHER DETAILS"
+          >
+            <div class="slds-grid slds-grid_pull-padded-medium">
+              <div class="slds-col slds-p-horizontal_medium">
+                <span
+                  ><lightning-input-field value={userClient}
+                    field-name="BMCServiceDesk__FKClient__c"
+                  ></lightning-input-field
+                ></span>
+              </div>
+              <div class="slds-col slds-p-horizontal_medium">
+                <span
+                  ><lightning-input-field
+                    field-name="BMCServiceDesk__contactType__c"
+                  ></lightning-input-field
+                ></span>
+              </div>
+            </div>
+          </lightning-accordion-section>
+
+          <lightning-accordion-section name="FLAGS" label="FLAGS">
+            <div class="slds-grid slds-grid_vertical">
+              <div class="slds-col">
+                <span
+                  ><div class="slds-grid slds-grid_pull-padded-medium">
+                    <div class="slds-col slds-p-horizontal_medium">
+                      <span
+                        ><lightning-input-field
+                          field-name="VIP_Ticket__c"
+                          variant="standard"
+                        ></lightning-input-field
+                      ></span>
+                    </div>
+                    <div class="slds-col slds-p-horizontal_medium">
+                      <span
+                        ><lightning-input-field
+                          field-name="Exclude_Client_Notifications__c"
+                          variant="standard"
+                        ></lightning-input-field
+                      ></span>
+                    </div></div
+                ></span>
+              </div>
+              <div class="slds-col slds-p-top_small">
+                <span
+                  ><lightning-input-field
+                    field-name="HD_System_Admin_Incident__c"
+                    variant="standard"
+                    onchange={handleChangeSBI}
+                    data-id="serBasInc"
+                  ></lightning-input-field
+                ></span>
+              </div>
+              <template if:true={serviceBasedIncident}>
+                <div class="slds-col slds-p-top_small">
+                  <span>
+                    <div
+                      class="slds-grid slds-grid--pull-padded-medium slds-m-left--medium"
+                    >
+                      <div class="slds-m-left--medium">
+                        <span
+                          ><lightning-input
+                            type="checkbox"
+                            label="Notify DL-EIS"
+                            name="Notify_DL-EIS"
+                            onchange={handleChangeEIS}
+                            variant="standard"
+                          ></lightning-input
+                        ></span>
+                      </div>
+                      <div class="slds-m-left--medium">
+                        <span
+                          ><lightning-input-field
+                            field-name="HD_WhiteHat_Incident__c"
+                            variant="standard"
+                          ></lightning-input-field
+                        ></span>
+                      </div>
+                    </div>
+                  </span>
+                </div>
+              </template>
+              <template if:true={notifyDlEis}>
+                <div class="slds-col slds-p-top_small">
+                  <span
+                    ><div
+                      class="slds-grid slds-grid--pull-padded-small slds-m-left--large"
+                    >
+                      <div class="slds-m-left--medium">
+                        <span
+                          ><lightning-input-field
+                            field-name="Notify_dl_sysadmin_on_creation__c"
+                            variant="standard"
+                          ></lightning-input-field
+                        ></span>
+                      </div>
+                      <div class="slds-m-left--medium">
+                        <span
+                          ><lightning-input-field
+                            field-name="Notify_dl_sysadmin_on_status_change__c"
+                            variant="standard"
+                          ></lightning-input-field
+                        ></span>
+                      </div>
+                      <div class="slds-m-left--medium">
+                        <span
+                          ><lightning-input-field
+                            field-name="HD_Notify_DL_EIS_on_Notes_Update__c"
+                            variant="standard"
+                          ></lightning-input-field
+                        ></span>
+                      </div></div
+                  ></span>
+                </div>
+              </template>
+            </div>
+          </lightning-accordion-section>
+
+          <lightning-accordion-section name="ATTACHMENTS" label="ATTACHMENTS">
+            <c-hd-file-uploader
+              max-files={fileLimit}
+              max-file-size={fileSizeLimit}
+            ></c-hd-file-uploader>
+          </lightning-accordion-section>
+        </lightning-accordion>
+      </lightning-record-edit-form>
+    </div>
+    <div slot="footer" style="display: inline;">
+      <lightning-button
+        data-id="submitButton"
+        label="Submit"
+        variant="brand"
+        onclick={handleSubmitForm}
+      >
+      </lightning-button>
+    </div>
+  </c-hd-modal-popup>
+</template>

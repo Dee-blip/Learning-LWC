@@ -1,0 +1,69 @@
+<aura:component controller="EditAccountLightningController" implements="force:lightningQuickAction,flexipage:availableForAllPageTypes,force:appHostable,force:hasRecordId" access="global" >
+	<aura:attribute name="Spinner" type="boolean" default="false"/>
+    
+    <!-- Define Attribute-->
+    <aura:attribute name="accountId" type="String"/>
+    <aura:attribute name="dealDeskSpecialInstructions" type="String"/>
+    <aura:attribute name="accountUrl" type="String"/>
+    <aura:attribute name="showSuccessMessage" access="public" type="Boolean" default="false"/>
+    <aura:attribute name="errorMsg" type="String"/>
+    <aura:attribute name="showErrorMessage" access="public" type="Boolean" default="false"/>
+    <br></br>
+    
+    <aura:if isTrue="{!v.Spinner}">
+        <div class="slds-spinner_container">
+          <div role="status" class="slds-spinner slds-spinner--medium">
+            <span class="slds-assistive-text">Loading</span>
+            <ui:spinner aura:id="spinner"/>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+          </div>
+        </div>
+     </aura:if>
+    
+ <ui:outputURL value="{!v.accountUrl}" label="Back to Account"/>
+    <br></br><br></br>
+        
+    <div id="container" class="container-fluid">
+        <h3 class="pageHeading">Edit Account Deal Desk</h3>
+        <br></br><br></br>
+        
+        <div class="error-class">
+            <aura:renderIf isTrue="{!v.showSuccessMessage}">
+            <ui:message title="Success" severity="confirm" closable="true">
+               Record Updated Successfully.
+             </ui:message>
+            </aura:renderIf>
+            
+            <aura:renderIf isTrue="{!v.showErrorMessage}">
+                <ui:message title="Error" severity="confirm" closable="true">
+                   Error updating record. Please contact admin.
+                    {{!v.errorMsg}}
+                 </ui:message>
+            </aura:renderIf>
+        </div>
+        
+        <br></br>
+        
+        <table class="fund-spender-table">
+            <!--<tr>
+                <label class="slds-text-align-center">Deal Desk Special Instructions</label>
+            </tr>-->
+            <tr>
+            	<td>
+                    <div class="form-group">
+                        
+                        <lightning:textarea aura:id="dealDeskSpecialInstructions" label="Deal Desk Special Instructions" value="{!v.dealDeskSpecialInstructions}" messageWhenBadInput="Please correct the input" minlength="1" maxlength="32768" messageWhenValueMissing="Please enter some value to save the record"/>
+                    </div>
+                </td>
+            </tr>
+            
+        </table>
+        <br></br>
+        
+    </div>
+    <br></br><br></br><br></br>
+    <div class="col-md-4 text-center">
+        <ui:button aura:id="button" class="btn btn-default button-class" press="{!c.updateRecord}" disabled="{!v.Spinner}">Save</ui:button>
+  </div>
+</aura:component>

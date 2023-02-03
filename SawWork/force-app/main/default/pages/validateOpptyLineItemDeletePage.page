@@ -1,0 +1,24 @@
+<apex:page standardController="OpportunityLineItem" extensions="ValidateOpptyLineItemController" action="{!pageRedirectDel}">
+ <apex:form id="validateOpptyForm">
+  <apex:outputPanel rendered="{!isEligibleToAddProduct}&&{!!isParentOpptyLocked}">
+   Please wait...
+  </apex:outputPanel>
+  <apex:outputPanel rendered="{!NOT(isEligibleToAddProduct)}">
+   <apex:pageMessage detail="{!partnerManageProductsErrorMessage}" severity="Error" rendered="{!NOT(isEligibleToAddProduct)}"/>
+   <apex:outputLink value="/{!opptynew.Id}"><apex:outputText value="<<Return to Opportunity"/></apex:outputLink>
+  </apex:outputPanel>
+  <apex:outputPanel rendered="{!isParentOpptyLocked}">
+   <!-- <apex:pageMessage detail="{!parentOpptyLockedErrorMEssage}" severity="Error" rendered="{!isParentOpptyLocked}" escape="false"/> --> <!-- SFDC-5897 Commented this code because escape false-->
+   <!-- Begin Rajesh Kumar SFDC-5897 Added below code to adjust apex:pageMessage escape -->
+   <div class="message errorM2" role="alert">
+    <apex:dynamicComponent componentValue="{!HtmlMessage}"/>
+   </div>
+   <!-- End Rajesh Kumar SFDC-5897 Added below code to adjust apex:pageMessage escape-->
+   <apex:outputLink value="/{!opptynew.Id}"><apex:outputText value="<<Return to Opportunity"/></apex:outputLink>
+  </apex:outputPanel>
+  <apex:outputPanel rendered="{!IF(isOliDeleteFailed,'true','false')}">  <!-- SFDC-5897 Added IF Condition-->
+   <apex:pageMessages rendered="{!IF(isOliDeleteFailed,'true','false')}" escape="false"/>  <!-- SFDC-5897 Added IF Condition -->
+   <apex:outputLink value="/{!opptynew.Id}"><apex:outputText value="<<Return to Opportunity"/></apex:outputLink>
+  </apex:outputPanel>
+ </apex:form>
+</apex:page>

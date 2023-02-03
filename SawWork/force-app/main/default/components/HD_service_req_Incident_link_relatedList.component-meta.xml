@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexComponent xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>32.0</apiVersion>
+    <description>This Component used as related list for linked SRM &amp; Incident</description>
+    <label>HD_service_req_Incident_link_relatedList</label>
+</ApexComponent>

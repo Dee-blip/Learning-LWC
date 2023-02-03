@@ -1,0 +1,46 @@
+<apex:page >
+  <apex:form id="assgntcktform" >
+	<apex:pageBlock title="Auto Assign Tickets to Ops Resources" id="assgntcktformpageblock">
+		<apex:pageBlockButtons location="top">
+			<apex:commandButton onclick="Assign();return false;" value="Assign Tickets" />
+		</apex:pageBlockButtons>
+    </apex:pageBlock>
+  </apex:form>
+  
+  <script src="/soap/ajax/29.0/connection.js" type="text/javascript"></script>
+    <script src="/soap/ajax/29.0/apex.js" type="text/javascript"></script>
+
+	<script language="JavaScript" type="text/javascript">
+        var __sfdcSessionId = '{!GETSESSIONID()}';
+    	var loadingWindow;
+			function openLoadingWindow(){
+                var url= '/apex/HD_AssignmentLoading';
+				loadingWindow=window.open(url,'','top=100,left=100,height=200,width=400,toolbar=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,modal=yes');
+			}	
+    		function assignTickets(){
+            	var success = sforce.apex.execute("HD_OpenTicketAssignment","assignOpenTickets",{}); 
+                //alert("Assigning Tickets"); 
+				if(success==0){ 
+                    loadingWindow.close();
+            		alert("Tickets Assignment Successful"); 
+        		} 
+				else if(success==1){ 
+                    loadingWindow.close();
+            		alert("No open tickets found"); 
+				} 
+				else if(success==2){ 
+                    loadingWindow.close();
+            		alert("No available resources found"); 
+        		} 
+        		else{ 
+                    loadingWindow.close();
+            		alert("Tickets assignment failed"); 
+				}	 
+           }
+        function Assign(){
+        	sforce.connection.sessionId = __sfdcSessionId;
+			openLoadingWindow();
+            setTimeout(assignTickets,2000);
+    	}
+    </script>    
+</apex:page>

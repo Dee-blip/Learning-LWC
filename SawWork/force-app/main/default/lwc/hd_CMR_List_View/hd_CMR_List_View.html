@@ -1,0 +1,28 @@
+<template>
+    <div style="height: 100%;overflow: hidden;">
+        <lightning-layout style="height: 100%;overflow: hidden;">
+            <lightning-layout-item size={gridPanelWidth}>
+                <div style="height: 100%;overflow: hidden;">
+                    <c-hd_-list_-view data-id="listView" records={data} columns={cols} list-views={listViews}
+                        selected-list-view={selectedListView} onloadmore={loadMoreData} menu-items={menuItems}
+                        onlistitemselected={onListViewSelected} search-place-holder={searchPlaceHolder}
+                        quick-actions={quickActions} object-name="Change Management Requests" sort-by={sortBy}
+                        sort-direction={sortDirection} onrowclicked={handleRowClick} default-columns={defaultColumns}
+                        all-columns={allColumns} onquickactionclicked={handleQuickActionButtonClick}
+                        onrecordsearch={handleCMRSearch} onrefresh={handleDataRefresh} onsort={handleColumnSorting}
+                        onmenuitemsvaluechanged={handleMenuItemsValueChanged}>
+                    </c-hd_-list_-view>
+                </div>
+            </lightning-layout-item>
+            <lightning-layout-item size={previewPanelWidth}
+                class="slds-p-around-xx_large slds-is-relative slds-scrollable_y">
+                <c-hd_-c-m-r_-preview if:true={showPreview} record={selectedRecord}>
+                </c-hd_-c-m-r_-preview>
+
+                <lightning-button-icon style="position:absolute;right:0px;top:0px;" icon-name="utility:close"
+                    class="slds-float_right slds-m-top_small slds-m-right_small" onclick={onClosePreview}>
+                </lightning-button-icon>
+            </lightning-layout-item>
+        </lightning-layout>
+    </div>
+</template>

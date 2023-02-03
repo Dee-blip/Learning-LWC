@@ -1,0 +1,136 @@
+<apex:page standardController="Case"  standardStylesheets="true" id="caseTransitionHistory" >
+    <!--
+    <apex:includeScript value="{!$Resource.JQuery_New}"/>
+    <style>
+        .nameHyperLink {
+            cursor:pointer;
+            color:blue;
+        }
+    </style>
+    <apex:form id="transitionHistoryForm" >
+        <apex:pagemessages />
+         <apex:image rendered="{!currentCase.has_active_transition__c}"
+                     url="{!URLFOR($Resource.SCNewHomePage, 'SCNewHomeScreenicons/transitionIcon.png')}" />
+         <apex:outputText styleClass="warning" rendered="{!currentCase.has_active_transition__c}" value="Case has Active Transition"/>
+         <apex:outputPanel rendered="{!historyVisible}"> 
+            <center>
+                <apex:actionStatus id="actStatusId" >
+                    <apex:facet name="start" >
+                        Loading History<img src="/img/loading.gif" />                    
+                    </apex:facet>
+                 </apex:actionStatus>       
+            </center>
+        </apex:outputPanel>     
+        <apex:inputHidden id="hiddenTransitionId" value="{!caseTransitionId}" />
+        <apex:inputHidden id="hiddenTransitionQuality" value="{!transitionQuality}" />
+        <apex:inputHidden id="hiddenTransitionFeedback" value="{!transitionFeedback}" />
+        <apex:actionFunction name="loadHistory" action="{!initialiseHistory}" status="actStatusId" rerender="transitionHistoryForm" oncomplete="initialise();" />
+        <apex:actionFunction action="{!updateTransition}" name="updateTransitionQuality" status="actStatusId" rerender="transitionHistoryForm" oncomplete="initialise();"/>
+        <apex:outputPanel rendered="{!historyVisible}">
+        <br/><a id="refreshHistoryPage" style="float:right;"
+                       onclick="loadHistory();return false;"> Refresh History Data</a>  
+       </apex:outputPanel>     
+        <apex:pageBlock mode="detail" id="transitionPageBlock" title="Case Transition History" rendered="{!historyVisible}"  >
+             
+            <apex:repeat value="{!caseTransitionObjectList}" var="caseTransitionObject">
+                <apex:pageBlockSection collapsible="true" showHeader="true" title="{!caseTransitionObject.name}" columns="2" id="transitionPageBlockSection">
+                    <apex:outputField value="{!caseTransitionObject.Issue_Summary__c}"/>
+                    <apex:outputField value="{!caseTransitionObject.Troubleshooting_to_Date__c}"/>
+                    <apex:outputField value="{!caseTransitionObject.Data_Collected__c}"/> 
+                    <apex:outputField value="{!caseTransitionObject.Customer_Expectations__c}"/> 
+                    <apex:outputField value="{!caseTransitionObject.Next_Action_Recommendation__c}" /> 
+                    <apex:inputField styleClass="nameHyperLink" value="{!caseTransitionObject.name}" onclick="openTransition('{!caseTransitionObject.id}');" /> 
+                    <apex:outputField value="{!caseTransitionObject.Approved_Date__c}" /> 
+                    <apex:outputField value="{!caseTransitionObject.Approved_by__c}" /> 
+                    <apex:outputField value="{!caseTransitionObject.Previous_Owner__c}" />
+                    <apex:outputField value="{!caseTransitionObject.New_Owner__c}" />
+                    <apex:outputField value="{!caseTransitionObject.previous_Shift__c}" />
+                    <apex:outputField value="{!caseTransitionObject.New_Shift__c}" />
+                     <apex:outputField value="{!caseTransitionObject.Start_Date__c}" />
+                    <apex:outputField value="{!caseTransitionObject.TargetDate__c}" />
+                    <apex:outputField value="{!caseTransitionObject.Completed_Date__c}" />
+                    <apex:outputField value="{!caseTransitionObject.completed__c}" />
+                    <apex:outputField value="{!caseTransitionObject.Time_Remaining__c}" />
+                    <apex:outputField value="{!caseTransitionObject.violation__c}" />
+                    <apex:outputField value="{!caseTransitionObject.Warm_Transition_Needed__c}" />
+                    <apex:outputField value="{!caseTransitionObject.Target_Shift__c}" />
+                    <apex:inputField styleClass="{!caseTransitionObject.id}" value="{!caseTransitionObject.Transition_Quality_Reason__c}" />
+                    <span/>
+                    <apex:pageBlockSectionItem >
+                        Transition Quality
+                        <apex:selectRadio styleClass="{!caseTransitionObject.id}"  value="{!caseTransitionObject.Transition_Quality__c}">
+                            <apex:selectOptions value="{!TargetShiftValues}" />
+                        </apex:selectRadio>     
+                    </apex:pageBlockSectionItem>
+             
+                    <apex:pageBlockSectionItem rendered="{!IF(caseTransitionObject.Previous_Owner__c != $user.id
+                                                    && currentCase.isclosed = false
+                                                    && caseTransitionObject.completed__c == true ,true,false)}">
+                        <!-- feedback cannot be given on non closed case , completed transition and logged in user not previous owner 
+                        <input type="button" value="Save FeedBack" onclick="saveRecord('{!caseTransitionObject.id}');return false;"/>
+                    </apex:pageBlockSectionItem>    
+                </apex:pageBlockSection>
+            </apex:repeat>
+        </apex:pageBlock>         
+      </apex:form>
+    <script>
+        
+        initialise();
+        refreshHistory();
+        function initialise(){
+            collapseAllPageBlocksExceptFirst();
+            enlargeTextArea();
+        }    
+    
+        function collapseAllPageBlocksExceptFirst(){
+            $("img[id$=transitionPageBlockSection]").each(function(index){
+                //dont collpase first one
+                if (index != 0){
+                    twistSection(this);
+                }    
+            });
+            $("span[id*=transitionHistoryForm\\:transitionPageBlock]").each(function(){
+                if ($(this).text().length > 200){
+                    $(this).attr('style','display:block;height:100px;width:150px;overflow:auto;');
+                }
+            });
+        }
+    
+        function refreshHistory(){
+            loadHistory();
+        } 
+    
+        var transitionIdTOOpen ;
+    
+        function openTransition(transitionId){
+            transitionIdTOOpen = transitionId;
+            sforce.console.getEnclosingPrimaryTabId(openSubtab);
+        }
+
+         var openSubtab = function openSubtab(result) {
+            //Now that we have the primary tab ID, we can open a new subtab in it
+            var primaryTabId = result.id;
+             sforce.console.openSubtab(primaryTabId , transitionIdTOOpen, true, 
+                'Case Transition', null);
+        };    
+            
+        function saveRecord(transitionId){
+            $("[id$=hiddenTransitionId]").val(transitionId);
+            var inputRadio = $('.'+transitionId).find('input:radio:checked').val();
+            if (inputRadio == undefined){
+                alert('Please Select Transition Quality');
+                return false;
+            } 
+            $("[id$=hiddenTransitionQuality]").val(inputRadio);
+            $("[id$=hiddenTransitionFeedback]").val( $('textarea.'+transitionId).val());
+            //call action function 
+            updateTransitionQuality();
+        }
+    
+        function enlargeTextArea(){
+            $('textarea').attr('cols','35'); 
+            $('textarea').attr('rows','5');
+        }    
+    </script>
+Commented by Vamsee as this page is not required-->
+</apex:page>

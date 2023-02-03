@@ -1,0 +1,30 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="HD_IncidentDetailController"> 
+    <aura:attribute name="recordId" type="Id" default="a5UR00000009piXMAQ"/>
+    <aura:attribute name="warnings" type="String[]"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:dependency resource="markup://force:editRecord" type="EVENT" />
+    <div>
+        <div aura:id="Accspinner" class="slds-spinner_container slds-hide">
+		<div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+			<span class="slds-assistive-text">Processing</span>
+			<div class="slds-spinner__dot-a"></div>
+			<div class="slds-spinner__dot-b"></div>
+		</div>
+	</div>
+	<div class="slds-form-element">
+            <label class="slds-form-element__label" for="status-input">Select Status: </label>
+            <ui:inputSelect class="dynamic custom-inputSelect slds-m-right--medium slds-m-left--small" aura:id="aurastatusinput" change="{!c.onStatusSelect}"/>
+        <br/>
+        <br/>
+        <div aura:id="statusnotediv" class="slds-show">
+            <label class="slds-form-element__label" for="aurastatusnoteinput">Additional Information</label>
+            <br/>
+            <ui:inputTextArea aura:id="aurastatusnoteinput" placeholder="Please provide additional information for this status"/>
+    </div>
+   
+                <br/>
+                <ui:button aura:id="HoldTicket" label="Hold Ticket" press="{!c.onHold}"/>
+ 	  			<ui:inputDefaultError aura:id="warn" value="{!v.warnings}" />
+            </div>
+    </div>
+</aura:component>

@@ -1,0 +1,36 @@
+.THIS .hideForm{
+    display:none;
+}
+
+.THIS .mytransition{
+    transition: .5s opacity linear;
+    position:absolute;
+}
+
+.THIS .container{
+    padding-left: 33%;
+	position :relative    
+}
+
+.THIS .showForm{
+    display:block;
+}
+.THIS .boxWidth{
+    width:410px;
+    margin:auto;
+    
+}
+
+.THIS .sWrap {
+    height:500px;
+    width:100%;
+}
+
+.THIS .height90{
+    height:90vh;
+}
+
+.THIS .height75{
+    
+    height:75vh;
+}

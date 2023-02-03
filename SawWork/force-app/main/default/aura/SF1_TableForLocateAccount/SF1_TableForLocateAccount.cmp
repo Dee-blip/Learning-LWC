@@ -1,0 +1,99 @@
+<aura:component controller="SF1_LocateAccountController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global">
+<aura:attribute name="acc_id" type="Id" />
+  <aura:attribute name="acclist" type="Account[]"/>  
+    <aura:attribute name="optty" type="Opportunity" />
+    <aura:attribute name="message" type="String" />
+    <aura:attribute name="ShowError" type="Boolean" default="false"/>    
+    <aura:attribute name="acc" type="Account"/>
+    <aura:attribute name="opp_id" type="Id" />
+    <aura:handler event="c:LTNG_EVT_SetError" action="{!c.setErrorMessage}"/>
+    <ui:scrollerWrapper class="sWrapTest">
+    
+        <aura:if isTrue="{!v.ShowError}">
+        <ui:message title="Error" severity="error" closable="false" body="{!v.message}">
+         {!v.message}
+        </ui:message>
+         </aura:if>
+        
+        
+    <div class="slds-scrollable--x">
+    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+   <thead>
+    <tr class="slds-text-title_caps">
+       
+      <th scope="col">
+        <div class="slds-truncate" title="Select"></div>
+      </th>
+
+       
+      <th scope="col">
+        <div class="slds-truncate" title="Name">Name</div>
+      </th>
+      
+      <th scope="col">
+        <div class="slds-truncate" title="Website">Website</div>
+      </th>
+        
+      <th scope="col">
+        <div class="slds-truncate" title="Billing Country">Billing Country</div>
+      </th>
+     
+       <th scope="col">
+        <div class="slds-truncate" title="Billing State">Billing State</div>
+      </th>
+          
+      <th scope="col">
+        <div class="slds-truncate" title="Account Owner">Account Owner</div>
+      </th>
+       
+        
+       
+      <th scope="col">
+        <div class="slds-truncate" title="Account Status">Account Status</div>
+      </th>
+        
+    </tr>
+  </thead>
+  <tbody>
+     <aura:iteration items="{!v.acclist}" var="acc">  
+    <tr>
+       
+      <td data-label="Select" title="Select">
+          <div class="slds-truncate"> <c:LTNG_ButtonLocateAccount acc_id="{!acc.Id}" opp_id="{!v.opp_id}"/></div>
+      </td>
+         
+     
+       
+      <td data-label="Name" title="Name">
+        <div class="slds-truncate">{!acc.Name}</div>
+      </td>
+         
+      <td data-label="Website" title="Website">
+        <div class="slds-truncate">{!acc.Website}</div>
+      </td>
+        
+      <td data-label="Billing Country" title="Billing Country">
+        <div class="slds-truncate" >{!acc.BillingCountry}</div>
+      </td>
+     
+        <td data-label="Billing State" title="Billing State">
+        <div class="slds-truncate" >{!acc.BillingState}</div>
+      </td>
+     
+       
+      <td data-label="Account Owner" title="Account Owner">
+        <div class="slds-truncate" >{!acc.Owner.Name}</div>
+      </td>
+      
+      
+      <td data-label="Account Status" title="Account Status">
+        <div class="slds-truncate" >{!acc.Account_Status__c}</div> 
+      </td>
+          
+    </tr> 
+      </aura:iteration>      
+  </tbody>
+</table>
+  </div>
+  </ui:scrollerWrapper>
+</aura:component>

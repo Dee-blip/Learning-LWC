@@ -1,0 +1,82 @@
+<apex:page controller="PA_AccountBased_Controller" showHeader="true" title="New Product Approval" label="Product Approval" tabStyle="Product_Approvals__c" standardStylesheets="true">
+   <apex:form id="changeStatusForm">
+   <br/>
+  <div align="center">  <apex:commandButton value="Cancel" action="{!cancel}" /><br/><br/> </div>   
+        <apex:pageBlock title="Product Approval">
+        <apex:pageMessages />
+        
+       <apex:outputLabel style="padding-left:130px">   
+          <b>Account Name  :</b>
+          <apex:outputText > {!Acct_name}</apex:outputText></apex:outputLabel>
+          
+          
+          
+       <apex:outputLabel style="padding-left:130px">   
+         <b> Product Name : </b> Site Shield 
+    <!--    <div style="padding-left:710px"> <apex:outputText > <apex:selectList value="{!SelectedApprovals}" multiselect="true" size="2" style="valign:middle">
+            <apex:selectOptions value="{!Approvals}"/>
+        </apex:selectList></apex:outputText></div> --></apex:outputLabel>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          
+        
+        <apex:outputLabel ></apex:outputLabel>
+        
+         
+    <div style="width: 100%;height: 100%">
+    <div style="float:left; width: 47%">
+    <apex:pageBlock >
+    <h2 style="font-size:20px"><u>Technical Sales Primary</u></h2>
+   <div style="height:180px;align:center">
+        <br/>
+        <!-- <apex:pageblockSection >
+        <b> <apex:outputLabel value="Technical User"  > </apex:outputLabel></b>
+           <apex:inputField id="User" value="{!pac.User_Technical__c}" label="Technical Owner" />-->
+           <b> <apex:outputLabel value="Technical Sales Primary"> </apex:outputLabel></b>
+          <apex:inputField id="User1"  label="Technical Sales Primary"  value="{!cpc.Chatter_User__c}" /> 
+           
+        
+       <!--  </apex:pageblockSection>-->
+        <br/>   This is Technical Sales Primary of the Account, you can change it if required.<br/>
+        Mail with the questionnaire link will be sent to Technical Sales Primary and Account Owner.
+        <br/><br/><br/>
+       <apex:outputLabel style="padding-left:150px"><apex:commandButton value="Send Mail To TSP"  action="{!save}" style="align:center" /></apex:outputLabel>
+          
+          </div>
+          </apex:pageBlock>
+    </div>
+    
+    <div style="float:left;width: 6%;height:100%">
+    <apex:pageBlock >
+   <div style="height:202px">
+    <br/><br/><br/><br/><br/><br/><apex:outputLabel style="padding-left:8px"><b style="font-size:20px">OR</b></apex:outputLabel><br/><br/><br/><br/>
+    </div>
+    </apex:pageBlock>
+    </div>
+    
+    <div style="float:right;width: 47%;height:100%">
+      
+      <apex:pageBlock >
+      <h2 style="font-size:20px"><u>Take Survey</u></h2>
+      <div style="height:180px">
+      <br/><br/><br/><br/>
+       Plese click "Take Survey" if you want to answer the questionnaire now.
+       <br/>Even if you are unable to answer some of the question you can use the link sent to you to answer later. <br/>
+       <br/>
+        <br/>
+     <br/>
+          <apex:outputLabel style="padding-left:200px"><apex:commandButton value="Take Survey" action="{!save_survey}" /></apex:outputLabel>
+        <br/>
+        <br/>
+        <br/>
+    </div>
+     </apex:pageBlock>
+    </div>
+</div>
+
+       </apex:pageBlock> 
+        </apex:form>
+        <apex:iframe />
+</apex:page>

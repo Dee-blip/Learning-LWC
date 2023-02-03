@@ -1,0 +1,5 @@
+<aura:event type="COMPONENT" description="Event template" >
+    <aura:attribute name="filterId" type="String"/>
+    <aura:attribute name="applyFilter" type="Boolean"/>
+       
+</aura:event>

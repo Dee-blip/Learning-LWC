@@ -1,0 +1,16 @@
+<aura:component controller="AkamaiUniversityRedirectController" implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global">
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="urlValue" type="String" />
+    <aura:attribute name="target" type="String" />
+    <aura:attribute name="loadComponent" type="Boolean" default="false"/>
+    <aura:if isTrue="{!v.loadComponent}">
+    <article class="slds-card">
+        <div class="slds-card__body slds-card__body_inner">
+            <div class="slds-text-body_regular">
+                If Akamai University does not appear in a new window please <lightning:formattedUrl value="{!v.urlValue}" label="click here" target="{!v.target}"/>  to launch
+            </div>
+        </div>
+	</article>
+    </aura:if>
+</aura:component>

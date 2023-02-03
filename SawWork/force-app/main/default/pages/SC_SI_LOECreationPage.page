@@ -1,0 +1,45 @@
+<!--
+/*=====================================================================================================+
+
+|  HISTORY  |                                                                            
+
+|  DATE             DEVELOPER       CR          DESCRIPTION                                                       
+
+|  ===========      =========       =======     =========== 
+                                    
+|  16-Jan-2016      Himanshu        3237131     - Controllor For : SC_SI_LOECreationPage 
++=====================================================================================================*/
+-->
+<apex:page standardController="Service_Incident_age_by_status__c" extensions="SC_SI_LOECreationFromVFPage" sidebar="false" showHeader="false">
+    
+    <apex:pageMessages id="showmsg"></apex:pageMessages>
+    
+    <apex:form id="LoeForm">
+    
+        <apex:pageBlock >
+            
+            <!-- Designing the Page Block Section -->
+            <apex:pageBlockSection title="Information" columns="2">
+            
+                <apex:outputText value="{!serviceIncidentNumber}" label="Incident"/>
+                <apex:repeat value="{!$ObjectType.Service_Incident_age_by_status__c.FieldSets.Fields_for_Activity_Tracking_in_SI_Page}" var="eachFieldSetValue">
+                
+                    <apex:inputfield value="{!LOERecVFPage[eachFieldSetValue]}">
+                    </apex:inputfield>
+                
+                </apex:repeat>
+            </apex:pageBlockSection>
+            
+            <!-- Designing the Button Section -->
+            <apex:pageBlockButtons >  
+        
+                <apex:commandButton value="Save" action="{!save}"/>  
+                <apex:commandButton value="Save & New" action="{!saveandNew}"/> 
+                <apex:commandButton value="Cancel" action="{!cancel}"/> 
+            
+            </apex:pageBlockButtons>
+            
+        </apex:pageBlock>
+        
+    </apex:form>
+</apex:page>

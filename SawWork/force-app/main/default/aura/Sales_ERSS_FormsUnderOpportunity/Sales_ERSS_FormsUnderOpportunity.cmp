@@ -1,0 +1,60 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" controller="Sales_ERSS_FormController">
+    <aura:attribute name="rssList" type="Object[]" />
+     <!-- Init Method -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <div class="slds-grid slds-gutters slds-scrollable_y" style="height:300px">
+        
+        <div class="slds-col">
+    <fieldset class="slds-box slds-theme--default slds-container_medium slds-scrollable_x" style="height:100%;width:100%;">
+        <div class="slds-text-heading_small "><strong>Published ERSS Forms</strong></div>
+        <br/>
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered" style="table-layout:fixed; width: 100%;word-wrap: break-word">
+                                    <thead>
+                                        <tr class="slds-line-height_reset">
+                                            <th class="" scope="col"  >
+                                                <div class="slds-truncate" title="Form Name">Form Name</div>
+                                            </th>
+                                           <!-- <th class="" scope="col"  >
+                                                <div class="slds-truncate" title="Version">Version</div>
+                                            </th> -->
+                                            <th class="" scope="col"  >
+                                                <div class="slds-truncate" title="CreatedDate">Published Date</div>
+                                            </th>
+                                            
+                                            <th class="" scope="col" >
+                                                <div class="slds-truncate" title="Owner">Publisher</div>
+                                            </th>
+                                        </tr></thead>
+                                    
+                                    <tbody> 
+                                        <aura:iteration items="{!v.rssList}" var="form" indexVar="i"> 
+                                            <tr class="slds-hint-parent">
+                                                <td data-label="Form Name">
+                                                    <div class="slds-truncate" title="{!form.Name}">
+                                                        
+                                                       <a href="{!'/lightning/cmp/c__Sales_ERSS_NewForm?c__id='+form.Id}"  target="_blank" >{!form.Name}</a>
+                                                    </div>
+                                                </td>
+                                       <!--         <td data-label="Version" >
+                                                    <div class="slds-truncate" title="Version">{!form.Version__c}</div>
+                                                </td> -->
+                                                <td data-label="Published Date">
+                                                    <div class="slds-truncate" title="Date"> <p><lightning:formattedDateTime value="{!form.Published_Date__c}"/></p></div>
+                                                </td>
+                                               
+                                                <td data-label="Published by">
+                                                    <a href="{!'/lightning/r/User/'+form.Published_by__c+'/view'}" tabindex="-1" target="_blank" >{!form.Published_by__r.Name}</a>
+                                                    
+                                                </td>
+                                            </tr>
+                                            
+                                        </aura:iteration>
+                                    </tbody>
+                                </table> 
+       
+    </fieldset>
+        </div>
+    </div>
+	
+</aura:component>

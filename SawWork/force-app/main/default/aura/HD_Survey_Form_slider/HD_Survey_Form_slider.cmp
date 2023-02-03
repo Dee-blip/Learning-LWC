@@ -1,0 +1,15 @@
+<aura:component >
+    <aura:attribute name="value" type="String"/>
+    <aura:attribute name="title" type="String"/>
+    <aura:attribute name="min" type="String" default="0"/>
+    <aura:attribute name="max" type="String" default="10"/>
+    <aura:attribute name="label" type="String" default="(scale)"/>
+    <div class="slds-form-element">
+        <label class="slds-form-element__label" for="slider-id-01">
+            <span class="slds-slider-label">
+                <span class="slds-form-element__legend slds-slider-label__label">{!v.title}</span>
+            </span>
+        </label>
+        <lightning:slider aura:id=""  min="{!v.min}" max="{!v.max}" value="{!v.value}" label="{!v.label}"/>
+    </div>
+</aura:component>

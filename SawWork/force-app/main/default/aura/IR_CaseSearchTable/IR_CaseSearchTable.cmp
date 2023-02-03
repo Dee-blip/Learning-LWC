@@ -1,0 +1,46 @@
+<aura:component controller="IR_CaseSearchController" implements="flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global">
+	<aura:attribute name="data" type="Object"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="sortBy" type="String"/>
+    <aura:attribute name="sortDirection" type="String"/>
+    <aura:attribute name="pageNumber" type="Integer" default="1"/>
+    <aura:attribute name="pageSize" type="Integer" default="25"/>
+    <aura:attribute name="isLastPage" type="Boolean" default="false"/>
+    <aura:attribute name="dataSize" type="Integer" default="0"/>
+    <aura:attribute name="filter" type="Map"/>
+    <aura:attribute name="applyFilterClicked" type="Boolean" default="false"/>
+
+    <!-- handlers--> 
+    <aura:handler name="init" value="{!this }" action="{!c.init }"/>
+    <aura:method name="clearFilter" action="{!c.clearFilter}" />
+    <aura:method name="applyFilter" action="{!c.applyFilter}" />
+
+	<div class="slds-clearfix">
+        <div class="slds-page-header" role="banner">
+            <div class="slds-float_right">
+                <lightning:button variant="base" label="First"
+                  onclick="{!c.handleFirst}" disabled="{!v.pageNumber == 1}"/>
+                <lightning:button variant="base" label="Prev" iconName="utility:chevronleft" iconPosition="left"
+                  onclick="{!c.handlePrev}" disabled="{! v.pageNumber == 1}"/>
+                <lightning:button variant="base" label="Next" iconName="utility:chevronright" iconPosition="right"
+                  onclick="{!c.handleNext}" disabled="{! v.isLastPage}"/>
+                <!-- <lightning:button variant="base" label="Last"
+                  onclick="{!c.handleLast}" disabled="{! v.isLastPage}"/> -->
+            </div>
+            <p class="slds-text-body_regular slds-text-align_left">Current Page: {!v.pageNumber}</p>
+        </div>
+    </div>
+
+    <!-- the container element determine the height of the datatable -->
+    <div class="table-div" style="{! 'height:'+((v.dataSize*47)+34)+'px;'}">
+        <lightning:datatable
+            keyField="id"
+            data="{!v.data }"
+            columns="{!v.columns }"
+            hideCheckboxColumn="true"
+            sortedBy="{!v.sortBy}"
+            sortedDirection="{!v.sortDirection}"
+            onsort="{!c.handleSort}"/>
+    </div>
+
+</aura:component>

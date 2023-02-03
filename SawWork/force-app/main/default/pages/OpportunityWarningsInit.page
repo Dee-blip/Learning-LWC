@@ -1,0 +1,38 @@
+<apex:page showHeader="false" sidebar="false" standardController="Opportunity" extensions="OpportunityWarningsExtensionController" lightningStylesheets="true">
+    <apex:includeScript value="/lightning/lightning.out.js" />
+    <script type="text/javascript">
+  
+    if ("{! JSENCODE($User.UIThemeDisplayed) }" == "Theme4t") { // SFDC-5897 Added JSENCODE
+
+      $Lightning.use("c:SF1_App_OpportunityBaseLine", function () {
+
+        $Lightning.createComponent("c:SF1_Component_OppWarningInit", {visualComplianceWarning:"{!visualComplianceWarning}",gamblingWarning:"{!gamblingWarning}",warningMessage:"Country Restrictions Applicable",noWarningMessage:"No Country Restrictions",warningPresent:"{!IF(showWarnings,'true','false')}",  POWarning:"{!IF(PurchaseOrdershowWarnings,'true','false')}", PurchaseOrderWarnings:"{!JSENCODE(PurchaseOrderWarnings)}" , oppId: "{!JSENCODE(opportunityId)}"}, "sf1_and_lightning", function (cmp) {
+          // SFDC 5897 Added JSENCODE & IF
+        });
+      });
+    }
+</script>
+
+    <apex:form rendered="{! $User.UIThemeDisplayed  != 'Theme4t' }">
+
+        <apex:outputText style="color:green;" value="No Country Restriction warnings for this Opportunity." rendered="{!!showWarnings}"></apex:outputText>
+        <!--<apex:pageMessages rendered="{!warningsPresent}" id="msgs" escape="false"/>-->
+
+        <apex:outputLink style="color:red; font-weight: bold;" value="/apex/OpportunityWarnings?opptyId={!opportunityId}" rendered="{!showWarnings}" target="_parent"> There are Country Restrictions that will prevent closing this Opportunity. Click here to view them. </apex:outputLink>
+        <br/>
+        <p>
+          <apex:outputText style="color:red; font-weight: bold;" value="{!visualComplianceWarning}" rendered="{!IF(visualComplianceWarning != null,'true','false')}"></apex:outputText>
+        </p>
+
+        <p>
+            <apex:outputText style="color:red; font-weight: bold;" value="{!PurchaseOrderWarnings}" rendered="{!PurchaseOrdershowWarnings}"></apex:outputText>
+        </p>
+
+        <p>
+            <apex:outputText style="color:red; font-weight: bold;" value="{!gamblingWarning}" rendered="{!IF(gamblingWarning != null,'true','false')}"></apex:outputText>
+        </p>
+
+    </apex:form>
+    <div id="sf1_and_lightning" />
+
+</apex:page>

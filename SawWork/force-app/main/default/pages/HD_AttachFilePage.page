@@ -1,0 +1,300 @@
+<!-- This page is used as POC to call REST API from Visualforce -->
+<apex:page sidebar="false" showheader="false" standardStylesheets="false" doctype="html-5.0" applyBodyTag="false" applyHtmlTag="false" standardController="BMCServiceDesk__Incident__c"  id="hdAttachFilePage">
+    <apex:includeScript value="/lightning/lightning.out.js" />
+    <apex:includeLightning />
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        
+        <head>
+            <apex:slds />
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <!-- Meta, title, CSS, favicons, etc. -->
+            <meta charset="utf-8" />
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            
+            <style type="text/css">
+                /* Absolute Center Spinner  */
+                .loading {
+                position: fixed;
+                z-index: 999;
+                height: 2em;
+                width: 2em;
+                overflow: show;
+                margin: auto;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                }
+                
+                /* Transparent Overlay */
+                .loading:before {
+                content: '';
+                display: block;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.3);
+                }
+                
+                /* :not(:required) hides these rules from IE9 and below */
+                .loading:not(:required) {
+                /* hide "loading..." text */
+                font: 0/0 a;
+                color: transparent;
+                text-shadow: none;
+                background-color: transparent;
+                border: 0;
+                }
+                
+                .loading:not(:required):after {
+                content: '';
+                display: block;
+                font-size: 10px;
+                width: 1em;
+                height: 1em;
+                margin-top: -0.5em;
+                -webkit-animation: spinner 1500ms infinite linear;
+                -moz-animation: spinner 1500ms infinite linear;
+                -ms-animation: spinner 1500ms infinite linear;
+                -o-animation: spinner 1500ms infinite linear;
+                animation: spinner 1500ms infinite linear;
+                border-radius: 0.5em;
+                -webkit-box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.5) -1.5em 0 0 0, rgba(0, 0, 0, 0.5) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
+                box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) -1.5em 0 0 0, rgba(0, 0, 0, 0.75) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
+                }
+                
+                /* Animation */
+                
+                @-webkit-keyframes spinner {
+                0% {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg);
+                }
+                100% {
+                -webkit-transform: rotate(360deg);
+                -moz-transform: rotate(360deg);
+                -ms-transform: rotate(360deg);
+                -o-transform: rotate(360deg);
+                transform: rotate(360deg);
+                }
+                }
+                @-moz-keyframes spinner {
+                0% {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg);
+                }
+                100% {
+                -webkit-transform: rotate(360deg);
+                -moz-transform: rotate(360deg);
+                -ms-transform: rotate(360deg);
+                -o-transform: rotate(360deg);
+                transform: rotate(360deg);
+                }
+                }
+                @-o-keyframes spinner {
+                0% {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg);
+                }
+                100% {
+                -webkit-transform: rotate(360deg);
+                -moz-transform: rotate(360deg);
+                -ms-transform: rotate(360deg);
+                -o-transform: rotate(360deg);
+                transform: rotate(360deg);
+                }
+                }
+                @keyframes spinner {
+                0% {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg);
+                }
+                100% {
+                -webkit-transform: rotate(360deg);
+                -moz-transform: rotate(360deg);
+                -ms-transform: rotate(360deg);
+                -o-transform: rotate(360deg);
+                transform: rotate(360deg);
+                }
+                }
+                
+                
+            </style>
+        </head>
+        <body class="nav-md" style="background: #fff none repeat scroll 0 0;">
+            <div id = "loadingId" class="loading" style="display:none;">Loading&#8230;</div>
+            <div id="loader" style="display:none;"></div>
+            <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"> </script>
+            <div class="slds-scope">
+                <div>
+                <div class="container body">
+                    <!-- page content -->
+                        <div class="clearfix"></div>
+                        <div>
+                            <input type="file" id="fileInput" name="file" multiple="true"/>
+                                </div>
+                            <br/>
+                                <div>
+                                <input type="button" id="attachButton" value="Attach Files" onclick="uploadFiles()" status="pageStatus"/>
+                                    
+                                    </div>   
+                                <br/>
+                                    <div id="errMsg" class="trace" style="display:none"/>
+                                        </div>
+                                    </div>
+                                    </div>
+                                    <script>
+            function showLoader() {
+                document.getElementById("loadingId").style.display = "block";
+                
+            } 
+            function hideLoader() {
+                document.getElementById("loadingId").style.display = "none";
+                
+            } 
+            
+            var $errMsg = $("#errMsg"); 
+            var $inputForFile = $("#fileInput");
+            var loadingWindow;
+            function openLoadingWindow(){
+                var url= '/apex/HD_AssignmentLoading';
+                loadingWindow=window.open(url,'','top=100,left=100,height=200,width=400,toolbar=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,modal=yes');
+            }  
+            function uploadFiles(){
+                var input = document.getElementById('fileInput');
+                console.log('Input:');
+                console.log(input);
+                var curFiles = input.files;
+                console.log('curFiles:');
+                console.log(curFiles);
+                console.log('Length:');
+                var num_of_files = curFiles.length;
+                console.log(num_of_files);
+                if(num_of_files>10){
+                    //var res = "Cannot attach more than 10 files";
+                    //printResult("<pre>"+res+"</pre>");
+                    alert("Cannot attach more than 10 files");
+                    setTimeout(function(){ resetResult(); }, 3000);
+                }
+                else{
+                    var file = null;        
+                    var fileContents = null;
+                    var fr;
+                    for(i=0;i<num_of_files;i++){
+                        file = curFiles[i];
+                        var fileSize = (file.size / (1024*1024)).toFixed(2);
+                        //var maxSize = (this.MAX_FILE_SIZE / (1024*1024)).toFixed(2);
+                        var maxSize = 25;
+                        var name = file.name;
+                        console.log('File size cannot exceed ' + maxSize);
+                        console.log('Selected file size: ' + fileSize);
+                        if(fileSize>maxSize){
+                            //var res = "Cannot attach more than 10 files";
+                            //printResult("<pre>"+res+"</pre>");
+                            alert("File "+name+"is more than 25 MB. Please select a smaller file.");
+                            setTimeout(function(){ resetResult(); }, 3000);
+                        }
+                        else{
+                        fr = new FileReader();
+                        var self = this;
+                        console.log('Self: ');
+                        console.log(self);
+                        fr.onload = (function(f) {
+                            return function(e){
+                                fileContents = this.result;
+                                console.log("Title: "+f.name)
+                                var base64Mark = 'base64,';
+                                var dataStart = fileContents.indexOf(base64Mark) + base64Mark.length;
+                                fileContents = fileContents.substring(dataStart);
+                                self.exec(f,fileContents);
+                            };
+                        })(file);
+                        fr.readAsDataURL(file);
+                    }
+                }
+                }
+            }
+            
+            function exec(f,fileContents){
+                //openLoadingWindow();
+                showLoader();
+                var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9+/=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/rn/g,"n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}};
+                var base64Data =  btoa(fileContents); // Base64.encode(fileContents);//encodeURIComponent(fileContents);
+                //var incId = '{!BMCServiceDesk__Incident__c.Id}';
+                var incId = '{!$CurrentPage.parameters.id}';
+                var type = f.type;
+                var name = f.name;
+                console.log('incId:');
+                console.log(incId);
+                console.log(f)
+                var postUrl = "/services/data/v43.0/sobjects/Attachment";
+                var jsonObj = {"name":name,"body":atob(base64Data),"parentId":incId,"ContentType":type}; //
+                var postData = JSON.stringify(jsonObj);
+                var heading = '<h3> Response : </h3> <br />';
+                resetResult();
+                $.ajax({
+                    type: 'POST',
+                    beforeSend: function (xhr)
+                    {
+                        xhr.setRequestHeader("Authorization",  'Bearer {!$API.Session_ID}');
+                    },
+                    headers : {'Content-Type' : 'application/json; charset=utf-8'},
+                    url: postUrl,
+                    data: postData,
+                    dataType: 'text'
+                })
+                .done(function( data ) {
+                    //loadingWindow.close();
+                    hideLoader();
+                    var res = "Attachment(s) created";
+                    printResult("<pre>"+res+"</pre>");
+                    setTimeout(function(){ resetResult(); }, 3000);
+                    console.log('Parent window');
+                    console.log(window.parent);            
+                    self.close();
+                })
+                .fail(function(xhr,textstatus,error){
+                    //loadingWindow.close();
+                    hideLoader();
+                    var output = "Failed to create attachment(s)";
+                    printResult(output);
+                    setTimeout(function(){ resetResult(); }, 3000);
+                    self.close();
+                    
+                });
+                console.log("Here-1");
+            }
+            function printResult(htmlVal)
+            {
+                console.log('In printResult');
+                console.log(htmlVal);
+                $errMsg.html(htmlVal);
+                $errMsg.show();
+            }
+            function resetResult()
+            {
+                console.log('In resetResult');
+                $errMsg.hide();
+                $errMsg.html("");
+                document.getElementById("fileInput").value = "";
+            }
+            
+            </script>
+        </body>
+    </html>
+</apex:page>

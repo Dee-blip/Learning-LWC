@@ -1,0 +1,353 @@
+<!--Legacy Page for Adding OC Products. To be dissasssociated soon. -->
+
+
+<apex:page standardController="Campaign_Product__c" extensions="campaignProdExtnController">
+
+<style>
+.percent {
+width:50%;
+height:50%;
+}
+</style>
+
+<apex:actionStatus id="usgstat" 
+                           startText="Loading..." 
+                           stopText=" "/>
+<apex:form id="mform">
+ <apex:pageBlock title="Campaign Product Details" mode="detail" id="pblock"> 
+ 
+<apex:actionRegion > 
+ <apex:pageBlockSection title="Product Details" columns="2" id="mycontent">                
+               <apex:inputField value="{!campProd.Campaign__c}" label="Online Channel Campaign"/>
+               
+              
+                <apex:inputField value="{!campProd.Name}" required="true" label="Product Name"/>   
+                <apex:inputField value="{!campProd.MPID__c}" required="true"/>
+                <apex:inputField value="{!campProd.Sec_MPID__c}"/>
+              
+                   
+                
+                
+                
+                <apex:inputField value="{!campProd.UOM__c}" label="Unit Of Measure">
+                <apex:actionSupport event="onchange" reRender="mform,mycontent,utype,ff,ug,cm,simug,bpdetials,pt" status="usgstat"/> 
+                </apex:inputField>
+                                        
+                <apex:inputField value="{!campProd.Usage_Type__c}">
+                <apex:actionSupport event="onchange" reRender="mform,utype,ff,ug,cm" status="usgstat"/>                    
+               </apex:inputField>                                                                                     
+ </apex:pageBlockSection>
+ </apex:actionRegion>
+
+ 
+ 
+ 
+  
+  <apex:pageBlockSection Title="In Case Of Trials" id="icot" >
+ 
+         <!-- Test  <apex:inputField value="{!campProd.Trial_Period__c}"/> -->
+               <apex:inputField value="{!campProd.Trial_Quantity__c}" Label="Trial Quantity (In {!campProd.UOM__c})"/> 
+                
+  </apex:pageBlockSection> 
+
+ <apex:actionRegion >
+  <apex:pageBlockSection title="Base Pricing Details" columns="2" id="bpdetails">
+  <apex:inputField value="{!campProd.Quantity_Base_UOM__c}" label="Base Included {!campProd.UOM__c}" /> 
+   <apex:inputField value="{!campPrice.baseprice__c}" label="Base Price (in USD)"/>  
+  </apex:pageBlockSection>
+   </apex:actionRegion>
+ </apex:pageBlock>
+ <!-- all the basic details and mandatory Fields above this -->
+ 
+ <!-- <apex:pageBlock title="{!campProd.Usage_Type__c}" id="utype" mode="detail" >  -->
+  
+ 
+ <apex:actionRegion > 
+ <apex:pageBlock title="{!IF(campProd.Usage_Type__c=='fixed','',campProd.Usage_Type__c)}" id="utype" mode="detail" >
+  
+  <!-- pageblockSection for commit begins-->
+  
+      <div class="percent">
+    <apex:pageBlockSection title="Commit Rates(Per Month) in USD" rendered="{!campProd.Usage_Type__c=='commit'}" id="cm" columns="3">     
+
+         
+   <apex:pageBlockSectionItem >
+   <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t1_commit_quantity__c}" label="Upto" style="width:20px;"/> </apex:pageBlockSectionItem>
+   <apex:pageBlockSectionItem >    <apex:outputField value="{!campProd.UOM__c}" label=" "/> </apex:pageBlockSectionItem>
+   </apex:pageBlockSectionItem> 
+   <apex:inputField value="{!campPrice.t1_price__c}" label="Price (In USD)" style="width:120px;text-align: left"/>
+   <apex:inputField value="{!campPrice.t1_overage_price__c}" label="Overage Price(USD)" style="width:120px;text-align: left"/>
+  
+       <apex:pageBlockSectionItem >
+   <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t2_commit_quantity__c}" label="Upto" style="width:20px;"/> </apex:pageBlockSectionItem>
+   <apex:pageBlockSectionItem >    <apex:outputField value="{!campProd.UOM__c}" label=" "/> </apex:pageBlockSectionItem>
+   </apex:pageBlockSectionItem>       
+    <apex:inputField value="{!campPrice.t2_price__c}" label="Price (In USD)" style="width:120px;text-align: left"/>
+  <apex:inputField value="{!campPrice.t2_overage_price__c}" label="Overage Price(USD)" style="width:120px;text-align: left"/>
+   
+   
+   
+ <apex:pageBlockSectionItem >
+   <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t3_commit_quantity__c}" label="Upto" style="width:20px;"/> </apex:pageBlockSectionItem>
+   <apex:pageBlockSectionItem >    <apex:outputField value="{!campProd.UOM__c}" label=" "/> </apex:pageBlockSectionItem>
+   </apex:pageBlockSectionItem> 
+   <apex:inputField value="{!campPrice.t3_price__c}" label=" Price (In USD)" style="width:120px;text-align: left"/> 
+  <apex:inputField value="{!campPrice.t3_overage_price__c}" label="Overage Price(USD)" style="width:120px;text-align: left"/>
+     
+   
+    <apex:pageBlockSectionItem >
+   <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t4_commit_quantity__c}" label="Upto" style="width:20px;"/> </apex:pageBlockSectionItem>
+   <apex:pageBlockSectionItem >    <apex:outputField value="{!campProd.UOM__c}" label=" "/> </apex:pageBlockSectionItem>
+   </apex:pageBlockSectionItem> 
+    <apex:inputField value="{!campPrice.t4_price__c}" label=" Price (In USD)" style="width:120px;text-align: left"/>
+  <apex:inputField value="{!campPrice.t4_overage_price__c}" label="Overage Price(USD)" style="width:120px;text-align: left"/>
+        
+        
+ <apex:pageBlockSectionItem >
+   <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t5_commit_quantity__c}" label="Upto" style="width:20px;"/> </apex:pageBlockSectionItem>
+   <apex:pageBlockSectionItem >    <apex:outputField value="{!campProd.UOM__c}" label=" "/> </apex:pageBlockSectionItem>
+   </apex:pageBlockSectionItem> 
+     <apex:inputField value="{!campPrice.t5_price__c}" label=" Price (In USD)" style="width:120px;text-align: left"/>
+     <apex:inputField value="{!campPrice.t5_overage_price__c}" label="Overage Price(USD)" style="width:120px;text-align: left"/>
+     
+ 
+  <apex:pageBlockSectionItem >
+   <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t6_commit_quantity__c}" label="Upto" style="width:20px;"/> </apex:pageBlockSectionItem>
+   <apex:pageBlockSectionItem >    <apex:outputField value="{!campProd.UOM__c}" label=" "/> </apex:pageBlockSectionItem>
+   </apex:pageBlockSectionItem> 
+     <apex:inputField value="{!campPrice.t6_price__c}" label=" Price (In USD)" style="width:120px;text-align: left"/>
+     <apex:inputField value="{!campPrice.t6_overage_price__c}" label="Overage Price(USD)" style="width:120px;text-align: left"/>
+   
+   
+   
+   
+    <apex:pageBlockSectionItem >
+   <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t7_commit_quantity__c}" label="Upto" style="width:20px;"/> </apex:pageBlockSectionItem>
+   <apex:pageBlockSectionItem >    <apex:outputField value="{!campProd.UOM__c}" label=" "/> </apex:pageBlockSectionItem>
+   </apex:pageBlockSectionItem> 
+     <apex:inputField value="{!campPrice.t7_price__c}" label=" Price (In USD)" style="width:120px;text-align: left"/>
+     <apex:inputField value="{!campPrice.t7_overage_price__c}" label="Overage Price(USD)" style="width:120px;text-align: left"/>
+   
+   
+   
+    <apex:pageBlockSectionItem >
+   <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t8_commit_quantity__c}" label="Upto" style="width:20px;"/> </apex:pageBlockSectionItem>
+   <apex:pageBlockSectionItem >    <apex:outputField value="{!campProd.UOM__c}" label=" "/> </apex:pageBlockSectionItem>
+   </apex:pageBlockSectionItem> 
+     <apex:inputField value="{!campPrice.t8_price__c}" label=" Price (In USD)" style="width:120px;text-align: left"/>
+     <apex:inputField value="{!campPrice.t8_overage_price__c}" label="Overage Price(USD)" style="width:120px;text-align: left"/>
+   
+   
+   
+   
+    <apex:pageBlockSectionItem >
+   <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t9_commit_quantity__c}" label="Upto" style="width:20px;"/> </apex:pageBlockSectionItem>
+   <apex:pageBlockSectionItem >    <apex:outputField value="{!campProd.UOM__c}" label=" "/> </apex:pageBlockSectionItem>
+   </apex:pageBlockSectionItem> 
+     <apex:inputField value="{!campPrice.t9_price__c}" label=" Price (In USD)" style="width:120px;text-align: left"/>
+     <apex:inputField value="{!campPrice.t9_overage_price__c}" label="Overage Price(USD)" style="width:120px;text-align: left"/>
+   
+   
+   
+   
+    <apex:pageBlockSectionItem >
+   <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t10_commit_quantity__c}" label="Upto" style="width:20px;"/> </apex:pageBlockSectionItem>
+   <apex:pageBlockSectionItem >    <apex:outputField value="{!campProd.UOM__c}" label=" "/> </apex:pageBlockSectionItem>
+   </apex:pageBlockSectionItem> 
+     <apex:inputField value="{!campPrice.t10_price__c}" label=" Price (In USD)" style="width:120px;text-align: left"/>
+     <apex:inputField value="{!campPrice.t10_overage_price__c}" label="Overage Price(USD)" style="width:120px;text-align: left"/>
+   
+   
+    
+
+
+  </apex:pageBlockSection> 
+   </div> 
+ 
+    <!-- pageblockSection for commit Ends--> 
+
+  
+     <!-- pageblockSection for Usage Begins--> 
+     <div class="percent">
+  <apex:pageBlockSection title="Usage Rates(Per month)" rendered="{!campProd.Usage_Type__c=='usage'}" id="ug" columns="5"> 
+ 
+
+  <apex:inputField value="{!campProd.t1_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t1_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t1_price__c}" label="Price(In USD)" style="width:120px;"/> 
+       <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+          <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+       
+
+         <apex:inputField value="{!campProd.t2_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t2_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t2_price__c}" label="Price(in USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>   <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+       
+
+       <apex:inputField value="{!campProd.t3_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t3_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t3_price__c}" label="Price(In USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>   <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+        
+
+       <apex:inputField value="{!campProd.t4_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t4_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t4_price__c}" label="Price(In USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>   <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+        
+        
+
+       <apex:inputField value="{!campProd.t5_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t5_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t5_price__c}" label="Price(In USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>     <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+        
+  
+         <apex:inputField value="{!campProd.t6_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t6_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t6_price__c}" label="Price(In USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>     <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+        
+        
+                 <apex:inputField value="{!campProd.t7_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t7_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t7_price__c}" label="Price(In USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>     <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+         
+  
+                <apex:inputField value="{!campProd.t8_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t8_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t8_price__c}" label="Price(In USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>     <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+  
+  
+  
+                <apex:inputField value="{!campProd.t9_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t9_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t9_price__c}" label="Price(In USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>     <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                
+  
+  
+                <apex:inputField value="{!campProd.t10_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t10_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t10_price__c}" label="Price(In USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>     <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+         
+        
+        
+  </apex:pageBlockSection> 
+  </div>
+     <!-- pageblockSection for Usage Ends--> 
+     
+     
+     
+          <!-- pageblockSection for Price Tier Begins--> 
+     <div class="percent">
+  <apex:pageBlockSection title="Usage Rates(Per month)" rendered="{!campProd.Usage_Type__c=='Price-Tier'}" id="pt" columns="5"> 
+ 
+
+  <apex:inputField value="{!campProd.t1_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t1_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t1_price__c}" label="Price(In USD)" style="width:120px;"/> 
+       <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+          <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+       
+
+         <apex:inputField value="{!campProd.t2_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t2_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t2_price__c}" label="Price(in USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>   <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+       
+
+       <apex:inputField value="{!campProd.t3_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t3_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t3_price__c}" label="Price(In USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>   <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+        
+
+       <apex:inputField value="{!campProd.t4_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t4_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t4_price__c}" label="Price(In USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>   <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+        
+        
+
+       <apex:inputField value="{!campProd.t5_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t5_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t5_price__c}" label="Price(In USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>     <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+        
+        
+        
+       <apex:inputField value="{!campProd.t6_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t6_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t6_price__c}" label="Price(In USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>     <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+        
+        
+        
+               <apex:inputField value="{!campProd.t7_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t7_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t7_price__c}" label="Price(In USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>     <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+        
+        
+               <apex:inputField value="{!campProd.t8_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t8_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t8_price__c}" label="Price(In USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>     <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+        
+     
+        
+               <apex:inputField value="{!campProd.t9_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t9_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t9_price__c}" label="Price(In USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>     <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+        
+        
+        
+               <apex:inputField value="{!campProd.t10_usage_quant_low__c}" label="Low Value" style="width:120px;"/> 
+      <apex:inputField value="{!campProd.t10_usage_quant_high__c}" label="High Value" style="width:120px;"/> 
+       <apex:inputField value="{!campPrice.t10_price__c}" label="Price(In USD)" style="width:120px;"/> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>     <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+        
+        
+        
+        <apex:inputField value="{!campPrice.overage_price__c}" label="Overage Price(In USD)" style="width:120px;"/> 
+        
+  </apex:pageBlockSection> 
+  </div>
+     <!-- pageblockSection for Price Tier Ends--> 
+     
+          
+     
+          <!-- pageblockSection for Simple Usage Begins  . will not be used for now-->       
+      <apex:pageBlockSection title="Simple Usage" rendered="{!campProd.Usage_Type__c=='Simple Usage'}" id="simug" columns="3">  
+        <apex:outputField value="{!campProd.UOM__c}" label="Unit Price Per"/>  
+       <apex:inputField value="{!campPrice.t1_price__c}" label="Price(In USD)" style="width:120px;"/>       
+         </apex:pageBlockSection>          
+           <!-- pageblockSection for Simple Usage ENDS-->   
+ 
+ 
+ 
+ 
+  </apex:pageBlock> 
+  
+
+
+  
+ </apex:actionRegion>   
+ 
+
+
+   
+ 
+  
+ <apex:commandButton action="{!save}" value="Save Product" status="usgstat"/> 
+  <apex:commandButton action="{!cancel}" value="Cancel" status="usgstat"/>     
+</apex:form> 
+
+
+</apex:page>

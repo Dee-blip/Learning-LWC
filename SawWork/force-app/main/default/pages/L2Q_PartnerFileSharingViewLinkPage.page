@@ -1,0 +1,20 @@
+<!-- SFDC-6265 -->
+<apex:page Controller="L2Q_PartnerFileSharingClass" lightningStylesheets="true" showHeader="false" showQuickActionVfHeader="false"
+           sidebar="false">
+    <script>
+    if ("{!themeDisplayed}" == "Lightning") {
+        window.parent.location = "/partners/s/file-download-page?id={!$CurrentPage.parameters.ContentVersionId}&retUrl={!$CurrentPage.parameters.retUrl}";
+    }
+    else {
+        $Lightning.use("c:L2Q_FileDownloadComponentApp", function () {
+            $Lightning.createComponent("c:L2Q_FileDownloadComponent", {
+                "contentVersionId": "{!$CurrentPage.parameters.ContentVersionId}",
+                "themeDisplayed": "classic"
+            }, "lightning", function (cmp) {
+            });
+        });
+    }
+    </script>
+    
+    
+</apex:page>

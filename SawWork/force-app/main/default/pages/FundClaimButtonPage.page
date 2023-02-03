@@ -1,0 +1,13 @@
+<apex:page controller="FundClaimButtonPageController" action="{!init}" lightningStylesheets="true">
+	<apex:pageMessages />
+	
+	<apex:form >
+		<apex:pageBlock >
+			<apex:outputText value="{!resultData}" style="font-weight:bold;font-size: 160%" />
+			<apex:pageBlockButtons location="bottom">
+				<apex:commandButton action="{!backToFundClaim}" value="Back"/>	
+			</apex:pageBlockButtons>
+		</apex:pageBlock>
+	</apex:form>
+
+</apex:page>

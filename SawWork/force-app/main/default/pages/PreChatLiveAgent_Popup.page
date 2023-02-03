@@ -1,0 +1,59 @@
+<apex:page Controller="PreChatController" showHeader="false">
+    <div id='businessAgentId'>
+        <b id="AMG_liveagent_button_offline_id"> </b> <b id="AMG_liveagent_button_online_id"> </b>
+    </div>
+    <div id='technicalAgentId'>
+        <b id="Akatec_liveagent_button_offline_id"> </b> <b id="Akatec_liveagent_button_online_id"> </b>
+    </div>
+    <center><p style="font-weight: bolder;position: relative;padding-top: 4%;font-size: 14px; font-family: Arial, Helvetica, sans-serif;display:block;" id="connectingId">Connecting...</p></center>
+    <div id="okId" style="display:none; position: relative;">
+        <div>
+            <center><p style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif;font-size: 14px;">Currently agents are unavailable. Please try after some time.</p></center>
+            <center style="padding-top: 8px;"><input type='button' style="width:21%;" value='OK' onclick="setOK()" class="btn btn-default"/></center>
+            
+        </div>
+    </div>
+    
+    <script type="text/javascript">
+    if (!window._laq) { window._laq = []; }
+    window._laq.push(function(){
+        liveagent.showWhenOnline('{!amgBtnId}', document.getElementById('AMG_liveagent_button_online_id'));
+        liveagent.showWhenOffline('{!amgBtnId}', document.getElementById('AMG_liveagent_button_offline_id'));
+        liveagent.showWhenOnline('{!akatechBtnId}', document.getElementById('Akatec_liveagent_button_online_id'));
+        liveagent.showWhenOffline('{!akatechBtnId}', document.getElementById('Akatec_liveagent_button_offline_id'));
+    });
+    window.onload = function() {
+        document.getElementById("connectingId").style.display = 'block';
+        var url = new URL(window.location.href);
+        var type = url.searchParams.get("type");
+        if(type == 'AMG'){
+            if(document.getElementById('AMG_liveagent_button_online_id').style.display != 'none'){
+                parent.setSearchResult('ONLINE');
+            }
+            else if(document.getElementById('AMG_liveagent_button_offline_id').style.display != 'none'){
+                parent.setSearchResult('OFFLINE');
+                document.getElementById("okId").style.display = 'block';
+                document.getElementById("connectingId").style.display = 'none';
+            }
+        }
+        else if(type == 'Akatec'){
+            if(document.getElementById('Akatec_liveagent_button_online_id').style.display != 'none'){
+                parent.setSearchResult('ONLINE');
+            }
+            else if(document.getElementById('Akatec_liveagent_button_offline_id').style.display != 'none'){
+                parent.setSearchResult('OFFLINE');
+                document.getElementById("okId").style.display = 'block';
+                document.getElementById("connectingId").style.display = 'none';
+            }
+        }
+    };
+    function setOK(){
+        parent.closeWaiting();
+    }
+    </script>
+    
+    <script type='text/javascript' src='{!akachatDeploymentJS}'></script>
+    <script type='text/javascript'>
+        liveagent.init('{!akachatInitURL}', '{!lunaDeploymentId}', '{!orgId}');
+    </script>
+</apex:page>

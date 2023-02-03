@@ -1,0 +1,11 @@
+.padding20 {
+    padding: 0 15px;
+}
+p.targetShiftStyle {
+    margin-top: -15px !important;
+}
+.backgroundInverse {
+    position: relative;
+    background-color: #16325c;
+    height: 80px;
+}

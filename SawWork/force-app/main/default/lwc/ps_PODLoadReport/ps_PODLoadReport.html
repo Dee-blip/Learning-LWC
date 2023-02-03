@@ -1,0 +1,199 @@
+<template>
+    <template if:true={showTable}>
+        
+        <lightning-card>
+            
+            
+            <!-- <div style="margin-left:20px;">
+                <span>
+                    <lightning-button-icon class="slds-m-right_x-small" size="large" icon-name="standard:account" variant="bare"></lightning-button-icon>
+                </span>
+                <span>It indicates that account doesn't have customer contacts added. Please click on the icon to manage recipients.</span>
+            </div> -->
+
+            <lightning-layout-item size="12" margin="around-small">
+                <div class="slds-grid slds-m-top_medium" >
+                    <div class="slds-col slds-size_2-of-12 " style="justify-content:center;align-content:center;padding-left:20px;">
+                        <lightning-input name="toggle"
+                        label="Select / De-select all"
+                        type="toggle"
+                        message-toggle-active=""
+                        message-toggle-inactive=""
+
+                        onchange={handleToggleChange}></lightning-input>
+                    </div>
+
+                    
+                    <div class="slds-col slds-size_2-of-12" style="justify-content:center;align-content:center">
+                        <!-- <div style="font-size:15;font-weight:600">Total No. of Records : {count}</div> -->
+
+                        <span style="font-size: 15px; font-weight: 700; margin-top: 15px;">
+                            <!-- <b>Report has {overallReportRows} rows</b> -->
+                            <a href={podReportLink} target="_blank">View Report ({overallReportRows})</a>
+                        </span>
+                    
+                        
+                    </div>
+
+                    <!-- <div class="slds-col slds-size_2-of-12" style="justify-content:center;align-content:center">
+
+                        <lightning-input  label="PODs" type="toggle" title="Assigned/UnAssigned PODs" class="globalSearchButton"
+                            onchange={podToggleEvent} 
+                            message-toggle-inactive="Un-Assigned" message-toggle-active="Assigned" >
+                        </lightning-input>
+                        
+                    </div> -->
+
+
+                    
+                    
+
+                    <!-- <div class="slds-col slds-size_1-of-12" style="justify-content:center;align-content:center">
+                        <lightning-input  label="PODs" type="toggle" title="Assigned/UnAssigned PODs" class="globalSearchButton"
+                            onchange={podToggleEventAssigned} 
+                            message-toggle-inactive="Un-Assigned" message-toggle-active={labelAssigned} >
+                        </lightning-input>
+                    </div> -->
+
+                    <div class="slds-col slds-size_2-of-12" style="justify-content:center;align-content:center; margin-bottom: 10px;margin-top: -20px">
+                        <!-- <h2 style="margin-left: -100px" class =" displayCountPOD" ><b>({countAV})</b></h2> -->
+                        <lightning-combobox
+                                name="progress"
+                                label="POD Association"
+                                value={cValue}
+                                placeholder="Select POD View"
+                                options={options}
+                                onchange={handleChange}
+                                required
+                        ></lightning-combobox>
+                        <!-- <p>Selected value is: {cValue}</p> -->
+                    </div>
+
+
+                    <div class="slds-col slds-size_1-of-12" style="justify-content:center;align-content:center">
+                        <h2 style="margin-left: 10px;margin-top: 10px" class =" displayCountPOD" ><b>({count})</b></h2>
+                    </div>
+
+
+
+                    <div class="slds-col slds-size_2-of-12" style="justify-content:center;align-content:center;margin-top:-15px;margin-right: 170px; ">
+                        <div onkeypress={keycheck} style="margin-bottom:5px;width:250px;">
+                            <lightning-input type="text" placeholder="Type search String and press Enter..." name="searchPODReportData" onblur={handleSearch} class="slds-align__absolute-center"></lightning-input>
+                        </div>
+                    </div>
+
+                    
+
+
+                    <div class="slds-col slds-size_2-of-12" style="place-content: center; margin-right: 31px;margin-left: -100px;">
+
+                        <lightning-button   variant="brand"
+                                label="Execute"
+                                title="Execute Records"
+                                onclick={getSelectedRec} 
+                                slot="actions"
+                                icon-name="utility:check">
+                        </lightning-button>
+
+                        <span style="margin-left: 80px;" >
+                            <!-- <lightning-button-icon tooltip="Refresh" icon-name="action:refresh" onclick={refresh} variant="brand" name="refreshPODs" alternative-text="Refresh" title="Refresh">
+                            </lightning-button-icon> -->
+                            <lightning-button-icon tooltip="Refresh" variant="brand" icon-name="utility:refresh" name="refreshPODs"  alternative-text="Refresh" class="slds-p-around_xx-small" onclick={refresh}></lightning-button-icon>
+
+                            <!-- <lightning-icon icon-name="action:refresh" tooltip="Refresh" variant="brand"  name="refreshPODs"  alternative-text="Refresh" class="slds-p-around_xxx-small" onclick={refresh}></lightning-icon> -->
+                        </span>
+
+                        <!-- <div class="slds-col slds-size_1-of-4 refresh" style="margin-top: 9px;" >
+                            
+                        </div> -->
+                        
+                        <!-- <span>
+                            <button style="margin-left:-100px;" class="slds-button slds-button_brand" onclick={handSendEmailConfirmation}>{getSendButtonTitle}</button></span>
+                        <span class="slds-m-left_large"><lightning-button variant="brand" label="Cancel" title="Cancel" onclick={handleCancel}></lightning-button></span> -->
+                    </div>
+                </div>
+                <!-- <div class="slds-align_absolute-center" style="margin-top:-25px;margin-bottom:-10px;">
+                    
+                    
+                    <span class="slds-float_right" style="margin-left:300px;">
+                        <lightning-button variant="brand" label="Send Emails" title="Send Emails" onclick={handleSendEmail}></lightning-button>
+                    </span>
+                </div>-->
+            </lightning-layout-item> 
+
+            <template if:true={showDataTable}>
+            <!-- <lightning-datatable
+                    
+                    key-field="Id"
+                    data={currentPageDataAllIncident}
+                    
+                    columns={columns}
+                    onsort={updateColumnSortingAllIncidentsSection}
+                    sorted-by={sortByAllIncidentsSection}
+                    sorted-direction={sortDirectionAllIncidentsSection}
+                    
+                    onrowselection={getSelectedName}
+                    selected-rows={preSelectedRows}
+                ></lightning-datatable> -->
+
+                <template if:true={loadSpinner}>
+                    <lightning-spinner style="top: 95px" alternative-text="Loading" size="medium" variant="brand"></lightning-spinner>
+                </template>
+
+                <c-ps_-pod-custom-data-type
+                    
+                    key-field={keyId}
+                    data={currentPageDataAllIncident}
+                    hide-checkbox-column
+                    columns={columns}
+                    onsort={updateColumnSortingAllIncidentsSection}
+                    sorted-by={sortByAllIncidentsSection}
+                    sorted-direction={sortDirectionAllIncidentsSection}
+                    
+                    
+                    selected-rows={preSelectedRows}
+                    onhandlecheckevent={handleCheckingRow}
+                    onhandleuncheckevent={handleUnCheckingRow}
+
+                ></c-ps_-pod-custom-data-type>  
+            </template>    
+
+
+            <lightning-layout-item size="12" margin="around-small">
+                <div class="slds-align_absolute-center slds-m-top_medium">
+                    <ul class="slds-button-group-row">
+                        <template if:true={hasPrevAllIncident}>
+                            <li class="slds-button-group-item prevAllIncidentSection" >
+                            <lightning-button variant ="neutral" label="Prev" name="prevAllIncident" onclick={onPrev}></lightning-button>
+                        </li>
+                        </template>
+                        <template if:true={arePagesMoreThanOneAllIncidentSection}>
+                        <template for:each={pagesListAllIncident} for:item= "pageNumber">
+                            <li class="slds-button-group-item pageButtonsAllIncident" key={pageNumber}>
+                                <lightning-button variant ="neutral" label={pageNumber} name="allIncidentPageButton" onclick={onPageClick}></lightning-button>
+                            </li>
+                        </template>
+                        </template> 
+                        <template if:true={hasNextAllIncident}>
+                            <li class="slds-button-group-item nextAllIncident" >
+                            <lightning-button variant ="neutral" label="Next" name="nextAllIncident" onclick={onNext}></lightning-button>
+                            
+                            </li>
+                        </template>
+                    </ul>
+                    <template if:true={arePagesMoreThanOneAllIncidentSection}>
+                    <span style="margin-left:15px;font-size:15px;color:#1876F2;">Page {pageAllIncident} of {pagesAllIncident.length}</span>
+                    </template>
+                </div>
+            </lightning-layout-item>
+        </lightning-card>                        
+                                
+                                
+    </template>
+
+
+            
+
+    </template>
+                                
+</template>

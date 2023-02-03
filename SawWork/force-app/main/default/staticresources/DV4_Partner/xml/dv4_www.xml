@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- akamai performance comp cory clarke / tendercreative.com -->
+<config name="akamai_performance" version="1.0.0" debug="true">
+	<default_url></default_url>
+	<global_cities>14,29,12,13,8,41,17,42,35,3,1,30</global_cities>
+	<global_cities_old>28,25,34,36,8,10,35,40,31,1,9,38</global_cities_old>
+	<methodology_page>http://www.akamai.com/html/technology/apc_methodology.html</methodology_page>
+	<training_video_page show="0">http://www.akamai.com/html/training/dv4_training.html</training_video_page>
+	<xml_url>http://wwwdv.akamai.com/python/v2.5/v25client.py/v25client?url=</xml_url>
+	<xml_graph_url>resource/DV4_Partner/xml/top_left.xml</xml_graph_url>
+	<xml_weeklong_url>http://www.akamai.com/cgi/pubdv4v2/pvsn_report.cgi?url=</xml_weeklong_url>
+	<xml_report_url>http://www.akamai.com/cgi/pubdv4v2/load_report.cgi?id=</xml_report_url>
+	<xml_previous_url>http://www.akamai.com/cgi/pubdv4v2/reportlist.cgi?</xml_previous_url>
+	<latlng_override>resource/DV4_Partner/xml/latlng.xml</latlng_override>
+	<fab_list>resource/DV4_Partner/xml/fab_urls.xml</fab_list>
+    <cookie name="apex_PARTNERDV4SESSION" enable="0" />
+	<email_url target="_blank" replace="">http://dev-www-scripts.akamai.com/cgi/dv4_qa/dv4_www.cgi</email_url>
+	<print_url target="_blank" replace="">http://dev-www-scripts.akamai.com/cgi/dv4_qa/dv4_www.cgi</print_url>
+	<timeout>120000</timeout>
+	<help>
+		<!-- Timeout message -->
+		<message id="timeout">Your request has timed out. Please enter the url again.</message>
+		<!-- tooltip messages -->
+		<message id="search_panel_help">Run an instant global performance check of your site! Simply enter the web address below and put it to test. You will see a comparison between the actual performance of your site versus an estimated performance with Akamai's dynamic site and application acceleration capabilities.
+        
+This version of DV4 provides additional cities and regional views tailored to your target market.
+        
+        </message>
+		<message id="weeklong_graph_help">Provides a benchmark for expected performance improvement over one week from a given city to the region in which the Origin is based.</message>
+		<message id="average_global_performance_help">Compares estimated performance over Akamai with actual performance direct to Origin. Breaks down total page download time in to connection time, first byte time and download time.</message>
+		<message id="performance_by_city_help">Compares estimated performance between Akamai and Origin, per city.</message>
+		<message id="performance_by_region_help">Compares estimated average performance between Akamai and Origin, per continent.</message>
+		<message id="m4">Dots on the map indicate the locations of Akamai testing agents. Click on these dots to simulate end user connection times from those locations.</message>
+		<message id="email_result">Email the results.</message>
+		<message id="print_result">Print the results.</message>
+		<message id="weeklong_performance_benchmark">Provides a benchmark for expected performance improvement over one week from a given city to the region in which the Origin is based.</message>
+		<message id="save_pdf">Save as PDF</message>
+		<!-- Loading messages -->
+		<message id="measure_default_peformance">
+			<![CDATA[Measuring the site's default performance]]>
+		</message>
+		<message id="weeklong_report_request">
+			<![CDATA[Submitting Weeklong Report Request]]>
+		</message>
+		<message id="previous_weeklong_list_loading">
+			<![CDATA[Previous Weeklong Report list loading]]>
+		</message>
+		<message id="weeklong_report_loading">
+			<![CDATA[Weeklong Report loading]]>
+		</message>
+		<message id="additional_site_revenue_per_month">
+			<![CDATA[Based on performance-driven site abandonment rates as captured in Forrester 2009 eCommerce]]>
+		</message>
+		<message id="calculate_improvement">
+			<![CDATA[Calculating performance improvement metrics]]>
+		</message>
+		<message id="present_improvement">
+			<![CDATA[Presenting performance improvement]]>
+		</message>
+	</help>
+</config>

@@ -1,0 +1,53 @@
+<template>
+    <!-- <div class="slds-hide">
+        <section class={css}>
+            <div class="slds-modal__container">
+                <header class="c-modal-header">
+                    <lightning-button-icon class="slds-modal__close" title="Close" icon-name="utility:close"
+                        icon-class="slds-button_icon-inverse" onclick={handleDialogClose}></lightning-button-icon>
+
+                    <h2 class="c-modal-title">
+                        <slot name="header"></slot>
+                    </h2>
+                </header>
+
+                <div class="slds-modal__content slds-p-top_x-small slds-p-bottom_medium" >
+                    <slot></slot>
+                </div>
+
+                <footer class="slds-modal__footer slds-hide">
+                    <slot name="footer" onslotchange={handleSlotFooterChange}></slot>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div> -->
+
+        <div class="c-modal-container">
+            <div class="c-modal-background">
+                <div class="c-modal">
+                    <section class={css}>
+                        <div class="slds-modal__container">
+                            <header class="c-modal-header">
+                                <lightning-button-icon class="slds-modal__close slds-m-right_x-small" title="Close" icon-name="utility:close"
+                                icon-class="slds-button_icon-inverse" onclick={handleDialogClose}></lightning-button-icon>
+                                <div class="c-modal-title">
+                                    <slot name="header"></slot>
+                                </div>
+                                <!-- <button class="c-modal-close" onclick={handleDialogClose}>&times;</button> -->
+                            </header>
+                            <div class="slds-modal__content slds-p-vertical_medium" >
+                                <slot></slot>
+                            </div>
+    
+                            <footer class="slds-modal__footer slds-hide">
+                                <slot name="footer" onslotchange={handleSlotFooterChange}></slot>
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </div>
+            </div>
+        </div>
+    
+</template>

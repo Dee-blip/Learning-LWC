@@ -1,0 +1,89 @@
+<apex:page standardController="SFDC_MDF_Claim__c" extensions="FundClaimAllocationController" >
+    <apex:outputText rendered="false" value="{!SFDC_MDF_Claim__c.Id} {!SFDC_MDF_Claim__c.Invoice_Date_del__c} {!SFDC_MDF_Claim__c.Amount_In_Corporate_Currency__c} {!SFDC_MDF_Claim__c.Amount__c} {!SFDC_MDF_Claim__c.CreatedDate} {!SFDC_MDF_Claim__c.Fund_Request__c} {!SFDC_MDF_Claim__c.Fund_Request__r.Account__c} "/>
+    
+    <apex:form id="allocateform"> 
+    <!--    <apex:outputPanel id="errors" rendered="{!error}">
+            <apex:pageMessage summary="{!errorMessage}"  severity="error" strength="3" /><br/><br/>
+        </apex:outputPanel> -->
+        <apex:outputPanel rendered="{!creditHold}">
+            <apex:pageMessages id="errmessage"/>
+            <apex:commandButton id="bttnCancel" value="Back" action="{!cancelAllocations}" status="buttonStatus" />
+        </apex:outputPanel>
+        <apex:outputPanel rendered="{! !creditHold}" id="errors">
+            <apex:pageMessages id="messages"/>
+        </apex:outputPanel>
+        <apex:pageBlock rendered="{! !creditHold}" id="claimblock" title="Fund Claim" tabStyle="SFDC_MDF_Claim__c">
+        
+            <apex:pageBlockSection columns="1">              
+                <apex:outputField value="{!SFDC_MDF_Claim__c.Account__c}"/>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Claim Number" for="claim"/>
+                    <apex:outputLink value="/{!SFDC_MDF_Claim__c.Id}" id="request">{!SFDC_MDF_Claim__c.Name}</apex:outputLink>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Claim Date" for="claimdate"/>
+                    <apex:outputText value="{!claimDateString}" id="claimdate"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Claim Amount" for="fundclmAmtApp"/>
+                    <apex:outputField value="{!SFDC_MDF_Claim__c.Amount_In_Corporate_Currency__c}" id="fundclmAmtApp"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Total Already Allocated" for="totalclaimed"/>
+                    <apex:outputField value="{!totalclaimed.Amount__c}" id="totalclaimed"/>
+                </apex:pageBlockSectionItem>
+                
+                <apex:inputField value="{!SFDC_MDF_Claim__c.Performance_Attached__c}" />
+            
+                <apex:inputField value="{!SFDC_MDF_Claim__c.Performance_Verified__c}" />
+            
+                <apex:inputField value="{!SFDC_MDF_Claim__c.Performance_Verified_Date__c}" />
+                <apex:outputField value="{!SFDC_MDF_Claim__c.Approved_Amount__c}" id="approvedAmt"/>
+                <apex:inputField value="{!SFDC_MDF_Claim__c.Fund_Request_Approved_Amount__c}" />
+                <apex:inputHidden value="{!SFDC_MDF_Claim__c.Fund_Request__r.Account__r.Name}" />
+                
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:pageBlock rendered="{! !creditHold}" id="budgetblock" title="Select from one or more Budgets" tabStyle="SFDC_Budget__c">
+            <apex:pageMessages id="messages"/>
+            <apex:pageBlockButtons location="bottom">
+                <apex:actionStatus id="buttonStatus" startText="processing...">
+                    <apex:facet name="start" >
+                        <img src="/apexpages/devmode/img/saveStatus.gif"/>
+                    </apex:facet>
+                    <apex:facet name="stop">
+                        <apex:outputPanel >
+                            <apex:commandButton id="btnSave" value="Save" action="{!saveAllocations}" status="buttonStatus" rerender="errors,blist"/>
+                            <apex:commandButton id="btnCancel" value="Cancel" action="{!cancelAllocations}" status="buttonStatus" rerender="buttons,blist"/>
+                        </apex:outputPanel>
+                    </apex:facet>
+                </apex:actionStatus>
+            </apex:pageBlockButtons>
+            <apex:outputText value="[ The list shows budgets which the associated fund request has reserved against ]"/>
+            <apex:pageBlockTable id="blist" value="{!budgets}" var="b">
+                <apex:column value="{!b.ba.Budget__c}"/>
+                <apex:column headerValue="Earned Period Ending" style="text-align:center;" value="{!b.ba.Budget__r.End_Earned_Date__c}"/>
+                <apex:column headerValue="Fund Claim Expiration Date" style="text-align:center;" value="{!b.ba.Budget__r.Fund_Claim_Deadline__c}"/>
+                <apex:column headerValue="Available Fund Request Reserve" headerClass="CurrencyElement" style="text-align:right;" value="{!b.ba.Amount__c}"/>
+                <apex:column headerValue="Allocation" headerClass="CurrencyElement" style="text-align:right;">
+                    <apex:inputField value="{!b.ba.Temp_Claim_Allocation__c}" id="input1" style="text-align:right;">
+                        <apex:actionSupport event="onchange" action="{!updateTotal}" rerender="exceed,atotal,approvedAmt"/>
+                    </apex:inputField>
+                </apex:column>
+                <!-- <apex:column headerValue="Close Reserve" style="text-align:center;">
+                    <apex:inputCheckbox value="{!b.closeReserve}"/>
+                </apex:column>
+                <apex:column headerValue="Exceeds Reserve" style="text-align:center;">
+                    <apex:inputCheckbox value="{!b.exceedsReserve}" disabled="true" id="exceed"/>
+                </apex:column> -->
+            </apex:pageBlockTable>
+            <apex:pageBlockSection columns="1">
+                <apex:outputText value=""/>
+                <apex:pageBlockSectionItem dataStyle="text-align:right;font-weight:bold;">
+                    <apex:outputLabel value="" for="atotal"/>
+                    <apex:outputField value="{!totalallocation.Amount__c}" id="atotal"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

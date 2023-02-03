@@ -1,0 +1,120 @@
+<apex:page standardController="Case" extensions="CaseTransitionController" showHeader="false" standardStylesheets="true">
+	<style type="text/css">
+   .customPopup{
+        background-color: white;
+        border-style: solid;
+        border-width: 7px;
+        left: 50%;
+        padding:10px;
+        position: absolute;
+        z-index: 9999;
+        width: 330px;
+        /* These are the 3 css properties you will need to tweak so the pop 
+        up displays in the center of the screen. First set the width. Then set 
+        margin-left to negative half of what the width is. You can also add 
+        the height property for a fixed size pop up.*/
+        margin-left: -250px;
+        top:100px;
+        height:100px;
+    }
+  </style>
+	<apex:form id="myForm">
+		<apex:pageMessages id="msgs"/>
+			<apex:outputpanel >
+				<apex:actionstatus id="goStatus">
+					<apex:facet name="start">
+						<div class="waitingSearchDiv"
+							style="background-color: #fbfbfb; height: 100%; opacity: 0.65; width: 100%;">
+						<div class="waitingHolder" style="top: 74.2px; width: 91px;">
+						<img class="waitingImage" src="/img/loading.gif"
+							title="Please Wait.." /> <span class="waitingDescription">Loading..</span>
+						</div>
+						</div>
+					</apex:facet>
+				</apex:actionstatus>
+			</apex:outputpanel>
+			
+      <apex:outputPanel styleClass="customPopup" layout="block" rendered="{!showOwnerPrompt}">
+      	<b>Please Select New Owner For Case Transition: </b> <br />
+      	 <apex:inputfield value="{!ctEdit.New_Owner__c}" style="height:25px; width:277px; margin-top: 10px; margin-bottom: 5px;"/> <br />
+         <apex:commandButton value="Save" action="{!saveCTOwner}" rerender="myForm" status="goStatus" style="margin-left: 105px;"/>
+         <apex:commandButton action="{!cancelRequest}" value="Cancel" reRender="myForm" status="goStatus"/>
+      </apex:outputPanel>
+			
+			<apex:actionFunction name="showDetail" action="{!showDetail}" immediate="true" reRender="myForm" status="goStatus">
+				<apex:param name="paramCTId" assignTo="{!ctID}" value=""/>
+			</apex:actionFunction>
+			
+			<apex:actionFunction name="showEdit" action="{!showEdit}" immediate="true" reRender="myForm" status="goStatus">
+				<apex:param name="paramCTId" assignTo="{!ctID}" value=""/>
+			</apex:actionFunction>
+			
+			<apex:actionFunction name="assignUser" action="{!assignUser}" immediate="true" reRender="myForm" status="goStatus">
+				<apex:param name="paramCTId" assignTo="{!ctID}" value=""/>
+			</apex:actionFunction>
+			
+			<apex:pageBlock id="listBlock">
+				<apex:commandButton value="New" onclick="showEdit('');return false;"/>
+				<div style="height: 142px; overflow:auto;">
+					<apex:pageBlockTable value="{!caseTransitions}" var="ct">
+	        	<apex:column style="width:80px;">
+	        		<a href="" onclick="javascript:showDetail('{!ct.Id}')" style="cursor:pointer;">View</a> <br />
+	        		<a href="" onclick="javascript:showEdit('{!ct.Id}')" style="cursor:pointer;">Edit</a> <br />
+	        		<a href="" onclick="javascript:assignUser('{!ct.Id}')" style="cursor:pointer;">Assign User</a>
+	        	</apex:column>
+	        	<apex:column >
+	        		<apex:facet name="header">Case Transition Name</apex:facet>
+	            {!ct.Name} 
+	        	</apex:column>
+	        	<apex:column >
+	        		<apex:facet name="header">Previous Owner</apex:facet>
+	            {!ct.Previous_Owner__r.Name} 
+	        	</apex:column>
+	        	<apex:column >
+	        		<apex:facet name="header">New Owner</apex:facet>
+	            {!ct.New_Owner__r.Name}
+	        	</apex:column>
+	        	<apex:column >
+	        		<apex:facet name="header">Transition Date</apex:facet>
+	            <apex:outputText value="{0,date,MM/dd/yyyy}">
+       					<apex:param value="{!ct.Transition_Date__c}" />
+       			  </apex:outputText>
+	        	</apex:column>
+	        </apex:pageBlockTable>
+        </div>
+			</apex:pageBlock>
+			
+			<apex:pageBlock id="editBlock" rendered="{!showEditBlock}">
+				<apex:pageBlockButtons location="bottom">
+          <apex:commandButton action="{!saveCase}" value="Save" reRender="myForm" status="goStatus"/>
+          <apex:commandButton action="{!cancelRequest}" value="Cancel" reRender="myForm" status="goStatus"/>
+	      </apex:pageBlockButtons>
+				<apex:pageBlockSection title=" {! IF(ISNULL(ctEdit.Id), 'New Case Transition', 'Case Transition Edit')}" columns="2">
+					<apex:inputField value="{!ctEdit.Issue_Summary__c}"/>
+					<apex:inputField value="{!ctEdit.Reason__c}"/>
+					<apex:inputField value="{!ctEdit.Troubleshooting_to_Date__c}"/>
+					<apex:inputField value="{!ctEdit.Data_Collected__c}"/>
+					<apex:inputField value="{!ctEdit.Escalation_Expectations__c}" rendered="{!currentCase.IsEscalated}"/>
+					<apex:inputField value="{!ctEdit.Customer_Expectations__c}"/>
+					<apex:inputField value="{!ctEdit.Next_Action_Recommendation__c}"/>
+					</apex:pageBlockSection>
+			</apex:pageBlock>
+			
+			<apex:pageBlock id="detailBlock" rendered="{!showDetailBlock}">
+				<apex:pageBlockSection title="Case Transition" columns="2">
+					<apex:outputField value="{!ctDetail.Case__c}" />
+					<apex:outputField value="{!ctDetail.Transition_Date__c}" />
+					<apex:outputField value="{!ctDetail.Previous_Owner__c}" />
+					<apex:outputField value="{!ctDetail.New_Owner__c}" />
+					<apex:outputField value="{!ctDetail.Issue_Summary__c}" />
+					<apex:outputField value="{!ctDetail.Reason__c}" />
+					<apex:outputField value="{!ctDetail.Troubleshooting_to_Date__c}" />
+					<apex:outputField value="{!ctDetail.Data_Collected__c}" />
+					<apex:outputField value="{!ctDetail.Escalated__c}" />
+					<apex:outputField value="{!ctDetail.Escalation_Expectations__c}" />
+					<apex:outputField value="{!ctDetail.Customer_Expectations__c}" />
+					<apex:outputField value="{!ctDetail.Next_Action_Recommendation__c}" />
+				</apex:pageBlockSection>
+			</apex:pageBlock>
+		</apex:form>
+</apex:page>

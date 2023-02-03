@@ -1,0 +1,47 @@
+<aura:component controller="PartnerCommunityNavigationController"
+                implements="forceCommunity:availableForAllPageTypes">
+    
+    <ltng:require styles="{! $Resource.bootstrap4 + '/dist/css/bootstrap.min.css'}" 
+                  scripts="{!join(',', 
+                           $Resource.jquery350, 
+                           $Resource.bootstrap4 + '/dist/js/bootstrap.min.js')
+                           }" afterScriptsLoaded="{!c.scriptsLoaded}"/>
+    
+    <aura:attribute name="menuItems" type="NavigationMenuItem" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    	
+    <article class="slds-card">
+    	<div class="slds-grid slds-einstein-header slds-card__header">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+              <div class="slds-grid slds-grid_vertical-align-center slds-size_3-of-4 slds-medium-size_2-of-3">
+                <div class="slds-media__body">
+                  <h2 class="slds-truncate" title="Einstein (10+)">
+                    <a href="javascript:void(0);" class="slds-card__header-link" title="Einstein (10+)">
+                      <span class="slds-text-heading_small">Quick Create</span>
+                    </a>
+                  </h2>
+                </div>
+              </div>
+              <div class="slds-einstein-header__figure slds-size_1-of-4 slds-medium-size_1-of-3"></div>
+            </header>
+          </div>
+        <div class="slds-card__body slds-card__body_inner">
+            <nav class="nav navbar-expand navbar-dark">
+            <div class="container-fluid">
+                <div class="collapse navbar-collapse justify-content-center" id="navbarNavDropdown">
+                    <ul class="scrollable-menu flex-column" id="nav">
+                        <aura:iteration items="{!v.menuItems}" var="item">
+                            <li class="nav-item" data-value="{!item.Target}" onclick="{!c.onClick}">
+                                <a href="javascript:void(0);" data-menu-item-id="{!item.Id}" class="nav-link">
+                                    <span style="white-space: pre;">{!item.Label}</span>
+                                </a>
+                        	</li>
+                        </aura:iteration>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        </div>
+    </article>
+</aura:component>

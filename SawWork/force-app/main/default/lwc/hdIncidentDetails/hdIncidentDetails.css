@@ -1,0 +1,40 @@
+.bg { 
+    background-image: url('/resource/HD_Incident_Detail_Vector');
+    height: 9.00rem; 
+    background-position: bottom; 
+    background-repeat: no-repeat; 
+    background-size: cover; 
+    }
+    .avat {
+        height: 8.00rem;
+        width: 8.00rem;
+        margin-left: 15%;
+        border-radius: 50%;
+        border-style:solid;
+        border-color:white;
+    }
+    .page-section {
+        border: solid 1px #ccc;
+        padding: 0.5rem;
+        border-radius: 10px;
+    }
+    
+    
+    .entityPhotoSpecificity {
+        overflow: hidden;
+        display: inline-block;
+        position: relative;
+        box-sizing: content-box;
+        flex-grow: initial;
+    }
+    
+    .defaultPhoto {
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+    
+    .accordionTitle{
+        font-size: larger;
+        font-weight: 600;
+    }

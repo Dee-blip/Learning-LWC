@@ -1,0 +1,112 @@
+.tableheight
+{
+    height:  90vh;
+}
+.panel-info
+{
+    border-color: white;
+    width: 100%;
+    padding-bottom : 3px;
+
+}
+.Paneldata
+{
+    color:white !Important;
+    padding-left: 10px !Important;
+    padding-top: 4px !Important;
+}
+.panel-heading
+{
+    background-image:linear-gradient(to right, #035b79,#2ebfea); 
+    height:35px; 
+    padding-top:5px;
+    padding-bottom:3px;
+}
+
+.slds-checkbox {
+    display: inline !important;
+}
+
+.customPagination {
+    margin-top: 10px;
+    background-color: white;
+    border-radius: 3px;
+}
+
+.Viewallfilters{
+    float: left;
+    margin-top: 9px;
+    margin-left: 2px;
+}
+.refreshbutton
+{
+    float: right;margin-top: 9px;margin-right: 1rem;
+}
+
+.snackbar {
+    visibility: hidden;
+    min-width: 250px;
+    margin-left: -125px;
+    background-color: green;
+    color: #fff;
+    text-align: center;
+    border-radius: 2px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1;
+    left: 50%;
+    top: 30px;
+    font-size: 17px;
+  }
+  .errorbar {
+    visibility: hidden;
+    min-width: 250px;
+    margin-left: -125px;
+    background-color: red;
+    color: #fff;
+    text-align: center;
+    border-radius: 2px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1;
+    left: 50%;
+    top: 30px;
+    font-size: 17px;
+  }
+  .ninty-percent {
+    zoom: 90%;
+}
+
+ .sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    top:0px;
+    z-index: 2 !important;
+    right: 0;
+    background-color: white;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 10px;
+    border : 1px solid #005fb2;
+}
+
+ .sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.cardborder
+{
+    border : 1px solid #1589ee;
+}
+
+
+
+.align-self-center{
+    align-self: center;
+}

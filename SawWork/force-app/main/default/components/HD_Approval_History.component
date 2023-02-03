@@ -1,0 +1,85 @@
+<apex:component id="apphistcomp" allowDML="true" controller="HD_Approval_History_component">
+<apex:includeScript value="/soap/ajax/32.0/connection.js"/>
+<apex:attribute name="servicerequestOrincidentRecordId" description="this attribute is the record ID,which defines the Action history related records to be displayed" required="true" type="String" assignTo="{!TargetObjectIdvalue}"/>
+<apex:form >
+<apex:actionFunction action="{!approveReject}" name="approverejectaction" status="approvalstat" reRender="apphistpageblock">
+<apex:param name="comment" assignTo="{!comment}" value=""/>
+<apex:param name="action" assignTo="{!action}" value=""/>
+<apex:param name="workItemId" assignTo="{!workItemId}" value=""/>
+</apex:actionFunction>
+
+<apex:actionFunction action="{!submitApproval}" name="subapproval" status="approvalstat" reRender="apphistpageblock"/>
+
+<apex:pageblock title="Service Request : Approval History" id="apphistpageblock" helpTitle="Need Help for this Section" helpUrl="">
+<apex:pageBlockButtons id="apphistpageblockbutton" location="top">
+<apex:commandButton id="submitapp" onclick="subapproval();return false;" value="Submit for Approval" rendered="{!NOT(IsApprovalPending)}" reRender="apphistpageblocktable,apphistpageblockbutton"/>
+<apex:commandButton id="recallapp" onclick="popitup('/{!WorkItemIDValue}/e?et=REMOVE&isdtp=vw&retURL=%2Fapex%2Fhdclosepopup%3FrefreshUrl=%2Fapex%2FServiceRequestdetail?id={!LEFT(TargetObjectIdvalue,15)}&saveURL=%2Fapex%2Fhdclosepopup%3FrefreshUrl=%2Fapex%2FServiceRequestdetail?id={!LEFT(TargetObjectIdvalue,15)}',75,500);return false;" value="Recall Approval Request" rendered="{!IsApprovalPending}"/>
+</apex:pageBlockButtons>
+<apex:messages style="color:red;"/>
+<apex:actionStatus id="approvalstat" startText="Processing..."></apex:actionStatus>
+<apex:pageBlockTable value="{!ApprovalHistory}" var="apphist" id="apphistpageblocktable" rows="10" rendered="{!IF(ApprovalHistory.size>0,true,false)}">
+
+
+<apex:column headerValue="Action" width="15"><apex:outputLink onclick="" ></apex:outputLink></apex:column>
+<apex:column headerValue="Date" width="30"><apex:outputText ></apex:outputText> </apex:column>
+<apex:column headerValue="Status" width="30"><apex:outputText ></apex:outputText> </apex:column>
+<apex:column headerValue="Assigned To" width="30"><apex:outputText ></apex:outputText> </apex:column>
+<apex:column headerValue="Actual Approver" width="30"><apex:outputText ></apex:outputText> </apex:column>
+<apex:column headerValue="Comments" width="30"><apex:outputText ></apex:outputText> </apex:column>
+<apex:column headerValue="Overall Status" width="30" style="background-color: #{!IF(apphist.status=='Removed','C0BEBC',IF(apphist.status=='Pending','FFD74B',IF(apphist.status=='Approved','A1F78D',IF(apphist.status=='Rejected','FB8A8C',''))))};"><apex:outputText styleclass="extraStatusDiv_P"><img src="{!IF(apphist.status=='Removed','/img/icon/recall12.png',IF(apphist.status=='Pending','/img/icon/pending12.gif',IF(apphist.status=='Rejected','/img/icon/reject12.gif','/img/icon/approve12.gif')))}" style="margin-right:5px;"></img><b>{!IF(apphist.status=='Removed','Recalled',apphist.status)}</b></apex:outputText> </apex:column>
+<apex:repeat value="{!apphist.StepsAndWorkitems}" var="stepswi">
+<apex:column headerValue="Action" width="30" breakBefore="true"><apex:outputLink style="color:#015BA7" rendered="{!IF(stepswi.StepStatus == 'Started',false,IF( (stepswi.StepStatus == 'Pending') && ( $Profile.Name == 'System Administrator' || stepswi.OriginalActorId == $User.Id ||  stepswi.ActorId == $User.Id || User_Part_of_Queue[loggedInUser]   ),true,false))}" onclick="popitup('/{!stepswi.Id}/e?et=REASSIGN&isdtp=vw&retURL=%2Fapex%2Fhdclosepopup%3FrefreshUrl=%2Fapex%2FServiceRequestdetail?id={!LEFT(TargetObjectIdvalue,15)}');return false;" >Reassign</apex:outputLink><apex:outputtext rendered="{!IF(stepswi.StepStatus == 'Started',false,IF( (stepswi.StepStatus == 'Pending') && ( $Profile.Name == 'System Administrator' || stepswi.OriginalActorId == $User.Id ||  stepswi.ActorId == $User.Id || User_Part_of_Queue[$User.Id] ),true,false))}" >&nbsp;|&nbsp;</apex:outputtext><apex:outputLink style="color:#015BA7" rendered="{!IF(stepswi.StepStatus == 'Started',false,IF( (stepswi.StepStatus == 'Pending') && ( $Profile.Name == 'System Administrator' || stepswi.OriginalActorId == $User.Id  ||  stepswi.ActorId == $User.Id || User_Part_of_Queue[$User.Id]  ),true,false))}" onclick="approvereject('Approve','{!stepswi.Id}');return false;">Approve</apex:outputLink><apex:outputtext rendered="{!IF(stepswi.StepStatus == 'Started',false,IF( (stepswi.StepStatus == 'Pending') && ( $Profile.Name == 'System Administrator' || stepswi.OriginalActorId == $User.Id ||  stepswi.ActorId == $User.Id || User_Part_of_Queue[$User.Id] ),true,false))}" >&nbsp;/&nbsp;</apex:outputtext><apex:outputLink style="color:#015BA7" rendered="{!IF(stepswi.StepStatus == 'Started',false,IF( (stepswi.StepStatus == 'Pending') && ( $Profile.Name == 'System Administrator' || stepswi.OriginalActorId == $User.Id ||  stepswi.ActorId == $User.Id || User_Part_of_Queue[$User.Id]  ),true,false))}" onclick="approvereject('Reject','{!stepswi.Id}');return false;">Reject</apex:outputLink> </apex:column>
+<apex:column headerValue="Date" width="30" breakBefore="false"><apex:outputText >{!stepswi.CreatedDate}</apex:outputText></apex:column>
+<apex:column headerValue="Status" width="30" breakBefore="false"><apex:outputText >{!IF(stepswi.StepStatus=='Removed','Recalled',IF(stepswi.StepStatus=='Started','Submitted',stepswi.StepStatus))}</apex:outputText></apex:column>
+<apex:column headerValue="Assigned To" width="30" breakBefore="false"><apex:outputText >{!stepswi.OriginalActor.Name}</apex:outputText></apex:column>
+<apex:column headerValue="Actual Approver" width="30" breakBefore="false"><apex:outputText > {!stepswi.Actor.name}</apex:outputText></apex:column>
+<apex:column headerValue="Comments" width="30" breakBefore="false"><apex:outputText >{!stepswi.Comments}</apex:outputText></apex:column>
+<apex:column headerValue="Overall Status" width="30" breakBefore="false"><apex:outputText ></apex:outputText></apex:column>
+</apex:repeat>
+
+
+</apex:pageBlockTable>
+<apex:outputText rendered="{!IF(ApprovalHistory.size>0,false,true)}">No records to display</apex:outputText>
+</apex:pageblock>
+</apex:form>
+<script>
+function popitup(url,height,width) {
+   //newwindow=window.open(url,'name','height='+height+',width='+width);
+      newwindow=window.open(url,'name','height=250,width=600,scrollbars=1');
+    if (window.focus) {newwindow.focus()}
+    return false;
+}
+
+//starting Delete operation
+var __sfdcSessionId = '{!GETSESSIONID()}';
+function DeleteNoteAttachment(noteattachid)
+{
+try{
+var r = confirm("Are You Sure !");
+if (r == true) {
+deletenoteattach(noteattachid);
+} else {
+console.log("You Pressed No !");
+}//else
+
+}//try
+catch(err)
+{
+alert(''+err);
+}//catch
+return false;
+}//function DeleteNoteAttachment(id)
+
+
+//function to approve and reject the Record
+function approvereject(action,workItemId)
+{
+var approvalcomment = prompt("Comment", "");
+if(approvalcomment != null){
+console.log(''+approvalcomment);
+approverejectaction(approvalcomment,action,workItemId);
+}//if(approvalcomment != null)
+}//
+
+</script>
+</apex:component>

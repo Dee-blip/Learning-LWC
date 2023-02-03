@@ -1,0 +1,831 @@
+<!--
+|  HISTORY  |                                                                            
+
+|  DATE           DEVELOPER   CR          DESCRIPTION                                                       
+
+|  ===========    =========   =======     =========== 
+                                                       
+|  27-Jul-2015    Akhila      CR 2948861    Home Page for EPE Team
+|  27-May-2016    Vamsee      CR 3125711    Removed filter for My team cases section
+|  29-Jul-2016    Vamsee      CR 3310901    Removing Unexpected Content Loading from Subject column
+|  09-Jan-2016    Pinkesh     CR 3528581 -  Update CCare queue label prefixes from CC to ATS (Akamai Technical Support)
+|  25-Jun-2018    Vandhana    ESESP-319 -  OLA for Escalations (Renamed Engagement Requests to Escalations)
+-->
+
+<apex:page controller="SC_EPE_HomePageCtrl" showHeader="false" sidebar="false">
+  <apex:includeScript value="/support/console/32.0/integration.js"/>
+  <script src="{!URLFOR($Resource.SCNewHomePage, '/js/bootstrap_jquerydatatables.js')}"></script>
+  <apex:stylesheet value="{!URLFOR($Resource.SCNewHomePage,'css/bootstrap_jquerydatatable.css')}"/>
+  <apex:stylesheet value="{!URLFOR($Resource.SCNewHomePage,'css/Inline_Styles.css')}"/>
+
+  <apex:form style="height:100%">
+
+    <!--Hidden fields to store values of Apex variables for JS usage-->
+    <apex:inputHidden value="{!lQCaseERjson}" id="hiddenFieldQueueList"/>
+    <apex:inputHidden value="{!lMCaseERjson}" id="hiddenFieldMyList"/>
+    <apex:inputHidden value="{!lMTeamCaseERjson}" id="hiddenFieldMyTeamList"/>
+    <apex:inputHidden value="{!pickFlag}" id="hiddenPickFlag"/>
+
+    <!--QueueTable Refresh on Picking Case/ER-->
+    <apex:actionFunction name="pickCaseERaction" action="{!pickCaseER}" reRender="hiddenFieldQueueList,hiddenPickFlag,qPanelHeader" onComplete="pick_reConstructQTable(),refreshMyTablePeriodic(),refreshMyTeamTablePeriodic" status="actQStatusId">     
+      <apex:param name="passRecId" value=""  assignTo="{!passRecId}"/>
+    </apex:actionFunction>
+
+                
+    <!-- Action functions on change of select list option-->
+    <apex:actionFunction name="refreshMyTeamTable" action="{!populateMyTeamTable}" reRender="hiddenFieldMyTeamList" oncomplete="reConstructMyTeamTable()" status="actMyTeamStatusId"/>
+    <apex:actionFunction name="refreshMyTable" action="{!populateMyTable}" reRender="hiddenFieldMyList" oncomplete="reConstructMTable()" status="actMStatusId"/>
+    <apex:actionFunction name="refreshQTable" action="{!populateQTable}" reRender="hiddenFieldQueueList" oncomplete="reConstructQTable()" status="actQStatusId"/>
+
+    <!--periodic refresh for QueueTable and MyTable and MyTeamTable-->
+    <apex:actionFunction name="refreshMyTeamTablePeriodic" action="{!populateMyTeamTable}" reRender="hiddenFieldMyTeamList" oncomplete="reConstructMyTeamTable()"/>
+    <apex:actionPoller interval="30" oncomplete="refreshMyTeamTablePeriodic();"/>
+
+    <apex:actionFunction name="refreshMyTablePeriodic" action="{!populateMyTable}" reRender="hiddenFieldMyList" oncomplete="reConstructMTable()"/>
+    <apex:actionPoller interval="30" oncomplete="refreshMyTablePeriodic();"/>
+
+    <apex:actionFunction name="refreshQTablePeriodic" action="{!populateQTable}" reRender="hiddenFieldQueueList" oncomplete="reConstructQTable()"/>
+    <apex:actionPoller interval="30" oncomplete="refreshQTablePeriodic();"/>
+
+    <!--To call Controller methods that returns Table Data-->
+    <apex:actionFunction name="populateQTable" action="{!populateQTable}" reRender="hiddenFieldQueueList" onComplete="constructQTable()" />
+    <apex:actionFunction name="populateMyTable" action="{!populateMyTable}" reRender="hiddenFieldMyList" onComplete="constructMTable()"/>
+    <apex:actionFunction name="populateMyTeamTable" action="{!populateMyTeamTable}" reRender="hiddenFieldMyTeamList" onComplete="constructMyTeamTable()"/>
+
+      
+    <div class="container-fluid setmargin setheight">
+      
+      <!--First Section - MyTeamTable-->
+      <div class="row TableClass"  id="myTeamSection" >
+        <div class="panel panel-default setheight"> <!--action status-->
+          <apex:actionStatus id="actMyTeamStatusId" >
+            <apex:facet name="start">
+              <div class="statusOuter">   
+                <div class="statusInner">        
+                  <img src="/img/loading.gif" />       
+                </div>             
+              </div>
+            </apex:facet>            
+          </apex:actionStatus>
+          <div class="panelheadtopsection">
+            <h4>Critical Cases
+              <apex:outputPanel id="myTeamPanelHeader"></apex:outputPanel> 
+              &nbsp;&nbsp;         
+            </h4>
+          </div>
+          <div id="myTeamTopPanel" class="panelbodytopsection">
+            <apex:outputPanel id="myTeamPanel" styleClass="setwidth setheight">   
+              <table id="myTeamTable" class="table table-striped" style="white-space: nowrap;table-layout: fixed;width:100%">
+                <thead>
+                  <tr style="height:25px">
+                    <th style="width:2%;" class="nosor nosort"></th>
+                    <th style="width:7%;">Id</th>
+                    <th style="width:14%;">Account Name</th>
+                    <th style="width:15%;">Subject</th>
+              <th style="width:10%;">Owner Name</th>
+                    <th style="width:7%;">Support Level</th>
+                    <th style="width:7%;">Status</th>
+                    <th style="width:5%;">Severity</th>
+                    <th style="width:6.5%;">Age(Days)</th>
+                    <th style="width:5%;">Alert</th>
+                    <th style="width:5%;">SLA</th>
+                    <th style="width:5.5%;">Res Sum</th>
+                    <th style="width:4%;">24x7</th>
+                    <th style="width:7%;">Critical Cust.</th>
+                    <th style="width:6%;">Incident</th>                
+                  </tr> 
+                </thead>
+              </table>
+            </apex:outputPanel>         
+          </div> 
+        </div>               
+      </div>
+      
+      <!--My Work section-->
+      <div class="row TableClass" style="float:left;" id="section2" >
+        <div class="panel panel-default setheight"> <!--action status-->
+          <apex:actionStatus id="actMStatusId" >
+            <apex:facet name="start">
+              <div class="statusOuter">   
+                <div class="statusInner">        
+                  <img src="/img/loading.gif" />       
+                </div>             
+              </div>
+            </apex:facet>            
+          </apex:actionStatus>
+          <div class="panelheadtopsection">
+            <h4>My Cases &amp; Escalations
+              <apex:outputPanel id="myPanelHeader"></apex:outputPanel> 
+              &nbsp;&nbsp;         
+            </h4>
+            <apex:selectList value="{!MyFilter}" size="1" style="margin-right: 10px;" onchange="refreshMyTable()">
+              <apex:selectOption itemLabel="My Work" itemValue="My Work"/>
+              <apex:selectOption itemLabel="Hide Pending" itemValue="Hide Pending"/>
+              <apex:selectOption itemLabel="Followed" itemValue="Followed"/>
+            </apex:selectList>
+          </div>
+          <div id="myTopPanel" class="panelbodytopsection">
+            <apex:outputPanel id="myPanel" styleClass="setwidth setheight">   
+              <table id="myTable" class="table table-striped" style="white-space: nowrap;table-layout: fixed;width:100%">
+                <thead>
+                  <tr style="height:25px">
+                    <th style="width:2%;" class="nosor nosort"></th>
+                    <th style="width:7%;">Id</th>
+                    <th style="width:19%;">Account Name</th>
+                    <th style="width:22%;">Subject</th>
+                    <th style="width:10%;">Support Level</th>
+                    <th style="width:10%;">Status</th>
+                    <th style="width:6%;">Severity</th>
+                    <th style="width:6.5%;">Age(Days)</th>
+                    <th style="width:5%;">Alert</th>
+                    <th style="width:7%;">SLA</th>
+                    <th style="width:6.5%;">Res Sum</th>
+                  </tr> 
+                </thead>
+              </table>
+            </apex:outputPanel>         
+          </div> 
+        </div>   
+      </div>
+       
+      <!-- Queue View-->
+      <div class="row TableClass" style="float:left;" id="section3" >
+        <div class="panel panel-default setheight">
+          <!--action status-->
+          <apex:actionStatus id="actQStatusId" >
+            <apex:facet name="start">
+              <div class="statusOuter">   
+                <div class="statusInner">        
+                  <img src="/img/loading.gif" />       
+                </div>             
+              </div>
+            </apex:facet>            
+          </apex:actionStatus>
+          <div class="panelheadtopsection">
+            <h4>Queue View 
+              <apex:outputPanel id="qPanelHeader"></apex:outputPanel>
+              &nbsp;&nbsp;        
+            </h4>
+            <apex:selectList value="{!QFilter}" size="1" style="margin-right: 10px;" onchange="refreshQTable()">
+              <apex:selectOption itemLabel="My Queues" itemValue="My Queues"/>
+              <apex:selectOption itemLabel="All AkaTec Queues - Cases" itemValue="All CCare Queues - Cases"/>
+              <apex:selectOption itemLabel="All AkaTec Queues - Escalations" itemValue="All CCare Queues - Escalations"/>
+            </apex:selectList>
+            <apex:commandButton style="background:rgb(195, 222, 241);padding:3px" onClick="sforce.console.openPrimaryTab(null, '/setup/ui/recordtypeselect.jsp?ent=Case&retURL=%2F500%2Fl&save_new_url=%2F500%2Fe%3FretURL%3D%252F500%252Fl', true);return false" value="New Case" />
+          </div>
+          <div id="qPanel" Class="panelbodytopsection" >                              
+            <table id="QueueTable" class="table table-striped" style="white-space: nowrap;table-layout: fixed;width:100%">   
+              <thead >
+               <tr style="height:25px">
+                  <th style="width:4%;" class="nosort"></th> 
+                  <th style="width:7%;">Id</th>
+                  <th style="width:17%;">Account Name</th>
+                  <th style="width:21%;">Subject</th>
+                  <th style="width:12%;">Support Level</th>
+                  <th style="width:4.5%;">Severity</th>
+                  <th style="width:10%;">Created</th>
+                  <th style="width:5%;">SLA</th>
+                  <th style="width:8%;">Product</th>
+                  <th style="width:11.5%;">Queue</th>
+                 </tr> 
+              </thead>                     
+            </table>
+          </div>                
+        </div>
+      </div>
+      <!--End of Queue View-->
+    </div>
+              
+    <script type="text/javascript">
+      var qTable=null;
+      var mTable=null;    
+      var myTeamTable=null;    
+      var userId = '{!$User.Id}';
+      
+      function openConsoleCaseERAcc(SF_Id,AkamId)
+      {
+        Tab_Label = AkamId;
+        sforce.console.generateConsoleUrl(['/'+SF_Id], openConsoleUrl);        
+      }   
+      
+      var openConsoleUrl = function(result){
+        sforce.console.openConsoleUrl(null, result.consoleUrl,true,[Tab_Label],null,openSuccess);        
+      }
+      
+      var openSuccess = function(result) {
+        //Report whether opening the new tab was successful
+        if (result.success == false)
+          alert('The corresponding tab is already opened');
+      };
+          
+      function openCaseER(Id)
+      {
+        window.prompt("Copy to clipboard!",  window.location.protocol + '//' + window.location.host + '/'+Id);
+      } 
+
+      function minsToDay(tm) {
+        var D= Math.floor(tm/1440) +'d';
+        if(tm%1440 !=0)
+          return (D+' '+minsToHrs(tm%1440));
+        else
+          return D;
+      }
+        
+      function minsToHrs(tm) {
+        var H = Math.floor(tm/60) +'h';
+        var m = tm%60+'m';
+        if(tm%60 == 0)
+          return H;
+        else if(tm/60== 0)
+          return m;
+        else
+          return (H+' '+m);
+      }        
+      
+      function pickCaseER(id,type)
+      {
+        if(type=='case')
+        {
+          if(confirm('Are you sure you want to take this Case?'))
+          {
+            pickCaseERaction(id);
+          }
+        }
+        else
+        {
+          if(confirm('Are you sure you want to take this Escalation?'))
+          {
+            pickCaseERaction(id);
+          }
+        }
+      }
+      
+      function constructQTable()
+      {
+        var datas = JSON.parse(document.getElementById('{!$Component.hiddenFieldQueueList}').value);
+        qTable=  $('#QueueTable').DataTable( {
+          "data": datas,
+              <!--image-->
+              "columns": [
+                { "data": "AkamId",
+                  "mRender" : function(data,type,full)
+                  {
+                    if(full.ObjectType=='case')
+                      return '<div class="caseImage imageIcons" onclick="openCaseER(\''+full.SFDCId+'\')"></div>'+
+                             '<div class="cursorHandImage imageIcons" onclick="pickCaseER(\'' + full.SFDCId + '\',\'case\')"/>';
+                    else
+                      return '<div class="ERImage imageIcons" onclick="openCaseER(\''+full.SFDCId+'\')"></div>'+
+                             '<div class="cursorHandImage imageIcons" onclick="pickCaseER(\'' + full.SFDCId + '\',\'er\')"/>';
+                  }
+                },
+                <!--Id-->
+                { "data": "AkamId",
+                  "type": "html",
+                  "mRender" : function(data,type,full)
+                  {
+                      return '<a  class="truncate" onClick="openConsoleCaseERAcc(\''+full.SFDCId+'\',\''+data+'\')">'+
+                                data+'</a>'
+                  }
+                },
+                <!--Account Name-->    
+                { "data": "AccountName",
+                  "type": "html",
+                  "mRender" : function(data,type,full)
+                  {
+                      return '<a  class="truncate" onClick="openConsoleCaseERAcc(\''+full.AccountId+'\',\''+data+'\')">'+
+                                data+'</a>'
+                  }
+                },
+                <!--Subject-->    
+                { "data": "Subject",
+                  "type": "html",
+                  "mRender" : function(data,type,full)
+                  {
+                      var escapedData = escapeHTML(data);
+                      return '<a  class="truncate" onClick="openConsoleCaseERAcc(\''+full.SFDCId+'\',\''+full.AkamId+'\')">'+escapedData+'</a>'
+                  }
+                },
+                <!--Support Level-->    
+                { "data": "SupportLevel",
+                  "type": "html",
+                  "mRender" : function(data,type,full)
+                  {
+                    return '<p  class="truncate" >'+data+'</p>';
+                  }
+                },
+                <!--Severity-->    
+                { "data": "Severity",
+                  "type": "html",
+                  "mRender" : function(data,type,full)
+                  {
+                    return '<p  class="truncate" >'+data+'</p>';
+                  }
+                },
+                <!--Created-->
+                { "data": "AkamCreatedDate",
+                  "mRender" : function(data,type,full)
+                  {
+                    if(type=='sort')
+                    return data;
+                    return '<p  class="truncate">'+full.formattedDate+'</p>';
+                  }
+
+                },
+                <!--SLA-->    
+                { "data": "SLA",
+                  "type": "num",
+                  "mRender" : function(data,type,full)
+                  {
+                     if(type=='sort')
+                    {
+                      if(data=='z')
+                        return 99999999999999;
+                      else if(data=='y')
+                        return 999999999;
+                      return data;
+                    }
+                    else
+                    {
+                        if(data=='z')
+                          return '';
+                        else if(data=='y')
+                          return '<p><span class="glyphicon glyphicon-ok" style="color:green"/></p>';
+                        else if(data<0)
+                          return '<p style="color:#CC3333">Miss&nbsp;<span class="glyphicon glyphicon-exclamation-sign"/></p>';
+                        else if(data<=15)
+                        {
+                          return '<p class="truncate" style="color:#CC3333">'+data+'m</p>';
+                        }
+                        else if(data<45)
+                        {
+                          return '<p class="truncate" style="color:orange">'+data+'m</p>';
+                        }
+                        else if(data<60)
+                        {
+                          return '<p class="truncate" style="color:green">'+data+'m</p>';
+                        }
+                        //day
+                        else if(data>=1440)
+                        {
+                          return '<p class="truncate" style="color:green">'+minsToDay(data)+'</p>';
+                        }
+                        else
+                        {
+                          return '<p class="truncate" style="color:green">'+minsToHrs(data)+'</p>';
+                        } 
+                    }
+                  }
+                },
+                <!--Product-->    
+                { "data": "CaseProduct",
+                  "type": "html",
+                  "mRender" : function(data,type,full)
+                  {
+                    return '<p  class="truncate" >'+data+'</p>';
+                  }            
+                },
+                <!--Queue/Owner-->    
+                { "data": "OwnerName",
+                  "type": "html",
+                  "mRender": function(data,type,full)
+                  {
+                    return '<a  class="truncate" onClick="openConsoleCaseERAcc(\'p/own/Queue/d?id='+full.OwnerId+'\',\''+data+'\')">'+
+                    data+'</a>  ';
+                  }
+                },
+              ],
+              'order': [7,'asc'],
+              'paging' : false,
+              'stateSave': true,
+              'searching' : false,
+              'aoColumnDefs': [{ 'bSortable': false, 'aTargets': ['nosort'] }],
+              'bInfo':false,
+              'bRedraw':false,
+              'autoWidth':false            
+            } );
+        document.getElementById('{!$Component.qPanelHeader}').innerHTML = '('+qTable.data().length+')';
+      }
+      
+      function constructMyTeamTable()
+      {
+        var mdatas = JSON.parse(document.getElementById('{!$Component.hiddenFieldMyTeamList}').value);          
+
+        myTeamTable=  $('#myTeamTable').DataTable( {
+          "data": mdatas,
+             "columns": [
+              { "data": "AkamId",
+                "type": "html",
+                "mRender": function(data,type,full)
+                {
+                  if(full.ObjectType=='case')
+                    return '<div class="caseImage imageIcons" onclick="openCaseER(\''+full.SFDCId+'\')"/>';
+                  else
+                    return '<div class="ERImage imageIcons" onclick="openCaseER(\''+full.SFDCId+'\')"/>';
+                } 
+              },
+              <!--Id-->
+              { "data": "AkamId",
+                "type": "html",
+                "mRender" : function(data,type,full)
+                {
+                    return '<a  class="truncate" onClick="openConsoleCaseERAcc(\''+full.SFDCId+'\',\''+data+'\')">'+
+                              data+'</a>'
+                }
+              },
+              <!--Account Name-->    
+              { "data": "AccountName",
+                "type": "html",
+                "mRender" : function(data,type,full)
+                {
+                    return '<a  class="truncate" onClick="openConsoleCaseERAcc(\''+full.AccountId+'\',\''+data+'\')">'+
+                              data+'</a>'
+                }
+              },
+              <!--Subject-->    
+              { "data": "Subject",
+                "type": "html",
+                "mRender" : function(data,type,full)
+                {
+                  var escapedData = escapeHTML(data);
+                    return '<a  class="truncate" onClick="openConsoleCaseERAcc(\''+full.SFDCId+'\',\''+full.AkamId+'\')">'+escapedData+'</a>'
+                }
+              },
+              <!--Owner-->    
+              { "data": "OwnerName",
+                "type": "html",
+                "mRender" : function(data,type,full)
+                {
+                 if(full.OwnerId.substring(0,3) == '00G')
+                  return '<a  class="truncate" onClick="openConsoleCaseERAcc(\'p/own/Queue/d?id='+full.OwnerId+'\',\''+data+'\')">'+
+                    data+'</a>  ';
+
+                 else
+                  return '<a  class="truncate" onClick="openConsoleCaseERAcc(\''+full.OwnerId+'\',\''+data+'\')">'+data+'</a>'
+                }
+              },
+              <!--Support Level-->    
+              { "data": "SupportLevel",
+                "type": "html",
+                "mRender" : function(data,type,full)
+                {
+                  return '<p  class="truncate" >'+data+'</p>';
+                }
+              },           
+              <!--Status--> 
+              { "data": "Status",
+                "type": "html",
+                "mRender" : function(data,type,full)
+                {
+                  return '<p  class="truncate" >'+data+'</p>';
+                }             
+              },
+              <!--Severity--> 
+              { "data": "Severity" ,
+                "type": "html",
+                "mRender" : function(data,type,full)
+                {
+                  return '<p  class="truncate" >'+data+'</p>';
+                }
+              },
+              <!--Age--> 
+              { "data": "Age",
+                "type": "num",
+                "mRender" : function(data,type,full)
+                {
+                  if(type=='sort')
+                      return data;
+                  return '<p  class="truncate" >'+data+'</p>';
+                }             
+              },
+              <!--Alert--> 
+              { "data": "Alert",
+                "type": "html",
+                "mRender" : function(data,type,full)
+                {
+                    if(type=='sort')
+                    return data;
+                    if(data=='1')
+                    return '<span class="fa fa-circle fa-fw" style="color:#CC3333"></span>';
+                    else
+                    return '';
+                }               
+              },
+              <!--SLA--> 
+              { "data": "SLA",
+                "type": "num",
+                "mRender" : function(data,type,full)
+                {
+                  if(type=='sort')
+                  {
+                    if(data=='z')
+                        return 99999999999999;
+                    else if(data=='y')
+                        return 999999999;
+                    return data;
+                  }
+                  else
+                  {
+                      if(data=='z')
+                        return '';
+                      else if(data=='y')
+                        return '<p><span class="glyphicon glyphicon-ok" style="color:green"/></p>';
+                      else if(data<0)
+                        return '<p style="color:#CC3333">Miss&nbsp;<span class="glyphicon glyphicon-exclamation-sign"/></p>';
+                      else if(data<=15)
+                      {
+                        return '<p class="truncate" style="color:#CC3333">'+data+'m</p>';
+                      }
+                      else if(data<45)
+                      {
+                        return '<p class="truncate" style="color:orange">'+data+'m</p>';
+                      }
+                      else if(data<60)
+                      {
+                        return '<p class="truncate" style="color:green">'+data+'m</p>';
+                      }
+                      //day
+                      else if(data>=1440)
+                      {
+                        return '<p class="truncate" style="color:green">'+minsToDay(data)+'</p>';
+                      }
+                      else
+                      {
+                        return '<p class="truncate" style="color:green">'+minsToHrs(data)+'</p>';
+                      } 
+                  }
+                }
+              },
+              <!--Resolution Sent-->
+              { "data": "ResolutionSent",
+                "type": "html",
+                "mRender": function(data,type,full)
+                {
+                  if(type=='sort')
+                  {
+                    return data;
+                  }
+                  if(data=='t')
+                    return '<p><span class="glyphicon glyphicon-ok" style="color:green"/></p>';
+                  else
+                    return '';
+                }
+
+              },
+              <!--24x7-->
+              { "data": "is24x7",
+                "type": "html",
+                "mRender": function(data,type,full)
+                {
+                  if(type=='sort')
+                  {
+                    return data;
+                  }
+                  if(data=='1')
+                    return '<p style="color:green">24x7</p>';
+                  else
+                    return '';
+                }
+
+              },
+              <!--Critical Customer-->
+              { "data": "CriticalCustomer",
+                "type": "html",
+                "mRender": function(data,type,full)
+                {
+                  if(type=='sort')
+                  {
+                    return data;
+                  }
+                  if(data=='1')
+                    return '<p><span class="glyphicon glyphicon-exclamation-sign" style="color:#CC3333"/></p>';
+                  else
+                    return '';
+                }
+
+              },
+              <!--Incident-->
+              { "data": "IncidentNumber",
+                "type": "html",
+                "mRender": function(data,type,full)
+                {
+                  if(data!=null)
+                    return '<a  class="truncate" onClick="openConsoleCaseERAcc(\''+full.IncidentId+'\',\''+data+'\')">'+data+'</a>';
+                  else
+                    return '';
+                }
+
+              }
+            ],
+              'order': [7,'asc'],
+              'paging' : false,
+              'stateSave': true,
+              'searching' : false,
+              'aoColumnDefs': [{ 'bSortable': false, 'aTargets': ['nosort'] }],
+              'bInfo':false,
+              'bRedraw':false,
+              'autoWidth':false                      
+            } );
+        document.getElementById('{!$Component.myTeamPanelHeader}').innerHTML = '('+myTeamTable.data().length+')';
+      }
+      
+
+      function constructMTable()
+      {
+        var mdatas = JSON.parse(document.getElementById('{!$Component.hiddenFieldMyList}').value);          
+
+        mTable=  $('#myTable').DataTable( {
+          "data": mdatas,
+             "columns": [
+              { "data": "AkamId",
+                "type": "html",
+                "mRender": function(data,type,full)
+                {
+                  if(full.ObjectType=='case')
+                    return '<div class="caseImage imageIcons" onclick="openCaseER(\''+full.SFDCId+'\')"/>';
+                  else
+                    return '<div class="ERImage imageIcons" onclick="openCaseER(\''+full.SFDCId+'\')"/>';
+                } 
+              },
+              <!--Id-->
+              { "data": "AkamId",
+                "type": "html",
+                "mRender" : function(data,type,full)
+                {
+                    return '<a  class="truncate" onClick="openConsoleCaseERAcc(\''+full.SFDCId+'\',\''+data+'\')">'+
+                              data+'</a>'
+                }
+              },
+              <!--Account Name-->    
+              { "data": "AccountName",
+                "type": "html",
+                "mRender" : function(data,type,full)
+                {
+                    return '<a  class="truncate" onClick="openConsoleCaseERAcc(\''+full.AccountId+'\',\''+data+'\')">'+
+                              data+'</a>'
+                }
+              },
+              <!--Subject-->    
+              { "data": "Subject",
+                "type": "html",
+                "mRender" : function(data,type,full)
+                { 
+                  var escapedData = escapeHTML(data);
+                    return '<a  class="truncate" onClick="openConsoleCaseERAcc(\''+full.SFDCId+'\',\''+full.AkamId+'\')">'+escapedData+'</a>'
+                }
+              },
+              <!--Support Level-->    
+              { "data": "SupportLevel",
+                "type": "html",
+                "mRender" : function(data,type,full)
+                {
+                  return '<p  class="truncate" >'+data+'</p>';
+                }
+              },           
+              <!--Status--> 
+              { "data": "Status",
+                "type": "html",
+                "mRender" : function(data,type,full)
+                {
+                  return '<p  class="truncate" >'+data+'</p>';
+                }             
+              },
+              <!--Severity--> 
+              { "data": "Severity" ,
+                "type": "html",
+                "mRender" : function(data,type,full)
+                {
+                  return '<p  class="truncate" >'+data+'</p>';
+                }
+              },
+              <!--Age--> 
+              { "data": "Age",
+                "type": "num",
+                "mRender" : function(data,type,full)
+                {
+                  if(type=='sort')
+                      return data;
+                  return '<p  class="truncate" >'+data+'</p>';
+                }             
+              },
+              <!--Alert--> 
+              { "data": "Alert",
+                "type": "html",
+                "mRender" : function(data,type,full)
+                {
+                    if(type=='sort')
+                    return data;
+                    if(data=='1')
+                    return '<span class="fa fa-circle fa-fw" style="color:#CC3333"></span>';
+                    else
+                    return '';
+                }               
+              },
+              <!--SLA--> 
+              { "data": "SLA",
+                "type": "num",
+                "mRender" : function(data,type,full)
+                {
+                  if(type=='sort')
+                  {
+                    if(data=='z')
+                        return 99999999999999;
+                    else if(data=='y')
+                        return 999999999;
+                    return data;
+                  }
+                  else
+                  {
+                      if(data=='z')
+                        return '';
+                      else if(data=='y')
+                        return '<p><span class="glyphicon glyphicon-ok" style="color:green"/></p>';
+                      else if(data<0)
+                        return '<p style="color:#CC3333">Miss&nbsp;<span class="glyphicon glyphicon-exclamation-sign"/></p>';
+                      else if(data<=15)
+                      {
+                        return '<p class="truncate" style="color:#CC3333">'+data+'m</p>';
+                      }
+                      else if(data<45)
+                      {
+                        return '<p class="truncate" style="color:orange">'+data+'m</p>';
+                      }
+                      else if(data<60)
+                      {
+                        return '<p class="truncate" style="color:green">'+data+'m</p>';
+                      }
+                      //day
+                      else if(data>=1440)
+                      {
+                        return '<p class="truncate" style="color:green">'+minsToDay(data)+'</p>';
+                      }
+                      else
+                      {
+                        return '<p class="truncate" style="color:green">'+minsToHrs(data)+'</p>';
+                      } 
+                  }
+                }
+              },
+              <!--Resolution Sent-->
+              { "data": "ResolutionSent",
+                "type": "html",
+                "mRender": function(data,type,full)
+                {
+                  if(type=='sort')
+                  {
+                    return data;
+                  }
+                  if(data=='t')
+                    return '<p><span class="glyphicon glyphicon-ok" style="color:green"/></p>';
+                  else
+                    return '';
+                }
+
+              }
+          ],
+              'order': [7,'asc'],
+              'paging' : false,
+              'stateSave': true,
+              'searching' : false,
+              'aoColumnDefs': [{ 'bSortable': false, 'aTargets': ['nosort'] }],
+              'bInfo':false,
+              'bRedraw':false,
+              'autoWidth':false                      
+            } );
+        document.getElementById('{!$Component.myPanelHeader}').innerHTML = '('+mTable.data().length+')';
+      }
+  
+        function escapeHTML(input){
+            var output = input.split("<").join("&lt;");
+            return output.split(">").join("&gt;");
+        }
+      function pick_reConstructQTable(){
+        if(document.getElementById('{!$Component.hiddenPickFlag}').value == 'false' )
+          alert('The Case/ER is taken up by another user');
+        reConstructQTable();
+      }
+
+      function reConstructMyTeamTable(){
+        myTeamTable.destroy();
+        constructMyTeamTable();
+      }
+      
+      function reConstructMTable(){
+        mTable.destroy();
+        constructMTable();
+      }
+      
+      function reConstructQTable(){
+        qTable.destroy();
+        constructQTable();    
+      }
+      
+      
+      $(document).ready(function(){
+        populateMyTeamTable();
+        populateMyTable();
+        populateQTable();
+      });
+     
+    </script>
+  </apex:form>
+</apex:page>

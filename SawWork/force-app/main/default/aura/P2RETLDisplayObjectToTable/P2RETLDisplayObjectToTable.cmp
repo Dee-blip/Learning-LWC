@@ -1,0 +1,95 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" controller="P2RETL_Mapping_cls" access="global">
+    
+<!-- Start of attribute declaration -->    
+    
+    <!-- 1.Stores the field name considered for sorting-->
+    <aura:attribute name="sortedBy" type="string" default="Name" />
+    
+    <!-- 2. Stores the Sorting order (Ascending/Descending)-->
+    <aura:attribute name="sortedDirection" type="string" default="asc" />
+    
+    <!-- 3.Stores the Table with all the rows  -->
+    <aura:attribute name="FinaltabledataWarehouse" type="Object"/>
+    
+    <!-- 5.Stores the headings of the Table displayed in the app -->
+    <aura:attribute name="columns" type="List"/>
+    
+    
+	 <!-- 8.Stores the table data to be displayed in a particular page -->    
+    <aura:attribute name="PaginationList" type="Object"/>
+    <!-- 11. Stores the number of rows in Finaltabledata attribute -->
+    <aura:attribute name="totalRecords" type="Integer" />
+    <!-- 17. Stores the search text entered by the user in the the search box 1-->
+    <aura:attribute name="searchField1" type="String" default="" />
+    
+    <!-- 18. Stores the search text entered by the user in the the search box 2-->
+    <aura:attribute name="searchField2" type="String" default="" />
+    <aura:attribute name="searchField3" type="String" default="" />
+    
+    
+<!-- End of attribute declaration -->   
+    
+<!-- Calling init method for initialization of the attributes needed-->   
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+    
+<!-- The third grid starts here (4 field searches)-->
+    <div class="slds-grid " style="height:50px;margin-left:10px;margin-right:10px;margin-bottom:0px;margin-top:20px;padding-top:5px;border: 0px solid #dddbda;border-radius: 0px;border-bottom:0px;">
+        
+        <!-- Search field 1 starts here -->
+        <div class="slds-col slds-size_4-of-12" align="center" valign="bottom"  style="padding-right:10px;padding-left:10px;" >
+            <div style="box-shadow: 0 5px 10px #888;border-radius:.25rem;">
+                <ui:inputText value="{!v.searchField1}" keyup="{!c.performSearchField}" updateOn="keyup"
+                              class=" column_search slds-lookup__search-input slds-input " 
+                              placeholder="Search Salesforce Objects" 
+                              />
+            </div>
+        </div>
+        <!-- Search field 1 ends here -->
+        
+        <!-- Search field 2 starts here -->
+        <div class="slds-col slds-size_4-of-12" align="center"  style="padding-right:10px;padding-left:10px;" >
+            <div style="box-shadow: 0 5px 10px #888;border-radius:.25rem;">
+                <ui:inputText value="{!v.searchField2}" keyup="{!c.performSearchField}" updateOn="keyup"
+                              class="column_search slds-lookup__search-input slds-input " 
+                              placeholder="Search EDW tables" 
+                              />
+            </div>
+        </div>
+        
+        <!-- Search field 2 ends here -->
+        
+         <div class="slds-col slds-size_4-of-12" align="center"  style="padding-right:10px;padding-left:10px;" >
+            <div style="box-shadow: 0 5px 10px #888;border-radius:.25rem;">
+                <ui:inputText value="{!v.searchField3}" keyup="{!c.performSearchField}" updateOn="keyup"
+                              class="column_search slds-lookup__search-input slds-input " 
+                              placeholder="Search Application Type" 
+                              />
+            </div>
+        </div>
+         </div>
+<!-- The third grid ends here (4 field searches)-->
+    
+    
+<!-- Table starts here-->
+    <div style="margin-left:10px;margin-right:10px;margin-top:0px;box-shadow:0px 10px 10px #999">
+        <ui:scrollerWrapper class="scrollerSize" >
+            <div class="slds-scrollable slds-float_left" style="height:600px;">
+                <lightning:datatable data="{! v.PaginationList }" class="slds-table slds-table--bordered slds-table--striped "
+                                     columns="{! v.columns }" 
+                                     keyField="id"
+                                     onsort="{!c.updateColumnSorting}" 
+                                     sortedBy="{!v.sortedBy}" 
+                                     sortedDirection="{!v.sortedDirection}"
+                                     hideCheckboxColumn="true"
+                                     resizeColumnDisabled="true"
+                                     showRowNumberColumn="true"
+                                     />
+            </div>
+        </ui:scrollerWrapper>
+    </div>
+<!-- Table ends here-->
+    
+    
+
+</aura:component>

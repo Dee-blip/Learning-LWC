@@ -1,0 +1,123 @@
+<!--
+ * Developer: Sharath Prasanna
+ * Enhancement: This VF page is called from BSScreenPopPage. It opens the IncidentCreateForm component
+ * Date: 18th August 2020
+ 
+Date		Developer		JIRA#		Description
+-------------------------------------------------------------------------------------------------------------
+9 OCT 2021	Harshil Soni	ACD2-348	Changed component to scCreateNewIncident for Create Incident function
+-------------------------------------------------------------------------------------------------------------
+-->
+<apex:page id="ACD2_NavigateToIncident">
+    <!-- This is for Lightning Out -->
+    <apex:includeLightning />
+	<style>
+        .slds-popover__body,
+.slds-popover__footer,
+.slds-popover__header {
+    position: relative;
+    padding: .5rem .75rem;
+    word-wrap: break-word
+}
+
+.slds-popover {
+    position: relative;
+    border-radius: .25rem;
+    width: 20rem;
+    min-height: 2rem;
+    z-index: 6000;
+    background-color: #fff;
+    display: inline-block;
+    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, .16);
+    border: 1px solid #d9dbdd
+}
+
+.slds-popover--tooltip,
+.slds-popover_tooltip {
+    width: auto;
+    max-width: 20rem;
+    background: #16325c;
+    border: 0
+}
+.slds-popover--tooltip .slds-popover__body,
+.slds-popover_tooltip .slds-popover__body {
+    font-size: .75rem;
+    color: #fff
+}
+
+.slds-fall-into-ground {
+    visibility: hidden;
+    opacity: 0;
+    transform: translate(0, 0);
+    transition: opacity .1s linear, visibility .1s linear, transform .1s linear;
+    will-change: transform
+}
+
+.slds-nubbin--bottom-left:before,
+.slds-nubbin_bottom-left-corner:before,
+.slds-nubbin_bottom-left:before {
+    width: 1rem;
+    height: 1rem;
+    position: absolute;
+    transform: rotate(45deg);
+    content: '';
+    background-color: inherit;
+    bottom: -.5rem;
+    margin-left: -.5rem
+}
+
+.slds-nubbin--bottom-left:after,
+.slds-nubbin--bottom-left:before,
+.slds-nubbin_bottom-left-corner:after,
+.slds-nubbin_bottom-left-corner:before,
+.slds-nubbin_bottom-left:after,
+.slds-nubbin_bottom-left:before {
+    left: 1.5rem;
+    top: 100%;
+    margin-top: -.5rem
+}
+
+.slds-nubbin--bottom-left:after,
+.slds-nubbin_bottom-left-corner:after,
+.slds-nubbin_bottom-left:after {
+    box-shadow: 2px 2px 4px 0 rgba(0, 0, 0, .16);
+    z-index: -1
+}
+
+.slds-popover :last-child {
+    margin-bottom: 0
+}
+    </style>
+    <script>
+    
+        //Code to Create the HD_CreateIncidentForm component. 
+	    //005G0000003D7MmIAK
+	    //Himanshu
+    	console.log('LOADING!!!');
+	    var userName = '{!$CurrentPage.parameters.userName}';
+    	var userId = '{!$CurrentPage.parameters.userId}';
+	    userName = userName? userName: ''; 
+	    userId = userId? userId: ''; 
+
+    	console.log('userId: ' + userId + ' userName: ' + userName);
+		$Lightning.use('c:hdCreateNewIncidentApp', function() {
+                $Lightning.createComponent(
+                    //ACD2-348
+                    //Changed Component
+                    'c:scCreateNewIncident',
+                    //ACD2-348
+                    //Changed Parameters
+                    {"isScreenPop": true,"selectedUserId": userId},
+                    'servicerequest',
+                    function(cmp) {
+                        console.log('Component create case is created!');
+                        console.log(cmp);
+                        //$A.eventService.addHandler({ "event": "c:SendDataToVFPage", "handler": retriveEventData });
+    
+                });
+            });
+            
+    </script>
+    
+    <div id="servicerequest"/>
+</apex:page>

@@ -1,0 +1,98 @@
+<aura:component controller="SF1_LocateAccountController" implements="force:lightningQuickAction,force:hasRecordId">
+ <aura:attribute name="recordId" type="Id" />
+ <aura:attribute name="FieldError" type="Boolean" default="false"/>
+ <aura:attribute name="ShowError" type="Boolean" default="false"/>
+ <aura:attribute name="IsPhone" type="Boolean" default="false"/>
+ <aura:attribute name="opp" type="Opportunity"/>
+ <aura:attribute name="message" type="String" />
+ <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+  <aura:attribute name="ProceedFlag" type="Boolean" default="false"/>
+<aura:attribute name="ShowtableFlag" type="Boolean" default="false"/>
+<aura:attribute type="object[]" name="acctList" default = "[]"/>
+<aura:attribute name="mycolumns" type="List"/>
+   
+  <aura:attribute name="getParentList" type="list" default="[]" description=""/>
+  <aura:attribute name="getChildList" type="list" default="[]"/>
+  <aura:attribute name="getPickListMap" type="map"/>
+  <aura:attribute name="getDisabledChildField" type="boolean" default="true"/>
+
+  <aura:attribute name="getObjectName" type="string" default="Account"/>
+  <aura:attribute name="getParentFieldAPI" type="string" default="Vertical__c"/>
+  <aura:attribute name="getChildFieldAPI" type="string" default="Sub_Vertical__c"/>
+  <aura:attribute name="getParentFieldLabel" type="string" />
+  <aura:attribute name="getChildFieldLabel" type="string"/>
+  <aura:attribute name="getParentValue" type="string" default=""/>
+  <aura:attribute name="getChildValue" type="string" default=""/>
+    
+    
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <center><lightning:spinner variant="brand" size="large" aura:id="ltngSpinner" class="slds-hide"/></center>
+    
+   
+     
+   <ui:scrollerWrapper class="scrollerSize" > 
+    <div style = "background-color:white;">
+            <br></br>
+    
+   <div class="slds-m-around--small"><c:SF1_BackToOpportunity recordId="{!v.recordId}"/></div><br/> 
+               <div  style="height:130px;padding:1px 4px 1px 4px;" class="{!(v.ShowtableFlag == false ? 'slds-hide' : 'slds-show')}">
+
+   <aura:if isTrue="{!v.ShowtableFlag}">
+
+  <p>Duplicate Record Found use one of these records</p>
+                <lightning:datatable data="{!v.acctList}" keyField="id" 
+                    columns="{! v.mycolumns }" enableInfiniteLoading ="true"
+                         hideCheckboxColumn="true" height="50%"/>
+          
+         </aura:if> </div><br/>
+    <div class="slds-m-horizontal--large"><ui:inputText aura:id="AccountName" label="Account Name" value="{!v.opp.Customer_Company_Name__c}" required="true"/></div>
+    <div class="slds-m-horizontal--large"><ui:inputText aura:id="AccountDomain" label="Website" value="{!v.opp.End_Customer_Website__c}" /></div> 
+    <div class="slds-m-horizontal--large"><ui:inputText aura:id="PrimaryStreet" label="Primary Street" value="{!v.opp.End_Customer_Street_Address__c}"/></div> 
+    <div class="slds-m-horizontal--large"><ui:inputText aura:id="PrimaryCity" label="Primary City" value="{!v.opp.End_Customer_City__c}" /></div> 
+    <div class="slds-m-horizontal--large"><ui:inputText aura:id="PrimaryState" label="Primary State" value="{!v.opp.End_Customer_State__c}"/></div> 
+    <div class="slds-m-horizontal--large"><ui:inputText aura:id="PostalCode" label="Primary Postal Code" value="{!v.opp.End_Customer_Zip_Code__c}" /></div>
+    <div class="slds-m-horizontal--large"><ui:inputText aura:id="PrimaryCountry" label="Primary Country" value="{!v.opp.End_Customer_Country__c}" required="true"/></div> 
+    <div class="slds-m-horizontal--large">
+        <lightning:select name="parentField"  aura:id="VerticalField"
+                                          value="{!v.getParentValue}"
+                                          label="{!v.getParentFieldLabel}"
+                                          onchange="{!c.ObjFieldByParent}"
+                          				required="true">
+                            <aura:iteration items="{!v.getParentList}" var="value"> 
+                                <option value="{!value}">{!value}</option>
+                            </aura:iteration>
+    	</lightning:select>
+    </div>
+    <div class="slds-m-horizontal--large">
+        <lightning:select name="childField" aura:id="SubVerticalField"
+                          value="{!v.getChildValue}"
+                          label="{!v.getChildFieldLabel}"
+                          disabled="{!v.getDisabledChildField}"
+                          required="true">
+            <aura:iteration items="{!v.getChildList}" var="value">
+                <option value="{!value}">{!value}</option>
+            </aura:iteration>
+        </lightning:select>
+    </div>
+    <aura:if isTrue="{!v.ShowError}">
+   <ui:message title="Error" severity="error" closable="false" body="{!v.message}">
+       {!v.message}
+  </ui:message>       
+    </aura:if>  
+
+    <aura:if isTrue="{!v.FieldError}">
+        <ui:message title="Error" severity="error" closable="false">
+         Please enter the fields marked *
+        </ui:message>
+   </aura:if><br/>
+<div class="slds-m-around--small">
+   <lightning:buttonGroup>
+    <lightning:button aura:id="Create Account" label="Create Account" onclick="{!c.CheckDupAccount}" class="{!(v.ProceedFlag == true ? 'slds-hide' : 'slds-show')}"/> 
+     <lightning:button aura:id="AllowDuplicate" class="{!(v.ProceedFlag == false ? 'slds-hide' : 'slds-show')}" label="Proceed" onclick="{!c.doInsert}"/> &nbsp;&nbsp;&nbsp;
+     <lightning:button aura:id="Search" label="Back To Search" onclick="{!c.Navigate}"/>
+  </lightning:buttonGroup>
+</div></div><br/><br/>
+</ui:scrollerWrapper>
+
+</aura:component>

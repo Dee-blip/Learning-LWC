@@ -1,0 +1,39 @@
+.numberCircle 
+{
+    min-width: 30px !important;
+    max-width: fit-content !important;
+    line-height: 27px !important;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 12px;
+    border: 1px solid lightgrey;
+    vertical-align: middle;
+    padding: 0;
+    margin: 3px;
+}
+
+.redBubble
+{
+    background-color: #d3342f;
+    color: white;
+    border: none;
+}
+
+.yellowBubble
+{
+    background-color: #ffd900;
+    border: none;
+}
+
+.darkGreyBubble
+{
+    background-color: #4d4d4a;
+    color: white;
+    border: none;
+}
+
+.lightGreyBubble
+{
+    background-color: lightgray;
+    border: none;
+}

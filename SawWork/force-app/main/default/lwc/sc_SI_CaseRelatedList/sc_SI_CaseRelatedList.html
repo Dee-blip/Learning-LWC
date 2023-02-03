@@ -1,0 +1,64 @@
+<!-- This Component displays upto 3 related Case records on SI as single related list -->
+<template>
+
+    <lightning-card>
+        <!-- Spinner -->
+        <template if:true={showSpinner}>
+            <lightning-spinner alternative-text="Loading" size="medium" variant="brand" position="absolute">
+            </lightning-spinner>
+        </template>
+        <!-- Header -->
+        <h4 slot="title" style="font-weight: bold; font-size: 14px">
+            <lightning-icon icon-name="standard:case" size="small"></lightning-icon> &nbsp;
+            <span class="titleButton">
+                <lightning-button variant="base" label={title} onclick={navigateToRelatedList}></lightning-button>
+            </span>
+        </h4>
+        <template if:false={noCaseExists}>
+            <div slot="footer" class="footerButton">
+                <lightning-button variant="base" label="View All" onclick={navigateToRelatedList}></lightning-button>
+            </div>
+        </template>
+        <!-- Record View Form -->
+        <div class="slds-m-around_medium viewForm">
+            <div if:true={listRecords}>
+                <template for:each={listRecords} for:item="rec" for:index="index">
+                    <div key={rec.Id} class="slds-box" style="padding: 0px">
+                        <div class="slds-grid">
+                            <div class="slds-col slds-size_2-of-3">
+                                <lightning-record-view-form record-id={rec.Id} object-api-name="Case">
+                                    <div class="slds-grid">
+                                        <div class="slds-col slds-size_1-of-2">
+                                            <lightning-output-field field-name="AKAM_Case_Ref__c">
+                                            </lightning-output-field>
+                                            <lightning-output-field field-name="AccountId"></lightning-output-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-2" style="padding-left: 7px;">
+                                            <lightning-output-field field-name="Support_Level__c">
+                                            </lightning-output-field>
+                                            <lightning-output-field field-name="Customer_Tier__c">
+                                            </lightning-output-field>
+                                        </div>
+                                        <!-- Menu Button -->
+                                        <div class="slds-col slds-size_1-of-2">
+                                            <div class="slds-p-around_x-small lgc-bg customMenu"
+                                                style="padding-left: 83px;padding-top: 6px">
+                                                <lightning-button-menu alternative-text="Show menu"
+                                                    variant="border-filled" onclick={handleDelink}
+                                                    menu-alignment="right">
+                                                    <lightning-menu-item value={index} label="Delink">
+                                                    </lightning-menu-item>
+                                                </lightning-button-menu>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-record-view-form>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </lightning-card>
+
+</template>

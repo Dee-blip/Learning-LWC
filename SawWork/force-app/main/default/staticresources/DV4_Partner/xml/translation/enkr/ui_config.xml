@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui>
+	<pltfm><![CDATA[Akamai 플랫폼]]></pltfm>
+	<prmap><![CDATA[맵 인쇄]]></prmap>
+	<svmap><![CDATA[맵 저장]]></svmap>
+	<compare>
+		<wait><![CDATA[기다려 주시기 바랍니다. 본 절차가 완료되는 데 2분 정도 걸릴 수 있습니다.]]></wait>
+		<abort><![CDATA[강제 종료]]></abort>
+	</compare>
+	<formview>
+		<hlink><![CDATA[방식 및 데이터 수집]]></hlink>
+		<ddown1>
+			<item1><![CDATA[실시간 보고서]]></item1>
+			<item2><![CDATA[주간 보고서]]></item2>
+			<item3><![CDATA[이전 주간 보고서]]></item3>
+		</ddown1>
+		<desc1><![CDATA[비교 URL]]></desc1>
+		<desc2><![CDATA[실시간 보고서용 웹사이트 주소 입력]]></desc2>
+		<submit><![CDATA[비교]]></submit>
+		<desc3><![CDATA[이전 보고서 목록]]></desc3>
+		<desc4><![CDATA[성공적으로 진행되었습니다. 일 주일 후에 보고서 링크가 포함된 이메일을 받으실 것입니다.]]></desc4>
+		<desc5><![CDATA[애플리케이션 성능 비교]]></desc5>
+		
+		<calc>
+			<label><![CDATA[선택 사항]]></label>
+			<mn_st_vst><![CDATA[월간 사이트 방문]]></mn_st_vst>
+			<cr_conv_rate><![CDATA[현재 전환율]]></cr_conv_rate>
+			<avg_ord_val><![CDATA[평균 주문액]]></avg_ord_val>
+			<cr_rev><![CDATA[월별 현재 사이트 매출]]></cr_rev>
+			<ad_rev><![CDATA[월별 추가 사이트 매출]]></ad_rev>
+		</calc>
+	</formview>
+	<brkdn>
+		<label><![CDATA[분석 결과]]></label>
+		<lbl_city><![CDATA[도시별 성능]]></lbl_city>
+		<lbl_city_smp><![CDATA[도시별 성능(샘플 도시)]]></lbl_city_smp>
+		<lbl_region><![CDATA[지역별 성능]]></lbl_region>
+		<lbl_gbl><![CDATA[평균 글로벌 성능]]></lbl_gbl>
+		<lbl_wk_lng><![CDATA[Weeklong Performance Test]]></lbl_wk_lng>
+	</brkdn>
+	<drpdn>
+		<label><![CDATA[지역]]></label>
+		<global><![CDATA[글로벌]]></global>
+		<amrcs><![CDATA[미주]]></amrcs>
+		<emea><![CDATA[EMEA]]></emea>
+		<asia><![CDATA[아시아]]></asia>
+	</drpdn>
+	<map>
+		<prf_imp><![CDATA[성능 향상]]></prf_imp>
+		<est_imp><![CDATA[향상 예상치]]></est_imp>
+		<graph>
+			<cnn><![CDATA[연결]]></cnn>
+			<firstb><![CDATA[첫 번째 바이트]]></firstb>
+			<dnld><![CDATA[다운로드]]></dnld>
+		</graph>
+		<pdf>
+			<org><![CDATA[오리진]]></org>
+			<impr><![CDATA[향상]]></impr>
+			<citynm><![CDATA[도시명]]></citynm>
+			<citynm_imp><![CDATA[도시 이름(향상)]]></citynm_imp>
+			<orgsec><![CDATA[오리진(초)]]></orgsec>
+			<akmsec><![CDATA[Akamai (초)]]></akmsec>
+		</pdf>
+		<save>
+			<msg><![CDATA[플래시가 파일 저장 대화를 시작합니다. 계속하려면 확인을 클릭하십시오.]]></msg>
+			<yes><![CDATA[확인]]></yes>
+			<no><![CDATA[취소]]></no>
+		</save>
+	</map>
+ </ui>

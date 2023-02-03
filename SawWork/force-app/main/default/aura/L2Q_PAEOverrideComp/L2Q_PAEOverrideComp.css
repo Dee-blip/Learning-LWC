@@ -1,0 +1,23 @@
+.THIS .main-container{
+    padding: 10px;
+    border: 2px solid #DDDBDA;
+    border-radius: 8px
+}
+.THIS .header-text{
+    font-size: 15px;
+}
+
+.THIS .required{
+color: red;
+}
+.THIS .customRequired{
+ font-weight: 400; } 
+
+.THIS .customRequired:before{    
+ content: "*";
+ margin: 0 0.125rem 0 0.125rem;
+ color: rgb(194, 57, 52);
+ float: left; } 
+
+.THIS .none{
+ display:none; }

@@ -1,0 +1,16 @@
+.slds-input {
+    border:none;
+}
+.slds-button_icon-border-filled, .slds-button--icon-border-filled, .slds-button_icon-border, .slds-button--icon-border{
+    border-color:white;
+}
+.THIS .myclass img:hover {
+    background: blue; 
+    cursor: pointer;
+}
+.highlightText {
+    color : yellow;
+}
+.normalText{
+    color : black;
+}

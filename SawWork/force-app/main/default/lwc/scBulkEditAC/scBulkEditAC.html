@@ -1,0 +1,228 @@
+<template>
+        <div class="slds-card_boundary">
+            <template if:true={showSpinner}>
+                <div style="opacity: 0.7;height:95%" class="slds-spinner_container">
+                    <lightning-spinner alternative-text="Loading" variant="brand" size="medium">
+                    </lightning-spinner>
+                </div>
+            </template>
+            <lightning-card>
+                <div style="background-color: rgb(243,242,242);margin-top: -1rem;padding-bottom: 1rem;">
+                    <header slot="title" class="slds-page-header slds-page-header_record-home" style="background-color: rgb(243,242,242);height:2rem;">
+                        <div style="float:left;">
+                            <lightning-icon icon-name="custom:custom20" size="small"></lightning-icon>&nbsp;&nbsp;&nbsp;
+                            <b style="font-size: 0.90rem;">Authorized Contacts ({authConSize})</b>
+                        </div>
+    
+                        <div style="float:right;padding-right: 1rem;">
+                            <div style="float: left;padding-right: 0.5rem;">
+                                <button class="slds-button slds-button slds-button_icon slds-button_icon-border-filled" onclick={refreshContacts}>
+                                    <lightning-icon icon-name="utility:refresh" alternative-text="Refresh" size="xx-small">
+                                    </lightning-icon>
+                                </button>
+                            </div>
+                            <lightning-button label="Associate Contact(s)" slot="actions" onclick={showModalPopup}></lightning-button>
+                            
+                            <template if:true={showModal}>
+                            <c-sc-add-authorized-contacts
+                                            show-modal={showModal}
+                                            onclose={closeModal}
+                                            show-table="true"
+                                            columns={contactColumns}
+                                            recordid={recordId}
+                                            >
+                            </c-sc-add-authorized-contacts>
+                            </template>
+                            <lightning-button label="Remove Contact(s)" slot="actions" onclick={showRemovePopup}></lightning-button>
+                            <template if:true={showDeleteModal}>
+                            <c-sc-add-authorized-contacts
+                                                show-delete-modal={showDeleteModal}
+                                                onclose={closeDeleteModal}
+                                                show-table="true"
+                                                columns={contactColumns}
+                                                recordid={recordId}
+                                            >
+                            </c-sc-add-authorized-contacts>
+                        </template>
+                        </div>
+                    </header>
+                </div>
+                <template if:true={contactPresent}>
+                    <div class="slds-border_top datatableStyle">
+                        <template if:true={contactData}>
+                            <!--<c-sc-bulk-edit-a-c-table
+                                data-id="mainTableId"
+                                key-field="Id" 
+                                data={slicedContactData}
+                                columns={columns} 
+                                onsave={handleSave}
+                                oncancel={handleCancel}
+                                draft-values={draftValues}
+                                wrap-text-max-lines="1" 
+                                column-widths-mode="auto"
+                                hide-checkbox-column="false"
+                                show-row-number-column="false"
+                                onrowaction={handleRowAction}
+                                onsaveproductinterest={handlePicklistSelection}>
+                            </c-sc-bulk-edit-a-c-table>-->
+                            <c-sc-custom-datatable
+                                data-id="mainTableId"
+                                key-field="Id" 
+                                data={slicedContactData}
+                                columns={columns} 
+                                onsave={handleSave}
+                                oncancel={handleCancel}
+                                draft-values={draftValues}
+                                wrap-text-max-lines="1" 
+                                column-widths-mode="auto"
+                                hide-checkbox-column="false"
+                                show-row-number-column="false"
+                                onrowaction={handleRowAction}
+                                onsaveproductinterest={handlePicklistSelection}>
+                            </c-sc-custom-datatable>
+                        </template>
+                    </div>
+                    <footer class="slds-card__footer" style="margin-top: -1px;">
+                        <a class="slds-card__footer-action" onclick={viewAll}>View All 
+                            <span class="slds-assistive-text"></span>
+                        </a>
+                    </footer>
+                </template>
+                
+            </lightning-card>
+        </div>
+    
+    
+        <template if:true={showAll}>
+            <div style="height:100%;">
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container" style="max-width: 100%;width: 99%;">
+                    <!-- Modal/Popup Box LWC header here -->
+                    <header class="slds-modal__header">
+    
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                            title="Close" onclick={closeViewAll}>
+                            <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                                size="small"></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+    
+                        <h2 class="slds-text-heading_medium slds-hyphenate">Viewing All Authorized Contacts of {pdName}</h2>
+                    </header>
+    
+                    <div class="slds-modal__content slds-p-around_medium" style="max-height: 100%;height: 99%;">
+    
+                        <template if:true={showSpinner}>
+                            <div style="opacity: 0.7;height:95%" class="slds-spinner_container">
+                                <lightning-spinner alternative-text="Loading" variant="brand" size="medium">
+                                </lightning-spinner>
+                            </div>
+                        </template>
+                        
+                        <!--<lightning-messages></lightning-messages> -->
+    
+                        <div class="slds-card_boundary datatableStylePopup">
+                            <lightning-card>
+                                <div style="background-color: rgb(243,242,242);margin-top: -1rem;padding-bottom: 0.5rem;">
+                                    <header slot="title" class="slds-page-header slds-page-header_record-home" style="background-color: rgb(243,242,242);">
+                                        <lightning-icon icon-name="custom:custom20" size="small"></lightning-icon>&nbsp;&nbsp;&nbsp;
+                                        <b>Authorized Contacts</b>
+                                            
+                                        <div style="float:right;padding-right: 0.5rem;">
+                                            <div style="float: left;padding-right: 0.5rem;">
+                                                <button class="slds-button slds-button slds-button_icon slds-button_icon-border-filled" onclick={refreshContacts}>
+                                                    <lightning-icon icon-name="utility:refresh" alternative-text="Refresh" size="x-small">
+                                                    </lightning-icon>
+                                                </button>
+                                            </div>
+                                            <!--
+                                        <lightning-button label="Associate Contact(s)" slot="actions" onclick={associateContacts}></lightning-button>   
+                                            -->
+                                            
+                                            <lightning-button label="Associate Contact(s)" slot="actions" onclick={showModalPopup}></lightning-button>
+                                            
+                                            <template if:true={showModal}>
+                                            <c-sc-add-authorized-contacts
+                                                show-modal={showModal}
+                                                onclose={closeModal}
+                                                show-table="true"
+                                                columns={contactColumns}
+                                                recordid={recordId}
+                                            >
+                                            </c-sc-add-authorized-contacts>
+                                            </template>
+                                            <lightning-button label="Remove Contact(s)" slot="actions" onclick={showRemovePopup}></lightning-button>
+                                            <template if:true={showDeleteModal}>
+                                            <c-sc-add-authorized-contacts
+                                                show-delete-modal={showDeleteModal}
+                                                onclose={closeDeleteModal}
+                                                show-table="true"
+                                                columns={contactColumns}
+                                                recordid={recordId}
+                                            >
+                                            </c-sc-add-authorized-contacts>
+                                        </template>
+                                        </div>
+                                    </header>
+                                </div>
+                                <div style="margin-bottom: -0.5rem;">
+                                    <template if:true={contactData}>
+                                        <!--<c-sc-bulk-edit-a-c-table 
+                                            data-id="mainTablePopupId"
+                                            key-field="Id" 
+                                            data={contactData}
+                                            columns={columns} 
+                                            onsave={handleSave}
+                                            oncancel={handleCancel}
+                                            draft-values={draftValues}
+                                            wrap-text-max-lines="1" 
+                                            column-widths-mode="auto"
+                                            hide-checkbox-column="false"
+                                            show-row-number-column="false"
+                                            onrowaction={handleRowAction}
+                                            onsaveproductinterest={handlePicklistSelectionPopup}>
+                                        </c-sc-bulk-edit-a-c-table>-->
+                                        <c-sc-custom-datatable
+                                            data-id="mainTablePopupId"
+                                            key-field="Id" 
+                                            data={contactData}
+                                            columns={columns} 
+                                            onsave={handleSave}
+                                            oncancel={handleCancel}
+                                            draft-values={draftValues}
+                                            wrap-text-max-lines="1" 
+                                            column-widths-mode="auto"
+                                            hide-checkbox-column="false"
+                                            show-row-number-column="false"
+                                            onrowaction={handleRowAction}
+                                            onsaveproductinterest={handlePicklistSelectionPopup}>
+                                        </c-sc-custom-datatable>
+                                    </template>
+                                </div>
+                                <!--<footer class="slds-card__footer" style="margin-top: -1px;">
+                                    <a class="slds-card__footer-action" onclick={viewAll}>View All
+                                        <span class="slds-assistive-text"></span>
+                                    </a>
+                                </footer>-->
+                            </lightning-card>
+                        </div>
+    
+                    </div>
+    
+                    <!-- Modal/Popup Box LWC footer starts here -->
+                    <footer class="slds-modal__footer">
+                        <center>
+                            <button class="slds-button slds-button_neutral" onclick={closeViewAll}
+                                title="Close">Close</button>
+                        </center>
+                    </footer>
+                    <!-- Modal/Popup Box LWC footer ends here -->
+    
+                </div>
+                </section>
+            </div>
+        </template>
+    
+    
+    </template>

@@ -1,0 +1,44 @@
+<!--/*Customer Community Component*/-->
+<apex:page controller="SC_SFCommunityCommentViewContrl" showHeader="false"  id="PageId">
+        <apex:includeScript value="/support/console/24.0/integration.js"/>
+    <apex:includeScript value="{!$Resource.JQuery_New}" />
+        <style>
+        .btnCls{
+        	padding: 10px 30px !important;
+        	margin-top: 1% !important;
+        }
+            .cke_contents{
+            	height : 600px !important;
+            }
+        </style>
+    <apex:form >
+
+    	<apex:pageBlock id="pageBlockId"> 
+            <div id ="bodyDivId">
+                <apex:inputtextarea style="height:700px" label="{!$Label.Jarvis_SC_SFCommunityCommentView_RichText}" richtext="true" id="bodyId" cols="10" rows="5" readonly="false" value="{!commentBodyFinal}"/> <!--RichText-->
+            </div>
+            
+            <div id="btnDivId">
+                <center>
+                    <apex:commandButton styleClass="btnCls" id="closeBtnId" title="{!$Label.Jarvis_SC_SFCommunityCommentView_CloseButtonText}" alt="{!$Label.Jarvis_SC_SFCommunityCommentView_CloseButtonText}" value="{!$Label.Jarvis_SC_SFCommunityCommentView_CloseButtonText}" onClick="closeCommentSection();"/> <!--Close - title-->
+                </center>
+            </div>
+        </apex:pageBlock> 
+    </apex:form>
+    <script type="text/javascript">
+    function closeCommentSection(){
+        if (sforce.console.isInConsole()) {
+            sforce.console.getEnclosingTabId(closeSubtab);
+        }    
+        else{
+            window.close();
+        }
+    }
+    
+    var closeSubtab = function closeSubtab(result) {
+        var tabId = result.id;
+        sforce.console.closeTab(tabId);
+    }; 
+    function openSuccess() {}
+    </script>
+</apex:page>

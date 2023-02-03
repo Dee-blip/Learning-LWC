@@ -1,0 +1,12 @@
+.THIS.pageSpinner{
+    position: relative;
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+}
+
+.THIS {
+    background: #FFFFFF;
+    margin-top: -25px;
+    padding-bottom:10px;
+}

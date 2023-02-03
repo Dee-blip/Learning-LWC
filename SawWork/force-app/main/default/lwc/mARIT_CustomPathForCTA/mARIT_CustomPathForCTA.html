@@ -1,0 +1,111 @@
+<template>
+    <div class="slds-m-around_large">
+        <div if:true={isLoaded} class="slds-is-relative">
+            <lightning-spinner alternative-text="Loading..." variant="brand">
+            </lightning-spinner>
+        </div>
+    </div>
+    <div data-id="lwc-outerdiv" style="margin:1%;" class="slds-box slds-theme_default">
+        <template if:false={isTurnbackToBeDisplayed}>
+            <div class="slds-grid slds-gutters">
+                <template for:each={stageValues} for:item="stageValue">
+                    <div class="slds-col slds-size_1-of-5" key={stageValue.label}>
+                        <div data-id={stageValue.label} class="slds-page-header">
+                            <div class="slds-media">
+                                <div class="slds-media__body" style="text-align: center;">
+                                    <span style="font-size:smaller;" class="slds-page-header__title slds-truncate"
+                                        title="">{stageValue.value}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </template>
+        <template if:true={isTurnbackToBeDisplayed}>
+            <div class="slds-grid slds-gutters">
+                <template for:each={stageValues} for:item="stageValue">
+                    <div class="slds-col slds-size_1-of-6" key={stageValue.label}>
+                        <div data-id={stageValue.label} class="slds-page-header">
+                            <div class="slds-media">
+                                <div class="slds-media__body" style="text-align: center;">
+                                    <span style="font-size:smaller;" class="slds-page-header__title slds-truncate"
+                                        title="">{stageValue.value}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </template>
+        <!--record form-->
+        <div style="flex: 100%; margin-top: 1%;">
+            <lightning-record-edit-form record-id={recordId} object-api-name="Lead" onsuccess={handleSuccess}
+                onsubmit={handleSubmit}>
+                <lightning-messages>
+                </lightning-messages>
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col slds-size_1-of-2" style="padding-left: 5%;">
+                        <lightning-output-field field-name="HasOptedOutOfEmail">
+                        </lightning-output-field>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="DoNotCall">
+                        </lightning-output-field>
+                    </div>
+                </div>
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col slds-size_1-of-2" style="padding-left: 5%;">
+                        <lightning-output-field field-name="First_SLA_DT__c">
+                        </lightning-output-field>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="Last_SLA_DT__c">
+                        </lightning-output-field>
+                    </div>
+                </div>
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col slds-size_1-of-2" style="padding-left: 5%;">
+                        <lightning-output-field field-name="adg_Self_Generated_Lead_Type__c">
+                        </lightning-output-field>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <div class="slds-grid slds-gutters">
+                            <div class="slds-col slds-size_2-of-7">
+                                <label style="padding-left: 1%;" class="slds-form-element__label"> Buyer Pain Points
+                                </label>
+                            </div>
+                            <div class="slds-col slds-size_5-of-7">
+                                <label class="slds-form-element__label bpp-values"> {bppValues} </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slds-border_top" data-id="testhide" style="display: none; padding-top: 1%;">
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col slds-size_1-of-7"></div>
+
+                        <div class="slds-col slds-size_3-of-7">
+                            <lightning-output-field data-id="hideInputPicklist" field-name="Lead_Qualification_Status__c">
+                            </lightning-output-field>
+                            <lightning-combobox label="Lead Qualification Status" variant="label-inline" data-id="hideComboboxPicklist"
+                                read-only={isCmbReadOnly} dropdown-alignment="auto" class="cmb-form" name="progress" value={cmbvalue} options={options}
+                                onchange={handleCmbChange}>
+                            </lightning-combobox>
+                            <lightning-input-field style="display: none;" field-name="Id">
+                            </lightning-input-field>
+                        </div>
+                        <div class="slds-col slds-size_1-of-7"></div>
+                        <div class="slds-col slds-size_1-of-7">
+                            <lightning-button class="slds-m-top_small" variant="brand" type="submit" name="update"
+                                label="Update">
+                            </lightning-button>
+                        </div>
+                        <div class="slds-col slds-size_1-of-7"></div>
+                    </div>
+                </div>
+            </lightning-record-edit-form>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,1435 @@
+<apex:page sidebar="false" showHeader="false" standardStylesheets="false"  cache="true" controller="PSA_TimecardApprovalController">
+
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" lang="en">
+     <apex:includeScript value="{!URLFOR($Resource.JQuery191, 'jquery-1.9.1.min.js')}"/>
+
+<meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=0.5, minimum-scale=0.5" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></link>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<apex:includeScript value="{!URLFOR($Resource.TooltipJS) }"/>
+
+<apex:slds /> 
+
+<style>
+.navbar-fixed-top  {padding-top:5px !important; padding-bottom:5px !important; min-height:32px !important; background-color:#2a516f !important}
+.navbar-fixed-bottom {min-height:57px !important}
+
+.glyphicon {
+    font-size: 1.2em; !important;
+}
+.datagrid table {
+    border-collapse: collapse;
+    text-align: left;
+    width: 100%;
+    margin-top: 2%;
+}
+
+.datagrid {
+    font: normal 12px/150% Arial, Helvetica, sans-serif;
+    background: #fff;
+    border: 1px solid #006699;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.datagrid table td, .datagrid table th {
+    padding: 3px 10px;
+}
+
+.datagrid table thead th {
+    background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );
+    background: -moz-linear-gradient( center top, #006699 5%, #00557F 100% );
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');
+    background-color: #006699;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: bold;
+    border-left: 1px solid #0070A8;
+}
+
+.datagrid table thead th:first-child {
+    border: none;
+}
+
+.datagrid table tbody td {
+    color: #00496B;
+    border-left: 1px solid #E1EEF4;
+    font-size: 15px;
+    font-weight: normal;
+}
+
+.datagrid table tbody .alt td {
+    background: #E1EEF4;
+    color: #00496B;
+}
+
+.datagrid table tbody td:first-child {
+    border-left: none;
+}
+
+.datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.datagrid table tbody tr td:first-child {
+    text-align: center;
+}
+.datagrid tr:hover{
+   background-color: #d3d3d3 !important
+}
+
+#tt {
+ position:absolute;
+ display:block;
+ font-size: 10px;
+ background:url(images/tt_left.gif) top left no-repeat;
+ }
+ #tttop {
+ display:block;
+ height:5px;
+ margin-left:5px;
+ font-size: 10px;
+ background:url(images/tt_top.gif) top right no-repeat;
+ overflow:hidden;
+ }
+ #ttcont {
+ display:block;
+ padding:2px 12px 3px 7px;
+ margin-left:5px;
+ font-size: 10px;
+ background:#666;
+ color:#fff;
+  }
+#tbot {
+display:block;
+height:5px; 
+margin-left:5px;  
+background:url(images/tt_bottom.gif) top right no-repeat; 
+overflow:hidden;
+}
+div.footer {
+  position: fixed;  
+  bottom: 5%;
+  margin: auto;
+  width: 50%;  
+  right:25%;
+  left:25%;  
+}
+
+  .float_center{              
+      position: absolute;
+      left: 40% !important; 
+      top: 2% !important;
+      display: inline;
+  }
+        .float_left{
+              position: absolute;
+              left: 2% !important; 
+              top: 2% !important;
+              width: 35% !important;
+              display: inline;   
+              height: 100% !important;       
+        }
+
+@media screen and (max-width: 320px) {
+  /* comes into effect for screens less than or equal to 320 pixels */
+    .footer button{
+        width: 5em;  height: 5em;
+    }
+    div.footer {
+      position: fixed;  
+      bottom: 2.2%;
+      margin: auto;
+      width: 50%;  
+      right: 25%;
+      left: 25%;  
+      
+    }
+  .float_center{              
+      position: absolute;
+      left: 15% !important; 
+      top: 2% !important;
+      display: inline;
+  }
+
+.datagrid table {
+    border-collapse: collapse;
+    text-align: left;
+    width: 100%;
+    margin-top: 7.5%;
+    margin-bottom: 7.5%;
+}
+
+}
+@media screen and (min-width: 321px) and (max-width: 480px) {
+  /* comes into effect for screens between 321 and 480 pixels (inclusive) */
+    .footer button{
+        width: 10em;  height: 7em;
+    }
+    div.footer {
+      position: fixed;  
+      bottom: 2.2%;
+      margin: auto;
+      width: 100%;  
+      right: 25%;
+      left: 25%;  
+      
+    }
+      .float_center{              
+          position: absolute;
+          left: 25% !important; 
+          top: 2% !important;
+          display: inline;
+      }
+.datagrid table {
+    border-collapse: collapse;
+    text-align: left;
+    width: 100%;
+    margin-top: 7.5%;
+    margin-bottom: 7.5%;
+}
+
+}
+@media screen and (min-width: 481px) {
+  /* comes into effect for screens larger than or equal to 481 pixels */
+    .footer button{
+       width: 9em;  height: 7em;
+    }
+    div.footer {
+      position: fixed;  
+      bottom: 5%;
+      margin: auto;
+      width: 50%;  
+      right: 25%;
+      left: 50%;  
+      
+    }
+  .float_center{              
+      position: absolute;
+      left: 35% !important; 
+      top: 2% !important;
+      display: inline;
+  }
+.datagrid table {
+    border-collapse: collapse;
+    text-align: left;
+    width: 100%;
+    margin-top: 5%;
+    margin-bottom: 7.5%;
+}
+
+}
+
+
+.round {
+    display: inline-block;
+    height: 30px;
+    width: 30px;
+    line-height: 30px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+    background-color: #222;    
+    color: #FFF;
+    text-align: center;  
+}
+.round.hollow {
+    display: inline-block;
+    height: 30px;
+    width: 30px;
+    line-height: 50px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+    background-color: #FFF;    
+    color: #222;
+    text-align: center;
+    -webkit-box-shadow: 0px 0px 0px 3px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.75);
+}
+
+.round.round-sm {
+    height: 20px;
+    width: 20px;
+    line-height: 20px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    font-size: 0.7em;
+}
+.round.round-lg {
+    height: 40px;
+    width: 40px;
+    line-height: 40px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+    font-size: 1.5em;
+}
+
+.round.blue {
+    background-color: #3EA6CE;
+}
+
+.nonScroll{
+    position: fixed;
+    overflow: hidden;
+}
+
+    .iconColorBag{
+      fill: gold !important;
+    }
+
+      #tt {
+        position:absolute;
+        display:block;
+        font-size: 10px;
+        background:url(images/tt_left.gif) top left no-repeat;
+       }
+
+      #tttop {
+        display:block;
+        position:absolute;
+        height:30px;
+        margin-top: 30px;
+        margin-left:5px;
+        font-size: 10px;
+        background:url(images/tt_top.gif) top right no-repeat;
+        overflow:hidden;
+       }
+      
+       #ttcont {
+        display:block;
+        position:absolute;
+        padding:2px 12px 3px 7px;
+        margin-left:5px;
+        font-size: 10px;
+        background:#666;
+        color:#fff;
+       }
+      
+      #tbot {
+        display:block;
+        position:absolute;
+        height:5px; 
+        margin-left:5px;  
+        font-size: 10px; 
+        background:url(images/tt_bottom.gif) top right no-repeat; 
+        overflow:hidden;
+      }
+
+</style>    
+<script>
+
+  Visualforce.remoting.timeout = 720000;
+  var $j = jQuery.noConflict();
+    var accountID;
+    var projectID;
+    var offsetVal = 0;
+    var renderedTimecardsLimit = 100;
+    var totalTC = 100;
+    var queryLimit = 1000;
+    var totalpendingTimecards = 0;
+    var rowCount = 1;
+    var batchLimit = 20;
+    var call;
+    var oldOffset = 0;
+    var records = [];
+    var unfilteredRecords = [];
+    var accounts;
+    var projects;
+    var resources;
+    var pFilter = '--None--';
+    var aFilter = '--None--';
+    var rFilter = '--None--';
+    var billableFilter = '--None--';
+    var currentPosition;
+    var tooltipTimeout;
+    var messageTimeout;
+    //18.6 Added filter variables 
+    var dFilter = '--None--';
+    var yNFilter = '--None--';
+    var actorIdToActorName = [];
+    var tcIdToActordetail = [];
+    var loggedInUser = '{!loggedInUser.Id}';
+    var loggedInUserName = '{!loggedInUser.Name}';
+
+    // var scrollListener = function() {
+
+    //             if ($j(window).scrollTop() >= $j(document).height() - $j(window).height() && records != undefined && offsetVal < records.length) 
+    //             {
+    //                 var iterationLimit ;
+    //                 if((offsetVal + totalTC) > records.length)
+    //                 {
+
+    //                     iterationLimit = records.length;                        
+    //                 }
+    //                 else
+    //                 {
+    //                     iterationLimit = offsetVal + totalTC;
+    //                 }
+    //                 for (var n=offsetVal; n<iterationLimit; n++)
+    //                 {
+    //                       var record = records[n];
+    //                       addTableRow(record);
+    //                 }
+    //                 offsetVal = iterationLimit;
+    //                 //$j('#shown').text("Timecard Approval (" + offsetVal + "/" + records.length + ")"); 
+    //                 $j('#shown').text("Timecard Approval (" + offsetVal + "/" + totalpendingTimecards + ")"); 
+
+    //             }
+    //      setTimeout(scrollListener, 1500);              
+    // };
+
+    function showMessage(text1)
+    {
+            $j('#MessagePTag').text(text1);
+             $j('#messages').css('display','block');
+             $j('#messages').modal('show');
+
+    }
+
+
+    function hideShowToolBar(message)
+    {
+        if($j('#tt') != undefined && $j('#tt').css('opacity') > 0)
+        {
+            tooltip.hide();
+        }
+        else
+        {
+          tooltip.show(message);
+          setTimeout(function() {
+              tooltip.hide();
+              }, tooltipTimeout);              
+        } 
+          
+    }
+
+   function prepareFilters()
+   {
+        var accFilter = $j('#accountFilter');
+        var projFiler = $j('#projectFilter');
+        var resourceFilter = $j('#resourceFilter');
+        //18.6
+        var delgFilter = $j('#delegatedFilter');
+       
+        if(accFilter.val() == undefined)
+        {   
+            if(accounts != undefined && Object.keys(accounts).length > 0)
+            {   
+                $j('<option>').val('--None--').text('--None--').appendTo('#accountFilter');
+                for(var j in accounts)
+                {   
+                    $j('<option>').val(j).text(accounts[j]).appendTo('#accountFilter');
+                }                            
+            }
+        }
+        if(resourceFilter.val() == undefined)
+        {
+            if(resources != undefined && Object.keys(resources).length > 0)
+            {
+                $j('<option>').val('--None--').text('--None--').appendTo('#resourceFilter');
+                for(var j in resources)
+                {
+                    $j('<option>').val(j).text(resources[j]).appendTo('#resourceFilter');
+                }                            
+            }
+        }
+       
+       /*//18.6
+        if(delgFilter.val() == undefined)
+        {
+            $j('<option>').val('--None--').text('--None--').appendTo('#delegatedFilter');
+            if(actorIdToActorName != undefined && Object.keys(actorIdToActorName).length > 0)
+            {
+                for(var j in actorIdToActorName)
+                {
+                    $j('<option>').val(j).text(actorIdToActorName[j]).appendTo('#delegatedFilter');
+                }                            
+            }
+        }*/
+   }
+
+   function createProjectFilter()
+   {
+        var accountId = $j('#accountFilter').val();
+        $j('#projectFilter')
+                .find('option')
+                    .remove()
+                        ;            
+
+        if(projects != undefined && Object.keys(projects).length > 0 && accountId != '--None--')
+        {
+            $j('<option>').val('--None--').text('--None--').appendTo('#projectFilter');            
+            for(var j in projects)
+            {
+                if(projects[j].Account == accountId)
+                {
+                    $j('<option>').val(j).text(projects[j].Name).appendTo('#projectFilter');    
+                }
+                
+            }                            
+        }
+
+   }
+   //18.6 
+   function createDelegatedFilter(){
+      
+    var yesNoVal = $j('#yesNoFilter').val();
+        $j('#delegatedFilter')
+                .find('option')
+                    .remove()
+                        ;
+       
+       //18.6
+        if(yesNoVal == 'yes')
+        {
+            $j('<option>').val('--None--').text('--None--').appendTo('#delegatedFilter');
+            if(actorIdToActorName != undefined && Object.keys(actorIdToActorName).length > 0 && yesNoVal != '--None--')
+            {
+                for(var j in actorIdToActorName)
+                {
+                    $j('<option>').val(j).text(actorIdToActorName[j]).appendTo('#delegatedFilter');
+                }                            
+            }
+        }
+
+   
+   }
+
+   function getRemoteTimecards(fromLocation,approveResult,action) 
+   {                    
+            Visualforce.remoting.Manager.invokeAction
+            (
+                '{!$RemoteAction.PSA_TimecardApprovalController.getTimecards}',
+                queryLimit,
+                renderedTimecardsLimit,
+                offsetVal, 
+                '{!$currentpage.parameters.projectId}',
+                '{!$currentpage.parameters.accountId}',
+                function(result, event)
+                {
+                  $j("#first").empty();
+                    if (event.status && result != undefined) 
+                    {
+                        if (result === 'No Records')
+                        {
+
+                            //$j('#shown').text("Timecard Approval ("+ offsetVal + "/" + records.length + ")"); 
+                            $j('#shown').text("Timecard Approval (" + offsetVal + "/" + totalpendingTimecards + ")"); 
+                            $j('#status').hide();                     
+                            $j('#scrollableTable').removeClass('nonScroll');
+
+                            showMessage('No Records Available');
+                             return;
+                        }
+                        //result = result.replaceAll('&quot','"').replaceAll(';','');                        
+                        result = b64DecodeUnicode(result);
+                        var ObjectJSON = JSON.parse(result).Objects;
+                        records = ObjectJSON[0].timecards;
+                        unfilteredRecords = records;
+                        accounts = ObjectJSON[1].accounts;
+                        projects = ObjectJSON[2].projects;
+                        resources = ObjectJSON[3].resources;
+                        totalpendingTimecards = Number(ObjectJSON[4].totalCount);
+                        
+                        //18.6 Adding below to store all delegated TC's information
+              tcIdToActordetail = ObjectJSON[5].mapTcIdToActor;
+                        actorIdToActorName = ObjectJSON[6].mapActorIdToActorName; 
+                        
+                        if(records.length < totalTC)
+                        {
+                            offsetVal = records.length;
+                        }
+                        else
+                        {
+                            offsetVal = totalTC;                            
+                        }
+                        console.log(records[0].Name);
+                        for (var n=0; n<offsetVal; n++)
+                        {
+                              var record = records[n];
+
+                              addTableRow(record);
+
+                        }
+                        //$j('#shown').text("Timecard Approval (" + offsetVal + "/" + records.length + ")"); 
+                        $j('#shown').text("Timecard Approval (" + offsetVal + "/" + totalpendingTimecards + ")");                         
+                        //$j('#status').hide();                     
+                        $j('#scrollableTable').removeClass('nonScroll');
+                        prepareFilters();  
+                        if(fromLocation === 'fromApprove')
+                        {
+                            applyFilter();
+                            var successCount = JSON.parse(approveResult).SuccessCount;
+                            var errors = JSON.parse(approveResult).errors;
+                            if(errors != undefined)
+                            {
+                                for(var errIndex in errors)
+                                {                                  
+                                  $j('#hourError' + errIndex).text(errors[errIndex]).css('color','red').css('font-size','12px').show();
+                                  setTimeout(function() {
+                                      $j('#hourError' + errIndex).hide()
+                                      }, messageTimeout);              
+                                }                                 
+                                //showMessage(''+errors);       
+                            }
+                            var message;
+                            if(action === 'Approve')
+                            {
+                                message = 'Approved ' + successCount + ' Record(s)';
+
+                            }
+                            else
+                            {
+                                message = 'Rejected ' + successCount + ' Record(s)';
+                            }
+                            if(Object.keys(errors).length > 0)
+                            {
+                                message += '. Some timecards could not be processed due to errors'
+                            }
+                            showMessage(message);    
+                            
+                        }
+
+                    } 
+                    else
+                    {                        
+                        showMessage(event.message);    
+                    } 
+                    $j('#status').hide();                     
+                }
+            );
+        
+    }
+    $j(document).ready(function() {
+        $j('#status').show();
+        //scrollListener();
+        //$j(window).scroll(function() { 
+                //else if(offsetVal === records.length)
+                {                 
+                  // currentPosition = $j(window).scrollTop();
+                  // console.log(currentPosition);
+     //             $j(window).off('scroll');
+     //             $j('#first').css('overflow','scroll');
+     //             // console.log(currentPosition);
+     //             //$j(window).scrollTop($j(document).height());
+          // //$(window).load(function() {
+          //   $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+          //});                 
+                }
+
+        //});
+          Visualforce.remoting.Manager.invokeAction
+          (
+              '{!$RemoteAction.PSA_TimecardApprovalController.getAccess}',
+              function(result, event)
+              {
+                  if (event.status && result != undefined) 
+                  {
+                      result = b64DecodeUnicode(result);
+                      var metadata = JSON.parse(result).metadata;
+                      var noAccessHtml = '<div style="font-size: initial;" ' +
+                                          'class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_info">' +
+                                          '<h6>You do not have access to the page</h6></div>';
+
+                      renderedTimecardsLimit = Number(metadata.Approval_Rendered_Limit__c);
+                      totalTC = Number(metadata.Approval_Rendered_Limit__c);
+                      queryLimit = Number(metadata.Approval_Query_Limit__c);
+                      batchLimit = Number(metadata.Approval_Batch_Limit__c);
+
+                      tooltipTimeout = Number(metadata.Tooltip_Timeout__c);
+                      messageTimeout = Number(metadata.Error_Message_Timeout__c);
+
+                      var access = JSON.parse(result).access;
+
+                      if (access === false)
+                      {
+                        $j('#status').hide();          
+                        showMessage('You do not have access to the page');
+                        $j('#mainDiv').html(noAccessHtml);
+                      }
+                      else if(access === true)
+                      {
+                        getRemoteTimecards('fromLoad');
+                      }
+
+                  }
+                  else
+                  {
+                      $j('#status').hide();          
+                      showMessage('You do not have access to the page');
+                      $j('#mainDiv').html(noAccessHtml);
+                    
+                  }
+              }
+           );             
+
+        
+        //scrollListener();               
+
+    });
+    var navigate = function(recordId)
+    {
+            var url = location.href.replace('apex/PSAPureVF','');
+            url +=recordId;
+            if( (typeof sforce != 'undefined') && (sforce != null) ) 
+            {
+                sforce.one.navigateToSObject(recordId);
+            }  
+            else
+            {
+            
+
+                window.open(url, '_blank');
+            }      
+
+    };
+    
+    function addTableRow(timecardRecord) 
+    {
+
+      var tc2 = timecardRecord;
+      var timecardName = timecardRecord.Name;
+      var weekNotes = '';
+      //18.6
+    var actualApprover = '';
+      var delegatedApprover = '';
+      
+      var mNotes = '';
+      var tNotes = '';
+      var wNotes = '';
+      var thNotes = '';
+      var fNotes = '';
+      var saNotes = '';
+      var suNotes = '';
+
+      var mHours2 = 0;
+      var tHours2 = 0;
+      var wHours2 = 0;
+      var thHours2 = 0;
+      var fHours2 = 0;
+      var saHours2 = 0;
+      var suHours2 = 0;
+
+      var stringHour;
+      var resource;
+      var totalhours = 0;
+      var milestoneName = '';
+      var productName = '';
+        
+      if(tcIdToActordetail[tc2.Id] == loggedInUser){
+          actualApprover = loggedInUserName;
+          //console.log('actualApprover ::' + actualApprover);
+      }
+      else{
+          actualApprover = actorIdToActorName[tcIdToActordetail[tc2.Id]];
+          //console.log('delgApprover ::' + actorIdToActorName[tcIdToActordetail[tc2.Id]]);
+    }
+
+      if(timecardRecord.pse__Assignment__c === undefined)
+      {
+          timecardName =  timecardRecord.pse__Project__r.Name;      
+      }
+      else
+      {
+          timecardName = timecardRecord.pse__Assignment__r.Name;        
+      }
+      
+      
+      resource = timecardRecord.pse__Resource__r.Name; 
+
+      milestoneName = timecardRecord.pse__Milestone__r.Name;
+      productName = timecardRecord.pse__Project_Methodology_Object__r.Name;
+
+      totalhours = timecardRecord.pse__Total_Hours__c ;
+
+      if(timecardRecord.pse__Additional_Notes__c != undefined)
+      {
+        weekNotes = timecardRecord.pse__Additional_Notes__c;  
+      }
+      
+
+      mHours2 = timecardRecord.pse__Monday_Hours__c.toFixed(2);
+      if(timecardRecord.pse__Monday_Notes__c != undefined)
+      {
+        mNotes = timecardRecord.pse__Monday_Notes__c; 
+      }
+
+
+      tHours2 = timecardRecord.pse__Tuesday_Hours__c.toFixed(2);
+      if(timecardRecord.pse__Tuesday_Notes__c != undefined)
+      {
+        tNotes = timecardRecord.pse__Tuesday_Notes__c;
+      }
+
+      wHours2 = timecardRecord.pse__Wednesday_Hours__c.toFixed(2); 
+      if(timecardRecord.pse__Wednesday_Notes__c != undefined)
+      {
+        wNotes = timecardRecord.pse__Wednesday_Notes__c;
+      }
+      
+
+      thHours2 = timecardRecord.pse__Thursday_Hours__c.toFixed(2); 
+      if(timecardRecord.pse__Thursday_Notes__c != undefined)
+      {
+        thNotes = timecardRecord.pse__Thursday_Notes__c;
+      }
+      
+      fHours2 = timecardRecord.pse__Friday_Hours__c.toFixed(2);  
+      if(timecardRecord.pse__Friday_Notes__c != undefined)
+      {
+        fNotes = timecardRecord.pse__Friday_Notes__c;
+      }
+      
+
+      saHours2 = timecardRecord.pse__Saturday_Hours__c.toFixed(2); 
+      if(timecardRecord.pse__Saturday_Notes__c != undefined)
+      {
+        saNotes = timecardRecord.pse__Saturday_Notes__c;
+      }
+      
+      suHours2 = timecardRecord.pse__Sunday_Hours__c.toFixed(2); 
+      if(timecardRecord.pse__Sunday_Notes__c != undefined)
+      {
+        suNotes = timecardRecord.pse__Sunday_Notes__c;
+      }
+        
+      var hoursInput;
+      var listString;
+
+      var selectString;
+        //18.6
+      var stDate = new Date(timecardRecord.pse__Start_Date__c).toLocaleString('en-US', { year: '2-digit', month: 'short', day: 'numeric' });
+      var endDate = new Date(timecardRecord.pse__End_Date__c).toLocaleString('en-US', { year: '2-digit', month: 'short', day: 'numeric' });
+
+
+        
+      var cardString = 
+      "<article class=\"slds-card slds-card--narrow\" id=\"article" + rowCount +"\">" +
+          "<div class=\"slds-card__body slds-card__body_inner\" >"+      
+            "<div class=\"slds-card__body--inner slds-grid slds-wrap \">"+      
+              "<div class=\"slds-p-horizontal_small slds-size_1-of-1  slds-hint-parent\" >"+       
+
+                "<div class=\"slds-grid slds-wrap slds-grid_pull-padded\">"+
+                     "<div class=\"slds-col--padded slds-size--6-of-12 slds-truncate\"> "+
+                          "<div class=\"slds-grid slds-wrap \">"+
+                              "<div class=\" slds-size--1-of-6\">"+
+                                  "<span id=\"bill"+rowCount+"\" class=\"slds-icon_container slds-icon-utility-moneybag\" style=\"display: none;\" >"+
+                                    "<svg class=\"slds-icon slds-icon--small iconColorBag\" aria-hidden=\"true\">"+
+                                      "<use xlink:href=\"{!URLFOR($Asset.SLDS, 'assets/icons/utility-sprite/svg/symbols.svg#moneybag')}\">"+                                    
+                                      "</use>"+
+                                    "</svg>"+
+                                  "</span>"+
+                                  "<span id=\"icon"+rowCount+"\" class=\"slds-icon_container slds-icon-custom-custom9\">"+ 
+                                    "<svg class=\"slds-icon slds-icon--small\" aria-hidden=\"true\">"+
+                                      "<use xlink:href=\"{!URLFOR($Asset.SLDS, 'assets/icons/custom-sprite/svg/symbols.svg#custom9')}\">"+                                    
+                                      "</use>"+
+                                    "</svg>"+
+                                  "</span>"+
+
+                              "</div>"+
+                          
+                              "<div class=\"slds-size--5-of-6 slds-truncate\">"+
+                                  "<label id=\"assignmentName" + rowCount + "\" style=\"font-size: 1.5em !important\" class=\"slds-truncate slds-wrap\" onclick=\"hideShowToolBar('" + timecardName + " ')\">" + timecardName + 
+                                  "</label>"+
+                              "</div>"+
+                           "</div>   "+
+                     "</div>"+
+                    
+                    
+                     "<div class=\"slds-col--padded slds-size--4-of-12 slds-truncate\">"+
+                        "<label id=\"resource" + rowCount +"\" onclick=\"hideShowToolBar('" +'Resource: ' +resource +"')\" style=\"font-size: 1.5em !important\">" + resource+
+                        "</label>"+
+                     "</div> "+
+
+                     "<div class=\"slds-col--padded slds-size--1-of-12\">"+
+                        "<label id=\"totalHours" + rowCount +"\" onclick=\"hideShowToolBar('" +timecardRecord.Name +"')\" style=\"font-size: 1.5em !important\">" +totalhours+
+                        "</label>"+
+                     "</div> "+
+                 
+                    "<div class=\"slds-col--padded slds-size--1-of-12\">"+
+
+                            "<input type=\"checkbox\" name=\"checkbox\"  id=\"" + timecardRecord.Id + "\"  />"+  
+                    "</div>"+
+                                                
+                 "</div>" + 
+                 "<div class=\"slds-grid slds-wrap slds-grid_pull-padded\" >"+
+                    "<div class=\"slds-col--padded slds-size--1-of-1 \">"+
+                          "<label id=\"hourError" + timecardRecord.Id +"\"  style=\"display: none;\">"+
+                          "</label>  "+
+                        "</div>"+ 
+                 "</div>";
+
+
+        //18.6
+           listString =  
+               "<div id=\"listCard" + rowCount +"\" >"+
+               
+                "<div class=\"slds-p-horizontal_small slds-size_1-of-1  slds-hint-parent\">"+
+                  "<div class=\"slds-grid slds-wrap slds-grid_pull-padded\" >" + 
+                  
+                  "<span class=\"slds-col--padded slds-size--6-of-12 slds-truncate\" style=\"font-size: 1.5em !important\" onclick=\"hideShowToolBar('" + 'Approver: ' + actualApprover+"')\">"+
+                    actualApprover +
+                     "</span> "+
+               
+          "<span class=\"slds-col--padded slds-size--3-of-12 slds-truncate\" style=\"font-size: 1.3em !important\" onclick=\"hideShowToolBar('" +'Week Start Date' +"')\" >"+
+                         stDate + 
+                     "</span> "+
+               
+                  "<span class=\"slds-col--padded slds-size--3-of-12 slds-truncate\" style=\"font-size: 1.3em !important\" onclick=\"hideShowToolBar('" +'Week End Date' +"')\" >"+
+                         endDate +
+                        
+                     "</span> "+
+                                                 
+                  "</div> "+
+               "</div> "+ 
+               
+               
+                  "<div id=\"listMilestone" + rowCount +"\" class=\"slds-p-horizontal_small slds-size_1-of-1  slds-hint-parent slds-truncate\" style=\"font-size: 1.5em !important\" onclick=\"hideShowToolBar('" +milestoneName +"')\" title=\"" +milestoneName+"\">" + milestoneName +      
+                  "</div> "+
+
+                  "<div id=\"listProduct" + rowCount +"\" class=\"slds-p-horizontal_small slds-size_1-of-1  slds-hint-parent slds-truncate\" style=\"font-size: 1.5em !important\"  onclick=\"hideShowToolBar('" +productName +"')\" title=\"" +productName+"\">"+  productName +  
+                  "</div> "+
+
+                  "<div class=\"slds-p-horizontal_small slds-size_1-of-1  slds-hint-parent\">"+
+                      "<div class=\"slds-grid slds-wrap slds-grid_pull-padded\">"+
+                      
+                        "<div class=\"slds-col--padded slds-size_1-of-12\" style=\"font-size: 1.5em !important;color: red; font-weight: bold;\">SUN"+
+                        "</div>"+
+                        "<div class=\"slds-col--padded slds-size_1-of-12\" style=\"font-size: 1.5em !important;color: blue; font-weight: bold;\">MON"+
+                        "</div>"+
+                        "<div class=\"slds-col--padded slds-size_1-of-12\" style=\"font-size: 1.5em !important;color: blue; font-weight: bold;\">TUE"+
+                        "</div>"+
+                        "<div class=\"slds-col--padded slds-size_1-of-12\" style=\"font-size: 1.5em !important;color: blue; font-weight: bold;\">WED"+
+                        "</div>"+
+                        "<div class=\"slds-col--padded slds-size_1-of-12\" style=\"font-size: 1.5em !important;color: blue; font-weight: bold;\">THU"+
+                        "</div>"+
+                        "<div class=\"slds-col--padded slds-size_1-of-12\" style=\"font-size: 1.5em !important;color: blue; font-weight: bold;\">FRI"+
+                        "</div>"+
+                        "<div class=\"slds-col--padded slds-size_1-of-12\" style=\"font-size: 1.5em !important;color: red; font-weight: bold;\">SAT"+
+                        "</div>"+
+                      "</div>  "+
+
+                  "</div>"+
+                  "<div class=\"slds-p-horizontal_small slds-size_1-of-1  slds-hint-parent\">"+
+                     "<div class=\"slds-grid slds-wrap slds-grid_pull-padded\">   "+
+
+                        "<div id=\"listsuHours" + rowCount +"\" class=\"slds-col--padded slds-size_1-of-12\" style=\"font-size: 1.5em !important\" onclick=\"hideShowToolBar('" +suNotes +"')\">"+ suHours2+
+                        "</div>"+
+                        "<div id=\"listmHours" + rowCount +"\" class=\"slds-col--padded slds-size_1-of-12\" style=\"font-size: 1.5em !important\" onclick=\"hideShowToolBar('" +mNotes +"')\">"+ mHours2+
+                        "</div>"+
+                        "<div id=\"listtHours" + rowCount +"\" class=\"slds-col--padded slds-size_1-of-12\" style=\"font-size: 1.5em !important\" onclick=\"hideShowToolBar('" +tNotes +"')\">"+ tHours2+
+                        "</div>"+
+                        "<div id=\"listwHours" + rowCount +"\" class=\"slds-col--padded slds-size_1-of-12\" style=\"font-size: 1.5em !important\" onclick=\"hideShowToolBar('" +wNotes +"')\">"+ wHours2+
+                        "</div>"+
+                        "<div id=\"listthHours" + rowCount +"\" class=\"slds-col--padded slds-size_1-of-12\" style=\"font-size: 1.5em !important\" onclick=\"hideShowToolBar('" +thNotes +"')\">"+thHours2 +
+                        "</div>"+
+                        "<div id=\"listfHours" + rowCount +"\" class=\"slds-col--padded slds-size_1-of-12\" style=\"font-size: 1.5em !important\" onclick=\"hideShowToolBar('" +fNotes +"')\">"+fHours2 +
+                        "</div>"+
+                        "<div id=\"listsaHours" + rowCount +"\" class=\"slds-col--padded slds-size_1-of-12\" style=\"font-size: 1.5em !important\" onclick=\"hideShowToolBar('" +saNotes +"')\">"+ saHours2+
+                        "</div>"+
+                      "</div>  "+
+                  "</div>"+
+               "</div>" ;  
+
+              
+
+        cardString += listString;         
+        cardString +=
+                    "</div>"+
+                "</div>"+
+              "</div>";
+           "</article>";                  
+    
+       $j('#first').append(cardString);
+      if(timecardRecord.pse__Billable__c === true)
+      { 
+        
+        $j('#bill'+rowCount).show();
+        $j('#icon'+rowCount).hide();
+      }
+
+       
+       rowCount++; 
+    }
+
+    function showModal(component, event, helper) 
+    {
+    
+        $j("#yourId").show();
+    
+    }
+    
+     function hideModal(component,event, helper)
+     {
+    
+        $j("#yourId").hide();
+        $j('#accountFilter').val(aFilter);
+        $j('#projectFilter').val(pFilter);
+        $j('#resourceFilter').val(rFilter);
+
+   
+     }
+     function showConfirm(action)
+     {
+         //18.6 adding the validtion for selection of records
+            var timecardIds = [];
+          $j("input:checkbox").each(function(){
+                var $this = $j(this);
+                    if($this.is(":checked") && $this.attr("id") != 'ALL'){
+                        timecardIds.push($this.attr("id"));
+                    }
+                }
+      );
+         
+          if(timecardIds.length ===0)
+            {
+                hideConfirm();
+                showMessage('No Records selected to ' + action);
+                return;            
+            }         
+         // ends here 
+            if(action === 'approve' && timecardIds.length > 0)
+            {
+                $j('#approveReject').html('Approve');
+                approveRecords();
+                return;
+            }
+            else
+            {
+                $j('#approveReject').html('Reject');
+            }
+          $j("#commentsDialog").show();
+         
+     }
+
+      function b64EncodeUnicode(str) 
+      {
+          // first we use encodeURIComponent to get percent-encoded UTF-8,
+          // then we convert the percent encodings into raw bytes which
+          // can be fed into btoa.
+          return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+              function toSolidBytes(match, p1) {
+                  return String.fromCharCode('0x' + p1);
+          }));
+      }
+
+      function b64DecodeUnicode(str) 
+      {
+          // Going backwards: from bytestream, to percent-encoding, to original string.
+          return decodeURIComponent(atob(str).split('').map(function(c) {
+              return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          }).join(''));
+      }
+
+     function hideConfirm()
+     {
+            $j("#commentsDialog").hide();
+     }
+
+     //18.6 Added a Filter to clear values in pop-up    
+   function clearFilter()
+     {
+        setNone = '--None--';
+        $j('#accountFilter').val(setNone);
+        $j('#projectFilter').val(setNone);
+        $j('#resourceFilter').val(setNone);
+        $j('#billableFilter').val(setNone);
+        $j('#delegatedFilter').val(setNone);
+        $j('#yesNoFilter').val(setNone);
+         
+         $j('#projectFilter')
+                .find('option')
+                    .remove()
+                        ;
+         $j('#delegatedFilter')
+                .find('option')
+                    .remove()
+                        ;
+     }
+     
+     function applyFilter()
+     {
+        $j("#yourId").hide();
+        aFilter = $j('#accountFilter').val();
+        pFilter = $j('#projectFilter').val();
+        rFilter = $j('#resourceFilter').val();
+        billableFilter = $j('#billableFilter').val();
+         //18.6
+         dFilter = $j('#delegatedFilter').val();
+         yNFilter = $j('#yesNoFilter').val();
+         
+        var billableBoolVal = 'none';
+        if(billableFilter != '--None--')
+        {
+           billableBoolVal = billableFilter === 'Billable'? true: false;              
+        }
+
+        records = []; 
+         //18.6 added dFilter && yNFilter
+        if((aFilter == '--None--' && (pFilter == undefined || pFilter =='--None--') && rFilter == '--None--' && billableFilter == '--None--' && dFilter == '--None--' && yNFilter == '--None--') || unfilteredRecords === undefined || unfilteredRecords.length === 0)
+        {
+            records = unfilteredRecords;
+        }
+        else
+        {
+          //for(var i =0; i < renderedTimecardsLimit && i < unfilteredRecords.length; i++)
+          for(var i =0; i < unfilteredRecords.length; i++)
+          {
+              var addrecord = true;
+
+              if(aFilter != '--None--' && unfilteredRecords[i].pse__Project__r.pse__Account__c != aFilter)
+              {
+                  addrecord = false;
+              }
+              if(pFilter != undefined && pFilter !='--None--' && unfilteredRecords[i].pse__Project__c != pFilter)
+              {
+                  addrecord = false;
+              }
+              if(rFilter != '--None--' && unfilteredRecords[i].pse__Resource__c != rFilter)
+              {
+                  addrecord = false;
+              }
+
+              if(billableBoolVal != 'none' && unfilteredRecords[i].pse__Billable__c != billableBoolVal)
+              {
+                addrecord = false;  
+              }
+              
+              //18.6
+              if(yNFilter == 'yes' && tcIdToActordetail[unfilteredRecords[i].Id] == loggedInUser)
+              {
+                addrecord = false;  
+              }
+              
+              if(yNFilter == 'no' && tcIdToActordetail[unfilteredRecords[i].Id] != loggedInUser )
+              {
+                addrecord = false;  
+              }
+              
+              if(yNFilter == 'yes' && dFilter != '--None--' && tcIdToActordetail[unfilteredRecords[i].Id] != dFilter)
+              {
+                addrecord = false;  
+              }
+              
+              if(addrecord)
+              {
+                  records.push(unfilteredRecords[i]);
+              }
+
+         }
+
+        }
+      $j("#first").empty();
+         //18.6 commented to fetch complete filtered records
+         /*if(records.length < totalTC)
+        {
+            offsetVal = records.length;
+        }
+        else
+        {
+            offsetVal = totalTC;                        
+        }*/
+        if(records.length >0)
+        {
+            //18.6 Alter the page limit to render direct number of TC pending on Apply Filter
+            offsetVal = records.length > totalTC ? totalTC : records.length ;
+            totalpendingTimecards = records.length;
+            for (var n=0; n<offsetVal; n++)
+            {
+                  var record = records[n];
+
+                  addTableRow(record);
+
+            }
+
+        }
+        else
+        {
+            showMessage('No Records Match Filter Criteria');
+        }
+        //$j('#shown').text("Timecard Approval (" + offsetVal + "/" + records.length + ")"); 
+        $j('#shown').text("Timecard Approval (" + offsetVal + "/" + totalpendingTimecards + ")"); 
+
+    }   
+   String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.split(search).join(replacement);
+    };
+
+    function selectDeselect(cBox)
+    {
+
+        $j('input:checkbox').not(cBox).prop('checked', false);
+        $j('input:checkbox').not(cBox).slice(0,batchLimit).prop('checked', cBox.checked);
+
+    }
+
+    function approveRecords()
+    {
+        var comments = $j('#comments').val();
+        var action = $j('#approveReject').html();
+        var timecardIds = [];
+        var limits = 20;
+        $j("input:checkbox").each(function(){
+            var $this = $j(this);
+            if($this.is(":checked") && $this.attr("id") != 'ALL'){
+                timecardIds.push($this.attr("id"));
+            }
+        });
+        
+        //18.6 commenting as this is taken care in showConfirm
+        /* 
+        if(timecardIds.length ===0)
+        {
+            hideConfirm();
+            showMessage('No Records selected to ' + action);
+            return;            
+        }*/
+
+        timecardIds = timecardIds.join(',');
+        // launchPiWebWorker(comments,action,limits,timecardIds);
+        console.log(timecardIds);
+        hideConfirm();
+         $j('#scrollableTable').addClass('nonScroll');
+        $j('#status').show();
+        Visualforce.remoting.Manager.invokeAction
+            (
+                '{!$RemoteAction.PSA_TimecardApprovalController.ApproveSelectedTC}',                
+                action,
+                comments,
+                timecardIds,
+                batchLimit,
+                function(result, event)
+                {
+                    if (event.status && result != undefined) 
+                    {
+                        var sMessage;
+                        $j("#tbodyId").empty(); 
+                        offsetVal = 0; 
+                        if(event.result === 'Failed')
+                        {
+                            sMessage = 'An Exception Occured';
+                        }
+                        else
+                        {  
+                            var approveResult = b64DecodeUnicode(result);
+                            
+                        }
+                        getRemoteTimecards('fromApprove',approveResult,action);                                        
+                        //console.log(result);
+                    }
+                    else
+                    {                        
+                      $j('#status').hide();
+                        showMessage(event.message);    
+                    } 
+
+                    
+                    $j('input:checkbox').prop('checked', false);
+                }
+
+            );                
+
+
+    }
+</script>
+
+<div id="messages" style="display:none;height: 100%;width: 100%" class="modal fade">
+  <div class="modal-dialog" >
+    <div class="modal-content" >
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      </div>
+      <div class="modal-body" style="font-size: 1.5em">
+        <p id="MessagePTag"> Success!!!</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size: 1.5em">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div  id="yourId" style="display: none;width: 100%;height: 100%" class="slds-scope" >
+
+     <div  role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open slds-modal--large" style="width: 100%;height: 100%">
+      <div class="slds-modal__container">
+        <div class="slds-modal__header">
+          <button class="slds-button slds-modal__close" style="color: white;" onclick="hideModal();">X</button>  
+          <h2 id="header43" class="slds-text-heading--medium" style="font-size: 1.5em">Filters</h2>
+        </div>
+        <div class="slds-modal__content slds-p-around--medium">
+        
+            <div class="slds-form-element">
+              <label class="slds-form-element__label" for="accountFilter" style="font-size: 1.5em">Account</label>
+              <div class="slds-form-element__control">
+                <div class="slds-select_container" style="font-size: 1.5em">
+                  <select id="accountFilter" class="slds-select" onchange="createProjectFilter();">
+                  </select>
+                </div>
+              </div>
+            </div>        
+
+            <div class="slds-form-element">
+              <label class="slds-form-element__label" for="projectFilter" style="font-size: 1.5em">Project</label>
+              <div class="slds-form-element__control">
+                <div class="slds-select_container" style="font-size: 1.5em">
+                  <select id="projectFilter" class="slds-select">
+                  </select>
+                </div>
+              </div>
+            </div>        
+
+            <div class="slds-form-element">
+              <label class="slds-form-element__label" for="resourceFilter" style="font-size: 1.5em">Resource</label>
+              <div class="slds-form-element__control">
+                <div class="slds-select_container" style="font-size: 1.5em">
+                  <select id="resourceFilter" class="slds-select">
+                  </select>
+                </div>
+              </div>
+            </div>        
+
+            <div class="slds-form-element">
+              <label class="slds-form-element__label" for="billableFilter" style="font-size: 1.5em">Billable</label>
+              <div class="slds-form-element__control">
+                <div class="slds-select_container" style="font-size: 1.5em">
+                  <select id="billableFilter" class="slds-select">
+                    <option value="--None--">--None--</option>
+                    <option value="Billable">Billable</option>
+                <option value="Non-Billable">Non-Billable</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div class="slds-form-element">
+              <label class="slds-form-element__label" for="yesNoFilter" style="font-size: 1.5em">Delegated</label>
+              <div class="slds-form-element__control">
+                <div class="slds-select_container" style="font-size: 1.5em">
+                  <select id="yesNoFilter" class="slds-select" onchange = "createDelegatedFilter();">
+                    <option value="--None--">--None--</option>
+                    <option value="yes">Yes</option>
+                <option value="no">No</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div class="slds-form-element">
+              <label class="slds-form-element__label" for="delegatedFilter" style="font-size: 1.5em">Delegated Timecards</label>
+              <div class="slds-form-element__control">
+                <div class="slds-select_container" style="font-size: 1.5em">
+                  <select id="delegatedFilter" class="slds-select">
+                  </select>
+                </div>
+              </div>
+            </div>
+
+        </div>
+        <div class="slds-modal__footer">
+          <button class="slds-button slds-button--brand" onclick="clearFilter();" style="font-size: 1.5em">Clear Filter</button>
+          <button class="slds-button slds-button--neutral" onclick="hideModal();" style="font-size: 1.5em">Cancel</button>
+          <button class="slds-button slds-button--brand" onclick="applyFilter();" style="font-size: 1.5em">Apply</button>
+        </div>
+      </div>
+    </div>
+    <div class="slds-backdrop slds-backdrop--open"></div>
+</div>
+<div  id="status" style="display: none;width: 100%;height: 100%" class="slds-scope slds-spinner_container" >
+   <div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand"  >
+      <span class="slds-assistive-text">Loading</span>
+      <div class="slds-spinner__dot-a"></div>
+      <div class="slds-spinner__dot-b"></div>
+    </div>
+
+</div>
+<div  id="commentsDialog" style="display: none;width: 100%;height: 100%" class="slds-scope" >
+
+     <div  role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open slds-modal--large" style="width: 100%;height: 100%">
+      <div class="slds-modal__container">
+        <div class="slds-modal__header">
+          <button class="slds-button slds-modal__close" style="color: white;" onclick="hideConfirm();">X</button>  
+          <h2 id="header43" class="slds-text-heading--medium">Rejection Comments</h2>
+        </div>
+        <div class="slds-modal__content slds-p-around--medium">
+        
+            <div class="slds-form-element">
+              <label class="slds-form-element__label" style="font-size: 1.5em" for="comments">Comments</label>
+              <div class="slds-form-element__control">
+                <div class="slds-select_container" style="font-size: 1.5em; ">
+                  <input  id="comments" type="text" class="slds-select" />
+                </div>
+              </div>
+            </div>        
+ 
+        </div>
+        <div class="slds-modal__footer">
+          <button id="cancelOp" class="slds-button slds-button--neutral" onclick="hideConfirm();" style="font-size: 1.5em">Cancel</button>
+          
+
+          <button id="approveReject" class="slds-button slds-button--brand" onclick="approveRecords();" style="font-size: 1.5em">Approve</button>
+        </div>
+      </div>
+    </div>
+    <div class="slds-backdrop slds-backdrop--open"></div>
+</div>
+
+<div id="mainDiv">
+    <nav class="navbar navbar-default navbar-fixed-top" style="height:30px">
+        <div  class ="container-fluid" style="display:block;width: 100%;position: fixed" >
+
+          <div class="float_left" style="cursor: pointer;margin-top: 2px;" onclick="showModal();">
+            <span style =" height: 100%;color: #B8860B; font-size: 2em" class= "glyphicon glyphicon-filter" aria-hidden="true">                      
+            </span>
+          </div>
+            <div  class="float_center" style="margin-top: 2px;">
+                
+                  <label id="shown" style="color:white;font-size: 1.7em"></label> 
+<!--                     <span id="badgeNum"  class="label label-default glyphicon glyphicon-flash" style =" height: 100%;background-color: #f1f1f1;color:black;font-size: 2em" aria-hidden="true"><label id="shown" style=""></label> 
+                    </span>
+ -->                
+            </div>                                        
+            <div id = "ToggeleButtonShow"  style="margin-top: 2px;float: right;display: inline;right: 5%; position: absolute; " >
+                    <!-- <i style="font-family: Arial, Helvetica, sans-serif;color: #B8860B; font-size: 2em">Filter</i> -->
+                  <input type='checkBox' id='ALL' onchange="selectDeselect(this);" /> 
+                    
+            </div>
+        </div>    
+    </nav>
+
+
+    <div id="first" style="position: absolute;top: 32px;overflow:scroll;width: 100%;bottom: 57px">
+    </div>
+
+
+    <nav class="navbar navbar-default navbar-fixed-bottom">
+           
+          <div style="height: 100%;width: 50%; display: inline-block;float: left;">
+               <div class="round round-lg hollow " onclick="showConfirm('approve');" style="postion:relative;cursor: pointer; background-color: #00BFFF;margin-left: 40% !important"> 
+                    
+                        <span  class="glyphicon glyphicon-ok" style="position:relative;top: calc(50% - 5px); color: white" aria-hidden="true">                    
+                        </span>                
+               </div>
+               <div style="postion:relative;cursor: pointer; margin-left: 41% !important;top: calc(50% - 50px)">
+                   <i style="color:black; font-size: 1.5em">Approve</i>        
+               </div>           
+              
+          </div>    
+          <div style="height: 100%;width: 50%; display: inline-block;float: right;">
+               <div class="round round-lg hollow " onclick="showConfirm('reject');" style="cursor: pointer; background-color: #FF6347;margin-left: 28%"> 
+                    <span  class="glyphicon glyphicon-remove" style="position:relative;top: calc(50% - 5px); color: white" aria-hidden="true">
+                    
+                    </span>
+                    
+               </div >
+               <div style="cursor: pointer; margin-left: 32%;top: calc(50% - 50px)">
+                   <i style="color:black; font-size: 1.5em">Reject</i>        
+               </div>
+              
+          </div>            
+    </nav>    
+</div>    
+</html>        
+</apex:page>

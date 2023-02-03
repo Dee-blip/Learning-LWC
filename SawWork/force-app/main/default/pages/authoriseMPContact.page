@@ -1,0 +1,8 @@
+<apex:page showHeader="true" sidebar="true" controller="MarketPlaceContactRoleController" action="{!save}">
+        <apex:param value="true" name="saveByForcingAuthorization" assignTo="{!forceAuthorize}"/> 
+        <apex:outputLink value="/{!contactId}"> Back to Contact </apex:outputLink>
+         <apex:pageMessages id="msgs" escape="false"/>
+           <apex:pageBlock rendered="{!validationErrorFlag}">
+        <apex:outputLabel value="{!contactOrAccountValidationError}"/>
+    </apex:pageBlock>
+</apex:page>

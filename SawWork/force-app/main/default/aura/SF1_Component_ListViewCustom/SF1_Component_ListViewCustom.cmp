@@ -1,0 +1,31 @@
+<aura:component controller="SF1_Controller_ListViewCustom" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+	
+   <aura:attribute name="sObjectName" type="String" /> 
+   <aura:attribute name="listViewSelectOptions" type="String[]" /> 
+   <aura:attribute name="ObjItems" type="SObject[]" /> 
+   <aura:attribute name="ObjItemsResult" type="SObject[]" /> 
+   <aura:attribute name="listItemCount" type="String" /> 
+   <aura:attribute name="currentOffset" type="String" /> 
+   <aura:attribute name="pageSize" type="String" /> 
+   <aura:attribute name="useFilter" type="Boolean" /> 
+   <aura:attribute name="loadButtonLabel" type="String" /> 
+   <aura:attribute name="userSelection" type="String" /> 
+
+
+   <aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
+   <aura:handler event="aura:waiting" action="{!c.waiting}"/> 
+   <aura:handler event="aura:doneWaiting" action="{!c.doneWaiting}"/>
+   <aura:handler event="c:SF1_Event_NavigateToListView" action="{!c.setSObjectType}"/>
+   
+    <ui:scrollerWrapper class="scrollerSize">
+    <div class="sectionThree" >
+            <div class="sectionContainer" style="" >
+                <aura:iteration var="item" items="{!v.listViewSelectOptions}">
+                    <span>
+                        <c:SF1_ListView_ListsForObject sObjectName="{!v.sObjectName}" listName="{!item}" />
+                    </span>
+                </aura:iteration>
+             </div>
+   </div>
+   </ui:scrollerWrapper>     
+</aura:component>

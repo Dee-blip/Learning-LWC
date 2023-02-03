@@ -1,0 +1,309 @@
+<!--Modified by ssawhney on 26/03/2013 for CR 2065285 - Resolution, Diagnosis/Technical notes should be mandatory at the time of Phase 2 -->
+<!--Modified by ssawhney on 20/06/2013 for CR 2031706 - SI: Add a section for customer facing notification/advisory -->
+<!--Modified by Himanshu on 22-Sep-14  for CR 2375247 - Add Hour Field on the Query-->
+<!--Modified By Aditya on 19/11/2014 for CR 2628246 - SI : Add a field How was the Issue Detected -->
+<!--Modified by Jay on 19/02/2015 for 2627751 and CR  2824410 -SI : added 2 new fields to display time spent by owner and others  -->
+<!-- Modified by Vamsee on 30-Nov-15 for CR 3150211- Adding Business Unit Category on Si Page-->
+<!-- Modified by Vamsee on 30-Aug-16 for CR 3469801 - Adding Executive Summary -->
+<!-- Modified by Pinkesh on 22-Oct-2018 for ESESP-410 - Changed Type Of Customer Impact to multi Select picklist-->
+<!-- Modified by Pinkesh on 22-Oct-2018 for ESESP-505 - Auto populate Incident Start Time while creation if Status = IN PROGRESS-->
+<!--Modified by Sheena on 01-march-2020 for ESESP-1767 - Added Pre-incident Status Value and Incident Declared Date/Time field)-->
+<!--Modified by Sheena on 27-April-2020 for ESESP-3460 - Changed the position of Description and Customer Advisory fields-->
+
+<apex:page Controller="SI_ServiceIncidentDetails" sidebar="false">
+    <script type="text/javascript" src="/resource/Jquery/js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="/resource/Jquery/js/jquery-ui-1.8.17.custom.min.js"/>
+        <link rel="stylesheet" type="text/css" href="/resource/Jquery/css/flick/jquery-ui-1.8.17.custom.css"></link>
+        <style type="text/css">
+            .RequiredField 
+            {
+                border-left:thick solid #ff0000;
+            }
+    .pbSubheader{
+        background-color: #1797C0 !important;
+        border-color: none !important;
+    }
+    </style>
+    
+    <apex:outputLabel style="color:red">
+        Please enter all date/time fields as per your time zone ( {!UserTImezone} ) and Locale in your  <apex:outputLink value="/{!UserSalesforceId}/e" target="_Blank" style="color:red;"> Personal Settings</apex:outputLink>
+        </apex:outputLabel>
+        <apex:form >
+            <script>
+            var temp;
+    
+    jServiceIncidentNew$ = jQuery.noConflict();
+    
+    var count=0;
+    function showIncidentStartonFocus(obj)
+    {
+        count++;
+        if(count<2)
+        {
+            showIncidentStart(obj);
+        }
+    }
+    function showIncidentStart(obj)
+    {
+        
+        var val = obj.getElementsByTagName('option')[obj.selectedIndex].innerHTML;
+        //Get the Elements to be rendered to show the incident start date time
+        var insd = jServiceIncidentNew$('.SIIncidentStart');
+        
+        if(val.indexOf('IN PROGRESS') < 0 && {!!NewPageRenders})
+        {
+            for(i=0;i<insd.length;i++)
+            {
+                insd[i].style.display="";
+            }
+        }
+        else if( {!!NewPageRenders})
+        {
+            for(i=0;i<insd.length;i++)
+            {
+                insd[i].style.display="none";
+            }
+        }
+    }
+    </script>
+    <apex:pageBlock id="Block"  >
+        
+        <apex:pageBlockButtons >
+            
+            
+            <apex:commandButton action="{!save1}" id="saveButton" value="Save"  />
+            <!--apex:commandButton action="{!Revert}"  id="revertButton"    value="Cancel"/-->
+            <apex:commandButton action="{!cancel1}"  id="cancelButton"    value="Cancel"/>
+            
+            
+        </apex:pageBlockButtons>
+        
+        
+        
+        <apex:pageMessages />
+        
+        <apex:pageBlockSection columns="2" collapsible="true"  title="General Information">
+            
+            
+            
+            <apex:pageBlockSectionItem rendered="true" >
+                <apex:outputLabel >Title</apex:outputLabel>
+                <apex:outputPanel layout="block" styleClass="requiredInput">
+                    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
+                    <apex:InputField value="{!ServiceIncident.BMCServiceDesk__Service_Request_Title__c}" style="width:260%">
+                    </apex:InputField>
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>   
+            
+            
+            <apex:pageBlockSectionItem >
+            </apex:pageBlockSectionItem>
+            
+            
+            
+            <apex:InputField value="{!ServiceIncident.Name}">
+                
+            </apex:InputField>
+            
+            
+            <apex:pageBlockSectionItem rendered="true" >
+                <apex:outputLabel >Category</apex:outputLabel>
+                <apex:outputPanel layout="block" styleClass="requiredInput">
+                    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
+                    <apex:selectList id="Category" size="1" value="{!ServiceIncident.BMCServiceDesk__FKCategory__c}" multiselect="false"  styleClass="requiredInput"  >
+                        
+                        <apex:selectOptions value="{!CategoryValues}"></apex:selectOptions>
+                    </apex:selectList>
+                    
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>   
+            
+            
+            <apex:pageBlockSectionItem rendered="true" >
+                
+                <apex:outputPanel >
+                    <apex:outputLabel > Status (Phase)</apex:outputLabel>
+                    
+                    <apex:outputPanel style="display:none;" styleClass="SIIncidentStart">
+                        <br/>
+                        <br/>
+                        <apex:outputLabel > Incident Start Time</apex:outputLabel>    
+                    </apex:outputPanel>
+                    
+                    
+                </apex:outputPanel>
+                <apex:outputPanel layout="block" styleClass="requiredInput">
+                    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
+                    <apex:selectList id="status" size="1" value="{!ServiceIncident.BMCServiceDesk__FKStatus__c}"  multiselect="false" onchange="showIncidentStart(this);" onmouseover="showIncidentStartonFocus(this);"  >
+                        <apex:selectOptions value="{!StatusValues}"></apex:selectOptions>
+                    </apex:selectList>
+                    <apex:outputPanel style="display:none;"  styleClass="SIIncidentStart">
+                        <br/>
+                        <apex:inputField value="{!ServiceIncident.SI_OutageStart__c}" />
+                    </apex:outputPanel>
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>        
+            
+            <apex:pageBlockSectionItem rendered="true" >
+                <apex:outputLabel >Incident Declared Date/Time</apex:outputLabel>
+                <apex:outputPanel layout="block">
+                    <apex:outputPanel layout="block"/>
+                    <apex:InputField value="{!ServiceIncident.Incident_Declared_Date_Time__c}"/>
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+            
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel > Owner (Technical Incident Manager)</apex:outputLabel>
+                <apex:outputPanel layout="block" styleClass="requiredInput">
+                    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
+                    <apex:InputField required="false" value="{!ServiceIncident.OwnerId}"  />
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+            
+            
+            <apex:pageBlockSectionItem rendered="true" >
+                <apex:outputLabel >Status Change Date</apex:outputLabel>
+                <apex:outputPanel layout="block" styleClass="requiredInput">
+                    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
+                    <apex:InputField value="{!ServiceIncident.SI_StatusChangeDate__c}"      />
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem> 
+            
+            
+            
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel >GSS Incident Manager / Business Information Lead</apex:outputLabel>
+                <apex:outputPanel layout="block" >
+                    <apex:outputPanel layout="block" />
+                    <apex:InputField value="{!ServiceIncident.SI_GSS_Inc_Manager_BIL__c}"  />
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+            
+            <apex:InputField value="{!ServiceIncident.SI_Type_of_customer_impact__c}">
+            </apex:InputField>
+            
+            <apex:pageBlockSectionItem >
+            </apex:pageBlockSectionItem>
+            
+            <apex:pageBlockSectionItem >
+                <apex:outputPanel >
+                    <apex:outputLink value="https://docs.akamai.com/incidents/procedure/severity-definition.html" target="_blank"  >Definition</apex:outputLink>
+                    <apex:outputLabel >Impact (Customer Severity)</apex:outputLabel>
+                </apex:outputPanel>
+                <apex:outputPanel layout="block" styleClass="requiredInput">
+                    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
+                    
+                    <apex:selectList id="impact" size="1"  multiselect="false" value="{!ServiceIncident.BMCServiceDesk__FKImpact__c}"     >
+                        <apex:actionSupport event="onchange"  reRender="recentmodify"></apex:actionSupport>
+                        <apex:selectOptions value="{!ImpactValues}"></apex:selectOptions>
+                    </apex:selectList>
+                    
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+            
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel > Urgency (Aggregate Severity)</apex:outputLabel>
+                <apex:outputPanel layout="block" styleClass="requiredInput">
+                    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
+                    <apex:selectList id="Urgency" size="1"  multiselect="false" value="{!ServiceIncident.BMCServiceDesk__FKUrgency__c}">
+                        <apex:actionSupport event="onchange"  reRender="recentmodify" ></apex:actionSupport>
+                        <apex:selectOptions value="{!UrgencyValues}"></apex:selectOptions>
+                    </apex:selectList>
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+            
+            <!--Aditya Start of Change CR:2628246 Adding "How was the Issue Detected" Field -->     
+            <apex:pageBlockSectionItem rendered="{!!disableIssueDetected}" >
+                <apex:outputLabel >How was the Issue Detected </apex:outputLabel>
+                <apex:outputPanel layout="block" styleClass="requiredInput">
+                    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
+                    <apex:selectList id="IncidentOrigin" disabled="{!disableIssueDetected}" size="1" value="{!ServiceIncident.How_was_the_Issue_Detected__c}"  multiselect="false"  >
+                        <apex:selectOptions value="{!IncidentOrigin}"></apex:selectOptions>
+                    </apex:selectList>    
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+            <!-- End of Change CR:2628246--> 
+            
+            
+            <apex:pageBlockSectionItem rendered="true" >
+                <apex:outputLabel > Description (Customer Impact)</apex:outputLabel>
+                <apex:outputPanel layout="block" styleClass="requiredInput">
+                    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
+                    <apex:InputField value="{!ServiceIncident.BMCServiceDesk__incidentDescription__c}"    style="width:100%;height:120px; resize:vertical"/>
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>  
+            
+            <apex:pageBlockSectionItem >
+                <!-- start of changes for CR 2031706 -->
+                <apex:outputLabel > Customer Advisory </apex:outputLabel>
+                <apex:InputField value="{!ServiceIncident.Customer_Advisory__c}"    style="width:100%;height:120px; resize:vertical"/>
+                <!-- end of changes for CR 2031706 -->
+            </apex:pageBlockSectionItem>
+            
+            
+            
+            <!--apex:outputField value="{!ServiceIncident.RecordType.Name}" label="Record Type" rendered="{!NewPageRenders}"/-->
+            
+            <apex:InputField value="{!ServiceIncident.CreatedById}" rendered="{!NewPageRenders}"/>
+            <apex:InputField value="{!ServiceIncident.CreatedDate}" rendered="{!NewPageRenders}"/> 
+            
+            <apex:outputField value="{!ServiceIncident.Days_Open__c}" label="Days Open" rendered="{!NewPageRenders}"/>
+            
+        </apex:pageBlockSection>
+        
+        
+        
+        
+        
+        <apex:pageBlockSection title="Impact/Details" columns="1" collapsible="true">
+            
+            <apex:InputField value="{!ServiceIncident.SI_Technical_Notes__c}" style="width:100%;height:160px;resize:vertical">
+                
+            </apex:InputField>
+            <apex:InputField value="{!ServiceIncident.SI_Diagnosis__c}" style="width:100%;height:80px;resize:vertical">
+                
+            </apex:InputField>
+            <apex:InputField value="{!ServiceIncident.SI_Impacted_CP_Codes_Domains__c}" style="width:100%;height:80px;resize:vertical">
+                
+            </apex:InputField>
+            <!--Start of changes by ssawhney on 26/03/2013 for CR 206528-->
+            <apex:InputField label="Resolution/Mitigation" value="{!ServiceIncident.BMCServiceDesk__incidentResolution__c}" style="width:100%;height:80px;resize:vertical">
+                <!--End of Changes for CR 206528-->
+            </apex:InputField>
+            <apex:InputField value="{!ServiceIncident.SI_Incident_Caused_By__c}">
+            </apex:InputField>
+            <apex:InputField value="{!ServiceIncident.SI_Network__c}">
+                
+            </apex:InputField>
+            <apex:InputField value="{!ServiceIncident.SI_Business_Unit_Category__c}" >
+                
+            </apex:InputField>
+            <apex:InputField value="{!ServiceIncident.SI_Executive_Summary__c}" style="width:100%;height:80px;resize:vertical">
+                
+            </apex:InputField>
+        </apex:pageBlockSection>
+        
+        
+        
+        <apex:pageBlockSection title="Platform Details" columns="2" collapsible="true">
+            
+            <apex:InputField value="{!ServiceIncident.SI_Incident_Sensitivity__c}" >
+                
+            </apex:InputField>
+            <apex:InputField value="{!ServiceIncident.SI_Incident_Review_Status__c}" >
+                
+            </apex:InputField>
+            
+            
+            
+            <apex:InputField value="{!ServiceIncident.SI_Incident_Review_Present_Date__c}" >
+            </apex:InputField>
+            <apex:InputField value="{!ServiceIncident.SI_Platform_Review_Date__c}">
+                
+            </apex:InputField>
+            
+        </apex:pageBlockSection>
+        
+    </apex:pageBlock>
+</apex:form>
+</apex:page>

@@ -1,0 +1,283 @@
+<template>
+    <template if:true={loadSpinner}>
+        <div class="forceModalSpinner testModal" style="z-index: 99 !important">
+            <div class="modal-glass" style="opacity: 0.2;">&nbsp;</div>
+            <div class="forceInlineSpinner indicatorContainer" aria-hidden="false" role="alert"
+                data-aura-class="forceInlineSpinner">
+                <div class="forceDotsSpinner" data-aura-class="forceDotsSpinner">
+                    <div class="slds-spinner slds-spinner_brand slds-spinner_medium" role="status">
+                        <span class="slds-assistive-text">Loading...</span>
+                        <div class="slds-spinner__dot-a"></div>
+                        <div class="slds-spinner__dot-b"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <lightning-card>
+        <div data-id="mainTableDiv">
+            <article class="slds-card">
+                <div class="slds-page-header"
+                    style="background-color: #e0e5ee;border-radius: 5px;margin-left: 5px; margin-right: 5px;">
+                    <div class="slds-page-header__row">
+                        <div class="slds-page-header__col-title">
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                    <lightning-icon icon-name="standard:individual" alternative-text="Employees"
+                                        size="medium" class="slds-m-top_xxx-small" title="Employee"></lightning-icon>
+                                </div>
+                                <div class="slds-media__body">
+                                    <div class="slds-page-header__name">
+                                        <div class="slds-page-header__name-title">
+                                            <h1>
+                                                <span
+                                                    class="slds-page-header__title slds-truncate slds-align-middle clip-text slds-line-clamp slds-m-right--xx-small slds-m-top_x-small">Support
+                                                    Teams By Employee ({filteredList.length})</span>
+                                            </h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <template if:true={isManager}>
+                            <div class="slds-page-header__controls" style="margin-right: 10vw;margin-top: 5px;">
+                                <div class="slds-page-header__control" style="margin-top: 4.5px;">
+                                    <span>My Reportees</span>
+                                </div>
+                                <div class="slds-page-header__control" style="margin-top: 2px;margin-right: 10px;">
+                                    <lightning-input type="toggle" class="" onchange={changeToggle}
+                                        checked={toggleChecked} message-toggle-active="" message-toggle-inactive="">
+                                    </lightning-input>
+                                </div>
+                            </div>
+                        </template>
+                        <div class="slds-page-header__col-actions">
+                            <div class="slds-page-header__controls">
+                                <div class="slds-page-header_control"
+                                    style="margin-top: 2px;margin-left: 10px; margin-right: 10px;">
+                                    <lightning-button-icon icon-name="utility:refresh" class="" onclick={refresh}
+                                        variant="brand" name="refreshQueue" alternative-text="Refresh" title="Refresh">
+                                    </lightning-button-icon>
+                                </div>
+                                <div class="slds-page-header_control"
+                                    style="margin-top: -8px;margin-left: 10px; margin-right: 10px;">
+                                    <div onkeypress={keycheck}>
+                                        <lightning-input type="text" placeholder="Search Employee..."
+                                            name="searchEmployee" onblur={handleSearch} value={searchEmployeeKey}
+                                            class="searchText slds-m-left_small"></lightning-input>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            <template if:false={isManager}>
+                <c-sc-s-t-m-cell-edit-custom-datatype class="" key-field="login" data={currentPageData}
+                    hide-checkbox-column="true" columns={mainTableColumns} sorted-by={sortBy}
+                    sorted-direction={sortDirection} onsort={updateColumnSorting} onrowaction={handleRowAction}
+                    onshowteamdetail={handleShowDetails}></c-sc-s-t-m-cell-edit-custom-datatype>
+            </template>
+            <template if:true={isManager}>
+                <c-sc-s-t-m-cell-edit-custom-datatype class="" key-field="login" data={currentPageData}
+                    hide-checkbox-column="true" columns={mainTableColumnsManager} sorted-by={sortBy}
+                    sorted-direction={sortDirection} onsort={updateColumnSorting} onrowaction={handleRowAction}
+                    oneditskill={handleEditSkill} onshowteamdetail={handleShowDetails}>
+                </c-sc-s-t-m-cell-edit-custom-datatype>
+            </template>
+            <div class="slds-align_absolute-center" style="margin-top:5px">
+                <template if:true={arePagesMoreThanOneMainTable}>
+                    <ul class="slds-button-group-row">
+                        <li class="slds-button-group-item">
+                            <lightning-button variant="neutral" label="First" name="firstMainTable" onclick={onFirst}>
+                            </lightning-button>
+                        </li>
+                        <template if:true={hasPrev}>
+                            <li class="slds-button-group-item">
+                                <lightning-button variant="neutral" label="Prev" name="prevMainTable" onclick={onPrev}>
+                                </lightning-button>
+                            </li>
+                        </template>
+                        <template for:each={pagesList} for:item="pageNumber">
+
+                            <li class="slds-button-group-item" key={pageNumber}>
+                                <lightning-button variant="neutral" label={pageNumber} name="mainTablePageButton"
+                                    onclick={onPageClick}></lightning-button>
+                            </li>
+                        </template>
+                        <template if:true={hasNext}>
+                            <li class="slds-button-group-item">
+                                <lightning-button variant="neutral" label="Next" name="nextMainTable" onclick={onNext}>
+                                </lightning-button>
+                            </li>
+                        </template>
+                        <li class="slds-button-group-item">
+                            <lightning-button variant="neutral" label="Last" name="lastMainTable" onclick={onLast}>
+                            </lightning-button>
+                        </li>
+                    </ul>
+                    <span style="margin-left:15px;font-size:15px;color:#1876F2;">Page {pageMainTable} of
+                        {pages.length}</span>
+                </template>
+            </div>
+        </div>
+        <template if:true={showSubTable}>
+            <div style="float:right;width:40%">
+                <div style="float:left;width:5%">
+                    <lightning-button variant="brand" class="expander" label=">>" title="Show Full Screen"
+                        onclick={handleExpansion}></lightning-button>
+                </div>
+                <div style="float:right;width:95%" class="slds-p-horizontal_medium slds-p-right_small">
+                    <article class="slds-card">
+                        <div class="slds-page-header" style="background-color: #e0e5ee;">
+                            <div class="slds-page-header__row">
+                                <div class="slds-page-header__col-title">
+                                    <div class="slds-media">
+                                        <div class="slds-media__figure">
+                                            <lightning-icon icon-name="standard:individual" alternative-text="Employee"
+                                                size="medium" class="slds-m-top_xxx-small" title="Employee">
+                                            </lightning-icon>
+                                        </div>
+                                        <div class="slds-media__body">
+                                            <div class="slds-page-header__name">
+                                                <div class="slds-page-header__name-title">
+                                                    <h1>
+                                                        <span>Employee</span>
+                                                        <span
+                                                            class="slds-page-header__title slds-truncate slds-align-middle clip-text slds-line-clamp"
+                                                            style="font-size:18px;">{selectedEmployeeName}</span>
+                                                    </h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                    <br>
+                    <div style="height:30vh">
+                        <template if:true={showTeamsTable}>
+                            <article class="slds-card">
+                                <div class="slds-page-header" style="background-color: #e0e5ee;">
+                                    <div class="slds-page-header__row">
+                                        <div class="slds-page-header__col-title">
+                                            <div class="slds-media">
+                                                <div class="slds-media__figure">
+                                                    <lightning-icon icon-name="standard:groups"
+                                                        alternative-text="Support Teams" size="medium"
+                                                        class="slds-m-top_xxx-small" title="Support Team">
+                                                    </lightning-icon>
+                                                </div>
+                                                <div class="slds-media__body">
+                                                    <div class="slds-page-header__name">
+                                                        <div class="slds-page-header__name-title">
+                                                            <h2>
+                                                                <span
+                                                                    class="subHeader slds-page-header__title slds-truncate slds-align-middle clip-text slds-line-clamp slds-m-right--xx-small slds-m-top_x-small">Support
+                                                                    Teams ({teamAndRole.length})</span>
+                                                            </h2>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                            <c-sc-s-t-m-cell-edit-custom-datatype class="slds-m-top_small" key-field="teamName"
+                                data={teamAndRole} hide-checkbox-column="true" columns={subTableColumns}
+                                onrowaction={handleRowActionForTeamTable}
+                                onshowaccountdetail={handleShowAccountDetails}></c-sc-s-t-m-cell-edit-custom-datatype>
+                        </template>
+                        <template if:true={showEditPicklist}>
+                            <article class="slds-card">
+                                <div class="slds-page-header" style="background-color: #e0e5ee;">
+                                    <div class="slds-page-header__row">
+                                        <div class="slds-page-header__col-title">
+                                            <div class="slds-media">
+                                                <div class="slds-media__figure">
+                                                    <lightning-icon icon-name="standard:record_update"
+                                                        alternative-text="Employee" size="medium"
+                                                        class="slds-m-top_xxx-small" title="Edit Record">
+                                                    </lightning-icon>
+                                                </div>
+                                                <div class="slds-media__body">
+                                                    <div class="slds-page-header__name">
+                                                        <div class="slds-page-header__name-title">
+                                                            <h1>
+                                                                <span>Edit Record</span>
+                                                                <span
+                                                                    class="slds-page-header__title slds-truncate slds-align-middle clip-text slds-line-clamp"
+                                                                    style="font-size:18px;">Support Team Skills</span>
+                                                            </h1>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                            <lightning-layout class="slds-m-horizontal_large slds-p-around_medium">
+                                <lightning-layout-item size="11">
+                                    <lightning-dual-listbox name="Support Team Skills" label="Select Skills"
+                                        source-label="Available" selected-label="Selected"
+                                        field-level-help="Select Support Team Skill for selected Employee"
+                                        options={serveroptions} value={selectedSkills} onchange={handleSkillChange}
+                                        disable-reordering></lightning-dual-listbox>
+                                </lightning-layout-item>
+                                <lightning-layout-item size="1" class="slds-m-horizontal_medium save"
+                                    style="margin-top: 15vh">
+                                    <lightning-button-icon icon-name="utility:save" alternative-text="Save"
+                                        disabled={hideSave} variant="brand" class="slds-m-left_xx-small save"
+                                        title="Save" onclick={handleSave}></lightning-button-icon>
+
+                                </lightning-layout-item>
+                            </lightning-layout>
+                        </template>
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <div style="height:30vh">
+                        <template if:true={showAccountTable}>
+                            <article class="slds-card">
+                                <div class="slds-page-header" style="background-color: #e0e5ee;">
+                                    <div class="slds-page-header__row">
+                                        <div class="slds-page-header__col-title">
+                                            <div class="slds-media">
+                                                <div class="slds-media__figure">
+                                                    <lightning-icon icon-name="standard:person_account"
+                                                        alternative-text="Support Team Account" size="medium"
+                                                        class="slds-m-top_xxx-small" title="Support Team Account">
+                                                    </lightning-icon>
+                                                </div>
+                                                <div class="slds-media__body">
+                                                    <div class="slds-page-header__name">
+                                                        <div class="slds-page-header__name-title">
+                                                            <h2>
+                                                                <span
+                                                                    class="subHeader slds-page-header__title slds-truncate slds-align-middle clip-text slds-line-clamp slds-m-right--xx-small slds-m-top_x-small">Support
+                                                                    Team Accounts ({teamAccountList.length})</span>
+                                                            </h2>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                            <lightning-datatable class="slds-m-top_small" key-field="teamAccountId"
+                                data={teamAccountList} hide-checkbox-column="true" columns={accountTableColumns}>
+                            </lightning-datatable>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            <div style="clear:both"></div>
+        </template>
+    </lightning-card>
+</template>

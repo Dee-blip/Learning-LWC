@@ -1,0 +1,39 @@
+<template>
+    <div style="display: flex; justify-content: space-between;">
+        <div style="display: flex; margin: auto;">
+            <!-- <lightning-button label="<<" onclick={handlePrevious}></lightning-button> -->
+            <div class="slds-button slds-button_neutral" onclick={handlePrevious} style="cursor: pointer;">
+                <lightning-icon icon-name="utility:jump_to_left" size="x-small" alternative-text={label.LB_PREV_PAGE}></lightning-icon>
+            </div>
+            <lightning-radio-group name="pagination" label={label.LB_PAGINATION} options={paginationOptions} value={selectedPageNumber} variant="label-hidden" onchange={handlePageNumberChange}
+                type="button"></lightning-radio-group>
+            
+            <div class="slds-button slds-button_neutral" onclick={handleNext} style="cursor: pointer;">
+                <lightning-icon icon-name="utility:jump_to_right" size="x-small" alternative-text={label.LB_NEXT_PAGE}></lightning-icon>
+            </div>
+            <!-- <lightning-button label=">>" onclick={handleNext}></lightning-button> -->
+        </div>
+
+        <div>
+            <div class="btn-group pull-right">
+                <!-- <button for:each={pageSizeButtonsInfo} for:item="btn" key={btn.value} value={btn.value} class={btn.css} onclick={handlePageSizeChange}> 
+                    <span>{btn.label} </span>
+                </button> -->
+                <lightning-combobox
+                name="Pagesize"
+                label={label.LB_PAGE_SIZE}
+                variant="label-hidden"
+                value={pageSize}
+                options={pageSizeButtonsInfo}
+                onchange={handlePageSizeChange} 
+                dropdown-alignment="right"
+                style="width: 80px;"
+                class="c-pagination-dropdown"
+                ></lightning-combobox>
+            <!-- <select name="pagesize" onchange={handlePageSizeChange} >
+                <option for:each={pageSizeButtonsInfo} for:item="pb" key={pb.value} value={pb.value}>{pb.label}</option>
+            </select> -->
+                </div> 
+        </div>
+    </div>
+</template>

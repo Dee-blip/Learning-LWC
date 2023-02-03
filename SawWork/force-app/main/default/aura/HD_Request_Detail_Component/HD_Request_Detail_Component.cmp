@@ -1,0 +1,209 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId"  controller="HD_Request_Detail_Input_Lightning">
+	<aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:attribute name="recordId" type="Id" default="a5UR0000000EG34MAG"/>
+    <aura:attribute name="srinformation" type="Map"/>
+    <!--<aura:attribute name="test" type="Map"/-->
+    <aura:attribute name="srInfoMap" type="Map"/>
+    <aura:attribute name="srdetails" type="List"/>
+    <aura:attribute name="placeholder" default="true" type="Boolean"/>
+     <aura:attribute name="displayInSecondColumn" type="Boolean"/>
+    <aura:attribute name="forPrint" type="Boolean" default="false"/>
+
+    <aura:attribute name="sredit_mode" default="false" type="Boolean"/>
+    <aura:attribute name="srdt_mode" default="true" type="Boolean"/>
+    <aura:handler event="c:Update_SR_Edit" action="{!c.updateEditForm}" />
+
+
+    <div>
+    <aura:renderIf isTrue="{!v.placeholder}">
+         <c:HD_Placeholder_service holderType="clientdetail" />
+        <c:HD_Placeholder_service holderType="clientdetail" />
+        <c:HD_Placeholder_service holderType="clientdetail"/>
+        <c:HD_Placeholder_service holderType="clientdetail"/>
+
+
+
+    </aura:renderIf>
+        <aura:if isTrue="{!v.forPrint == false}">
+        <!--<c:HD_Incident_Client_Detail recordId="{!v.recordId}"/>-->
+        </aura:if>
+         <lightning:spinner aura:id="mySpinner_head" />
+  <aura:renderIf isTrue="{!v.srdt_mode}">
+    <div aura:id="serviceRequestComponent" class="hideMe">
+
+     <section id="sectionid_edit" class="slds-popover index-fix slds-size--2-of-2" role="dialog" aria-describedby="dialog-body-id-43" style="background-color:#FAFAF9;padding: .75rem 1rem; ">
+       <!--<span class="sr-header">SR Input Details ~ {!v.test.BMCServiceDesk__FKRequestDefinition__r.BMCServiceDesk__serviceRequestTitle__c}</span><span aura:id="ar_sr_edit_link"  id='sr_edit_link' class="sr_link"> <a href='' onclick="{!c.edit_sr}">Edit Details</a></span>-->
+              <span class="sr-header">SR Input Details ~ {!v.srInfoMap.BMCServiceDesk__FKRequestDefinition__r.BMCServiceDesk__serviceRequestTitle__c}</span><span aura:id="ar_sr_edit_link"  id='sr_edit_link' class="sr_link"> <a href='' onclick="{!c.edit_sr}">Edit Details</a></span>
+
+
+   </section>
+
+    <section class=" slds-popover index-fix slds-size--2-of-2" role="dialog" aria-describedby="dialog-body-id-43">
+
+        <div class="slds-grid slds-wrap">
+        <aura:if isTrue="{!v.displayInSecondColumn != true}" >
+
+         <aura:iteration items="{!v.srdetails}" var="item">
+
+             <aura:if isTrue="{!item[2] == 'Header Section'}">
+
+                    <aura:if isTrue="{!item[3] !=0}">
+                        <div class=" padding-bottonm-top  slds-p-horizontal--small slds-p-around--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-small-size--1-of-1 slds-large-size--1-of-1 " >
+                            <hr></hr>
+                            <div class=" slds-text-heading--small "><pre class="printClass"><b>{!item[0]} </b></pre></div>
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!item[3] ==0}">
+                        <div class=" padding-bottonm-top custom-bkcolor-coral slds-p-horizontal--small slds-p-around--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-small-size--1-of-1 slds-large-size--1-of-1 " >
+                            <div class=" slds-text-heading--small"><pre class="printClass"><b>{!item[0]}</b></pre></div>
+                        </div>
+                    </aura:if>
+                </aura:if>
+              <aura:if isTrue="{!item[2] != 'Header Section'}">
+                    <div class="slds-p-horizontal--small slds-p-around--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-small-size--1-of-1 slds-large-size--1-of-1 " >
+
+                          <aura:if isTrue="{!item[1] == 'Data is encrypted'}">
+                              <div class=""><pre class="heading-color"><b>{!item[0]}</b></pre>
+                                  <pre class="one-em-top"> <span style="color:red">{!item[1]}</span></pre></div>
+                          </aura:if>
+                          <aura:if isTrue="{!item[1] != 'Data is encrypted'}">
+                              <div class="">
+                                <pre class="heading-color"><b> {!item[0]}</b>
+                                  <aura:if isTrue="{! and(item[4]!=null,item[4] !='')}" >
+                                    <span class="infoIcon" >
+                                      <lightning:icon iconName="utility:info"  size="xx-small"/>
+                                    </span>
+                                    <div class="tooltip">
+                                      <section class="slds-popover " role="dialog" aria-label="Dialog Title" aria-describedby="dialog-body-id-2">
+                                        <div class="slds-popover__body" id="dialog-body-id-2">
+                                          <p>{!item[4]}</p>
+                                        </div>
+                                      </section>
+                                    </div>
+                                  </aura:if>
+
+                                </pre>
+                                  <pre class="one-em-top"> {!item[1]}</pre></div>
+                          </aura:if>
+
+
+                    </div>
+                </aura:if>
+
+          </aura:iteration>
+      	</aura:if>
+        <aura:if isTrue="{!v.displayInSecondColumn == true}">
+
+        	<aura:iteration items="{!v.srdetails}" var="item">
+                <aura:if isTrue="{!item[2] != 'Header Section'}">
+                	<div class="slds-p-horizontal--small slds-p-around--small slds-size--1-of-2 slds-medium-size--1-of-2 slds-small-size--1-of-1 slds-large-size--1-of-2 " >
+
+                          <aura:if isTrue="{!item[1] == 'Data is encrypted'}">
+                              <div class=""><pre class="heading-color"><b>{!item[0]}</b></pre><pre style="color:red" class="one-em-top">{!item[1]}</pre></div>
+                          </aura:if>
+                          <aura:if isTrue="{!item[1] != 'Data is encrypted'}">
+                              <div class="">
+                                <pre class="heading-color"><b>{!item[0]}</b>
+                                  <aura:if isTrue="{! and(item[4]!=null,item[4] !='')}" >
+                                    <span class="infoIcon" >
+                                      <lightning:icon iconName="utility:info"  size="xx-small"/>
+                                    </span>
+                                    <div class="tooltip">
+                                      <section class="slds-popover " role="dialog" aria-label="Dialog Title" aria-describedby="dialog-body-id-2">
+                                        <div class="slds-popover__body" id="dialog-body-id-2">
+                                          <p>{!item[4]}</p>
+                                        </div>
+                                      </section>
+                                    </div>
+                                  </aura:if>
+                                </pre>
+                                <pre class="one-em-top"> {!item[1]}</pre>
+                              </div>
+                          </aura:if>
+
+
+                    </div>
+                    <div class="slds-p-horizontal--small slds-p-around--small slds-size--1-of-2 slds-medium-size--1-of-2 slds-small-size--1-of-1 slds-large-size--1-of-2 " >
+
+                       	<aura:if isTrue="{!item[5] != null}">
+                              <aura:if isTrue="{!item[5] == 'Data is encrypted'}">
+                                  <div class=""><pre class="heading-color"><b>{!item[5]}</b> </pre>
+                                      <pre><span style="color:red" class="one-em-top">{!item[6]}</span></pre></div>
+                              </aura:if>
+                              <aura:if isTrue="{!item[5] != 'Data is encrypted'}">
+                                  <div class=""><pre class="heading-color"><b>{!item[5]}</b>
+                                    <aura:if isTrue="{! and(item[9]!=null,item[9] !='')}" >
+                                    <span class="infoIcon" >
+                                      <lightning:icon iconName="utility:info"  size="xx-small"/>
+                                    </span>
+                                    <div class="tooltip">
+                                      <section class="slds-popover " role="dialog" aria-label="Dialog Title" aria-describedby="dialog-body-id-2">
+                                        <div class="slds-popover__body" id="dialog-body-id-2">
+                                          <p>{!item[9]}</p>
+                                        </div>
+                                      </section>
+                                    </div>
+                                  </aura:if>
+
+                                    </pre>
+
+
+                                    <pre class="one-em-top"> {!item[6]}</pre></div>
+                              </aura:if>
+                        </aura:if>
+
+
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!item[2] == 'Header Section'}">
+                    <aura:if isTrue="{!item[3] !=0}">
+
+                        <div class=" padding-bottonm-top  slds-p-horizontal--small slds-p-around--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-small-size--1-of-1 slds-large-size--1-of-1 " >
+                            <hr></hr>
+                            <div class=" slds-text-heading--large "><pre class="printClass"><b>{!item[0]}</b></pre></div>
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!item[3] ==0}">
+                        <div class=" padding-bottonm-top custom-bkcolor-coral slds-p-horizontal--small slds-p-around--small slds-size--1-of-1 slds-medium-size--1-of-1 slds-small-size--1-of-1 slds-large-size--1-of-1 " >
+                            <div class=" slds-text-heading--small"><pre class="printClass"><b>{!item[0]}</b></pre></div>
+                        </div>
+                    </aura:if>
+                </aura:if>
+
+
+
+          </aura:iteration>
+        </aura:if>
+    </div>
+    </section>
+    </div>
+    </aura:renderIf>
+
+     <aura:If isTrue="{!v.sredit_mode}">
+    <div  id='service_request_form' >
+
+        <section id="sectionid_edit" class="slds-popover slds-size--2-of-2" role="dialog" aria-describedby="dialog-body-id-43" style="background-color:#FAFAF9;padding: .75rem 1rem; ">
+          <!--<span class="sr-header">SR Edit ~ {!v.test.BMCServiceDesk__FKRequestDefinition__r.BMCServiceDesk__serviceRequestTitle__c}</span><span id='sr_edit_cancel_link' class="sr_link"> <a href='' onclick="{!c.cancel_sr_form}">Cancel</a></span>-->
+         <span class="sr-header">SR Edit ~ {!v.srInfoMap.BMCServiceDesk__FKRequestDefinition__r.BMCServiceDesk__serviceRequestTitle__c}</span><span id='sr_edit_cancel_link' class="sr_link"> <a href='' onclick="{!c.cancel_sr_form}">Cancel</a></span>
+        </section>
+        <c:HD_SR_Edit recordId="{!v.recordId}"/>
+    </div>
+    </aura:If>
+
+    <div aura:id="incidentComponent" class="hideMe">
+
+
+        <div class="slds-text-color--inverse-weak">Sorry, This is not a Service Request.</div>
+    </div>
+    </div>
+
+    <!--
+    <p>Request For : {!v.test.Owner.Name} </p>
+    <p>Request By : {!v.test.BMCServiceDesk__FKClient__r.Name}</p>
+    <p>Employee Number: {!v.test.BMCServiceDesk__FKClient__r.EmployeeNumber}</p>
+    <p>Employee Phone: {!v.test.BMCServiceDesk__FKClient__r.Phone }</p>
+    <p>Employee Email: {!v.test.BMCServiceDesk__FKClient__r.Email }</p>
+    <p>Employee Department: {!v.test.BMCServiceDesk__FKClient__r.Department }</p>
+    <p>Employee Division: {!v.test.BMCServiceDesk__FKClient__r.Division }</p>
+    -->
+</aura:component>

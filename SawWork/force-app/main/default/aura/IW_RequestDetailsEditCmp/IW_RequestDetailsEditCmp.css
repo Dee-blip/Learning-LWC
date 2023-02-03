@@ -1,0 +1,58 @@
+.THIS {
+}
+
+.THIS .slds-modal__container{
+    width:75%;
+    max-width:80rem;
+}
+.THIS div > label{
+  display: inline-block;
+  line-height: 2rem;
+  width:5rem;
+  font-weight:500;  
+}
+.THIS .accountDetailTopCls{
+    display: flex;
+    border: 1px solid rgb(240, 240, 240);
+    border-radius: 5px;
+    color: #000000;
+    background-color: #f6f6f6;
+    box-shadow: 3px 8px 14px 0px #545456;
+}
+.THIS .slds-modal__content:last-child {
+    border-bottom-right-radius: .25rem;
+    border-bottom-left-radius: .25rem;
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.16);
+}
+
+.THIS .customRequired{
+ font-weight: 400; 
+} 
+
+ .THIS .customRequired:before{    
+ content: "*";
+ margin: 0 0.125rem 0 0.125rem;
+ color: rgb(194, 57, 52);
+ float: left; 
+} 
+
+ .THIS .none{
+ display:none; 
+}
+
+.THIS .slds-has-inline-listbox{
+    margin-bottom: 15px;
+    margin-top: -8px;
+	margin-left: 5px;
+
+}
+
+.THIS .Opportunityy{
+	margin-left: 5px;
+
+}
+/*
+.THIS .slds-pill__remove {
+display: none;
+}
+*/

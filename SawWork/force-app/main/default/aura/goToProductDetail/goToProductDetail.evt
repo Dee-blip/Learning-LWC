@@ -1,0 +1,3 @@
+<aura:event type="APPLICATION" description="Passing the Product Id" >
+	<aura:attribute name="OppLineItemId" type="Id"/>
+</aura:event>

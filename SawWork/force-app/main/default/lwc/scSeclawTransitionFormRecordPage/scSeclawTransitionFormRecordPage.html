@@ -1,0 +1,178 @@
+<template>
+    <div class="form-div slds-box slds-theme_default slds-is-relative">
+        <template if:true={showSpinner}>
+            <lightning-spinner alternative-text="Loading form..." size="large" variant="brand"></lightning-spinner>
+        </template>
+        <lightning-record-view-form object-api-name="SecLaw_Transition_Form__c" record-id={recordId}>
+            <div if:true={showForm} class="seclaw-form-heading-top">
+                <b><u>General Information for Transition to SecLaw</u></b>
+            </div>
+            <div if:true={showForm} class="seclaw-form-field slds-box">
+                <label for="gen_info">What sort of case is this?</label>
+                <div class="spacing-div"></div>
+                <lightning-output-field id="gen_info" field-name="General_Information__c" variant="label-hidden">
+                </lightning-output-field>
+            </div>
+            <template if:true={showHighPrioritySection}>
+                <div if:true={showForm} class="seclaw-form-field slds-box">
+                    <label for="actions_summary">Summary of the actions taken:</label>
+                    <div class="spacing-div"></div>
+                    <lightning-output-field id="actions_summary" field-name="Steps_taken_so_far__c"
+                        variant="label-hidden">
+                    </lightning-output-field>
+                </div>
+            </template>
+            <template if:true={showCPClaimQuestionnaireSection}>
+                <div if:true={showForm} class="seclaw-form-heading">
+                    <b><u>CP Claim Questionnaire</u></b>
+                </div>
+                <div if:true={showForm} class="seclaw-form-field slds-box">
+                    <label for="on_akamai">Is this content on Akamai?</label>
+                    <div class="spacing-div"></div>
+                    <lightning-output-field id="on_akamai" field-name="Content_on_Akamai__c" variant="label-hidden">
+                    </lightning-output-field>
+                </div>
+                <template if:true={showCPCodeSection}>
+                    <div if:true={showForm} class="seclaw-form-field slds-box">
+                        <label for="cp_code">CP code:</label>
+                        <div class="spacing-div"></div>
+                        <lightning-output-field id="cp_code" field-name="CP_Code__c" variant="label-hidden">
+                        </lightning-output-field>
+                    </div>
+                    <div if:true={showForm} class="seclaw-form-field slds-box">
+                        <label for="blocked_removed">Has the content been blocked/removed already by AkaTec?</label>
+                        <div class="spacing-div"></div>
+                        <lightning-output-field id="blocked_removed" field-name="Content_Blocked_Removed__c"
+                            variant="label-hidden">
+                        </lightning-output-field>
+                    </div>
+                    <div if:true={showForm} class="seclaw-form-field slds-box">
+                        <label for="customer_informed_of_blocking">Has the customer been informed of the
+                            content/blocking?</label>
+                        <div class="spacing-div"></div>
+                        <lightning-output-field id="customer_informed_of_blocking"
+                            field-name="Customer_informed_of_content_blocking__c" variant="label-hidden">
+                        </lightning-output-field>
+                    </div>
+                    <div if:true={showForm} class="seclaw-form-field slds-box">
+                        <label for="requestor_informed_of_case_handling">Has the requestor been informed that the case
+                            is being handled?</label>
+                        <div class="spacing-div"></div>
+                        <lightning-output-field id="requestor_informed_of_case_handling"
+                            field-name="Requestor_informed_of_case_handling__c" variant="label-hidden">
+                        </lightning-output-field>
+                    </div>
+                </template>
+            </template>
+            <template if:true={showOtherSection1}>
+                <div if:true={showForm} class="seclaw-form-heading">
+                    <b><u>Other</u></b>
+                </div>
+                <div if:true={showForm} class="seclaw-form-field slds-box">
+                    <label for="akamai_related">Is this Akamai-related?</label>
+                    <div class="spacing-div"></div>
+                    <lightning-output-field id="akamai_related" field-name="Akamai_related__c" variant="label-hidden">
+                    </lightning-output-field>
+                </div>
+                <template if:true={showOtherSection2}>
+                    <div if:true={showForm} class="seclaw-form-field slds-box">
+                        <label for="urls_ip_addresses">Akamai-specific URL(s)/IP address(es)
+                            and the connected CP code(s)</label>
+                        <div class="spacing-div"></div>
+                        <lightning-output-field id="urls_ip_addresses" field-name="URLs_IPs_and_connected_CP_code__c"
+                            variant="label-hidden">
+                        </lightning-output-field>
+                    </div>
+                    <div if:true={showForm} class="seclaw-form-field slds-box">
+                        <label for="connected_account">Connected Account Name</label>
+                        <div class="spacing-div"></div>
+                        <lightning-output-field id="connected_account" field-name="Connected_Account__c"
+                            variant="label-hidden">
+                        </lightning-output-field>
+                    </div>
+                </template>
+            </template>
+            <template if:true={showAdditionalDetailsSection}>
+                <div if:true={showForm} class="seclaw-form-heading">
+                    <b><u>Additional Details</u></b>
+                </div>
+                <div if:true={showForm} class="seclaw-form-field slds-box">
+                    <label for="request_type">Request Type</label>
+                    <div class="spacing-div"></div>
+                    <lightning-output-field id="request_type" field-name="Request_Type__c" variant="label-hidden">
+                    </lightning-output-field>
+                </div>
+                <div if:true={showForm} class="seclaw-form-field slds-box">
+                    <label for="reported_issue">What is the reported issue?</label>
+                    <div class="spacing-div"></div>
+                    <lightning-output-field id="reported_issue" field-name="reported_issue__c" variant="label-hidden">
+                    </lightning-output-field>
+                </div>
+                <div if:true={showForm} class="seclaw-form-field slds-box">
+                    <label for="steps_taken">What steps have been taken so far to investigate the request? How is this
+                        connected to Akamai? Please provide the outcome (your notes, collected data, links to external
+                        sites such as VirusTotal, screenshots).</label>
+                    <div class="spacing-div"></div>
+                    <lightning-output-field id="steps_taken" field-name="Steps_taken_so_far__c" variant="label-hidden">
+                    </lightning-output-field>
+                </div>
+                <div if:true={showForm} class="seclaw-form-field slds-box">
+                    <label for="complainant_informed">Has the complainant been informed about case
+                        creation?</label>
+                    <div class="spacing-div"></div>
+                    <lightning-output-field id="complainant_informed" field-name="Complainant_is_informed__c"
+                        variant="label-hidden">
+                    </lightning-output-field>
+                </div>
+                <div if:true={showForm} class="seclaw-form-field slds-box">
+                    <label for="whats_required">What is required from SecLaw? Add a “brief summary”. Include an
+                        explanation of what is required from the SecLaw Team.</label>
+                    <div class="spacing-div"></div>
+                    <lightning-output-field id="whats_required" field-name="What_is_required_from_SecLaw__c"
+                        variant="label-hidden">
+                    </lightning-output-field>
+                </div>
+                <div if:true={showForm} class="seclaw-form-field slds-box">
+                    <label for="enough_info">Is there enough information to perform analysis for this type of request?
+                        (based on the data provided by the requestor and your own research).</label>
+                    <div class="spacing-div"></div>
+                    <lightning-output-field id="enough_info" field-name="Enough_information__c" variant="label-hidden">
+                    </lightning-output-field>
+                </div>
+                <template if:true={showInformationForAnalysisSection}>
+                    <div if:true={showForm} class="seclaw-form-field slds-box">
+                        <label for="timeframe">The exact timeframe the occurrence was observed - preferably with
+                            sub-second precision:</label>
+                        <div class="spacing-div"></div>
+                        <lightning-output-field id="timeframe" field-name="Timeframe__c" variant="label-hidden">
+                        </lightning-output-field>
+                    </div>
+                    <div if:true={showForm} class="seclaw-form-field slds-box">
+                        <label for="in_depth_description">An in-depth description of the occurrence:</label>
+                        <div class="spacing-div"></div>
+                        <lightning-output-field id="in_depth_description" field-name="In_depth_description__c"
+                            variant="label-hidden">
+                        </lightning-output-field>
+                    </div>
+                    <div if:true={showForm} class="seclaw-form-field slds-box">
+                        <label for="volumetric_data">{volumetricDataFieldLabel}</label>
+                        <div class="spacing-div"></div>
+                        <lightning-output-field id="volumetric_data"
+                            field-name="Volumetric_data_traffic_snippets_logs__c" variant="label-hidden">
+                        </lightning-output-field>
+                    </div>
+                    <template if:true={showAbuseDetailsSection}>
+                        <div if:true={showForm} class="seclaw-form-field slds-box">
+                            <label for="abuse">The type of the alleged attack (for example - TCP SYN, UDP etc.) and
+                                whether it was directed at a particular destination port or a random port:</label>
+                            <div class="spacing-div"></div>
+                            <lightning-output-field id="abuse" field-name="Abuse_claim_attack_details__c"
+                                variant="label-hidden">
+                            </lightning-output-field>
+                        </div>
+                    </template>
+                </template>
+            </template>
+        </lightning-record-view-form>
+    </div>
+</template>

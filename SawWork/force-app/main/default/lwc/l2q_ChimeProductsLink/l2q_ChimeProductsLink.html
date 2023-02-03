@@ -1,0 +1,60 @@
+<template>
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-04" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div style="max-width:60rem;min-width:60rem;" class="slds-modal__container">
+
+            <header class="slds-modal__header">
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={handleClose} alternative-text="close" variant="bare-inverse" class="slds-modal__close"></lightning-button-icon>
+                <h2 style="font-weight:600;color:#514f4D;" id="modal-heading-01" class="slds-modal__title slds-hyphenate">Quick LOEs</h2>
+              </header>
+
+              
+        
+        <div class="slds-modal__content slds-p-horizontal_medium slds-p-bottom_medium" id="modal-content-id-1"> 
+          <div class="slds-m-vertical_small slds-align_absolute-center search" onkeypress={keycheck} >
+            <lightning-input type="text" placeholder="Search Product and press Enter..." value={searchKey} name="searchProduct" onblur={handleSearch} class="slds-align__absolute-center"></lightning-input>
+            
+          </div>     
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+        <thead>
+          <tr class="slds-line-height_reset">
+            <th class="slds-cell-wrap" style="width:250px" scope="col">
+              <div title="Product">Product</div>
+            </th>
+            <th class="slds-cell-wrap" style="width:100px" scope="col">
+              <div title="Default LOE for Standard Integrations">Default LOE for Standard Integrations</div>
+            </th>
+            <th class="slds-cell-wrap" style="width:100px" scope="col">
+              <div title="Default LOE for Managed Integrations">Default LOE for Managed Integrations</div>
+            </th>    
+          </tr>
+        </thead>
+   
+    <tbody>
+        <template for:each={Products} for:item="iteratedProduct">
+            <tr key ={iteratedProduct.Id} class="slds-hint-parent">
+            
+                <td style="width:250px" class="slds-cell-wrap" data-label="Product Name">
+                    <div>{iteratedProduct.Product_Name__c}</div>
+                </td>
+                <td style="width:100px" class="slds-cell-wrap" data-label="Standard LOE">
+                    <div>{iteratedProduct.Default_LOE_Standard__c}</div>
+                </td>
+                <td style="width:100px" class="slds-cell-wrap" data-label="Managed LOE">
+                    <div>{iteratedProduct.Default_LOE_Managed__c}</div>
+                </td>   
+            </tr>
+        </template>
+    </tbody>
+</table> 
+
+</div>
+<!--<footer class="slds-modal__footer">
+    <button class="slds-button slds-button_neutral slds-align_absolute-center">Close</button>
+   
+  </footer>-->
+</div>
+</section>
+<div class="slds-backdrop slds-backdrop_open"></div>            
+
+    
+</template>

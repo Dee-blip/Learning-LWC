@@ -1,0 +1,343 @@
+<aura:component controller="SF1_ManageProductsController" implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global">
+  <aura:attribute name="opportunityObj" type="Opportunity"/>
+  <aura:attribute name="oppId" type="Id"/>
+  <aura:attribute
+    name="oppLineItemObject"
+    type="OpportunityLineItem"
+    default="{'sobjectType':'OpportunityLineItem',
+                            'Product2Id': '',
+                            'OpportunityId' : '',
+                            'Projected_Monthly_commit_fees__c': '',
+                            'NRR__c': '',
+                            'Term__c': '',
+                            'SSN__c': '',
+                            'Quantity' : 1,
+                            'PricebookEntryId' : '',
+                            'Specialist_Forecast_Category__c' : '',
+                            'Specialist_Projected_Monthly_Commit__c': '',
+                            'Specialist_NRR__c':''
+                       }"/>
+  <aura:attribute name="productNames" type="String[]"/>
+  <aura:attribute name="carrierAppValues" type="String[]"/>
+  <aura:attribute name="carrierAppValue" type="String"/>
+  <aura:attribute name="oppCategoryValues" type="String[]"/>
+  <aura:attribute name="selectedOppCategoryValues" type="String[]"/>
+  <aura:attribute name="oppCategoryValue" type="String"/>
+  <aura:attribute name="oppSubCategoryValues" type="String[]"/>
+  <aura:attribute name="oppSubCategoryValue" type="String"/>
+  <aura:attribute name="oppCancellationLostValues" type="String[]"/>
+  <aura:attribute name="oppCancellationLostValue" type="String"/>
+  <aura:attribute name="additionalLossValue" type="String"/>
+  <aura:attribute name="aggregationPartnerValues" type="String[]"/>
+  <aura:attribute name="aggregationPartnerValue" type="String"/>
+  <aura:attribute name="competitorValues" type="String[]"/>
+  <aura:attribute name="competitorValue" type="String"/>
+  <aura:attribute name="otherCompetitorName" type="String"/>
+  <aura:attribute name="productName" type="String"/>
+  <aura:attribute name="accountName" type="String"/>
+  <aura:attribute name="productNamesMap" type="Map" default="{}"/>
+  <aura:attribute name="categoryToSubcategoryMap" type="Map" default="{}"/>
+  <aura:attribute name="SubcategoryToCancelLossReasonMap" type="Map" default="{}"/>
+  <aura:attribute name="missingProductFeature" type="String"/>
+  <aura:attribute name="initialOutClause" type="String"/>
+  <aura:attribute name="consolidationAccount" type="String"/>
+  <aura:attribute name="unacceptableTermsAndConditions" type="String"/>
+  <aura:attribute name="term" type="Integer"/>
+  <aura:attribute name="termRequired" type="Boolean" default="false"/>
+  <aura:attribute name="termErrorMessage" type="String" default=""/>
+  <aura:attribute name="AdditionalLossDetailError" type="String" default=""/>
+  <aura:attribute name="AdditionalLossDetailRequired" type="Boolean" default="false"/>
+
+  <aura:attribute name="isSpecialistUser" type="Boolean" default="false"/>
+
+  <aura:attribute name="splForecastCategoryTouched" type="Boolean" default="false"/>
+  <aura:attribute name="splForecastCategory" type="List"/>
+  <aura:attribute name="splForecastCategoryFld" type="String"/>
+
+  <aura:attribute name="splCloseDateTouched" type="Boolean" default="false"/>
+  <aura:attribute name="splCloseDate" type="Date"/>
+  <aura:attribute name="splCloseDateFld" type="Date"/>
+
+  <aura:attribute name="splProMonComTouched" type="Boolean" default="false"/>
+  <aura:attribute name="splProMonComFld" type="String" default="0"/>
+  <aura:attribute name="proMonComFld" type="String" default="0"/>
+
+  <!-- <aura:attribute name="splProMonUsgTouched" type="Boolean" default="false"/>
+  <aura:attribute name="splProMonUsgFld" type="String" default="0"/> -->
+  <aura:attribute name="proMonUsgFld" type="String" default="0"/>
+
+  <aura:attribute name="specialistOneTimeFeeTouched" type="Boolean" default="false"/>
+  <aura:attribute name="specialistOneTimeFee" type="String" default="0"/>
+
+  <aura:handler event="c:invokeAddProductInit" action="{!c.performAddProductInit}"/>
+  <aura:registerEvent name="productDetailNavigateEvent" type="c:goToProductDetail"/>
+  <aura:registerEvent name="oppProdDetailsViewInvokeInit" type="c:invokeOppProdDetailsInit"/>
+  <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+  <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+  <div>
+    <center>
+      <lightning:spinner variant="brand" size="large" aura:id="ltngSpinnerAddProd" class="slds-hide"/>
+    </center>
+  </div>
+
+  <ui:scrollerWrapper class="scrollerSize">
+    <div class="slds-panel slds-grid slds-grid_vertical slds-nowrap slds-show" aura:id="AddProductDetailsId">
+      <div class="slds-form slds-form_stacked slds-grow slds-scrollable_y">
+        <div class="slds-panel__section slds-border_bottom">
+          <div class="slds-media__body">
+            <div class="slds-button-group slds-m-top_small" role="group">
+              <button aura:id="BackAddProdBtnId" class="slds-button slds-button_neutral slds-grow slds-show" onclick="{!c.backProductAction}">
+                Cancel
+              </button>
+              <button aura:id="SaveAddProdBtnId" class="slds-button slds-button_neutral slds-grow slds-show" onclick="{!c.saveProductAction}">
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slds-panel__section" aura:id="addOnlyProdInfoId">
+        <h3 class="slds-text-heading_small slds-m-bottom_medium">
+          Add Product Information
+        </h3>
+        <div class="slds-hide" style="color:red;" aura:id="prodErrorMessageId">
+          <p>
+            Please select a valid Product Name
+          </p>
+        </div>
+        <div class="slds-hide" style="color:red;" aura:id="termErrorMessageId">
+          <p>
+            {!v.termErrorMessage}
+          </p>
+        </div>
+        <ul>
+          <lightning:select aura:id="productNameId" onchange="{!c.productSelection}" value="{!v.oppLineItemObject.Product2Id}" label="Product Name" required="true">
+            <aura:iteration items="{!v.productNames}" var="prod" indexVar="key">
+              <option text="{!prod}" label="{!prod}"/>
+            </aura:iteration>
+          </lightning:select>
+          <br/>
+
+          <lightning:input type="number" placeholder="0" value="{!v.proMonComFld}" name="input1" label="Projected Monthly Commit" onchange="{! c.updateSpcltMonCmtFld }" step="any"/>
+          <br/>
+
+          <lightning:input type="number" placeholder="0" value="{!v.oppLineItemObject.NRR__c}" name="oneTimename" label="One-Time Fee" onchange="{! c.updateSpecialistOneTimeFee}" step="any"/>
+          <br/>
+
+          <lightning:input type="number" value="{!v.oppLineItemObject.Term__c}" name="Term" label="Term" required = "{!v.termRequired}" step="any" aura:id = "TermValue"/>
+          <br/>
+
+          <lightning:input disabled="{! !v.isSpecialistUser }" type="number" label="Specialist Projected Monthly Commit" placeholder="0" value="{! v.splProMonComFld }" onchange="{! c.touchedMonCmtFld }" step="any"/>
+          <br/>
+
+          <lightning:input disabled="{! !v.isSpecialistUser }" type="number" label="Specialist One-Time Fee" placeholder="0" value="{! v.specialistOneTimeFee}" onchange="{! c.touchedOneTimeFee}" step="any"/>
+          <br/>
+
+          <!-- <lightning:input disabled="{! !v.isSpecialistUser }" type="number" label="Specialist Projected Monthly Usage" placeholder="0" value="{! v.splProMonUsgFld }" onchange="{! c.touchedMonUsgFld }" step="any"/>
+          <br/> -->
+
+          <div>
+            <lightning:select value="{!v.splForecastCategoryFld}" label="Specialist Forecast Category" disabled="{! !v.isSpecialistUser }" onchange="{! c.touchedSplForecastCat }">
+              <aura:iteration items="{!v.splForecastCategory}" var="option" indexVar="key">
+                <option text="{!option.label}" label="{!option.value}" selected="{!option.isSelected}"/>
+              </aura:iteration>
+            </lightning:select>
+          </div>
+          <br/>
+          <lightning:input disabled="{! !v.isSpecialistUser }" type="date" label="Specialist Close Date" placeholder="0" value="{! v.splCloseDateFld }" onchange="{! c.touchedSplCloseDate }" step="any"/>
+          <br/><br/>
+        </ul>
+      </div>
+    </div>
+  </ui:scrollerWrapper>
+
+
+  <div class="demo-only slds-hide" style="height:120px;" aura:id="addCarrierApplicationId">
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal slds-slide-up-saving">
+      <div class="slds-modal__container">
+        <header class="slds-modal__header">
+          <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+            Carrier Application
+          </h2>
+        </header>
+        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+          <div class="slds-show" style="color:blue;" aura:id="carrierErrorMessageId">
+            <p>
+              Please select a valid value to proceed
+            </p>
+            <br/>
+          </div>
+
+          <table class="slds-table slds-table--bordered slds-table--cell-buffer" aura:id="carrierAppTableId">
+            <tbody>
+              <aura:iteration items="{!v.carrierAppValues}" var="val">
+                <tr>
+                  <td scope="row" class="slds-text-align--left" style="padding-left: 0.1cm;">
+                    <div class="slds-form-element">
+                      <div class="slds-form-element__control">
+                        <label class="slds-checkbox">
+                          <ui:inputCheckbox aura:id="boxPack" change="{!c.selectCarrierApp}" text="{!val}"/>
+                          <span class="slds-checkbox--faux"/>
+                          <span class="slds-form-element__label text"/>
+                        </label>
+                      </div>
+                    </div>
+                  </td>
+                  <td scope="row">
+                    <div class="slds-truncate">
+                      <a class="slds-truncate" style="font-size:small">
+                        {!val}
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              </aura:iteration>
+            </tbody>
+          </table>
+        </div>
+        <footer class="slds-modal__footer">
+          <button class="slds-button slds-button_neutral" onclick="{!c.hideAddCarrierApplication}">
+            Cancel
+          </button>
+          <button class="slds-button slds-button_brand" onclick="{!c.saveCarrierApplication}">
+            Save
+          </button>
+        </footer>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open" aura:id="backDropId"/>
+  </div>
+
+  <div class="demo-only slds-hide" style="height:120px;" aura:id="addOppDetailsId" aria-hidden="false">
+    <section role="document" tabindex="-1" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal slds-slide-up-saving">
+      <div class="slds-modal__container">
+        <header class="slds-modal__header">
+          <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+            Opportunity Details
+          </h2>
+        </header>
+        <div class="slds-modal__content slds-p-around_small slds-show" id="modal-content-id-1" aura:id="oppPicklistDetailsId">
+          <div class="slds-hide" style="color:red;" aura:id="addOppErrorMessageId">
+            <p>
+              Please select a valid picklist value for all the fields</p>
+          </div>
+
+          <lightning:select aura:id="oppCategoryId" onchange="{!c.oppCategorySelection}" value="{!v.oppCategoryValue}" label="Loss Category" required="true">
+            <option text="--none--" label="--None--"/>
+            <aura:iteration items="{!v.oppCategoryValues}" var="val">
+              <option text="{!val}" label="{!val}"/>
+            </aura:iteration>
+          </lightning:select>
+          <br/>
+          <lightning:select aura:id="oppCategoryId" value="{!v.oppCancellationLostValue}" label="Loss Reason" required="true" onchange="{!c.oppCancellationSelection}">
+            <option text="--none--" label="--None--"/>
+            <aura:iteration items="{!v.oppCancellationLostValues}" var="val">
+              <option text="{!val}" label="{!val}"/>
+            </aura:iteration>
+          </lightning:select>     
+            <br/>
+            <lightning:textarea value="{!v.additionalLossValue}" label="Additional Loss Detail" required="{!v.AdditionalLossDetailRequired}" >
+          </lightning:textarea>
+          <div class="slds-hide" style="color:red;" aura:id="AdditionalLossDetail">
+            <p>
+              {!v.AdditionalLossDetailError}
+            </p>
+          </div>
+            <br/>
+        </div>
+        <div class="slds-modal__content slds-p-around_medium slds-hide" id="modal-content-id-2" aura:id="cancellationFieldsId">
+          <div class="slds-hide" style="color:red;" aura:id="cancellationErrorMessageId">
+            <p>
+              Please enter a valid value for all the fields</p>
+          </div>
+          <div class="slds-hide" aura:id="missingProductFeatureId">
+            <lightning:textarea name="myTextArea" value="{!v.missingProductFeature}" label="Missing Product Feature"/>
+            <br/>
+          </div>
+          <div class="slds-hide" aura:id="initialOutClauseId">
+            <lightning:textarea name="myTextArea" value="{!v.initialOutClause}" label="Initial Out Clause Description"/>
+            <br/>
+          </div>
+          <div class="slds-hide" aura:id="aggregationPartnerId">
+            <lightning:select aura:id="aggregationPartnerPickId" onchange="{!c.oppAggregationSelection}" value="{!v.aggregationPartnerValue}" required="true" label="Aggregation Partner">
+              <option text="--none--" label="--None--"/>
+              <aura:iteration items="{!v.aggregationPartnerValues}" var="val">
+                <option text="{!val}" label="{!val}"/>
+              </aura:iteration>
+            </lightning:select>
+            <br/>
+          </div>
+          <div class="slds-hide" aura:id="consolidationAccountId">
+
+            <span class="slds-form-element__label">Consolidation Account</span>
+            <c:SF1_LookupComponent placeholderText="Consolidation Account" type="Account" value="{!v.consolidationAccount}" fieldsToShowInSuggestion="Account_Name__c"/>
+
+            <br/><br/><br/><br/><br/><br/><br/><br/><br/>
+          </div>
+          <div class="slds-hide" aura:id="oppCompetitorId">
+            <div class="slds-hide" style="color:red;" aura:id="otherCompetitorNameErrorId">
+            <p>
+              Please enter Other Competitor Name
+            </p>
+          </div>
+            <lightning:select aura:id="competitorPickId" value="{!v.competitorValue}" label="Competitor" onchange="{!c.handleCompetitorOnChange}">
+            <!-- <lightning:select aura:id="competitorPickId" value="{!v.competitorValue}" label="Competitor"> -->
+              <option text="--none--" label="--None--"/>
+              <aura:iteration items="{!v.competitorValues}" var="val">
+                <option text="{!val}" label="{!val}"/>
+              </aura:iteration>
+            </lightning:select>
+            <br/>
+          </div>
+          <div class="slds-hide" aura:id="otherCompetitorNameId">
+            <lightning:input name="otherCompetitorName" value="{!v.otherCompetitorName}" label="Other Competitor(s)" required="true"/>
+            <br/>
+          </div>
+          <div class="slds-hide" aura:id="unacceptableTermsandConditionsId">
+            <lightning:textarea name="myTextArea" value="{!v.unacceptableTermsAndConditions}" label="Unacceptable Terms and Conditions"/>
+            <br/>
+          </div>
+        </div>
+        <div aura:id="mainFooterId" class="slds-show">
+          <footer class="slds-modal__footer">
+            <button class="slds-button slds-button_neutral" onclick="{!c.addOppDetailsCancelAction}" aura:id="cancelButtonId">
+              Cancel
+            </button>
+          </footer>
+        </div>
+        <div aura:id="nextFooterId" class="slds-hide">
+          <footer class="slds-modal__footer">
+            <button class="slds-button slds-button_neutral" onclick="{!c.addOppDetailsCancelAction}" aura:id="cancelButtonId">
+              Cancel
+            </button>
+            <button class="slds-button slds-button_brand" onclick="{!c.addOppDetailsNextAction}" aura:id="nextButtonId">
+              Next
+            </button>
+          </footer>
+        </div>
+        <div aura:id="saveFooterId" class="slds-hide">
+          <footer class="slds-modal__footer">
+            <button class="slds-button slds-button_neutral" onclick="{!c.addOppDetailsCancelAction}" aura:id="cancelButtonId">
+              Cancel
+            </button>
+            <button class="slds-button slds-button_brand" onclick="{!c.addOppDetailsSaveAction}" aura:id="saveButtonId">
+              Save
+            </button>
+          </footer>
+        </div>
+        <div aura:id="saveAfterNextFooterId" class="slds-hide">
+          <footer class="slds-modal__footer">
+            <button class="slds-button slds-button_neutral" onclick="{!c.addOppDetailsBackAction}" aura:id="backButtonId">
+              Back
+            </button>
+            <button class="slds-button slds-button_brand" onclick="{!c.addOppDetailsSaveAction}" aura:id="saveButtonId">
+              Save
+            </button>
+          </footer>
+        </div>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open" aura:id="backDropId"/>
+  </div>
+
+</aura:component>

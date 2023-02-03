@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="Event template">
+	<aura:attribute name="change" type="BMCServiceDesk__Change_Request__c"/>
+</aura:event>

@@ -1,0 +1,15 @@
+<apex:page >
+	<script>
+		window.onload = function ()
+		{
+			window.open('{!$Label.IncentUrl}','_blank');
+		}
+	</script>
+	<body>
+		<apex:form >
+			<apex:pageBlock >
+				<apex:outputText value="{!$Label.DisplayMessageForIncentRedirection}" style="font-weight:bold;font-size: 160%" />
+			</apex:pageBlock>
+		</apex:form>
+	</body>
+</apex:page>

@@ -1,0 +1,130 @@
+<apex:page standardController="TS_TeamMember__c" extensions="TSTeamMemberExtension" sidebar="false" standardStylesheets="true" showheader="false" id="tsteampage">
+    <head>
+        <apex:includeScript value="{!URLFOR($Resource.JQuery111, 'jquery-1.11.2/dist/jquery.min.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.JQueryUI111, 'jquery-ui.min.js')}"/>
+        
+        <apex:includeScript value="{!URLFOR($Resource.bootstrap3, 'dist/js/bootstrap.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.bootstrap3, 'dist/js/bootstrap.min.js')}"/>
+        
+        <apex:stylesheet value="{!URLFOR($Resource.bootstrap3, 'dist/css/bootstrap.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.bootstrap3, 'dist/css/bootstrap.min.css')}"/>
+        
+        <apex:stylesheet value="{!URLFOR($Resource.jQueryDataTablesZip, 'jQueryDataTables/css/jquery.dataTables.css')}"/>
+        <style type="text/css">
+           .textsize {font-size : 9pt;}
+           .accNoLabel {
+                    color: #4a4a56;
+                    font-weight: 700;
+                    font-size: 91%;
+                }
+
+        </style>
+        <script type="text/javascript" src="../soap/ajax/25.0/connection.js"></script>
+        <script type="text/javascript">
+            function closeWin(){ 
+                var successElement = document.getElementById('{!$Component.tsteampageform.success}'); 
+                if(successElement.value=='true') {
+                   if(window.parent){ 
+                      window.parent.opener.location.href = window.parent.opener.location.href; 
+                      window.parent.close();                  
+                      window.close();                       
+                    }   
+                   else{
+                       window.opener.location.href = window.opener.location.href;
+                       window.close();   
+                    }   
+                }           
+            }
+            
+    </script>
+    </head>
+    <body class="textsize">
+     
+        
+        <apex:form id="tsteampageform">
+            <apex:pageBlock id="tsteampagepgblock" >
+                <apex:pageMessages id="msgQ"/>
+                    <apex:pageblockSection columns="1" title="Create Support Team Member" collapsible="false" id="tsteampagepgblocksection">
+                        <apex:inputField value="{!TS_TeamMember__c.TS_Support_Team__c}" required="true"/>
+                        <apex:inputField id="teammember" styleClass="teamMember" value="{!TS_TeamMember__c.Team_Member__c}" required="true"/>                          
+                        <apex:inputField value="{!TS_TeamMember__c.Role__c}" required="true"/>
+                       <!-- <apex:outputLink id="showAccsLink" style="color: #2a6496;text-decoration: underline;" value="" >Click to see #Accounts</apex:outputLink>-->
+                        <div id="accCount" style="display: none; ">
+                            <label class="accNoLabel"  for="primAcc">#Accounts Primary</label>
+                            <input type="text" value="" id="primAcc" readonly="readonly"/>
+                            <label class="accNoLabel"   for="seccAcc">#Accounts Secondary</label>
+                            <input type="text" value="" id="seccAcc" readonly="readonly"/>
+                        </div> 
+                    </apex:pageblockSection>    
+            </apex:pageBlock>
+            
+            <apex:panelGrid columns="2" style="margin-left:auto; margin-right:auto">
+                <apex:inputHidden id="success" value="{!success}"/><br/>
+                <apex:commandButton value="Save" action="{!save}" oncomplete="closeWin();" styleClass="btn btn-default" reRender="success,msgQ"/>
+                <apex:commandButton value="Cancel" onClick="window.close();"  styleClass="btn btn-default" immediate="true"/>
+            </apex:panelGrid>
+        </apex:form>
+    </body>
+     
+     <script type="text/javascript">
+        var $j = jQuery.noConflict();
+    
+    $j(document).ready(function(){
+            $j('[id$=tsteampage\\:tsteampageform\\:tsteampagepgblock\\:tsteampagepgblocksection\\:teammember]').focus(function(){
+                
+                //alert("helllooooo");
+                 var id = document.getElementById('tsteampage:tsteampageform:tsteampagepgblock:tsteampagepgblocksection:teammember_lkid').value;           
+                var query = "select COUNT(AccountId) accCount from AccountTeamMember where UserId='"+id+"' and TeamMemberRole ='Technical Support - Primary' group by UserId";
+                sforce.connection.sessionId = '{!$Api.Session_ID}';
+                var result = sforce.connection.query(query);
+                var primaryAccCount = 0; var secondaryAccCount = 0;
+                if(result.get("size")!=0){
+                  var records = result.getArray("records");  
+                  primaryAccCount =  records[0].accCount;
+                  
+                 }   
+                
+                query = "select COUNT(AccountId) accCount from AccountTeamMember where UserId='"+id+"' and TeamMemberRole ='Technical Support - Secondary' group by UserId";
+                result = sforce.connection.query(query);
+                if(result.get("size")!=0){
+                  var records = result.getArray("records");  
+                  secondaryAccCount =  records[0].accCount;     
+                }
+                
+                document.getElementById("primAcc").value = primaryAccCount;
+                document.getElementById("seccAcc").value = secondaryAccCount;
+                $j('[id$=accCount]').show();
+                 event.preventDefault();
+                });
+        
+        
+        /* $j('[id$=showAccsLink]').click(function(event) {   
+                var id = document.getElementById('tsteampage:tsteampageform:tsteampagepgblock:tsteampagepgblocksection:teammember_lkid').value;           
+                var query = "select COUNT(AccountId) accCount from AccountTeamMember where UserId='"+id+"' and TeamMemberRole ='Technical Support - Primary' group by UserId";
+                sforce.connection.sessionId = '{!$Api.Session_ID}';
+                var result = sforce.connection.query(query);
+                var primaryAccCount = 0; var secondaryAccCount = 0;
+                if(result.get("size")!=0){
+                  var records = result.getArray("records");  
+                  primaryAccCount =  records[0].accCount;
+                  
+                 }   
+                
+                query = "select COUNT(AccountId) accCount from AccountTeamMember where UserId='"+id+"' and TeamMemberRole ='Technical Support - Secondary' group by UserId";
+                result = sforce.connection.query(query);
+                if(result.get("size")!=0){
+                  var records = result.getArray("records");  
+                  secondaryAccCount =  records[0].accCount;     
+                }
+                
+                document.getElementById("primAcc").value = primaryAccCount;
+                document.getElementById("seccAcc").value = secondaryAccCount;
+                $j('[id$=accCount]').show();
+                 event.preventDefault();
+                // return false;
+            });*/
+               
+     });
+     
+        </script>
+</apex:page>

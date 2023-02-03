@@ -1,0 +1,40 @@
+<apex:page controller="EB_CtrlBouncedEmailReport" id="bouncedReport">
+<apex:form >
+  <apex:pageMessages id="errorMessage">
+  </apex:pageMessages>
+  <apex:outputText value="Bounced Contacts Report: {!mailerName}" style="font-size:14px;font-weight:bold"/><br/><br/>
+  <apex:dataTable value="{!Details}" var="mailerContact" id="bounceDetails" cellpadding="10px">
+      
+      <apex:column style="border-color:grey; border-width:1px; border-top-style:none; border-right-style:dashed; border-bottom-style:solid; border-left-style:none; vertical-align: middle;">
+          <apex:facet name="header">Mailer Account Name</apex:facet>
+          <apex:commandLink value="{!mailerContact.mailerAccountName}" action="{!redirect}{!mailerContact.mailerAccountId}" target="_blank"/>
+      </apex:column>
+      <apex:column style="border-color:grey; border-width:1px; border-top-style:none; border-right-style:dashed; border-bottom-style:solid; border-left-style:none; vertical-align: middle;">
+          <apex:facet name="header">Account Names</apex:facet>
+          <apex:commandLink value="{!mailerContact.accountName}" action="{!redirect}{!mailerContact.accountId}" target="_blank"/>
+      </apex:column>
+      <apex:column style="border-color:grey; border-width:1px; border-top-style:none; border-right-style:dashed; border-bottom-style:solid; border-left-style:none; vertical-align: middle;">
+          <apex:facet name="header">Mailer Contact Name</apex:facet>
+          <apex:commandLink value="{!mailerContact.mailerContactName}" action="{!redirect}{!mailerContact.mailerContactId}" target="_blank">
+          <!--<apex:param name="mailerContactName" assignTo="{!redirectMailerContactId}" value="{!mailerContact.mailerContactId}"/>-->
+          </apex:commandLink>
+      </apex:column>
+      <apex:column style="border-color:grey; border-width:1px; border-top-style:none; border-right-style:dashed; border-bottom-style:solid; border-left-style:none; vertical-align: middle;">
+          <apex:facet name="header">Contact</apex:facet>
+          <apex:commandLink value="{!mailerContact.ContactName}" action="{!redirect}{!mailerContact.ContactId}" target="_blank"/>
+      </apex:column>
+      <apex:column style="border-color:grey; border-width:1px; border-top-style:none; border-right-style:dashed; border-bottom-style:solid; border-left-style:none; vertical-align: middle;">
+          <apex:facet name="header">Bounced Email Id</apex:facet>
+          <apex:outputText value="{!mailerContact.bouncedEmailId}"/>
+      </apex:column>
+      <apex:column style="border-color:grey; border-width:1px; border-top-style:none; border-right-style:dashed; border-bottom-style:solid; border-left-style:none; vertical-align: middle;">
+          <apex:facet name="header">Bounced Reason</apex:facet>
+          <apex:outputText value="{!mailerContact.emailBouncedReason}"/>
+      </apex:column> 
+      <apex:column style="border-color:grey; border-width:1px; border-top-style:none; border-right-style:none; border-bottom-style:solid; border-left-style:none; vertical-align: middle;">
+          <apex:facet name="header">To List</apex:facet>
+          <apex:outputText value="{!mailerContact.toList}"/>
+      </apex:column>
+  </apex:dataTable>
+  </apex:form>
+</apex:page>

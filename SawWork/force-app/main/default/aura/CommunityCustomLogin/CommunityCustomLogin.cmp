@@ -1,0 +1,49 @@
+<!--/*Customer Community Component*/-->
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:themeLayout,forceCommunity:availableForAllPageTypes">
+
+    <!--<aura:handler event="aura:doneRendering" value="{!this}" action="{!c.afterRender}"/>-->
+    
+    <article class="slds-card main-article slds-clearfix" aura:id="mainArticle">
+        <div class="slds-card__header slds-grid article-header">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__body">
+                	<h2><span class="slds-text-heading_medium"><b>{!$Label.c.Jarvis_CommunityCustomLogin_WelcomeText}<!--Welcome to Akamai Community!--></b></span></h2>
+                </div>
+            </header>
+        </div>
+    	<div class="slds-card__body slds-card__body_inner article-body">
+            {!$Label.c.Jarvis_CommunityCustomLogin_CommunityDescription}
+            <!--The Akamai Community enables Akamai customers, partners, employees and guests to collaborate online, share ideas and best practices, and facilitate self-service through knowledge sharing. If you are an Akamai customer, partner, or employee, we strongly recommend you login with your Luna account (on the login menu) as it will entitle you to view important content, such as product announcements, that is not available to guest users.-->
+        </div>
+        <br/><br/>
+        <div class="slds-clearfix" aura:id="loginOption">
+            <a class="anchor" onclick="{!c.SSOInitiation}">
+                <div class="slds-float_left login-link">
+                    <div class="slds-card__header slds-grid">
+                        <div class="slds-media__body">
+                            <h2><span class="slds-text-heading_small">{!$Label.c.Jarvis_CommunityCustomLogin_RegisteredUserLoginHeading}<!--Customer / Partner / Employee Login--></span></h2>
+                        </div>
+                    </div>
+                    <div class="slds-card__body slds-card__body_inner">
+                        {!$Label.c.Jarvis_CommunityCustomLogin_RegisteredUserLoginDescription}
+                        <!--Akamai Customers, Partners and Employees, click here to use your Luna account to login. If this is your first visit to the community this will also register you.-->
+                    </div>                
+                </div>
+            </a>
+            <a class="anchor" onclick="{!c.displayLogin}">
+                <div class="slds-float_left login-link" style="margin-left:5%;">
+                    
+                    <div class="slds-card__header slds-grid">
+                        <div class="slds-media__body">
+                            <h2><span class="slds-text-heading_small">{!$Label.c.Jarvis_CommunityCustomLogin_GuestLoginHeading}<!--Guest Login--></span></h2>
+                        </div>
+                    </div>
+                    <div class="slds-card__body slds-card__body_inner">
+                        {!$Label.c.Jarvis_CommunityCustomLogin_GuestLoginDescription}
+                        <!--Guest Login Click here to log in. If you are new to the Akamai Community, please return to the homepage and click Register.-->
+                    </div>
+                </div>
+            </a>
+        </div>
+    </article>
+</aura:component>

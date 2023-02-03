@@ -1,0 +1,14 @@
+<aura:component implements="forceCommunity:themeLayout,forceCommunity:availableForAllPageTypes">
+    <aura:attribute name="button1Label" type="String" access="global"/>
+    <aura:attribute name="button1URL" type="String" access="global"/>
+    <aura:attribute name="button2Label" type="String" access="global"/>
+    <aura:attribute name="button2URL" type="String" access="global"/>
+    <div>
+        <h2 class="body-headCls">{!$Label.c.JV_Welcome_to_Community}</h2>
+        <p class="body-pCls">{!$Label.c.JV_Community_Invite_msg}</p>
+        <div class="body-innerDivCls">
+            <ui:button aura:id="button" buttonTitle="{!v.button1Label}" class="btn" label="{!v.button1Label}" press="{!c.openGetStarted}"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <ui:button aura:id="button" buttonTitle="{!v.button2Label}" class="btn" label="{!v.button2Label}" press="{!c.openNews}"/>
+        </div>
+    </div>
+</aura:component>

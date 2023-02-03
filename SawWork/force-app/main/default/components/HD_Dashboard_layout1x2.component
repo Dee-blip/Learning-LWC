@@ -1,0 +1,38 @@
+<apex:component >
+    <apex:attribute name="boolValue" description="when true layout will be renderd" type="String" required="true"/>
+    <apex:attribute name="reportID1" description="when true layout will be renderd" type="String" required="true"/>
+    <apex:attribute name="reports" description="when true layout will be renderd" type="List" required="true"/>
+    <apex:attribute name="reportID2" description="when true layout will be renderd" type="String" required="true"/>
+    
+
+  
+                      <apex:outputPanel rendered="{!boolValue}">
+                        <table class = "max-width">
+                          <tr>
+                            <td class = "half-width full-height">
+                              <apex:outputPanel > 
+                              <apex:outputPanel >
+                              <apex:selectList value="{!reportID1}" multiselect="false" size="1" onchange="{!test}" >
+                              <apex:selectOptions value="{!reports}"/>
+                              <apex:actionSupport action="{!test}" event="onchange"/>
+                              </apex:selectList>
+                              </apex:outputPanel>
+                              <analytics:reportChart cacheResults="false" reportId="{!reportID1}" size="large"   />
+                              </apex:outputPanel>
+                            </td>
+                            <td class = "half-width half-height">
+                              <apex:outputPanel >
+                              <apex:outputPanel >
+                              <apex:selectList value="{!reportID2}" multiselect="false" size="1" onchange="{!test}"   >
+                              <apex:selectOptions value="{!reports}"/>
+                              <apex:actionSupport action="{!test}" event="onchange"/>
+                              </apex:selectList>
+                              </apex:outputPanel>
+                              <analytics:reportChart cacheResults="false" reportId="{!reportID2}" size="large" />
+                              </apex:outputPanel>
+                            </td>
+                          </tr>
+                        </table>
+                      </apex:outputPanel>
+                     
+</apex:component>

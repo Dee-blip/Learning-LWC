@@ -1,0 +1,13 @@
+<design:component >
+    <flexipage:template >
+        <flexipage:region name="leftUp" defaultWidth="MEDIUM"/>
+        <flexipage:region name = "rightUp" defaultwidth = "MEDIUM"/>  
+        <flexipage:region name="secondRow" defaultWidth="MEDIUM">               
+            <flexipage:formfactor type="MEDIUM" width="MEDIUM" />
+        </flexipage:region>
+        <flexipage:region name="thirdRow" defaultWidth="MEDIUM">               
+            <flexipage:formfactor type="MEDIUM" width="MEDIUM" />
+        </flexipage:region>
+        
+    </flexipage:template>
+</design:component>

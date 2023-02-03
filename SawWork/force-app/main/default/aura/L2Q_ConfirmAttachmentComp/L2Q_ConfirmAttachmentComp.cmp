@@ -1,0 +1,511 @@
+<!-- SFDC-6362 -->
+<aura:component access="global"
+    implements="force:appHostable,lightning:isUrlAddressable,lightning:actionOverride,force:hasRecordId,force:lightningQuickAction"
+    controller="CFA_ConfirmAttachmentController">
+    <aura:attribute name="contentVersionId" type="String" />
+    <aura:attribute name="hasErrors" type="Boolean" default="false" />
+    <aura:attribute name="errorMessage" type="String" />
+    <aura:attribute name="successMessage" type="String" />
+    <aura:attribute name="acceptanceDoc" type="Object" />
+    <aura:attribute name="orderFileName" type="String" />
+    <aura:attribute name="emailNotificationList" type="String" />
+    <aura:attribute name="customerUniqueId" type="String" />
+    <aura:attribute name="authorizeOrderForm" type="Boolean" default="false" />
+    <aura:attribute name="notificationRequired" type="Boolean" default="false" />
+    <aura:attribute name="PORequired" type="Boolean" default="false" />
+    <aura:attribute name="acceptanceRecordId" type="String" />
+    <aura:attribute name="listOfFilesAttached" type="List" />
+    <aura:attribute name="fileToBeUploaded" type="Object[]" />
+    <aura:attribute name="fileDownloadURL" type="String" />
+    <aura:attribute name="parameterMap" type="Object" />
+    <aura:attribute name="hasErrorsAfterAction" type="Boolean" default="false" />
+    <aura:attribute name="isSuccessAfterAction" type="Boolean" default="false" />
+    <aura:attribute name="afterInitialCallback" type="Boolean" default="false" />
+    <aura:attribute name="POContentDocument" type="Object" />
+    <aura:attribute name="POFileAttachedFlag" type="Boolean" default="false" />
+    <aura:attribute name="themeDisplayed" type="String" default="Lightning" />
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+
+    <c:SF1_CustomLoader />
+    <div id="scrollableDiv" class="slds-scrollable_y" style="height: 80vh;">
+        <aura:if isTrue="{! v.afterInitialCallback }">
+            <lightning:card iconName="standard:opportunity" variant="narrow">
+
+                <aura:set attribute="title">
+                    <aura:if isTrue="{! !v.hasErrors }">
+                        <strong>
+                            Order Acceptance for {! v.acceptanceDoc.Opportunity__r.Name }
+                        </strong>
+                    </aura:if>
+                </aura:set>
+
+                <aura:set attribute="actions">
+                    <aura:if isTrue="{! !v.hasErrors }">
+                        <button class="slds-button slds-button--neutral" onclick="{! c.backToOpportunity }">Go to
+                            Opportunity</button>
+                    </aura:if>
+                    <button class="slds-button slds-button--neutral" onclick="{! c.poaListViewJS }">POA List View</button>
+                </aura:set>
+                <aura:if isTrue="{! v.hasErrors }">
+                    <ui:message title="" severity="error" closable="false">
+                        <strong>
+                            ERROR:
+                        </strong>
+                        <br />
+                        <ui:outputRichText class="slds-text-longform" value="{! v.errorMessage }" />
+                    </ui:message>
+
+                    <aura:set attribute="else">
+
+
+
+                        <aura:if isTrue="{! v.PORequired }">
+                            <ui:message title="" severity="info" closable="false">
+                                <strong>
+                                    NOTE:
+                                </strong>
+                                <br />
+                                <ui:outputText class="slds-text-longform" value="A Purchase Order is required before you can accept the order. Please attach it to the 'Upload Purchase Order' section
+                        below before filling any details." />
+                            </ui:message>
+                        </aura:if>
+
+                        <aura:if isTrue="{! v.hasErrorsAfterAction }">
+                            <ui:message title="" severity="error" closable="false">
+                                <strong>
+                                    ERROR:
+                                </strong>
+                                <br />
+                                <ui:outputRichText class="slds-text-longform" value="{! v.errorMessage }" />
+                            </ui:message>
+                        </aura:if>
+                        <aura:if isTrue="{! v.isSuccessAfterAction }">
+                            <ui:message title="" severity="confirm" closable="false">
+                                <strong>
+                                    Success:
+                                </strong>
+                                <br />
+                                <ui:outputRichText class="slds-text-longform" value="{! v.successMessage }" />
+                            </ui:message>
+                        </aura:if>
+
+                        <div style="padding:10px">
+                            <div class="slds-box">
+                                <div class="slds-border_bottom" style="padding:5px">
+                                    <strong>
+                                        Opportunity Information
+                                    </strong>
+                                </div>
+                                <lightning:layout horizontalAlign="spread" multipleRows="true">
+                                    <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="6"
+                                        largeDeviceSize="6">
+                                        <div class="slds-border_bottom" style="padding:5px;">
+                                            <div class="slds-grid slds-gutters">
+                                                <div class="slds-col slds-size_2-of-6">
+                                                    <span>
+                                                        <label class="slds-form-element__label"
+                                                            for="combobox-unique-id">
+                                                            Account Name
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                                <div class="slds-col slds-size_4-of-6">
+                                                    <span>
+                                                        <ui:outputText
+                                                            title="{! v.acceptanceDoc.Opportunity__r.Account.Name }"
+                                                            value="{! v.acceptanceDoc.Opportunity__r.Account.Name }" />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="6"
+                                        largeDeviceSize="6">
+                                        <div class="slds-border_bottom" style="padding:5px;">
+                                            <div class="slds-grid slds-gutters">
+                                                <div class="slds-col slds-size_2-of-6">
+                                                    <span>
+                                                        <label class="slds-form-element__label"
+                                                            for="combobox-unique-id">
+                                                            Opportunity Name
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                                <div class="slds-col slds-size_4-of-6">
+                                                    <span>
+                                                        <ui:outputText title="{! v.acceptanceDoc.Opportunity__r.Name }"
+                                                            value="{! v.acceptanceDoc.Opportunity__r.Name }" />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="6"
+                                        largeDeviceSize="6">
+                                        <div class="slds-border_bottom" style="padding:5px;">
+                                            <div class="slds-grid slds-gutters">
+                                                <div class="slds-col slds-size_2-of-6">
+                                                    <span>
+                                                        <label class="slds-form-element__label"
+                                                            for="combobox-unique-id">
+                                                            Close Date
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                                <div class="slds-col slds-size_4-of-6">
+                                                    <span>
+                                                        <lightning:formattedDateTime
+                                                            value="{! v.acceptanceDoc.Opportunity__r.CloseDate }" />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="6"
+                                        largeDeviceSize="6">
+                                        <div class="slds-border_bottom" style="padding:5px;">
+                                            <div class="slds-grid slds-gutters">
+                                                <div class="slds-col slds-size_2-of-6">
+                                                    <span>
+                                                        <label class="slds-form-element__label"
+                                                            for="combobox-unique-id">
+                                                            Sales Stage
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                                <div class="slds-col slds-size_4-of-6">
+                                                    <span>
+                                                        <ui:outputText
+                                                            value="{! v.acceptanceDoc.Opportunity__r.StageName }" />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </div>
+                        </div>
+
+                        <div style="padding:10px">
+                            <div class="slds-box">
+                                <div class="slds-border_bottom" style="padding:5px">
+                                    <strong>
+                                        Customer Activation Request
+                                    </strong>
+                                </div>
+                                <lightning:layout horizontalAlign="spread" multipleRows="true">
+                                    <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="12"
+                                        largeDeviceSize="12">
+                                        <div class="slds-border_bottom" style="padding:5px;">
+                                            <div class="slds-grid slds-gutters">
+                                                <div class="slds-col slds-size_1-of-6">
+                                                    <span>
+                                                        <label class="slds-form-element__label"
+                                                            for="combobox-unique-id">
+                                                            File Name
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-6"></div>
+                                                <div class="slds-col slds-size_4-of-6">
+                                                    <span>
+                                                        <!--replace-->
+                                                        <lightning:formattedUrl
+                                                            value="{! v.fileDownloadURL + v.contentVersionId }"
+                                                            target="_blank" title="{! v.orderFileName }"
+                                                            label="{! v.orderFileName }" />
+                                                        &nbsp;
+                                                        <lightning:icon iconName="utility:download" size="xx-small"
+                                                            alternativeText="download" />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="12"
+                                        largeDeviceSize="12">
+                                        <div class="slds-border_bottom" style="padding:5px;">
+                                            <div class="slds-grid slds-gutters">
+                                                <div class="slds-col slds-size_1-of-6">
+                                                    <span>
+                                                        <label class="slds-form-element__label"
+                                                            for="combobox-unique-id">
+                                                            Authorization to Place Orders
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-6">
+                                                    <lightning:input type="checkbox"
+                                                        checked="{! v.authorizeOrderForm }" />
+                                                </div>
+                                                <div class="slds-col slds-size_4-of-6">
+                                                    By submitting this Order Form, you hereby acknowledge that <br />1.
+                                                    you
+                                                    have the
+                                                    authority to place a legally binding
+                                                    order with the applicable Akamai entity or entities on behalf of the
+                                                    Reseller pursuant to the terms of the
+                                                    Agreement, and per the attached Order Form, and <br />2. Reseller
+                                                    has
+                                                    contemporaneously entered into an agreement
+                                                    with the Customer for the purchase of the Akamai Services.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="12"
+                                        largeDeviceSize="12">
+                                        <div class="slds-border_bottom" style="padding:5px;">
+                                            <div class="slds-grid slds-gutters">
+                                                <div class="slds-col slds-size_1-of-6">
+                                                    <span>
+                                                        <label class="slds-form-element__label"
+                                                            for="combobox-unique-id">
+                                                            Notification
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-6">
+                                                    <lightning:input type="checkbox"
+                                                        checked="{! v.acceptanceDoc.Notification__c }" />
+                                                </div>
+                                                <div class="slds-col slds-size_4-of-6">
+                                                    Email me a copy of the customer activation request. Enter any
+                                                    additional
+                                                    email addresses you would like this sent
+                                                    to (separate multiple addresses with commas):
+                                                    <br />
+                                                    <ui:inputTextArea
+                                                        value="{! v.acceptanceDoc.Notification_email_list__c }" rows="3"
+                                                        cols="70" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning:layoutItem>
+
+                                </lightning:layout>
+                            </div>
+                        </div>
+
+                        <div style="padding:10px">
+                            <div class="slds-box">
+                                <div class="slds-border_bottom" style="padding:5px">
+                                    <strong>
+                                        Customer Information
+                                    </strong>
+                                </div>
+                                <lightning:layout horizontalAlign="spread" multipleRows="true">
+                                    <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="12"
+                                        largeDeviceSize="12">
+                                        <div class="slds-border_bottom" style="padding:5px;">
+                                            <div class="slds-grid slds-gutters">
+                                                <div class="slds-col slds-size_1-of-6">
+                                                    <span>
+                                                        <label class="slds-form-element__label"
+                                                            for="combobox-unique-id">
+                                                            Customer Name
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                                <div class="slds-col slds-size_5-of-6">
+                                                    <span>
+                                                        <ui:outputText title="{! v.acceptanceDoc.Customer_Name__c }"
+                                                            value="{! v.acceptanceDoc.Customer_Name__c }" />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="12"
+                                        largeDeviceSize="12">
+                                        <div class="slds-border_bottom" style="padding:5px;">
+                                            <div class="slds-grid slds-gutters">
+                                                <div class="slds-col slds-size_1-of-6">
+                                                    <span >
+                                                        <br/>
+                                                        <label class="slds-form-element__label"
+                                                            for="combobox-unique-id">
+                                                            Customer Unique Id
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-6">
+                                                    <span>
+                                                        <lightning:input
+                                                            value="{! v.acceptanceDoc.Customer_Unique_Id__c }" />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="12"
+                                        largeDeviceSize="12">
+                                        <div class="slds-border_bottom" style="padding:5px;">
+                                            <div class="slds-grid slds-gutters">
+                                                <div class="slds-col slds-size_1-of-6">
+                                                    <span >
+                                                        <br/>
+                                                        <label class="slds-form-element__label"
+                                                            for="combobox-unique-id">
+                                                            PO Number
+                                                        </label>
+                                                    </span>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-6">
+                                                    <span>
+                                                        <lightning:input
+                                                            value="{! v.acceptanceDoc.PO_Number__c}" />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </div>
+                        </div>
+                        <aura:if isTrue="{! v.PORequired }">
+                            <div style="padding:10px">
+                                <div class="slds-box">
+                                    <div class="slds-border_bottom" style="padding:5px">
+                                        <strong>
+                                            Upload Purchase Order
+                                        </strong>
+                                    </div>
+                                    <lightning:layout horizontalAlign="spread" multipleRows="true">
+                                        <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="12"
+                                            largeDeviceSize="12">
+                                            <div class="slds-border_bottom" style="padding:5px;">
+                                                <div class="slds-grid slds-gutters">
+                                                    <div class="slds-col slds-size_1-of-6">
+                                                        <span>
+                                                            <label class="slds-form-element__label"
+                                                                for="combobox-unique-id">
+                                                                File Name
+                                                            </label>
+                                                        </span>
+                                                    </div>
+                                                    <div class="slds-col slds-size_1-of-6"></div>
+                                                    <div class="slds-col slds-size_3-of-6">
+                                                        <span>
+                                                            <a onclick="{! c.viewFileJS }">
+                                                                <ui:outputText
+                                                                    title="{! v.POContentDocument.LatestPublishedVersion.Title }"
+                                                                    value="{! v.POContentDocument.LatestPublishedVersion.Title }" />
+                                                            </a>
+                                                            <aura:if
+                                                                isTrue="{! and(!v.POFileAttachedFlag, v.PORequired) }">
+                                                                &nbsp;
+                                                                <lightning:icon iconName="utility:download"
+                                                                    size="xx-small" alternativeText="download" />
+                                                            </aura:if>
+                                                        </span>
+                                                    </div>
+                                                    <div class="slds-col slds-size_1-of-6">
+                                                        <a onclick="{! c.deletePOFile }"> Delete File</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </lightning:layoutItem>
+                                        <aura:if isTrue="{! and(v.PORequired, v.themeDisplayed == 'Lightning') }">
+                                            <lightning:layoutItem flexibility="grow" size="12" mediumDeviceSize="12"
+                                                largeDeviceSize="12">
+
+                                                <div class="slds-form-element">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:fileUpload label="Attach receipt" name="fileUploader"
+                                                            multiple="false" recordId="{!v.acceptanceRecordId}"
+                                                            onuploadfinished="{!c.handleUploadFinished}"
+                                                            disabled="{! v.POFileAttachedFlag }" />
+                                                    </div>
+                                                </div>
+                                            </lightning:layoutItem>
+                                            <aura:set attribute="else">
+                                                <aura:if isTrue="{! !v.POFileAttachedFlag }">
+                                                    <lightning:layoutItem flexibility="grow" size="12"
+                                                        mediumDeviceSize="12" largeDeviceSize="12">
+                                                        <div class="slds-form-element">
+                                                            <div class="slds-form-element__control"
+                                                                style="padding:5px;">
+                                                                <span>
+                                                                    <a onclick="{! c.uploadPOFileJS }">
+                                                                        Upload PO
+                                                                        File</a>
+                                                                </span>
+                                                                &nbsp;
+                                                                <a onclick="{! c.uploadPOFileJS }">
+                                                                    <lightning:icon iconName="utility:new_window"
+                                                                        size="xx-small" alternativeText="download" />
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </lightning:layoutItem>
+                                                </aura:if>
+                                            </aura:set>
+                                        </aura:if>
+
+                                    </lightning:layout>
+                                </div>
+                            </div>
+                        </aura:if>
+
+
+                        <aura:if isTrue="{! !v.isSuccessAfterAction }">
+                            <div style="height: 180px;">
+                                <div class="slds-docked-form-footer">
+                                    <button type="button" class="slds-button slds-button_neutral"
+                                        onclick="{! c.openModal }" disabled="{! !v.authorizeOrderForm }">Reject-Contact
+                                        Me</button>
+                                    <button type="button" class="slds-button slds-button_brand"
+                                        onclick="{! c.acceptOrderForm }"
+                                        disabled="{! !v.authorizeOrderForm }">Accept</button>
+                                </div>
+                            </div>
+                        </aura:if>
+                    </aura:set>
+                </aura:if>
+            </lightning:card>
+        </aura:if>
+
+    </div>
+
+    <div>
+        <div role="dialog" tabindex="-1" aura:id="Modalbox" aria-labelledby="header43"
+            class="slds-modal  slds-modal_small ">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-button--icon-inverse slds-modal__close" onclick="{!c.closeModal}">
+                        <span>
+                            <lightning:icon iconName="utility:close" size="medium" alternativeText="close" />
+                            <span class="slds-assistive-text">Close</span>
+                        </span>
+                    </button>
+                    <h6 id="modal-heading-01" class="slds-text-heading--small">Order Rejection Details</h6>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <div>
+                        <ul class="slds-has-dividers_around-space ">
+                            <span>
+                                <label class="slds-form-element__label" for="combobox-unique-id">
+                                    Rejection Comments
+                                </label>
+                            </span>
+                            <br />
+
+                            <ui:inputTextArea value="{! v.acceptanceDoc.Rejection_Comments__c }" rows="3" cols="100" />
+
+                        </ul>
+                    </div>
+                </div>
+                <div class="slds-modal__footer">
+                    <div>
+                        <button class="slds-button slds-button--neutral" onclick="{!c.closeModal}">Close</button>
+                        <button class="slds-button slds-button--brand" onclick="{!c.rejectOrderForm}">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop" aura:id="ModalClose"></div>
+    </div>
+</aura:component>

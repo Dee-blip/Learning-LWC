@@ -1,0 +1,181 @@
+<aura:component controller="SC_CreateCXMActivityController" implements="flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasRecordId">
+   
+    <aura:attribute name="selectedUser" type="sObject" />
+    <aura:attribute name="selectedUserId" type="Id" />
+    <aura:attribute name="selectedName" type="sObject" />
+    <aura:attribute name="selectedNameId" type="Id" />
+    <aura:attribute name="relatedToId" type="Id" />
+    <aura:attribute name="relatedToName" type="Id" />
+    <aura:attribute name="filetype" type="List" default="['.png', '.jpg', '.jpeg','.pdf','.doc','.docx','.xlsx','.xls','.pptx','.csv']" />
+    <aura:attribute name="multiple" type="Boolean" default="true" />
+    <aura:attribute name="taskRecordId" type="Id" />
+    <aura:attribute name="stepName" type="String" default = "1. Create CXM Activity" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="recTypeId" type="Id" default="0124R000001JHjiQAG" />
+    <aura:attribute name="showAssignedToLookUp" type="Boolean" default="false" />
+    <aura:attribute name="subjectList" type="List" default="false" />
+    <aura:attribute name="statusList" type="List" default="false" />
+    <aura:attribute name="priorityList" type="List" default="false" />
+    <aura:attribute name = "isCXMUser" type="Boolean" />
+
+    <aura:attribute name="parentList" type="list" default="[]" description=""/>
+    <aura:attribute name="childList" type="list" default="[]"/>
+    <aura:attribute name="pickListMap" type="map"/>
+    <aura:attribute name="disabledChildField" type="boolean" default="true"/>
+    <aura:attribute name="objectName" type="string" default="Task"/>
+    <aura:attribute name="parentFieldAPI" type="string" default="Product__c"/>
+    <aura:attribute name="childFieldAPI" type="string" default="Features__c"/>
+    <aura:attribute name="parentFieldLabel" type="string" default="Product"/>
+    <aura:attribute name="childFieldLabel" type="string" default="Feature"/>
+    <aura:attribute name="parentValue" type="string" default=""/>
+    <aura:attribute name="childValue" type="string" default=""/>
+    <aura:attribute name="showProductsAndFeatures" type="Boolean" default="true"/>
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:if isTrue="{!v.showSpinner}">
+        <div class="spinnerClass">
+            <lightning:spinner alternativeText="Loading" size="large" />
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.isCXMUser}">
+        <div class="slds-m-vertical_large">
+            <c:SC_SI_GenericChevronComponent location="1" chevronState="{!v.stepName}" picklistValueList="['1. Create CXM Activity','2. Upload Files']" />
+        </div>
+   
+        <aura:if isTrue="{!v.stepName == '1. Create CXM Activity'}">
+        <div class="slds-grid slds-m-top_medium">
+            <div class="slds-col slds-m-right_medium">
+                <lightning:select class="slds-m-top_medium" aura:id="subject" required="true" value="Product Feature Consideration" name="subject" label="Subject" onchange="{! c.handleSubjectChange }">
+                <aura:iteration items="{!v.subjectList}" var="subject">
+                    <option value="{!subject}">{!subject}</option>
+                </aura:iteration>       
+                <!--<option value="Product Feature Consideration">Product Feature Consideration</option>
+                    <option value="Onboarding of New Traffic">Onboarding of New Traffic</option>
+                    <option value="Value Confirmation">Value Confirmation</option>
+                    <option value="Customer Training &amp; Enablement">Customer Training &amp; Enablement</option>
+                    <option value="Strategic Meeting">Strategic Meeting</option>
+                    <option value="Customer Success Reporting">Customer Success Reporting</option>
+                    <option value="Customer Escalation">Customer Escalation</option>
+                    <option value="Upsell/Cross-Sell Identified">Upsell/Cross-Sell Identified</option>
+                    <option value="Akamai Event Invitation">Akamai Event Invitation</option>
+                    <option value="Akamai Event Follow-Up">Akamai Event Follow-Up</option>-->
+                </lightning:select>
+
+                <!-- Controller Field -->
+            <aura:if isTrue="{!v.showProductsAndFeatures}">
+                <lightning:select name="parentField" aura:id="parentField" class="slds-m-top_medium"
+                                value="{!v.parentValue}" required="true"
+                                label="{!v.parentFieldLabel}"
+                                onchange="{!c.parentFieldChange}">
+                    <aura:iteration items="{!v.parentList}" var="value">
+                        <option value="{!value}">{!value}</option>
+                    </aura:iteration>
+                </lightning:select>
+            </aura:if>  
+            <aura:if isTrue="{!v.showProductsAndFeatures}">
+                <lightning:select name="childField" class="slds-m-top_medium" aura:id="childField"
+                                value="{!v.childValue}" required="true"
+                                label="{!v.childFieldLabel}"
+                                disabled="{!v.disabledChildField}">
+                    <aura:iteration items="{!v.childList}" var="value">
+                        <option value="{!value}">{!value}</option>
+                    </aura:iteration>
+                </lightning:select>
+                </aura:if>
+            
+
+                <lightning:select aura:id="status" class="slds-m-top_medium" required="true" value="Not Started" name="status" label="Status" onchange="{! c.handleStatusChange}">
+                    <aura:iteration items="{!v.statusList}" var="status">
+                    <option value="{!status}">{!status}</option>
+                </aura:iteration> 
+                <!-- <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Invalid">Invalid</option>-->
+                    
+                </lightning:select>
+
+                <lightning:input aura:id="dueDate" type="date" class="slds-m-top_medium" name="dueDate" label="Due Date" />
+                <lightning:textarea aura:id="comments" name="comments" class="slds-m-top_medium" label="Comments" placeholder="Plaese enter any additional details here..."/>
+            </div>
+            <div class="slds-col slds-m-left_medium slds-m-top_medium">
+                <aura:if isTrue= "{!v.showAssignedToLookUp}">
+                <c:SC_CXMLookupComponent
+                        objectAPIName="User/Queue"
+                        IconName="standard:account"
+                        label="Assigned To (User / Queue)"
+                        selectedRecord="{!v.selectedUser}"
+                        selectedRecordId="{!v.selectedUserId}"
+                />
+            </aura:if>
+
+                <!--Dependent Field-->
+                <!-- <aura:if isTrue="{!v.showProductsAndFeatures}">
+                <lightning:select name="childField" class="slds-m-top_medium" aura:id="childField"
+                                value="{!v.childValue}" required="true"
+                                label="{!v.childFieldLabel}"
+                                disabled="{!v.disabledChildField}">
+                    <aura:iteration items="{!v.childList}" var="value">
+                        <option value="{!value}">{!value}</option>
+                    </aura:iteration>
+                </lightning:select>
+                </aura:if> -->
+        
+
+                <div class="slds-text-title slds-m-vertical_medium">Related To</div>
+                <lightning:formattedText value="{!v.relatedToName}" />
+                <div class="slds-m-top_medium">
+                    <c:SC_CXMLookupComponent
+                    objectAPIName="Contact/Lead"
+                    IconName="standard:contact"
+                    label="Name (Contact / Lead)"
+                    selectedRecord="{!v.selectedName}"
+                    selectedRecordId="{!v.selectedNameId}"
+                />
+                </div>
+                <lightning:select aura:id="priority" class="slds-m-top_medium" required="true" value="Normal" name="priority" label="Priority" onchange="{! c.handlePriorityChange}">
+                    <aura:iteration items="{!v.priorityList}" var="priority">
+                        <option value="{!priority}">{!priority}</option>
+                    </aura:iteration>  
+                    <!--<option value="High">High</option>
+                    <option value="Normal">Normal</option>
+                    <option value="Low">Low</option>-->
+                    
+                    
+                </lightning:select>
+            </div>
+
+        </div>   
+        <lightning:button class="slds-m-top_large slds-align_absolute-center" variant="brand" label="Create CXM Activity and move to file upload section." title="Create CXM Activity and move to file upload section." onclick="{! c.handleCreateTask }" /> 
+        </aura:if>
+        <aura:if isTrue="{!v.stepName == '2. Upload Files'}">
+            <lightning:fileUpload class="slds-m-top_large slds-align_absolute-center" label="Attach Files for created Task"
+            name="fileUploader"
+            multiple="true"
+            accept="{!v.filetype}"
+            recordId="{!v.taskRecordId}"
+            onuploadfinished="{!c.handleUploadFinished}" />
+        </aura:if>
+    </aura:if>  
+    
+    <aura:if isTrue="{!!v.isCXMUser}">
+        <div class="demo-only" style="height:4rem;margin-top:250px;">
+            <div class="slds-notify_container slds-is-relative">
+              <div class="slds-notify slds-notify_toast slds-theme_warning" role="status">
+                
+                <div class="slds-notify__content">
+                  <h2 class="slds-text-heading_small "> Only CXM Users are authorized to create CXM Activities.
+                    </h2>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+    </aura:if>
+
+    
+
+  
+</aura:component>

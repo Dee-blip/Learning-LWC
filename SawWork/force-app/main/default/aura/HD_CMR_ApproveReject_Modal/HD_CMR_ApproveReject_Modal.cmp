@@ -1,0 +1,61 @@
+<!--@Author: Nikhil Karn @Akamai Technology -->
+<!--@CreatedDate: 13 Aug,2018-->
+<!--@Details: This modal is responsible to show form page before approving or rejecting any cmr-->
+<!--@Controller: HD_CMR_ChangeCalendar -->
+<!--@Events:    -->
+<!--@Child_Components:  -->
+<!--@LastModifiedDate:               -->
+<!--@LastModifyDetails:              -->
+<!--@LastModifiedBy:                 -->
+
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickAction" access="global" controller="HD_CMR_ChangeCalendar">
+    
+    <aura:registerEvent name="refreshPreview" type="c:HD_CMR_PreviewRefreshEvent" />
+    <aura:registerEvent name="getChangeListEvent" type="c:getIncidentList"/>
+    
+    <aura:attribute name="change" type="BMCServiceDesk__Change_Request__c" />
+    <aura:attribute name="action" type="String" default=""/>
+    <aura:attribute name="isOpen" type="Boolean" default="false"/>
+    <aura:attribute name="processWorkItemId" type="String" default=""/>
+    <aura:attribute name="comments" type="String" />
+    <aura:attribute name="isSpinnerEnabled" type="Boolean" default="false"/>
+    
+    <div class="demo-only" style="height: 640px;">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            
+            <!-- aura spinner -->
+            <aura:if isTrue="{!v.isSpinnerEnabled}">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </aura:if>
+            <!-- aura smpinner -->
+            
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.close}">
+                        <lightning:icon iconName="utility:close" alternativeText="Close" />
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.action} CMR</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label" for="text-input-id-1">Comments</label>
+                        <div class="slds-form-element__control">
+                            <ui:inputtextarea aura:id="comments"  class="slds-input" rows="3" value="{!v.comments}" updateOn="keyup"/>
+                        </div>
+                    </div>    
+                    
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_brand" onclick="{!c.approveOrReject}">{!v.action}</button>
+                    <button class="slds-button slds-button_neutral" onclick="{!c.close}">Cancel</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>     
+</aura:component>

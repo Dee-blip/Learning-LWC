@@ -1,0 +1,20 @@
+<apex:page controller="createViewOrderFormController" action="{!redirectBuyAkamaiorMomentum}">
+	<apex:includeLightning />
+    <div id="lightning"/>
+    <script type="text/javascript">
+        $Lightning.use("c:createViewOrderFormApp", function () {
+            $Lightning.createComponent("c:createViewOrderFormComponent", {
+                oppAkamId: '{! akamId }',
+                oppId: '{!recordId}',
+                redirectionURL: '{!buyAkamaiRedirectionURL}',
+                userTheme: '{!theme}',
+                recTypeId: '{!recordTypeId}',
+                oppStage: '{!stageName}',
+                field: '{!getField}',
+                oaId: '{!orderApprovalId}'
+            }, "lightning", function (cmp) {
+            // do some stuff
+                });
+        });
+	</script>
+</apex:page>

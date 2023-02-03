@@ -1,0 +1,164 @@
+<template>
+    
+    <lightning-card  variant="Narrow"  title="Overage Report" icon-name="standard:report">
+        <div class="slds-p-left_large slds-grid slds-gutters">
+          <!--  <div class="slds-col">
+                <lightning-input type="date" label="Billing Period from" value={periodstartdate} class="startdate"></lightning-input>
+            </div>
+            <div class="slds-col">
+                <lightning-input type="date" label="Billing Period till" value={periodenddate} class="enddate"></lightning-input>
+            </div>
+
+            -->
+            <lightning-combobox
+                        name="Month"
+                        label="Billing Period Month"
+                        value={value}
+                        placeholder="Select Month"
+                        options={options} class="mnth"></lightning-combobox>
+
+            <lightning-combobox
+                        name="Year"
+                        label="Year"
+                        value={yearval} 
+                        placeholder="Select Year"
+                        options={years} class="selyr"></lightning-combobox>
+            <div class="slds-col" style="margin-top: auto;">
+                <lightning-button variant="brand" label="Show Results" title="Primary action" onclick={handleExecute} class="slds-m-left_x-small"></lightning-button>
+            </div>
+        </div> 
+    </lightning-card> 
+
+    <div class="table slds-p-bottom_xx-large">
+
+    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="contractName">Contract Detail</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="AccountName">Account Name</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="ProjectName">Project Name</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="ProjectId">Project ID</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="ProjectStage">Project Stage</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="CloseCode">Close Code</div>
+                    </th>
+                    <th class="" scope="col">
+                            <div class="slds-truncate" title="UnitsLow">Unit Low</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="ApprovedHours">Approved Hours</div>
+                    </th>
+                   <!-- <th class="" scope="col">
+                        <div class="slds-truncate" title="OverageHours">Overage Hours</div>
+                    </th> -->
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="BillingStartDate">Start Date</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="BillingEndDate">End Date</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="OverageName">Overage Name</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="OverageHours">Overage Hours</div>
+                    </th>
+                    <th class="" scope="col">
+                            <div class="slds-truncate" title="TotalOverageHours">Overage Hours on Contract</div>
+                    </th>
+                </tr>
+            </thead>           
+            <tbody>
+    
+        <template if:true={contractData}>             
+            <template for:each={contractData} for:item="acontract">
+                <template for:each={acontract.approverHoursList} for:item="contractrec" for:index="indx">
+                    <tr class="slds-hint-parent" key={contractrec.recId} >
+                        <td data-label="contractName" rowspan={acontract.rowSpan} if:false={indx}>
+                            <div class="slds-truncate" title={acontract.contractName}>
+                                {acontract.contractName}</div>
+                        </td>
+                        <td data-label="AccountName">
+                            <div class="slds-truncate" title={contractrec.AccountName}>
+                                {contractrec.AccountName}</div>
+                        </td>
+                        <td data-label="ProjectName">
+                            <div class="slds-truncate" title={contractrec.ProjectName}>
+                                {contractrec.ProjectName}</div>
+                        </td>
+                        <td data-label="ProjectID">
+                            <div class="slds-truncate" title={contractrec.ProjectID}>
+                                {contractrec.ProjectID}</div>
+                        </td>
+                        <td data-label="ProjectStage">
+                            <div class="slds-truncate" title={contractrec.ProjectStage}>
+                                {contractrec.ProjectStage}</div>
+                        </td>
+                        <td data-label="CloseCode">
+                            <div class="slds-truncate" title={contractrec.CloseCode}>
+                                {contractrec.CloseCode}</div>
+                        </td>
+                        <td data-label="UnitsLow">
+                            <div class="slds-truncate" title={contractrec.UnitsLow}>
+                                {contractrec.UnitsLow}</div>
+                        </td>
+                        <td data-label="ApprovedHours">
+                            <div class="slds-truncate" title={contractrec.ApprovedHours}>
+                                {contractrec.ApprovedHours}</div>
+                        </td>
+                    <!----   <td data-label="OverageHours">
+                            <div class="slds-truncate" title={contractrec.OverageHours}>
+                                {contractrec.OverageHours}</div>
+                        </td>   -->                          
+                        <td data-label="BillingStartDate">
+                            <div class="slds-truncate" title={contractrec.BillingStartDate}>
+                                {contractrec.BillingStartDate}</div>
+                        </td>
+                        <td data-label="BillingEndDate">
+                            <div class="slds-truncate" title={contractrec.BillingEndDate}>
+                                {contractrec.BillingEndDate}</div>
+                        </td>
+                        <td data-label="OverageName">
+                            <div class="slds-truncate" title={contractrec.Name}>
+                                <a href={contractrec.url} data-value={contractrec.recId} target="_blank" > 
+                                {contractrec.Name} </a></div> 
+                        </td>
+                        <td data-label="OverageHours">
+                            <div class="slds-truncate" title={contractrec.OverageHours}>
+                                {contractrec.OverageHours}</div>
+                        </td> 
+                        <td data-label="TotalOverageHours" rowspan={acontract.rowSpan} if:false={indx}>
+                                <div class="slds-truncate" title={acontract.overageHrs}>
+                                    {acontract.overageHrs}</div>
+                        </td>  
+                    </tr>
+                </template>
+            </template>
+        </template>
+
+        <!--<template if:true={flag}> 
+            <div class="slds-text-align--center">
+                <p> No overage data available </p>
+            </div>
+        </template> -->
+
+        <template if:true={error}>
+            <div class="slds-text-color_error">
+                <p>An error occurred while loading the data</p>
+            </div>
+        </template>
+
+        </tbody>
+    </table>    
+    </div>
+</template>

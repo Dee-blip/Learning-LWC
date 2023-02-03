@@ -1,0 +1,19 @@
+<apex:page StandardController="Account" >
+<apex:sectionHeader title="Refresh Contract Access" />
+
+<apex:includeLightning />
+    <div id="lightning"/>
+<script type="text/javascript">
+	//get account Id from current URL
+    var accountId = "{!$CurrentPage.parameters.id}";
+  
+
+    $Lightning.use("c:L2Q_AccountTeamContractRefreshApp", function () {
+      $Lightning.createComponent("c:L2Q_AccountTeamContractAccessRefresh", {"recordId" : accountId}, "lightning", function (cmp) {
+      	console.log('Account Refresh Component');
+      });
+    });
+</script>
+    
+
+</apex:page>

@@ -1,0 +1,212 @@
+<apex:page controller="CFA_SendEmailController" action="{!validate}" showHeader="true" title="CFA" id="TopPage"  tabStyle="Order_Approval__c" >
+<!-- SFDC-7914 Start-->
+   <style>
+      .overlay {
+         background-color: #EFEFEF;
+         position: fixed;
+         width: 100%;
+         height: 100%;
+         z-index: 1000;
+         top: 0px;
+         left: 0px;
+         opacity: .5;
+         filter: alpha(opacity=50);
+      }
+   </style>
+   <!-- SFDC-7914 Stop-->
+<script type='text/javascript'>
+         var newWin=null;
+         function openLookupPopup(name, id, query)
+         {
+          var value=document.getElementById(name).value;
+          //alert(value);
+          var url="/apex/CustomObjectLookup?namefield=" + name + "&idfield=" + id +"&query="+value+"&opp={!oa.Associated_Opportunity__c}";
+          newWin=window.open(url, 'Popup','height=500,width=800,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no');
+          if (window.focus)
+          {
+           newWin.focus();
+          }
+
+             return false;
+         }
+
+         function closeLookupPopup()
+         {
+            if (null!=newWin)
+            {
+               newWin.close();
+            }
+         }
+
+        function CheckAll(checkval)
+        {
+            var val=checkval.checked;
+            for (var j=0;j < document.forms['TopPage:Pageform'].elements.length;j++)
+            {
+                var e = document.forms['TopPage:Pageform'].elements[j];
+                if (e.type == 'checkbox')
+                {
+                    e.checked = val;
+                }
+            }
+        }
+ //SFDC-7914
+      function disableScreen() {
+         // creates <div class="overlay"></div> and
+         // adds it to the DOM
+         var div = document.createElement("div");
+         div.className += "overlay";
+         document.body.appendChild(div);
+      }
+      //SFDC-7914
+    </script>
+<apex:form id="Pageform">
+ <apex:pageMessages escape="false"/>
+  <style type='text/css'>
+    .betaLink {
+    background-color:#F8F8F8;
+    border:1px solid #D4DADC;
+    display:inline-block;
+    font-weight:bold;
+    line-height:25px;
+    margin-bottom:15px;
+    padding:0 7px;
+    }
+    </style>
+
+   <style>
+a:hover {
+background:#ffffff;
+text-decoration:none;
+} /*BG color is a must for IE6*/
+
+
+a.tooltip span {
+display:none;
+padding:2px 3px;
+margin-left:8px;
+width:130px;
+}
+
+
+a.tooltip:hover span{
+display:inline;
+position:absolute;
+background:#ffffff;
+border:1px solid #cccccc;
+color:#6c6c6c;
+}
+#ErrorTop{
+color:red;
+}
+
+</style>
+     <apex:actionStatus id="Loadingstatus">
+    <apex:facet name="start">
+    <c:enhancedActionStatus BackColor="#ffffff" borderColor="#ffffff" borderSize="2" height="50px" width="150px" ImageUrl="/changemgmt/img/spinner24.gif" Message="Loading..." messageStyle="color:darkred;font-size:11pt;font-weight:bold;"/>
+    </apex:facet>
+    </apex:actionStatus>
+  <apex:sectionHeader title="Order Approval" subtitle="{!oa.Name}" />
+   <apex:commandLink value=" « Back to Order approval " action="{!cancel}"/>
+      <apex:pageBlock rendered="{!showPage && mode==0}">
+      <!--  <div id="ErrorTop" ><b>{!topErrorMessage}</b><br/><br/></div>-->
+      <apex:pageMessage escape="false" summary="{!ErrorMessage}" severity="Warning" strength="3"/>
+          <apex:pageBlockButtons location="bottom" >
+               <apex:commandButton value="Go to Opportunity" action="{!canceltoOppty}" />
+            </apex:pageBlockButtons>
+      </apex:pageBlock>
+      <apex:pageBlock rendered="{!showPage && mode==1}">
+       You can view some default text on this page. You have the option to make necessary modification before sending this email.<br/>
+       'To' is defaulted to the user with role as 'Partner' in Opportunity Sales team.<br/><br/>
+          <apex:pageBlockSection title="Email Content" columns="2" collapsible="false">
+          <apex:pageBlockSectionItem helpText="To Address">
+             <apex:outputLabel value="To:" >  <!--<apex:inputField value="{!opp.CFA_To__c}"/> -->
+             <apex:inputText value="{!contactName}" id="contactName"/>
+            <apex:inputHidden value="{!opp.CFA_To__c}" id="contactId"/>
+            <apex:commandLink onclick="openLookupPopup('{!$Component.contactName}', '{!$Component.contactId}'); return false;"><apex:image url="{!$Resource.searchImage}" style="vertical-align:bottom;"/></apex:commandLink>
+            </apex:outputLabel>
+
+          </apex:pageBlockSectionItem><apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+             <!--apex:inputText size="25" value="{!PartnerEmail}"/> (Example: abc@xyz.com,xyz@abc.com)-->
+          <apex:pageBlockSectionItem >
+             <apex:outputLabel value="Cc:"  > <apex:inputText size="20" value="{!PartnerCcEmail}"/> (Separate multiple addresses with commas) </apex:outputLabel>
+          </apex:pageBlockSectionItem><apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+          <apex:pageBlockSectionItem >
+             <apex:outputLabel value="Subject:"> <apex:inputText value="{!emailSubject}" size="62"/> </apex:outputLabel>
+          </apex:pageBlockSectionItem><apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+          <apex:pageBlockSectionItem >
+              <apex:outputLabel value="Message:"> <apex:inputTextarea value="{!emailBody}" richText="true" cols="10" rows="10"/>  </apex:outputLabel>
+           </apex:pageBlockSectionItem><apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+          </apex:pageBlockSection>
+          <apex:pageBlockSection title="Select order" collapsible="false" id="attachmentPageBlockSection" columns="1" rendered="{!showPage}">
+          NOTE: The link of the below selected attachement(s) will be sent to the recipient of the email.
+                <apex:pageBlockTable value="{!oaAttachment}" var="atw" id="attachmentPageBlockTable" align="center">
+                    <apex:column width="10px" style="align:center" >
+                        <apex:facet name="header"><input type="checkbox" Name="AttachAll" value="" onClick="CheckAll(this);" /></apex:facet>
+                        <apex:panelGroup rendered="true">
+                        <apex:inputCheckbox value="{!atw.checked}" id="new"/>
+                        </apex:panelGroup>
+                    </apex:column>
+
+                    <apex:column headerValue="Object" value="{!atw.parentType}"/>
+                    <apex:column headerValue="Name" value="{!atw.attach.ContentDocument.LatestPublishedVersion.Title}"/>
+                    <apex:column headerValue="Last Modified" value="{!atw.attach.ContentDocument.LastModifiedDate}"/>
+                    <apex:column headerValue="Created By" value="{!atw.attach.ContentDocument.CreatedBy.Name}"/>
+                    <apex:column >
+                      <apex:facet name="header"><b>Action</b></apex:facet>
+                      <apex:commandLink value="View" onclick="window.open('/{!atw.attach.ContentDocumentId}');"/>
+                    </apex:column>
+                </apex:pageBlockTable>
+            </apex:pageBlockSection>
+         <apex:pageBlockSection title="Select T&Cs" collapsible="false" id="termsPageBlockSection" columns="1" rendered="{!showPage && TNCDocs.size>0}">
+
+            <apex:pageBlockTable value="{!TNCDocs}" var="atw" id="attachmentPageBlockTable" align="center">
+               <apex:column width="10px" style="align:center">
+                <apex:actionsupport action="{!selectTNCDoc}" event="onclick" rerender="none" oncomplete="return false;">  
+                  <input type="radio" value="{!atw.fileId}" name="checkboxGroup" checked="{!atw.checked}"/>                    
+                      <apex:param name="fileId" value="{!atw.fileId}">
+                  </apex:param></apex:actionsupport>        
+         </apex:column>
+
+               <apex:column headerValue="Object" value="{!atw.parentType}" />
+               <apex:column headerValue="Name" value="{!atw.attach.ContentDocument.LatestPublishedVersion.Title}" />
+               <apex:column headerValue="Last Modified" value="{!atw.attach.ContentDocument.LastModifiedDate}" />
+               <apex:column headerValue="Created By" value="{!atw.attach.ContentDocument.CreatedBy.Name}" />
+               <apex:column >
+                  <apex:facet name="header">
+                     <b>Action</b>
+                  </apex:facet>
+                  <apex:outputLink target="_blank" value="{!URLFOR($Action.ContentDocument.View, atw.attach.ContentDocumentId)}" >View</apex:outputLink>
+               </apex:column>
+            </apex:pageBlockTable>
+         </apex:pageBlockSection>
+
+            <apex:pageBlockButtons location="bottom" >
+
+               <apex:commandButton value="Preview and Send Email" action="{!preview}"  />
+            </apex:pageBlockButtons>
+      </apex:pageBlock>
+       <apex:pageBlock rendered="{!showPage && mode==2}">
+           <apex:pageBlockSection title="Preview Email" columns="1" collapsible="false">
+
+           <apex:outputLabel value="To:" > <!-- <apex:outputfield value="{!opp.CFA_To__c}"/> </apex:outputLabel>-->
+            <apex:outputLink value="/{!opp.CFA_To__c}"><apex:outputText value="{!contactName}" id="contactName"/></apex:outputLink></apex:outputLabel>
+
+             <!--apex:inputText size="25" value="{!PartnerEmail}"/> (Example: abc@xyz.com,xyz@abc.com)-->
+
+            Cc: {!PartnerCcEmail}<br/>
+
+            <p>Subject: {!emailSubject}</p>
+
+             <p>Message: <table width="600px" style="Background-color:white;border-width:1px;border-style:solid;"><tr><td><apex:outputText value="{!htmlBodyOfEmail}"  escape="false" /></td></tr></table></p>
+
+          </apex:pageBlockSection>
+          <apex:pageBlockButtons location="bottom" >
+               <!-- SFDC-7914 Add on-click action -->
+                <apex:commandButton value="Send Email" action="{!SendEmail}" onclick="disableScreen()" />
+
+               <apex:commandButton value="Back" action="{!back}" />
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+  </apex:form>
+</apex:page>

@@ -1,0 +1,75 @@
+<!----------------------------------------------------------------------------------------
+ * Page Name            : SC_EditAuthorizedContact
+ * Controller           : SC_EditAuthorizedContactCtrl
+ * Developer Name       : Vamsee Surya
+ * Date                 : 25th Oct,2017
+ * JIRA                 : ESESP-764 (SOCC)
+ * Purpose              : This page is used to Edit Authorized Contact
+------------------------------------------------------------------------------------------>
+<apex:page standardController="Authorized_Contact__c" extensions="SC_EditAuthorizedContactCtrl" tabStyle="Authorized_Contact__c" title="Authorized Contact">
+    <apex:includeScript value="/support/console/41.0/integration.js"/>
+            
+    <apex:form id="editForm">
+        <center>
+            <apex:actionstatus id="actStatusId">
+                <apex:facet name="start">
+                    <div class="waitingSearchDiv"
+                         style="background-color: #fbfbfb; height: 100%; opacity: 0.65; width: 100%;position:fixed;z-index:1000;">
+                         <div class="waitingHolder" style="top: 50%; width: 91px; position: fixed;z-index: 1001; left: 50%;">
+                            <img class="waitingImage" src="/img/loading.gif"
+                                title="Please Wait.." /> <span class="waitingDescription">Saving..</span>
+                         </div>
+                    </div>
+               </apex:facet>
+             </apex:actionstatus> 
+        </center>
+
+        <apex:pageBlock >
+            <h3 style="font-size:15px;">Authorized Contact Edit</h3>
+            
+            <!--Buttons-->
+            <br/>
+            <apex:commandButton value="Save" style="margin-left:40%;margin-right:10px;" action="{!UpdateAuthorizedContact}" status="actStatusId" reRender="editForm" id="saveButton"/>
+            <apex:commandButton value="Cancel" action="{!cancel}" />
+            <br/><br/>
+            
+            <!--PageMessage-->
+            <apex:pagemessages />
+            <br/>
+            <!--Contact Detail Section-->
+            <apex:pageBlockSection title="Contact Detail" collapsible="false" columns="2">
+                <apex:outputField value="{!authorizedContactObject.Contact_Name__c}"/>
+                <apex:inputField value="{!authorizedContactObject.PD_Lead__c}"/>
+                <apex:outputText title="Product Interest1234" >
+                    <b style="margin-left:17%;font-size:11.3px;color:#4a4a56;" id="productInterest">Product Interests</b><br/>
+                    <div style="margin-left:35%;">
+                        <c:ERSSMultiselectPicklist leftLabel="Available List" rightLabel="Chosen List" size="10" width="100%" leftOptions="{!availableProductList}" RightOptions="{!chosenProductList}" isEditable="true"/>                    
+                    </div>
+                    </apex:outputText>
+                <apex:inputField value="{!authorizedContactObject.Instruct__c}"/>
+            </apex:pageBlockSection>
+            
+            <!--Communication Preference Section-->
+            <apex:pageBlockSection title="Communication Preference" collapsible="false" columns="2">
+                <apex:inputField value="{!authorizedContactObject.Maintenance_Email__c}"/>
+                <apex:inputField value="{!authorizedContactObject.Emergency_Voice__c}"/>
+                <apex:inputField value="{!authorizedContactObject.Emergency_Email__c}"/>
+                <apex:inputField value="{!authorizedContactObject.Emergency_Text__c}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        
+        <!--Buttons-->
+        <apex:commandButton value="Save" style="margin-left:40%;margin-right:10px;" action="{!UpdateAuthorizedContact}" status="actStatusId" reRender="editForm" id="saveButton"/>
+        <apex:commandButton value="Cancel" action="{!cancel}"/>
+            
+    </apex:form>
+    <script>
+        //This method is to modify the styles of few Elements when page is loaded on console
+        window.addEventListener('DOMContentLoaded', function() {
+            if(sforce.console.isInConsole()) {
+                document.getElementById("productInterest").style.fontSize = "10.5px";
+                document.getElementById("productInterest").style.marginLeft = "21%";
+            }
+        },true);
+    </script>
+</apex:page>

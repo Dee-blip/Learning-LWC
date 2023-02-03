@@ -1,0 +1,17 @@
+<!--=====================================================================================================+
+    Component name      : SC_QualityCoaching_Escalation_Invoker   
+    Author              :   Pinkesh
+    Created             :   22-Sep-19
+	JIRA				:	ESESP-2316
+    Purpose             :  Quality Coaching Create/Edit button
+             
+    Last Modified         Developer                 Purpose            
+    ============= ========================         ==========
+
++=====================================================================================================-->
+<aura:component implements="lightning:actionOverride,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:utilityItem" access="global">
+    <!-- Register Event to pass parameters to utility bar component -->
+    <aura:registerEvent name="qualityCoachingEvent" type="c:SC_QualityCoaching_Event"/>
+    <!-- init method to trigger event and pass parameters -->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>  
+</aura:component>

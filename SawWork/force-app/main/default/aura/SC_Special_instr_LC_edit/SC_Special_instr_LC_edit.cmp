@@ -1,0 +1,147 @@
+<!--=====================================================================================================+
+    Component name      :   SC_Special_instr_LC_Edit 
+    Author              :   Supreeth
+    Created             :   18-Mar-19
+    Purpose             :   Special edit special instruction
+             
+    Last Modified         Developer                 Purpose            
+    ============= ========================         ==========
+    2-APR-19             Supreeth                 
++=====================================================================================================-->
+<aura:component implements="lightning:actionOverride,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:hasRecordId,force:lightningQuickAction" controller="SC_Special_Instructions" access="global">
+    <!-- Stores the URL for displaying flag image-->
+    <aura:attribute name="Flag_Url" type="String" />
+    
+    <!--Spinner on or off value -->
+    <aura:attribute name="Is_Loading" type="boolean" default="false"/>
+    
+    <!--Saves Special Instruction Template ID -->
+    <aura:attribute name="Special_Instruction_Template_Id" type="String"/>
+    
+    <!-- checks if the save button should be enabled -->
+    <aura:attribute name="Is_Save_For_Special_Instructions_Without_Template_disabled" type="Boolean" default="true"/>
+    <aura:attribute name="Is_Save_For_Special_Instructions_With_Template_disabled" type="Boolean" default="true"/>
+    
+    <!--Contains the Special Instruction Template for that particular Special Instruction-->
+    <aura:attribute name="default_SIT_Template" type="String" />
+    
+    <!--Contains the List of Special Instruction Templates for the dropdown -->
+    <aura:attribute name="Special_Instruction_Template_List" type="List"/>
+    
+    <!--Has details of which type of edit Special Instruction should be opened.(With or without Template)-->
+    <aura:attribute name="Is_Special_Instructions_Without_Templates_Open" type="boolean" default="false"/>
+    <aura:attribute name="Is_Special_Instructions_With_Templates_Open" type="boolean" default="false"/>
+    
+    <!-- calling init method -->
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    
+    <!-- Workspace API to open and close the tab -->
+    <lightning:workspaceAPI aura:id="workspace"/>
+    
+    <!-- Code for Spinner-->
+    <aura:if isTrue="{! v.Is_Loading }">
+        <lightning:spinner alternativeText="Is_Loading" variant="brand" />
+    </aura:if>
+    
+    <!-- Special_Instruction_WithOut_Template Page Starts -->
+    <aura:if isTrue="{!v.Is_Special_Instructions_Without_Templates_Open}">
+        <div class="slds-box slds-theme_default">
+            
+            
+            <div align="center">  
+                <lightning:button variant="brand" 
+                                  label="Save"
+                                  title="Save"
+                                  onclick="{! c.Save_Special_Instruction_WithOut_Template }"
+                                  disabled="{!v.Is_Save_For_Special_Instructions_Without_Template_disabled}"/>
+            </div>
+            <lightning:recordEditForm aura:id="recordViewForm" objectApiName="Special_Instructions__c"   recordId="{!v.recordId}" onload="{!c.stop_spinner}">
+                <lightning:inputField aura:id="SI_Account" class ="testcss1" fieldName="Account__c"  onchange="{! c.save_Disable_Check_For_Special_Instruction_Without_Template }"/>
+                <br/>
+                <lightning:inputField aura:id="SI_Title" class ="testcss1" fieldName="Title__c" onchange="{! c.save_Disable_Check_For_Special_Instruction_Without_Template }"/>
+                <br/>
+                <lightning:inputField aura:id="SI_Start_Date" class ="testcss1" fieldName="Start_Date__c" onchange="{! c.save_Disable_Check_For_Special_Instruction_Without_Template }"/>
+                <br/>
+                <lightning:inputField aura:id="SI_Expiration_Date" class ="testcss1" fieldName="Expiration_Date__c" onchange="{! c.save_Disable_Check_For_Special_Instruction_Without_Template }"/> 
+                <br/> 
+                <lightning:inputField aura:id="SI_Instructions" class ="testcss1" fieldName="Instructions__c" onchange="{! c.save_Disable_Check_For_Special_Instruction_Without_Template }"/> 
+                <br/> 
+                <lightning:inputField aura:id="SI_SRT" class ="testcss1" fieldName="Show_for_Record_Types__c" onchange="{! c.save_Disable_Check_For_Special_Instruction_Without_Template }"/> 
+                <br/>                               
+            </lightning:recordEditForm>
+            <div align="center">  
+                <lightning:button variant="brand" 
+                                  label="Save"
+                                  title="Save"
+                                  onclick="{! c.Save_Special_Instruction_WithOut_Template }"
+                                  disabled="{!v.Is_Save_For_Special_Instructions_Without_Template_disabled}"/>
+            </div>
+            
+        </div>
+    </aura:if>
+    <!-- Special_Instruction_WithOut_Template Page ends -->
+    
+    <!-- Special_Instruction_With_Template Page starts -->
+    <aura:if isTrue="{!v.Is_Special_Instructions_With_Templates_Open}">
+        <div class="slds-box slds-theme_default">
+            
+            <div align="center">  
+                <lightning:button variant="brand" 
+                                  label="Save"
+                                  title="Save"
+                                  onclick="{! c.Save_Special_Instruction_With_Template }"
+                                  disabled="{!v.Is_Save_For_Special_Instructions_With_Template_disabled}"/>
+            </div>
+            <lightning:recordEditForm aura:id="recordViewForm" objectApiName="Special_Instructions__c"  recordId="{!v.recordId}" onload="{!c.Flag_calc}">
+                <br/>
+                <lightning:inputField aura:id="SIT_Account" class ="testcss1" fieldName="Account__c" onchange="{! c.save_Disable_Check_For_Special_Instruction_With_Template }"/>
+                <br/>
+                <lightning:inputField aura:id="SIT_Start_Date" class ="testcss1" fieldName="Start_Date__c" onchange="{! c.save_Disable_Check_For_Special_Instruction_With_Template }"/>
+                <br/>
+                <lightning:inputField aura:id="SIT_Expiration_Date" class ="testcss1" fieldName="Expiration_Date__c" onchange="{! c.save_Disable_Check_For_Special_Instruction_With_Template }"/>  
+            </lightning:recordEditForm>
+            <br/>
+            <lightning:select aura:id="SIT_Template" name="select" label="Special Instruction Template" value="{!v.default_SIT_Template}" onchange="{! c.handle_Special_Instruction_Template_Change }">
+                
+                <aura:iteration items="{!v.Special_Instruction_Template_List}" var="tem">
+                    <option text="{!tem.Name}"></option>
+                </aura:iteration>
+            </lightning:select>
+            <br/>
+            <div class="panel-heading case-panel" style="background:#0070d2;height:30px;padding-right:0px;padding-top:3px;color:white">
+                <div style=" padding-left: 5px; padding-top: 3px;">
+                    <h6><b>Preview</b></h6>
+                </div>
+            </div>
+            
+            <lightning:recordViewForm  aura:id="recordViewForm" objectApiName="Special_Instruction_Template__c" recordId="{!v.Special_Instruction_Template_Id}" >
+                <lightning:outputField class ="testcss1" fieldName="Title__c"  />
+                <br/>
+                <lightning:outputField  class ="testcss1" fieldName="Show_for_Record_Types__c" />  
+                <br/>
+                
+                <lightning:outputField  class ="testcss1" fieldName="Instructions__c" /> 
+                <br/>
+                
+            </lightning:recordViewForm>
+            <h1 style="font-size:16px;color:#005fb2;">Flag Icon</h1>
+            <img  src="{!v.Flag_Url}"/>
+            
+            
+            <div align="center">  
+                <lightning:button variant="brand" 
+                                  label="Save"
+                                  title="Save"
+                                  onclick="{! c.Save_Special_Instruction_With_Template }"
+                                  disabled="{!v.Is_Save_For_Special_Instructions_With_Template_disabled}"/>
+            </div>
+        </div>
+    </aura:if>
+    <!-- Special_Instruction_With_Template Page ends -->
+    
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    
+</aura:component>

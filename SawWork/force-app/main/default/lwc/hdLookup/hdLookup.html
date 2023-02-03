@@ -1,0 +1,73 @@
+<template>
+    <div class="slds-form-element__control">
+        <div class="slds-combobox-group">
+            <div if:true={showObjectList} class="slds-combobox_object-switcher slds-combobox-addon_start">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <div class="slds-combobox_container">
+                            <lightning-combobox onfocus={handleObjectSelectorFocus} name="progress"
+                                variant="label-hidden" value={objectName} options={supportedObjects}
+                                onchange={onObjectChange}>
+                            </lightning-combobox>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class={searchInputClass}>
+                <div class={comboDropdownClass} aria-expanded="false" aria-haspopup="listbox" role="combobox"
+                    style="width: -webkit-fill-available">
+                    <template if:false={selectedRecord}>
+                        <lightning-input type="search" id="input" onfocus={handleSearchInputFocus}
+                            is-loading={isLoading} onkeydown={handleKeyDown} onchange={handleOnchange}
+                            variant="label-hidden" autocomplete="on" placeholder={searchPlaceholder}>
+                        </lightning-input>
+                    </template>
+                    <template if:true={showDropdown}>
+                        <template if:true={selectedRecord}>
+                            <div class="slds-combobox__form-element slds-input-has-icon 
+                        slds-input-has-icon_left-right" role="none">
+                                <span class="slds-icon_container
+                            slds-icon-standard-account 
+                            slds-combobox__input-entity-icon" title="Account">
+                                    <lightning-icon icon-name={iconname}></lightning-icon>
+                                </span>
+                                <input class="slds-input slds-combobox__input
+                       slds-combobox__input-value" id="combobox-id-5" aria-controls="listbox-id-5" autocomplete="off"
+                                    role="textbox" type="text" placeholder="Select an Option" readonly=""
+                                    value={selectedRecordValue} />
+                                <button class="sicon_container slds-button slds-button_icon 
+                               slds-input__icon slds-input__icon_right" title="Remove selected option"
+                                    onclick={handleRemove}>
+                                    <lightning-icon icon-name="utility:close" size="x-small">
+
+                                    </lightning-icon>
+                                    <span class="slds-assistive-text">Remove selected option</span>
+                                </button>
+                            </div>
+                        </template>
+                        <template if:true={records}>
+                            <template if:false={selectedRecord}>
+                                <div id="listbox-id-4"
+                                    class="slds-dropdown slds-dropdown_length-with-icon-5 slds-dropdown_fluid"
+                                    role="listbox" style="width: -webkit-fill-available">
+                                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                        <template for:each={records} for:item="record">
+                                            <li key={record.Id} class="slds-listbox__item" role="presentation">
+                                                <c-hd-lookup-record-list key={record.Id} record={record}
+                                                    advanced-template="false" onselect={handleSelect}
+                                                    onitemlinked={handleItemLink} iconname={iconname}
+                                                    meta-data-fields={metadataFields} fieldname={searchField}>
+                                                </c-hd-lookup-record-list>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </template>
+                        </template>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</template>

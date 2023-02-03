@@ -1,0 +1,163 @@
+<!-----------------------------------------------------------------------------------
+ * Page Name            : SC_PassphraseRenewal
+ * Developer Name       : Pinkesh Rathore
+ * Date                 : 26th Oct,2017
+ * JIRA                 : ESESP-761
+ * Controller Class     : SC_PassphraseController
+ ----------------------------------------------------------------------------------->
+<apex:page standardController="Contact" extensions="SC_PassphraseController" sidebar="false" showHeader="false" id="resetPassphraseId"  title="Passphrase Renewal">
+    <apex:includeScript value="{!$Resource.JQuery_New}" />
+    
+    <Script type="text/javascript">    
+        var left1 = (screen.width/2)-500;
+        var top1 = (screen.height/2)-175;    
+        window.resizeTo(1000,350);   
+        window.moveTo(left1,top1);
+       
+    </Script>
+    
+    <Style type="text/css">
+        .bPageBlock .detailList .data2Col {
+            padding-left: 50px !important;
+            padding-top: 10px !important;
+            padding-bottom: 10px !important;
+        }
+        
+        .bPageBlock {
+            background-color: rgba(241, 241, 241, 0.58) !important;
+            border-bottom: 3px solid #9d9fa5  !important;
+            border-left: 3px solid #9d9fa5  !important;
+            border-right: 3px solid #9d9fa5  !important;
+            border-top: 3px solid #9d9fa5  !important;
+            -moz-border-radius: 4px !important;
+            -webkit-border-radius: 4px !important;
+            border-radius: 10px !important;
+        }
+    
+            
+         body .bPageBlock .pbBody .labelCol, body .print .topics-label {
+            vertical-align: middle !important;
+        }
+        .permissionErrorCls {
+            color: #c31b24;
+            background-color: #c7c7c7;
+            font-size: 1em;
+            vertical-align: middle;
+            margin: 10px 10px 10px 10px;
+            padding: 12px;
+            border-radius: 10px;
+        }
+          #fade{
+        display: none;
+        position:absolute;
+        top: 0%;
+        left: 0%;
+        width: 100%;
+        height: 100%;
+        background-color: #dddddd;
+        z-index: 1001;
+        -moz-opacity: 0.8;
+        opacity: .20;
+        filter: alpha(opacity=80);
+    }
+    .loadingClass{
+    display: none;
+    position: absolute;
+    top: 47%;
+    left: 46%;
+    width: 8%;
+    height: 5%;
+    padding: 4px 5px 0px;
+    border: 3px solid #e4e4e4;
+    box-shadow: 1px 1px 10px #ababab;
+    border-radius: 8px;
+    background-color: #9d9fa5;
+    text-align: center;
+    color:white;
+    overflow: auto;
+    vertical-align: super;
+    }
+
+    </Style>
+    
+    <div id="div" style="margin: 30px 50px 30px 50px;">
+    <apex:form id="resetFormId" style="width:100%;height:150px" styleClass="pageBlockClass" >
+        
+        <!--Action status to show processing-->
+        <apex:actionStatus id="statusId">
+            <apex:facet name="start">
+                <div class="fadeModal"/>     
+                <div class="loadingClass" style="display:block;">
+                    <img id="creatingMailerModalId" src="{!$Resource.CMCLoadingImage}" width="25" height="25" style="display:inline;"/>&nbsp;&nbsp;<b style="vertical-align: super;" id="textModalId">Saving..</b>
+                </div>
+            </apex:facet>
+            <apex:facet name="stop"> </apex:facet>
+        </apex:actionStatus>
+        
+        <div id="fade"></div>
+        
+        <apex:inputHidden id="isSuccessId" value="{!isSuccess}" rendered="true"/>
+        <apex:pageblock id="pageblockid">
+            <apex:pageMessages id="PageMessages"></apex:pageMessages>
+            <apex:pageBlockSection id="pageBlockSection" columns="1">
+                <apex:actionFunction name="encryptData" id="encryptDataId" action="{!encrypt}" rerender="PageMessages,isSuccessId" oncomplete=" closeModal();refreshParent(); return false;" status="statusId"/>
+                <apex:outputText value="{!encrypted_data}" label="Old Passphrase" style="float:left;"></apex:outputText>
+                <apex:inputText id="newPassphraseId" label="New Passphrase" value="{!newPassphrase}" style="float:left;"></apex:inputText>
+                <apex:inputText id="confirmPassphraseId" label="Confirm Passphrase" value="{!confirmPassphrase}" style="float:left;"></apex:inputText>
+            </apex:pageBlockSection>
+            
+            <div style="margin-top:10px;">
+                <button onclick="openModal(); encryptData(); return false;"
+                        id="button" 
+                        style="color: #fff !important;
+                            margin: 1px !important;
+                            padding: 5px 10px !important;
+                            border: 1px solid #4d4d4d !important;
+                            border-bottom-color: #363636 !important;
+                            font-weight: 600 !important;
+                            font-size: .9em !important;
+                            border-radius: 5px !important;
+                            margin-left: 22% !important;
+                            background-color: #9d9fa5 !important;
+                            background: none;cursor: pointer;">Save and Close
+                </button> 
+            </div>
+
+        </apex:pageblock>
+    </apex:form>
+    </div>
+    <div class="permissionErrorCls" id="pId" style="display:none">
+        <p>
+            Error: You do not have permission to access this page. Please contact your administrator for more information.
+        </p>  
+    </div>
+
+    
+    <Script type="text/javascript">
+        var $j = jQuery.noConflict();
+        
+        $j(window).load(function() {
+            if(!{!hasUserAccess}){
+                $j("#div").hide();
+                $j("#pId").show();
+            }
+        });
+        
+        /*function refreshParent(){
+        var isSuccess = $j("[id*='isSuccessId']")[0].value;
+            if(isSuccess == 'true'){
+                setTimeout(function(){window.close();}, 2000);
+            }
+        }*/
+        
+        function openModal() {
+            document.getElementById('fade').style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('fade').style.display = 'none';
+        }
+         
+        
+    </Script>
+</apex:page>

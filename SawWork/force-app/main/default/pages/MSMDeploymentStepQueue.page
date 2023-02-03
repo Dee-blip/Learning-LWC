@@ -1,0 +1,121 @@
+<apex:page id="deploymentStepQueue" Controller="MSMController"	sideBar="false" showHeader="false">
+
+	<style type="text/css">
+		
+	</style>
+	<script type="text/javascript">
+		function handlePageRenderJS() {
+            //alert(document.getElementById('$Component.assignedToMeInput').checked);
+            handlePageRender(document.getElementById('{!$Component.form1.assignedToMeInput}').checked);
+        }
+	</script>
+	<div style="display:block; height:75vh; overflow: scroll; font-size:14px;"> 
+
+	    <apex:form id="formId1">
+	    	<apex:actionPoller reRender="healthMonitor" interval="5" oncomplete="loader.cancel()" onsubmit="handlePageRenderJS()" />
+	        <apex:pageBlockSection columns="1" id="pblockID">
+
+				<apex:pageBlockTable id="dsrTable" style="width:100%;" value="{!dsrObjectList}" var="dsr"  >
+
+					<apex:variable var="rowcount" value="{!0}" />
+	              	<apex:column style="width:4%;" headerValue="Priority" >
+	                	<table>
+	                  		<tr>
+	                    		<td>{!rowcount}</td>
+	                   		</tr> 
+	                	</table>
+	                <apex:variable var="rowcount" value="{!rowcount+1}" />
+	              	</apex:column>
+
+		            <apex:column style="width:25%"  headerValue="Deployment-Step">
+		                <apex:outputField value="{!dsr.Deployment_Step__c}"></apex:outputField>
+		            </apex:column>
+
+		            <!-- <apex:column style="width:5%" headerValue="Status" styleClass="{!IF(dsr.status__c == 'New','newClass','assignedClass')}">
+		              	<apex:outputField value="{!dsr.status__c}" id="statuss"></apex:outputField>
+		            </apex:column> --> 
+		            <apex:column style="width:10%" headerValue="Status">
+			            <apex:outputText rendered="{!IF(dsr.status__c =='New', true, false)}"> &#x25FD;</apex:outputText>
+			            <apex:outputText rendered="{!IF(dsr.status__c =='Assigned', true, false)}">&#8987;</apex:outputText>
+			              		&nbsp;
+			            <b style="color: black;"><apex:outputText rendered="{!IF(dsr.status__c =='New', true, false)}" value="{!dsr.status__c}"></apex:outputText></b>
+			            <b style="color: orange;"><apex:outputText rendered="{!IF(dsr.status__c =='Assigned', true, false)}" value="{!dsr.status__c}"></apex:outputText></b>
+		            </apex:column>
+
+		            <apex:column style="width:5%"  headerValue="Environment">
+		                <apex:outputField value="{!dsr.environment__c}"></apex:outputField>
+		            </apex:column>
+
+		            <apex:column style="width:25%"  headerValue="Comments">
+		                <apex:outputField value="{!dsr.devComments__c}" ></apex:outputField>
+		            </apex:column>
+
+		            <!-- <apex:column style="width:25%"  headerValue="Comments">
+		                <apex:outputField value="{!dsr.opsComments__c}" ></apex:outputField>
+		            </apex:column> -->
+
+		            <apex:column style="width:5%" headerValue="Requested By">
+		              	<apex:outputField value="{!dsr.requestedBy__c}" >&nbsp;[{!dsr.Deployment_Step__r.Team__c}]</apex:outputField>
+		            </apex:column>
+		  
+		            <apex:column style="width:10%" headerValue="Submission Time">
+		                <apex:outputField value="{!dsr.submissionTime__c}" ></apex:outputField>
+		            </apex:column>
+
+		            <apex:column style="width:7%" headerValue="Assigned To">
+		              	<apex:outputField value="{!dsr.assignedTo__c}" ></apex:outputField>
+		            </apex:column>
+					<!-- updateStatusJS('{!dsr.id}','Failed') -->
+
+		            <apex:column style="width:5%" headerValue="Action" headerClass="centerAlign"> 
+		            	<apex:panelGrid columns="3" id="theGrid">
+
+        					<apex:commandButton onclick="Prompt.render('<b>Please select one of the following</b>','assign_request','{!dsr.id}')" value = "{! If(dsr.assignedTo__c == null,'Assign','Re-Assign') }" rendered="{! If(isOps, true, false) }" reRender="dsrTable"/>
+ 
+        					<apex:commandButton rendered="{! If(dsr.assignedTo__c == $User.Id, true, false) }" onclick="Prompt.render('<b>Are you sure to mark this Deployment Step as Completed?<br/>Comments If Any:</b>','complete_request','{!dsr.id}')" reRender="dsrTable" value = "Completed" />
+
+        					<apex:commandButton rendered="{! If(dsr.assignedTo__c == $User.Id, true, false) }" onclick="Prompt.render('<b>Please provide the Reason for Failure</b>','fail_request','{!dsr.id}')" reRender="dsrTable" value = "Failed" />
+
+        					<apex:commandButton rendered="{! If(AND(dsr.requestedBy__c == $User.Id, dsr.assignedTo__c == null) ,true, false) }" onclick="Confirm.render('<b>Are you sure to cancel this Deployment Step?</b>','cancel_request','{!dsr.id}')" reRender="dsrTable" value = "Cancel" />
+        					
+    					</apex:panelGrid>		              	
+    				<!-- <apex:inputField value="{!dsr.status__c}"   onchange="updateStatusJS('{!dsr.id}',this)" ></apex:inputField> -->
+		            </apex:column>
+
+
+	              	<!-- <apex:column style="width:10%" headerValue="Assign">
+		              	<apex:selectList value="{!dsr.assignedTo__c}"  onchange="updateAssignedToJS('{!dsr.id}',this)" size="1">
+			            	<apex:selectOptions value="{!userList}" ></apex:selectOptions>
+			            </apex:selectList>
+		            </apex:column> -->
+	               
+	            </apex:pageBlockTable>
+			</apex:pageBlockSection>
+
+	        <apex:actionFunction action="{!updateStatusDSR}" name="updateStatus" reRender="dsrTable">
+	          	<apex:param name="id"  value="" />
+	          	<apex:param name="status" value="" />
+              	<apex:param name="reason" value="" />
+            </apex:actionFunction>
+
+	        <apex:actionFunction action="{!updateAssignedDSR}" name="updateAssignedTo" reRender="dsrTable" >
+	          	<apex:param name="id"  value="" />
+	           	<apex:param name="assignedTo" value="" />
+	           	<apex:param name="passOnComments" value="" />
+            </apex:actionFunction>
+
+	    </apex:form>
+
+	</div>
+	<div>
+		<center>
+		<apex:form id="form1">
+		<!--<input type="checkbox" id="assignedToMeInput" checked="{!myRequestsFlag}" onclick="func()"/> <b style="font-size: 14px;">My Requests</b> -->
+            <apex:inputCheckbox id="assignedToMeInput" value="{!myRequestsFlag}" onclick="loader.render()" /> <b style="font-size: 14px;">My Requests</b>
+            <apex:actionFunction action="{!reloadDSR}" name="handlePageRender" reRender="dsrTable" >
+            <apex:param name="requestFlag"  value="" />
+            </apex:actionFunction>
+        </apex:form>     			
+		</center>
+	</div>
+</apex:page>

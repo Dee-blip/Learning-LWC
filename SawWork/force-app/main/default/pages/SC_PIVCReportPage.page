@@ -1,0 +1,40 @@
+<apex:page standardController="Merge_Contract_Header__c" sidebar="false" extensions="SC_PIVCReportClass">
+	<apex:form >
+        
+        <style>
+            .ui-state-active{
+            	border: 1px solid #fbd850;
+                background: #D8BFD8;
+                font-weight: bold;
+                color: #eb8f00;
+            }
+        </style>
+        
+		<apex:pageBlock title="PIVC Contract Details for Account: [{!accountName}]">
+            
+            	<apex:PageBlockTable value="{!contractList}" var="eachContractRec">
+						
+                    	<apex:column headerValue="Original Contract Id" styleClass="{!IF(OrgContractId == eachContractRec.Name,'ui-state-active','')}">
+                        	<apex:outputField value="{!eachContractRec.Name}"/>
+                        </apex:column>
+                		
+                    	<apex:column headerValue="Effective Start Date" styleClass="{!IF(OrgContractId == eachContractRec.Name,'ui-state-active','')}">
+                			<apex:outputField value="{!eachContractRec.Effective_Start_Date__c}"/>
+                        </apex:column>
+                    
+                        <apex:column headerValue="Effective End Date" styleClass="{!IF(OrgContractId == eachContractRec.Name,'ui-state-active','')}">    
+                			<apex:outputField value="{!eachContractRec.Effective_End_Date__c}"/>
+                        </apex:column>
+                    
+                    	<apex:column headerValue="Akam Created Date" styleClass="{!IF(OrgContractId == eachContractRec.Name,'ui-state-active','')}">    
+                			<apex:outputField value="{!eachContractRec.AKAM_Created_Date__c}"/>
+                        </apex:column>
+                    
+                    	<apex:column headerValue="SFDC Created Date" styleClass="{!IF(OrgContractId == eachContractRec.Name,'ui-state-active','')}">    
+                			<apex:outputField value="{!eachContractRec.createddate}"/>
+                        </apex:column>
+               
+			</apex:PageBlockTable>
+  		</apex:pageBlock>
+   	</apex:form>
+</apex:page>

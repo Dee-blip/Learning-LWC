@@ -1,0 +1,96 @@
+<!--
+Author          : Sumukh SS
+Description     : Living Summary Template Selector for SOCC  
+
+Date                 Developer             JIRA #          Description  
+==============================================================================                                                     
+27 May 2019     	Sumukh SS		 ESESP-2198     SOCC Lightning Migration
+-->
+<aura:component
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                controller="SC_SOCC_Case_LightningUtility" access="global" >
+    
+    <aura:attribute name="options" type="List" />
+    <aura:attribute name="selectedValue" type="String" />
+    <aura:attribute name="SummaryID" type="string"/>  
+    <!--Is the Component rendered as a child component?-->
+    <aura:attribute name="IsChildComponent" type="boolean" default="false" />
+    <aura:attribute name="loaded" type="boolean" default="false" />
+    <!--Get the record ID of the case-->
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="showSummaryEditorModal" type="Boolean" default="false"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    
+    <div class="slds-box slds-theme_default">
+        <lightning:accordion allowMultipleSectionsOpen="true" aura:id="accordion" activeSectionName="">
+            <lightning:accordionSection name="LS" label="Living Summary Editor" class="c-accordion-section">
+                <aura:if isTrue="{!v.loaded}">
+                    <lightning:spinner alternativeText="Loading" size="medium" />
+                </aura:if>
+                <lightning:recordEditForm aura:id="editForm"
+                                          onsuccess="{!c.ReloadPage}"
+                                          recordId="{!v.recordId}"
+                                          objectApiName="Case">
+                    <!-- the messages component is for error messages -->
+                    <lightning:messages />
+                    <lightning:inputField aura:id="input_LS" fieldName="Living_Summary_Next_Steps__c" />
+                    <div class="slds-m-top_medium">
+                        <aura:if isTrue="{!v.IsChildComponent}">
+                            <lightning:button variant="brand" name="save" label="Save and Authorize!" onclick="{!c.updateandauthorize}"/>
+                            <aura:set attribute="else">
+                                <lightning:button variant="brand" name="save" label="Save" onclick="{!c.update}"/>
+                                <lightning:buttonIcon class="c-button" alternativeText="Maximise Editor" iconName="utility:new_window" onclick="{!c.showSummaryEditorModal}"/>
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                </lightning:recordEditForm>
+            </lightning:accordionSection>
+        </lightning:accordion>
+        
+        <lightning:accordion allowMultipleSectionsOpen="true" activeSectionName="LS2">
+            <lightning:accordionSection name="LS2" label="Template Selector" class="c-accordion-section">
+                
+                <lightning:select label="Select a Living Summary Template:" aura:id="SummaryId" value="{!v.selectedValue}" onchange="{!c.showLivingSummaryTemplate}">
+                    <aura:iteration items="{!v.options}" var="option">
+                        <option text="{!option.text}" value="{!option.Id}" />
+                    </aura:iteration>
+                </lightning:select>
+                
+                
+                <lightning:recordForm recordId="{!v.SummaryID}"
+                                      objectApiName="SC_SOCC_Living_Summary_Template__c"
+                                      fields="Living_Summary_Template__c"
+                                      mode="readonly" />
+                <br/>
+                <lightning:button variant="success" label="I Choose this!" onclick='{!c.ChooseLSTemplate}'/>
+            </lightning:accordionSection>
+        </lightning:accordion>
+    </div>
+
+    <!-- Summary Editor Modal -->
+    <aura:if isTrue="{!v.showSummaryEditorModal}">
+        <lightning:recordEditForm aura:id="editFormInModal"
+                                  onsuccess="{!c.ReloadPage}"
+                                  recordId="{!v.recordId}"
+                                  objectApiName="Case">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container summary-editor-modal-container summary-editor-modal">
+                    <header class="slds-modal__header">
+                        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Living Summary Editor</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <lightning:inputField aura:id="input_LS_Modal" fieldName="Living_Summary_Next_Steps__c" />
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button label="Cancel" onclick="{!c.hideSummaryEditorModal}" />
+                        <lightning:button variant="brand" label="Save" onclick="{!c.updateLivingSummaryFromModal}" />
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </lightning:recordEditForm>
+
+    </aura:if>
+
+</aura:component>

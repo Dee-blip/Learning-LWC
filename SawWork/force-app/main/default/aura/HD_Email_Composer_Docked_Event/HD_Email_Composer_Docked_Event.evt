@@ -1,0 +1,7 @@
+<aura:event type="APPLICATION" description="Event for HD_Email_Composer_Docked_Event" >
+<aura:attribute name="fromEmail" type="String"/>
+<aura:attribute name="toEmails" type="String[]"/>
+<aura:attribute name="ccEmails" type="String[]"/>
+<aura:attribute name="subject" type="String" />
+<aura:attribute name="emailBody" type="String"/>
+</aura:event>

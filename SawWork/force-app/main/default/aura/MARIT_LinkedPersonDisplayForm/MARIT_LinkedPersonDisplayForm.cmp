@@ -1,0 +1,80 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="MARIT_CreateOrLinkToLiveChatController">
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="personrecordId" type="String" />
+    <aura:attribute name="personName" type="String" />
+    <aura:attribute name="isPersonContact" type="Boolean" default="true" />
+    <aura:if isTrue="{!v.isPersonContact}">
+        <lightning:recordViewForm recordId="{!v.personrecordId}" objectApiName="Contact">
+            <article class="slds-card">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-account" title="Contact">
+                                <span class="slds-assistive-text">Contact</span>
+                            </span>
+                        </div>
+                        <div class="slds-media">
+                            <div class="slds-media__figure">
+                                <lightning:icon iconName="standard:contact" size="small" alternativeText="contact" />
+                            </div>
+                            <div class="slds-media__body">
+                                <h1 class="slds-page-header__title slds-text-heading_small slds-align-middle slds-truncate" title="Contact">Contact</h1>
+                                <br/>
+                                
+                            </div>
+                        </div>
+                    </header>
+                </div>
+                <div class="slds-card__body slds-card__body_inner">
+                    <div style="padding-left:4px">
+                        <label class="slds-form-element__label" for="unique-id-of-input">Full Name</label> <br/>
+                        <lightning:workspaceAPI aura:id="workspace" />
+                        <lightning:button variant="base" label="{!v.personName}" onclick="{!c.openSubTab}" />
+                    </div>
+                    <lightning:outputField fieldName="Email" />
+                    <lightning:outputField fieldName="Phone" />
+                    <lightning:outputField fieldName="Title" />
+                    <lightning:outputField fieldName="MailingAddress" />
+                    <lightning:outputField fieldName="Company__c" />
+                </div>
+            </article>
+        </lightning:recordViewForm>
+        <aura:set attribute="else">
+                    <lightning:recordViewForm recordId="{!v.personrecordId}" objectApiName="Lead">
+            <article class="slds-card">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-account" title="Lead">
+                                <span class="slds-assistive-text">Lead</span>
+                            </span>
+                        </div>
+                        <div class="slds-media">
+                            <div class="slds-media__figure">
+                                <lightning:icon iconName="standard:lead" size="small" alternativeText="Lead" />
+                            </div>
+                            <div class="slds-media__body">
+                                <h1 class="slds-page-header__title slds-text-heading_small slds-align-middle slds-truncate" title="Contact">Lead</h1>
+                                <br/>
+                                
+                            </div>
+                        </div>
+                    </header>
+                </div>
+                <div class="slds-card__body slds-card__body_inner">
+                     <div style="padding-left:4px">
+                        <label class="slds-form-element__label" for="unique-id-of-input">Full Name</label> <br/>
+                        <lightning:workspaceAPI aura:id="workspace" />
+                        <lightning:button variant="base" label="{!v.personName}" onclick="{!c.openSubTab}" />
+                    </div>
+                    <lightning:outputField fieldName="Email" />
+                    <lightning:outputField fieldName="Phone" />
+                    <lightning:outputField fieldName="Title" />
+                    <lightning:outputField fieldName="Address" />
+                    <lightning:outputField fieldName="Company_Self_Entered__c" />
+                </div>
+            </article>
+        </lightning:recordViewForm>
+        </aura:set>
+    </aura:if>
+</aura:component>

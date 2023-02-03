@@ -1,0 +1,373 @@
+<!-- 
+ Main page for showing shifting month calendar
+ @author sfdcdev11981
+ -->
+<apex:page controller="ShiftPlanningCalendarController" docType="HTML-5.0" showHeader="false" sidebar="false" standardStylesheets="false">
+
+   <apex:includeScript value="{!$Resource.JQuery_New}"/>
+   <apex:includeScript value="{!URLFOR($Resource.bootstrap, 'js/bootstrap.js')}"/>
+   <apex:includeScript value="{!URLFOR($Resource.bootstrap, 'js/bootstrap-datepicker.js')}"/>
+   <apex:stylesheet value="{!URLFOR($Resource.bootstrap, 'css/bootstrap.css')}"/>
+   <apex:stylesheet value="{!URLFOR($Resource.bootstrap, 'css/datepicker.css')}"/>
+   
+   <style>
+    table{
+    height: 100%;
+    width: 100%;
+    }
+    .spc {
+        text-align: left;
+    }
+    
+    .spc th {
+        text-align: center;
+        width: 130px;
+        border-bottom-width: 1px;
+    }
+    
+    .spc td, .fc th {
+        padding: 0;
+        vertical-align: top;
+    }
+    
+    .fc-day-number {
+        float: left;
+        padding: 0 2px;
+    }
+    
+    .fc-day-content {
+        clear: both;
+        padding: 2px 2px 1px;
+        min-height: 50px;
+    }
+    
+    .showGray {
+        background-color:#F2F2F3;
+    }
+    .holiday {
+        background-color:{!holidayColor};
+    }
+    
+    .currentWeek {
+        background-color: #DEE7EF;
+    }
+    
+    .currentDay {
+        background-color: {!currentDayColor};
+    }
+    
+    .weekend {
+        background-color:{!weekendColor};
+    }
+   
+        
+ </style>
+ 
+ <script>
+ function copyAssignments() {
+    var fromDt = document.getElementById('fromDate').value;
+    var startDt = document.getElementById('startDate').value;
+    var endDt = document.getElementById('endDate').value;
+    var incWeekend = document.getElementById('includeWeekend').checked;
+    jsCopyAssignment(fromDt, startDt, endDt, incWeekend);
+ }
+ 
+ </script>
+
+<apex:form id="shiftCalForm" >
+        <apex:actionFunction name="getRoleData" action="{!showRoleData}"
+            reRender="modeRoleData">
+            <apex:param name="param1" assignTo="{!selectedDay}" value="" />
+            </apex:actionfunction>
+            <apex:actionFunction name="showCopyTool" action="{!showCopyTool}"
+                reRender="copyToolData" oncomplete="bindDatePicker();" />
+
+            <apex:actionFunction name="saveShiftRoleAssignmentChanges"
+                action="{!saveShiftRoleAssignmentChanges}" reRender="shiftCalForm" />
+
+            <apex:actionfunction name="jsCopyAssignment"
+                action="{!copyAssignments}" rerender="shiftCalForm">
+                <apex:param name="param1" assignTo="{!fromDateParam}" value="" />
+                <apex:param name="param2" assignTo="{!startDateParam}" value="" />
+                <apex:param name="param3" assignTo="{!endDateParam}" value="" />
+                <apex:param name="param4" assignTo="{!includeWeekendParam}" value="" />
+            </apex:actionfunction>
+
+
+            <apex:outputPanel id="mainOP">
+                <div class="container">
+                <fieldset><legend>Shift Planning Calendar</legend> <apex:outputPanel id="errorSection">
+                    <apex:repeat value="{!pageMessages}" var="msg">
+                        <apex:outputPanel rendered="{!msg.isError}">
+                            <div class="alert alert-error"><a class="close"
+                                data-dismiss="alert">×</a> <strong>Error!&nbsp;</strong>{!msg.message}
+                            </div>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!msg.isInfo}">
+                            <div class="alert alert-info"><a class="close"
+                                data-dismiss="alert">×</a> <strong>Info!&nbsp;</strong>{!msg.message}
+                            </div>
+                        </apex:outputPanel>
+                    </apex:repeat>
+                </apex:outputPanel>
+
+                <div class="row">
+                <div class="span12"></div>
+                </div>
+                <div class="row">
+                <div class="span1"><apex:commandLink action="{!previousMonth}"
+                    value=" ◄ " rerender="mainOP" status="dateStatus" styleClass="btn" />
+                </div>
+                <div class="span3" style="margin-top: -14px; text-align: center;">
+                <h3>{!monthname}</h3>
+                </div>
+                <div class="span1"><apex:commandLink action="{!nextMonth}"
+                    value=" ► " rerender="mainOP" status="dateStatus" styleClass="btn" />
+                </div>
+                <div class="span2"><apex:selectList id="shiftList"
+                    value="{!selectedShift}" multiselect="false" size="1"
+                    style="width:180px;">
+                    <apex:selectOptions value="{!shiftOptions}" />
+                    <apex:actionSupport event="onchange" action="{!reloadCalendar}"
+                        rerender="shiftCalForm" />
+                </apex:selectList></div>
+                <div class="span2"><apex:selectList id="divisionList"
+                    value="{!selectedDivision}" multiselect="false" size="1">
+                    <apex:selectOptions value="{!divisionOptions}" />
+                    <apex:actionSupport event="onchange" action="{!reloadCalendar}"
+                        rerender="shiftCalForm" />
+                </apex:selectList></div>
+                </div>
+                <div class="row">
+                <div class="span12"></div>
+                </div>
+                <div class="row">
+                <div class="span12">
+                <table id="splitTbl" class="spc" border="1" width="80%">
+                    <tr>
+                        <th>Sun</th>
+                        <th>Mon</th>
+                        <th>Tue</th>
+                        <th>Wed</th>
+                        <th>Thu</th>
+                        <th>Fri</th>
+                        <th>Sat</th>
+                    </tr>
+                    <apex:repeat value="{!days}" var="week">
+                        <tr>
+                            <apex:repeat value="{!week}" var="dw">
+                                <td class="{!dw.styleClass}">
+                                    <table>
+                                    <tr style="height:10%;">
+                                        <td>
+                                            <div class="fc-day-number">
+                                                <apex:outputText value="{!IF(dw.day==0, '',IF(dw.day<0,text(dw.day*-1),text(dw.day)))}" /> 
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr style="height:80%;">
+                                        <td>
+                                            <div class="fc-day-content">
+                                            <div style="position: relative; height: 49%;"><apex:outputpanel rendered="{!dw.showData}">
+                                            <div style="font-size: 0.8em;">                              
+                                            <apex:repeat value="{!dw.mapRoleWithAssignedMember}" var="val">
+                                            <a href="/{!val}" target="_blank">{!dw.mapRoleWithAssignedMember[val]}</a>
+                                            <br />
+                                            </apex:repeat> 
+                                            </div>
+                                            </apex:outputpanel></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <apex:outputpanel rendered="{!dw.showData}">
+                                            <div style="text-align: center; margin-top:5px;"><a
+                                            class="btn btn-mini btn-info"
+                                            onclick="getRoleData('{!dw.day}');return false;"
+                                            href="#editData" role="button" data-toggle="modal"
+                                            style="vertical-align: bottom;">Edit</a></div>
+                                           </apex:outputpanel> 
+                                         </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                            </apex:repeat>
+                        </tr>
+                    </apex:repeat>
+                </table>
+                </div>
+
+                </div>
+                <div class="row" style="padding-top: 10px">
+                <div class="span1"><span class="holiday">&nbsp;Holiday&nbsp;</span>
+                </div>
+                <div class="span1"><span class="currentDay">&nbsp;CurrentDay&nbsp;</span>
+                </div>
+                <div class="span1"><span class="weekend">&nbsp;Weekend&nbsp;</span>
+                </div>
+                <div class="span6"></div>
+                <div class="span1">
+                    <apex:outputPanel rendered="{!isEditable}"><a class="btn btn-mini btn-info"
+                    onclick="showCopyTool();return false;" href="#copyTool"
+                    role="button" data-toggle="modal" style="vertical-align: bottom;">Copy
+                Tool</a></apex:outputPanel>
+                </div>
+                </div>
+
+                <!-- Edit data modal  -->
+                <div id="editData" class="modal hide fade in" style="display: none;">
+                <apex:outputPanel id="modeRoleData">
+                    <div class="modal-header"><a class="close"
+                        data-dismiss="modal">×</a>
+
+                    <h3>{!selectedDayRolePopupHeaderLabel}</h3>
+                    </div>
+                    <div class="modal-body">
+                    <div class="accordion" id="roleAccordion"><apex:repeat value="{!divisionRoleWrapperList}" var="dw">
+                        <div class="accordion-group">
+                        <div class="accordion-heading"><a class="accordion-toggle"
+                            data-toggle="collapse" data-parent="#roleAccordion"
+                            href="#{!dw.divisionRole.Id}"> {!dw.divisionRole.Name} </a></div>
+                        <div id="{!dw.divisionRole.id}" class="accordion-body collapse">
+                        <div class="accordion-inner">
+                        <c:MultiselectPicklist leftLabel="Available"
+                            leftOptions="{!dw.availableShiftUserOptions}"
+                            rightLabel="Assigned" rightOptions="{!dw.roleAssignmentsOptions}" isEditable="{!isEditable}"
+                            size="10" width="200px" />
+                        </div>
+                        </div>
+                        </div>
+                    </apex:repeat></div>
+                    <apex:repeat value="{!pageMessages}" var="msg">
+                        <apex:outputPanel rendered="{!msg.isError}">
+                            <div class="alert alert-error"><a class="close"
+                                data-dismiss="alert">×</a> <strong>Error!&nbsp;</strong>{!msg.message}
+                            </div>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!msg.isInfo}">
+                            <div class="alert alert-info"><a class="close"
+                                data-dismiss="alert">×</a> <strong>Info!&nbsp;</strong>{!msg.message}
+                            </div>
+                        </apex:outputPanel>
+                    </apex:repeat></div>
+                    <apex:outputPanel rendered="{!hasDivisionRoleWrappers}">
+                        <div class="modal-footer"><a href="#"
+                            class="btn btn-success"
+                            onclick="saveShiftRoleAssignmentChanges();return false;"
+                            data-dismiss="modal">Save</a> <a href="#" class="btn"
+                            data-dismiss="modal">Close</a></div>
+                    </apex:outputPanel>
+                </apex:outputPanel></div>
+
+
+                <!-- Copy Tool modal  -->
+                <div id="copyTool" class="modal hide fade in" style="display: none;">
+                <div class="modal-header"><a class="close"
+                    data-dismiss="modal">×</a>
+                <h3>Copy Tool</h3>
+                </div>
+                <apex:outputPanel id="copyToolData">
+                    <div class="modal-body"><apex:outputPanel rendered="{!AND(NOT(ISNULL(selectedDivisionName)), NOT(ISNULL(selectedShiftName))) }">
+
+                        <div style="font-weight: bold; font-size: 1.2em;">
+                        Division:&nbsp;<apex:outputText value="{!selectedDivisionName}" /><br />
+                        </div>
+
+                        <div
+                            style="font-weight: bold; font-size: 1.2em; padding-top: 10px;">
+                        Shift:&nbsp;<apex:outputText value="{!selectedShiftName}" /><br />
+                        </div>
+                        <div class="alert alert-error" id="alert"><strong></strong>
+                        </div>
+
+                        <div style="padding-top: 15px;">
+                        <table>
+                            <tr>
+                                <td><label class="control-label">Date To Copy
+                                Shift Role Assignment From</label></td>
+                                <td width="5px;"></td>
+                                <td>
+                                <div class="controls">
+                                <div class="input-append date datepicker"
+                                    data-date="{!currentDateStr}" data-date-format="mm/dd/yyyy"
+                                    autoclose="true"><input size="14" type="text"
+                                    id="fromDate" value="{!currentDateStr}" style="width: 120px" /><span
+                                    class="add-on"><i class="icon-th"></i></span></div>
+                                </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label class="control-label">Copy To Start
+                                Date</label></td>
+                                <td width="5px;"></td>
+                                <td>
+                                <div class="controls">
+                                <div class="input-append date datepicker"
+                                    data-date="{!currentDateStr}" data-date-format="mm/dd/yyyy"
+                                    autoclose="true"><input size="14" id="startDate"
+                                    type="text" value="{!currentDateStr}" style="width: 120px" /><span
+                                    class="add-on"><i class="icon-th"></i></span></div>
+                                </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label class="control-label">Copy To End Date</label>
+                                </td>
+                                <td width="5px;"></td>
+                                <td>
+                                <div class="controls">
+                                <div class="input-append date datepicker"
+                                    data-date="{!currentDateStr}" data-date-format="mm/dd/yyyy"
+                                    autoclose="true"><input size="14" id="endDate"
+                                    type="text" value="{!currentDateStr}" style="width: 120px" /><span
+                                    class="add-on"><i class="icon-th"></i></span></div>
+                                </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label class="control-label">Include Weekends</label>
+                                </td>
+                                <td width="5px;"></td>
+                                <td>
+                                <div class="controls"><label class="checkbox"> <input
+                                    type="checkbox" id="includeWeekend" /> </label></div>
+                                </td>
+                            </tr>
+                        </table>
+                        </div>
+                    </apex:outputPanel> <apex:repeat value="{!pageMessages}" var="msg">
+                        <apex:outputPanel rendered="{!msg.isError}">
+                            <div class="alert alert-error"><a class="close"
+                                data-dismiss="alert">×</a> <strong>Error!&nbsp;</strong>{!msg.message}
+                            </div>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!msg.isInfo}">
+                            <div class="alert alert-info"><a class="close"
+                                data-dismiss="alert">×</a> <strong>Info!&nbsp;</strong>{!msg.message}
+                            </div>
+                        </apex:outputPanel>
+                    </apex:repeat></div>
+                    <apex:outputPanel rendered="{!AND(NOT(ISNULL(selectedDivisionName)),NOT(ISNULL(selectedShiftName)) )}">
+                        <div class="modal-footer"><a href="#"
+                            class="btn btn-success" onclick="copyAssignments();return false;"
+                            data-dismiss="modal">Save</a> <a href="#" class="btn"
+                            data-dismiss="modal">Cancel</a></div>
+                    </apex:outputPanel>
+                </apex:outputPanel></div>
+
+                </fieldset>
+                </div>
+
+            </apex:outputPanel>
+    </apex:form>
+<script>
+$('.datepicker').datepicker({ autoclose : true });
+
+function bindDatePicker() {
+    $('.datepicker').datepicker({ autoclose : true });
+}
+
+</script>
+
+</apex:page>

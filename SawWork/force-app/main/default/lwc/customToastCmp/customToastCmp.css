@@ -1,0 +1,6 @@
+h2{
+    white-space: pre-line !important;
+}
+h2 p{
+    float : left;
+}

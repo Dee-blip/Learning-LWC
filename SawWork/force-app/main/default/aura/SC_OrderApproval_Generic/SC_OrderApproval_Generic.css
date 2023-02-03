@@ -1,0 +1,26 @@
+.THIS {
+}
+
+.THIS .wk_success {
+    background : #04844B !important;
+}
+
+.THIS.slds-spinner_container {  
+  z-index: 10000;
+  position: fixed;   
+}
+
+.THIS.highlightButton{
+    background-color: lightblue !important;
+}
+
+.THIS .close-case-warning-message {
+	padding: 0.375rem 0.75rem 0.375rem 0.75rem;
+    margin: 0rem 0rem 0.5rem 0rem;
+    min-width: 100%;
+    max-width: 100%;
+}
+
+.THIS .warning-ack-checkbox .slds-checkbox_faux {
+    margin-right: 0.25rem !important;
+}

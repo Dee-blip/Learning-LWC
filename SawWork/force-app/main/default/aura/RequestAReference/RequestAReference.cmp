@@ -1,0 +1,12 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global" 
+                controller="MARIT_RequestAReferenceController">
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="showErrorMessage" access="public" type="Boolean" default="false"/>
+    
+    <aura:if isTrue="{!v.showErrorMessage}">
+        <ui:message title="Error" severity="error">
+            You can only request a reference from the Akamai Insider Advocate Hub when the Sales Stage is 5 or 6.
+        </ui:message>
+    </aura:if>
+</aura:component>

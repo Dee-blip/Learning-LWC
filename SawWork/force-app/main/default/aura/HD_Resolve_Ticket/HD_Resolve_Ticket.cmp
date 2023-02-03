@@ -1,0 +1,33 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="HD_IncidentDetailController">
+    <aura:registerEvent name="HDLogger" type="c:HDLogger"/>
+    <ltng:require scripts="{!$Resource.HD_Error_Logger}" /> 
+    <aura:attribute name="recordId" type="String" default="{!recordId}"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:attribute name="hasOpenTasks" type="Boolean" default="false" />
+    <aura:attribute name="warnings" type="String[]"/>
+            
+    <div >
+    
+    <div class="slds-form-element">
+      <div class="slds-form-element__control" for="resolution">
+        <ui:inputTextArea aura:id="resolution"  label="Resolution" placeholder="Please enter the resolution" rows="5" required="true"/>
+      </div>
+
+    </div>
+    <div class="slds-form-element">
+            <div class="slds-form-element__control" for="effort" style = "width:18%">
+                <ui:inputText label="Effort" aura:id="effort"  placeholder="hh:mm" required="true"/>
+            </div>
+    </div>
+
+    <aura:if isTrue="{!v.hasOpenTasks}">
+      <br />
+      <lightning:input type="checkbox" aura:id="taskCloseConfirm"
+        label="The Incident has open tasks. Would you want to close them before resolving?" name="input1">
+      </lightning:input>
+    </aura:if>
+        <br />
+    <ui:button label="Resolve Ticket" press="{! c.resolveTicket }" />
+    <ui:inputDefaultError aura:id="warn" value="{!v.warnings}" />
+    </div>
+</aura:component>

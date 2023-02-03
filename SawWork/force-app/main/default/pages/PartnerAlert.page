@@ -1,0 +1,25 @@
+<apex:page showHeader="false" sidebar="false" standardController="Opportunity" extensions="PartnerAlertPageController" action="{!checkForRenewal}">
+    <script type="text/javascript">
+function openRebateTermsConditionsPage()
+{
+ window.parent.location='/partners/apex/RebateTermsConditions?id={!JSENCODE(opportunity.Id)}&accountId={!JSENCODE(opportunity.Partner_Involved__c)}'; // SFDC-5897 Added JSENCODE
+
+}
+function openPartnerLead()
+{
+ window.parent.location='/partners/{!JSENCODE(opportunity.Associated_Lead__c)}'; // SFDC-5897 Added JSENCODE
+ 
+}
+</script>
+    <div style="color: red;"><b><apex:outputText rendered="{!oppty.isRebateTCToShow__c=='false'}">Please Click on Submit for Approval button. </apex:outputText>
+        <apex:outputText rendered="{!oppty.isRebateTCToShow__c=='true'}">{!$Label.PartnerRebate_TC_Notification_Text}</apex:outputText>
+        &nbsp;<apex:outputLink rendered="{!oppty.isRebateTCToShow__c=='true'}" onclick="openRebateTermsConditionsPage()">
+                {!$Label.Rebate_TC_Label}
+        </apex:outputLink>
+        <br></br>
+        <br></br>
+        <apex:outputLink rendered="{!oppty.Associated_Lead__c!=null}" onclick="openPartnerLead()">
+            Navigate to associated Lead
+        </apex:outputLink>
+    </b></div>
+</apex:page>

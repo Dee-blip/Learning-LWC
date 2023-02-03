@@ -1,0 +1,1553 @@
+<!-- Pramod Kamath         31st March     Apex page to add a new product to a Package. Effective release 3.40
+                                            CR 2568594 - Online Channel:Package Creation
+                                            
+                                            
+    Pramod Kamath            21 July 2014   Added Cloudlets Pricing type.   | CR 2703234   | Release 3.44   
+
+    Ruchika Sharma         Release 3.45     CR 2733834- Online Channel: Overage support for Cloudlets
+
+    Ruchika Sharma         Release 4.0      CR 2733897- Online Channel: New Pricing Type - Commit with Multiple UOMs   
+    
+    Ruchika Sharma         Release 4.0      CR 2771940- Online Channel: Format the Commit Pricing Type fields     
+
+    Ruchika Sharma                 Release 4.1      CR 2801910- Marketplace : 4.1       
+
+    Ruchika Sharma                 Release 4.6      CR 2946116 - Change number of tiers for pricing type clodulets                   
+. -->
+
+<apex:page standardController="Online_Channel_Package_Product__c"
+    extensions="OnlineChannelProdAdd">
+
+    <style>
+.percent {
+    width: 50%;
+    height: 50%;
+}
+</style>
+    <style>
+.overagePercent {
+    width: 68%;
+    height: 50%;
+}
+</style>
+    <apex:actionStatus id="usgstat" startText="Loading..." stopText=" " />
+    <apex:form id="mform">
+        <apex:pageBlock title="Campaign Product Details" mode="detail"
+            id="pblock">
+
+            <apex:actionRegion >
+                <apex:pageBlockSection title="Product Details" columns="2"
+                    id="mycontent">
+                    <apex:inputField value="{!campProd.Online_Channel_Package__c}"
+                        label="Online Channel Package" />
+
+
+                    <apex:inputField value="{!campProd.Name}" required="true"
+                        label="Product Name" />
+                    <apex:inputField value="{!campProd.MPID__c}" required="true" />
+                    <apex:inputField value="{!campProd.Sec_MPID__c}" />
+
+
+
+                    <!--Modified by rsharma: CR 2733897- UOM should be visible under product details when pricing type is not 'Commit with Multiple UOMs'  -->
+
+                    <apex:inputField value="{!campProd.UOM__c}" label="Unit Of Measure"
+                        rendered="{!campProd.Usage_Type__c!='Commit with Multiple UOMs'}">
+                        <apex:actionSupport event="onchange"
+                            reRender="mform,mycontent,utype,ff,ug,cm,simug,bpdetials,pt"
+                            status="usgstat" />
+                    </apex:inputField>
+
+                    <apex:inputField value="{!campProd.Usage_Type__c}" required="true">
+                        <apex:actionSupport event="onchange"
+                            reRender="mform,utype,ff,ug,cm,bpdetails" status="usgstat" />
+                    </apex:inputField>
+
+                    <!--Modified by rsharma: CR 2733897- billing cycle should be visible under product details when pricing type is not 'Commit with Multiple UOMs'  -->
+                    <apex:inputField value="{!campProd.Billing_Cycle__c}"
+                        required="true"
+                        rendered="{!campProd.Usage_Type__c!='Commit with Multiple UOMs'}" />
+
+
+
+                </apex:pageBlockSection>
+            </apex:actionRegion>
+
+
+
+
+            <apex:actionRegion >
+
+            <apex:pageBlockSection Title="In Case Of Trials" id="icot"
+                columns="2">
+
+                <!-- Test  <apex:inputField value="{!campProd.Trial_Period__c}"/> -->
+                <apex:inputField value="{!campProd.Trial_Quantity__c}"
+                    Label="Trial Quantity" />
+                <!--Modified by rsharma: CR 2733897- below fields should be visible under 'in case of trials' when pricing type is 'Commit with Multiple UOMs'  -->
+                <apex:inputField value="{!campProd.UOM__c}" Label="Unit Of Measure"
+                    rendered="{!campProd.Usage_Type__c=='Commit with Multiple UOMs'}">
+                <apex:actionSupport event="onchange"
+                            reRender="mform,utype,ff,ug,cm,bpdetails" status="usgstat" />
+                </apex:inputField>
+                <apex:inputField value="{!campProd.Trial_Quantity1__c}"
+                    Label="Trial Quantity"
+                    rendered="{!campProd.Usage_Type__c=='Commit with Multiple UOMs'}" />
+                <apex:inputField value="{!campProd.UOM1__c}" Label="Unit Of Measure"
+                    rendered="{!campProd.Usage_Type__c=='Commit with Multiple UOMs'}">
+                    <apex:actionSupport event="onchange"
+                            reRender="mform,utype,ff,ug,cm,bpdetails" status="usgstat" />
+                </apex:inputField>
+                <apex:inputField value="{!campProd.Trial_Quantity2__c}"
+                    Label="Trial Quantity"
+                    rendered="{!campProd.Usage_Type__c=='Commit with Multiple UOMs'}" />
+                <apex:inputField value="{!campProd.UOM2__c}" Label="Unit Of Measure"
+                    rendered="{!campProd.Usage_Type__c=='Commit with Multiple UOMs'}">
+                    <apex:actionSupport event="onchange"
+                            reRender="mform,utype,ff,ug,cm,bpdetails" status="usgstat"/>
+                </apex:inputField>
+
+
+            </apex:pageBlockSection>
+            </apex:actionRegion>
+
+            <apex:actionRegion >
+                <apex:pageBlockSection title="Base Pricing Details" columns="2"
+                    id="bpdetails"
+                    rendered="{!IF(campProd.Usage_Type__c=='Cloudlets'||campProd.Usage_Type__c=='Commit with Multiple UOMs',false,true)}">
+                    <apex:inputField value="{!campProd.Quantity_Base_UOM__c}"
+                        label="Base Included {!campProd.UOM__c}" />
+                    <apex:inputField value="{!campPrice.baseprice__c}"
+                        label="Base Price (USD)" />
+                </apex:pageBlockSection>
+            </apex:actionRegion>
+        </apex:pageBlock>
+        <!-- all the basic details and mandatory Fields above this -->
+
+        <!-- <apex:pageBlock title="{!campProd.Usage_Type__c}" id="utype" mode="detail" >  -->
+
+
+        <apex:actionRegion >
+
+            <!-- title doesnt appear for fixed and cloudlets-->
+            <apex:pageBlock title="{!IF(campProd.Usage_Type__c=='fixed' || campProd.Usage_Type__c=='Cloudlets'||campProd.Usage_Type__c=='Client Reputation' ,'',campProd.Usage_Type__c)}"
+                id="utype" mode="detail">
+
+                <!-- pageblockSection for commit begins-->
+
+                <div class="percent"><!-- this --> <apex:pageBlockSection title="Commit Rates(Per Month) in USD"
+                    rendered="{!campProd.Usage_Type__c=='commit'}" id="cm" columns="4">
+
+
+                    
+                        <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t1_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                        </apex:pageBlockSectionItem>
+                      
+                            <apex:outputField value="{!campProd.UOM__c}" label=" " />
+                     
+                    <apex:inputField value="{!campPrice.t1_price__c}"
+                        label="Price (USD)" style="width:90px;text-align: left" />
+                    <apex:inputField value="{!campPrice.t1_overage_price__c}"
+                        label="Overage Price per unit(USD)"
+                        style="width:90px;text-align: left" />
+
+                        <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t2_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                        </apex:pageBlockSectionItem>
+                             <apex:outputField value="{!campProd.UOM__c}" label=" " />
+                   
+                    <apex:inputField value="{!campPrice.t2_price__c}"
+                        label="Price (USD)" style="width:90px;text-align: left" />
+                    <apex:inputField value="{!campPrice.t2_overage_price__c}"
+                        label="Overage Price per unit(USD)"
+                        style="width:90px;text-align: left" />
+
+
+
+                        <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t3_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                        </apex:pageBlockSectionItem>
+                            <apex:outputField value="{!campProd.UOM__c}" label=" " />
+                    <apex:inputField value="{!campPrice.t3_price__c}"
+                        label=" Price (USD)" style="width:90px;text-align: left" />
+                    <apex:inputField value="{!campPrice.t3_overage_price__c}"
+                        label="Overage Price per unit(USD)"
+                        style="width:90px;text-align: left" />
+
+
+                        <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t4_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                        </apex:pageBlockSectionItem>
+                            <apex:outputField value="{!campProd.UOM__c}" label=" " />
+                    <apex:inputField value="{!campPrice.t4_price__c}"
+                        label=" Price (USD)" style="width:90px;text-align: left" />
+                    <apex:inputField value="{!campPrice.t4_overage_price__c}"
+                        label="Overage Price per unit(USD)"
+                        style="width:90px;text-align: left" />
+
+
+
+                        <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t5_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                        </apex:pageBlockSectionItem>
+
+                            <apex:outputField value="{!campProd.UOM__c}" label=" " />
+
+                    <apex:inputField value="{!campPrice.t5_price__c}"
+                        label=" Price (USD)" style="width:90px;text-align: left" />
+                    <apex:inputField value="{!campPrice.t5_overage_price__c}"
+                        label="Overage Price per unit(USD)"
+                        style="width:90px;text-align: left" />
+
+
+
+                        <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t6_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                        </apex:pageBlockSectionItem>
+
+                            <apex:outputField value="{!campProd.UOM__c}" label=" " />
+
+                    <apex:inputField value="{!campPrice.t6_price__c}"
+                        label=" Price (USD)" style="width:90px;text-align: left" />
+                    <apex:inputField value="{!campPrice.t6_overage_price__c}"
+                        label="Overage Price per unit(USD)"
+                        style="width:90px;text-align: left" />
+
+
+
+
+
+                        <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t7_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                        </apex:pageBlockSectionItem>
+
+                            <apex:outputField value="{!campProd.UOM__c}" label=" " />
+
+                    <apex:inputField value="{!campPrice.t7_price__c}"
+                        label=" Price (USD)" style="width:90px;text-align: left" />
+                    <apex:inputField value="{!campPrice.t7_overage_price__c}"
+                        label="Overage Price per unit(USD)"
+                        style="width:90px;text-align: left" />
+
+
+
+
+                        <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t8_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                        </apex:pageBlockSectionItem>
+                      
+                            <apex:outputField value="{!campProd.UOM__c}" label=" " />
+                        
+                    <apex:inputField value="{!campPrice.t8_price__c}"
+                        label=" Price (USD)" style="width:90px;text-align: left" />
+                    <apex:inputField value="{!campPrice.t8_overage_price__c}"
+                        label="Overage Price per unit(USD)"
+                        style="width:90px;text-align: left" />
+
+
+
+
+                    
+                        <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t9_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                        </apex:pageBlockSectionItem>
+                     
+                            <apex:outputField value="{!campProd.UOM__c}" label=" " />
+                    
+                    <apex:inputField value="{!campPrice.t9_price__c}"
+                        label=" Price (USD)" style="width:90px;text-align: left" />
+                    <apex:inputField value="{!campPrice.t9_overage_price__c}"
+                        label="Overage Price per unit(USD)"
+                        style="width:90px;text-align: left" />
+
+
+
+
+                  
+                        <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t10_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                        </apex:pageBlockSectionItem>
+                       
+                            <apex:outputField value="{!campProd.UOM__c}" label=" " style="width:120px;text-align: left" />
+                        
+                    <apex:inputField value="{!campPrice.t10_price__c}"
+                        label=" Price (USD)" style="width:90px;text-align: left" />
+                    <apex:inputField value="{!campPrice.t10_overage_price__c}"
+                        label="Overage Price per unit(USD)"
+                        style="width:90px;text-align: left" />
+
+
+
+
+
+                </apex:pageBlockSection></div>
+
+                <!-- pageblockSection for commit Ends-->
+
+                <!-- Modified by rsharma: CR 2733897: pageblockSection for 'Commit with Multiple UOMs' begins-->
+
+
+                <div class="overagePercent">
+                
+                <apex:actionRegion >
+                 <apex:pageBlockSection title="Tier1"
+                    rendered="{!campProd.Usage_Type__c=='Commit with Multiple UOMs'}" id="comulUOM" columns="4">
+                     <span style="padding-left:100px;width:20%;">
+                      <apex:pageBlockSectionItem > Price Per Month (USD)&nbsp;<apex:inputField value="{!campPrice.t1_price__c}"
+                         style="width:70px;text-align: left" />
+                      </apex:pageBlockSectionItem> 
+                     </span>
+                     
+                      <apex:pageBlockSectionItem /> 
+                    <!--This row repeats 3 times-->
+                    <!--1st Row-->
+                      <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t1_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                        </apex:pageBlockSectionItem>
+                     <!--If UOM is entered in 'In case of trials' section, then display it here, else take it as input-->
+                     <apex:inputField value="{!campProd.UOM__c}" label="Unit Of Measure" rendered="{!campProd.UOM__c==''}">
+                       <apex:actionSupport event="onchange"
+                            reRender="mform,mycontent,utype,ff,ug,cm,simug,bpdetials,pt"
+                            status="usgstat" />
+                    </apex:inputField>
+                     <apex:outputField value="{!campProd.UOM__c}" label="Unit Of Measure" rendered="{!campProd.UOM__c!=''}" />
+                     
+                     <apex:inputField value="{!campProd.Billing_Cycle__c}" label="Billing Cycle">
+                       <apex:actionSupport event="onchange"
+                            reRender="mform,mycontent,utype,ff,ug,cm,simug,bpdetials,pt"
+                            status="usgstat" />
+                    </apex:inputField> 
+                   
+                     <apex:inputField value="{!campPrice.t1_overage_price__c}" label="Overage Price per unit(USD)"
+                        style="width:120px;text-align: left" />
+                    
+                     <!--2nd Row-->
+                     <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t2_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                     </apex:pageBlockSectionItem>
+                     <!--If UOM is entered in 'In case of trials' section, then display it here, else take it as input-->
+                     <apex:inputField value="{!campProd.UOM1__c}" label="Unit Of Measure" rendered="{!campProd.UOM1__c==''}">
+                       <apex:actionSupport event="onchange"
+                            reRender="mform,mycontent,utype,ff,ug,cm,simug,bpdetials,pt"
+                            status="usgstat" />
+                    </apex:inputField>
+                     <apex:outputField value="{!campProd.UOM1__c}" label="Unit Of Measure" rendered="{!campProd.UOM1__c!=''}" />
+                     <apex:inputField value="{!campProd.Billing_Cycle1__c}" label="Billing Cycle">
+                       <apex:actionSupport event="onchange"
+                            reRender="mform,mycontent,utype,ff,ug,cm,simug,bpdetials,pt"
+                            status="usgstat" />
+                    </apex:inputField> 
+                   
+                     <apex:inputField value="{!campPrice.t2_overage_price__c}" label="Overage Price per unit(USD)"
+                        style="width:120px;text-align: left" />
+                     <!--3rd Row-->
+                     <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t3_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                     </apex:pageBlockSectionItem>
+                     <!--If UOM is entered in 'In case of trials' section, then display it here, else take it as input-->
+                     <apex:inputField value="{!campProd.UOM2__c}" label="Unit Of Measure" rendered="{!campProd.UOM2__c==''}">
+                       <apex:actionSupport event="onchange"
+                            reRender="mform,mycontent,utype,ff,ug,cm,simug,bpdetials,pt"
+                            status="usgstat" />
+                    </apex:inputField>
+                     <apex:outputField value="{!campProd.UOM2__c}" label="Unit Of Measure" rendered="{!campProd.UOM2__c!=''}" />
+                     
+                     <apex:inputField value="{!campProd.Billing_Cycle2__c}" label="Billing Cycle">
+                       <apex:actionSupport event="onchange"
+                            reRender="mform,mycontent,utype,ff,ug,cm,simug,bpdetials,pt"
+                            status="usgstat" />
+                    </apex:inputField> 
+                   
+                     <apex:inputField value="{!campPrice.t3_overage_price__c}" label="Overage Price per unit(USD)"
+                        style="width:120px;text-align: left" />
+                 </apex:pageBlockSection>
+                 </apex:actionRegion>
+                 <!--Above PageBlockSection repeats in different tiers-->
+                 <!--Tier2 begins-->
+                 <apex:pageBlockSection title="Tier2"
+                    rendered="{!campProd.Usage_Type__c=='Commit with Multiple UOMs'}" id="comulUOM1" columns="4">
+                      <span style="padding-left:100px;width:20%;">
+                      <apex:pageBlockSectionItem > Price Per Month (USD)&nbsp;<apex:inputField value="{!campPrice.t2_price__c}"
+                         style="width:70px;text-align: left"  />
+                      </apex:pageBlockSectionItem> 
+                      </span>
+                      <apex:pageBlockSectionItem /> 
+                   
+                    <!--This row repeats 3 times-->
+                    <!--1st Row-->
+                      <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t4_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                        </apex:pageBlockSectionItem>
+                     
+                     <apex:outputField value="{!campProd.UOM__c}" label="Unit Of Measure"  />
+                     <apex:outputField value="{!campProd.Billing_Cycle__c}" label="Billing Cycle"/> 
+                   
+                     <apex:inputField value="{!campPrice.t4_overage_price__c}" label="Overage Price per unit(USD)"
+                        style="width:120px;text-align: left" />
+                    
+                     <!--2nd Row-->
+                     <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t5_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                     </apex:pageBlockSectionItem>
+                   
+                     <apex:outputField value="{!campProd.UOM1__c}" label="Unit Of Measure" />
+                     <apex:outputField value="{!campProd.Billing_Cycle1__c}" label="Billing Cycle"/> 
+                   
+                     <apex:inputField value="{!campPrice.t5_overage_price__c}" label="Overage Price per unit(USD)"
+                        style="width:120px;text-align: left" />
+                     <!--3rd Row-->
+                     <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t6_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                     </apex:pageBlockSectionItem>
+                 
+                     <apex:outputField value="{!campProd.UOM2__c}" label="Unit Of Measure" />
+                     <apex:outputField value="{!campProd.Billing_Cycle2__c}" label="Billing Cycle"/> 
+                   
+                     <apex:inputField value="{!campPrice.t6_overage_price__c}" label="Overage Price per unit(USD)"
+                        style="width:120px;text-align: left" />
+                 </apex:pageBlockSection>
+                 <!--Tier2 ends-->
+                 <!--Tier3 begins-->
+                 <apex:pageBlockSection title="Tier3"
+                    rendered="{!campProd.Usage_Type__c=='Commit with Multiple UOMs'}" id="comulUOM2" columns="4">
+                     <span style="padding-left:100px;width:20%;">
+                      <apex:pageBlockSectionItem > Price Per Month (USD)&nbsp;<apex:inputField value="{!campPrice.t3_price__c}"
+                         style="width:70px;text-align: left"  />
+                      </apex:pageBlockSectionItem> 
+                     </span> 
+                      <apex:pageBlockSectionItem /> 
+                    <!--This row repeats 3 times-->
+                    <!--1st Row-->
+                      <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t7_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                        </apex:pageBlockSectionItem>
+                     
+                     <apex:outputField value="{!campProd.UOM__c}" label="Unit Of Measure"  />
+                     <apex:outputField value="{!campProd.Billing_Cycle__c}" label="Billing Cycle"/> 
+                   
+                     <apex:inputField value="{!campPrice.t7_overage_price__c}" label="Overage Price per unit(USD)"
+                        style="width:120px;text-align: left" />
+                    
+                     <!--2nd Row-->
+                     <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t8_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                     </apex:pageBlockSectionItem>
+                   
+                     <apex:outputField value="{!campProd.UOM1__c}" label="Unit Of Measure" />
+                     <apex:outputField value="{!campProd.Billing_Cycle1__c}" label="Billing Cycle"/> 
+                   
+                     <apex:inputField value="{!campPrice.t8_overage_price__c}" label="Overage Price per unit(USD)"
+                        style="width:120px;text-align: left" />
+                     <!--3rd Row-->
+                     <apex:pageBlockSectionItem > Upto&nbsp;&nbsp;<apex:inputField value="{!campProd.t9_commit_quantity__c}" label="Upto"
+                                style="width:70px;" />
+                     </apex:pageBlockSectionItem>
+                 
+                     <apex:outputField value="{!campProd.UOM2__c}" label="Unit Of Measure" />
+                     <apex:outputField value="{!campProd.Billing_Cycle2__c}" label="Billing Cycle"/> 
+                   
+                     <apex:inputField value="{!campPrice.t9_overage_price__c}" label="Overage Price per unit(USD)"
+                        style="width:120px;text-align: left" />
+                 </apex:pageBlockSection>
+                 </div>
+                <!-- pageblockSection for 'Commit with Multiple UOMs' Ends-->
+                
+                <!-- pageblockSection for Usage Begins-->
+                <div class="percent"><apex:pageBlockSection title="Usage Rates(Per month)"
+                    rendered="{!campProd.Usage_Type__c=='usage'}" id="ug" columns="5">
+
+
+                    <apex:inputField value="{!campProd.t1_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t1_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t1_price__c}"
+                        label="Price per Unit(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+                    <apex:inputField value="{!campProd.t2_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t2_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t2_price__c}"
+                        label="Price per Unit(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+                    <apex:inputField value="{!campProd.t3_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t3_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t3_price__c}"
+                        label="Price per Unit(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+                    <apex:inputField value="{!campProd.t4_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t4_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t4_price__c}"
+                        label="Price per Unit(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+
+                    <apex:inputField value="{!campProd.t5_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t5_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t5_price__c}"
+                        label="Price per Unit(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+                    <apex:inputField value="{!campProd.t6_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t6_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t6_price__c}"
+                        label="Price per Unit(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+                    <apex:inputField value="{!campProd.t7_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t7_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t7_price__c}"
+                        label="Price per Unit(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+                    <apex:inputField value="{!campProd.t8_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t8_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t8_price__c}"
+                        label="Price per Unit(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+
+                    <apex:inputField value="{!campProd.t9_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t9_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t9_price__c}"
+                        label="Price per Unit(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+
+                    <apex:inputField value="{!campProd.t10_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t10_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t10_price__c}"
+                        label="Price per Unit(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+
+                </apex:pageBlockSection></div>
+                <!-- pageblockSection for Usage Ends-->
+
+
+
+                <!-- pageblockSection for Price Tier Begins-->
+                <div class="percent"><apex:pageBlockSection title="Usage Rates(Per month)"
+                    rendered="{!campProd.Usage_Type__c=='Price-Tier'}" id="pt"
+                    columns="5">
+
+
+                    <apex:inputField value="{!campProd.t1_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t1_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t1_price__c}"
+                        label="Price(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+                    <apex:inputField value="{!campProd.t2_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t2_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t2_price__c}"
+                        label="Price(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+                    <apex:inputField value="{!campProd.t3_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t3_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t3_price__c}"
+                        label="Price(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+                    <apex:inputField value="{!campProd.t4_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t4_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t4_price__c}"
+                        label="Price(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+
+                    <apex:inputField value="{!campProd.t5_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t5_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t5_price__c}"
+                        label="Price(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+
+                    <apex:inputField value="{!campProd.t6_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t6_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t6_price__c}"
+                        label="Price(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+
+                    <apex:inputField value="{!campProd.t7_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t7_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t7_price__c}"
+                        label="Price(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+                    <apex:inputField value="{!campProd.t8_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t8_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t8_price__c}"
+                        label="Price(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+
+                    <apex:inputField value="{!campProd.t9_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t9_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t9_price__c}"
+                        label="Price(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+
+                    <apex:inputField value="{!campProd.t10_usage_quant_low__c}"
+                        label="Low Value" style="width:120px;" />
+                    <apex:inputField value="{!campProd.t10_usage_quant_high__c}"
+                        label="High Value" style="width:120px;" />
+                    <apex:inputField value="{!campPrice.t10_price__c}"
+                        label="Price(USD)" style="width:120px;" />
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+
+
+
+                    <apex:inputField value="{!campPrice.overage_price__c}"
+                        label="Overage Price per unit(USD)" style="width:120px;" />
+
+                </apex:pageBlockSection></div>
+                <!-- pageblockSection for Price Tier Ends-->
+
+
+
+                <!-- pageblockSection for Simple Usage Begins  . will not be used for now-->
+                <apex:pageBlockSection title="Simple Usage"
+                    rendered="{!campProd.Usage_Type__c=='Simple Usage'}" id="simug"
+                    columns="3">
+                    <apex:outputField value="{!campProd.UOM__c}" label="Unit Price Per" />
+                    <apex:inputField value="{!campPrice.t1_price__c}"
+                        label="Price(USD)" style="width:120px;" />
+                </apex:pageBlockSection>
+                <!-- pageblockSection for Simple Usage ENDS-->
+
+
+
+
+            </apex:pageBlock>
+
+
+            <!-- pageblock for Cloudlet after this. has 6 tiers and 3 units of measure -->
+            <apex:pageBlock rendered="{!campProd.Usage_Type__c=='Cloudlets'}"
+                title="Cloudlets Pricing">
+
+
+
+
+                <table>
+
+                    <tr align="Center">
+                        <th align="Center"><apex:outputLabel >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GB</apex:outputLabel>
+                        </th>
+
+                        <th><apex:outputLabel ></apex:outputLabel></th>
+
+
+                        <th><apex:outputLabel >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mbps</apex:outputLabel>
+                        </th>
+
+                        <th><apex:outputLabel ></apex:outputLabel></th>
+
+
+
+                        <th><apex:outputLabel >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MPV</apex:outputLabel>
+                        </th>
+
+                        <th><apex:outputLabel >
+                        </apex:outputLabel></th>
+
+
+
+                        <th><apex:outputLabel >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Price(USD)</apex:outputLabel>
+                        </th>
+                    </tr>
+
+                    <!-- Unit: ONE ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t1_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t1_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                            <!--CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried-->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t1_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t1__c}"
+                            label="High" style="width:30px;" /> 
+                            <!--CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.mpv_low_quantity_t1__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mpv_high_quantity_t1__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit3__c}"/> </span></td>
+
+                        <td><apex:inputField value="{!campPrice.t1_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: ONE ROW -->
+
+
+
+                    <!-- Unit: 2nd ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t2_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t2_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t2_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t2__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.mpv_low_quantity_t2__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mpv_high_quantity_t2__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit3__c}"/> </span></td>
+
+                        <td><apex:inputField value="{!campPrice.t2_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 2nd ROW -->
+
+
+
+                    <!-- Unit: 2nd ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t3_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t3_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t3_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t3__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.mpv_low_quantity_t3__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mpv_high_quantity_t3__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit3__c}"/> </span></td>
+
+                        <td><apex:inputField value="{!campPrice.t3_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 3rd ROW -->
+
+
+
+                    <!-- Unit: 4th ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t4_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t4_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t4_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t4__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.mpv_low_quantity_t4__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mpv_high_quantity_t4__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit3__c}"/> </span></td>
+
+                        <td><apex:inputField value="{!campPrice.t4_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 4th ROW -->
+
+
+                    <!-- Unit: 5th ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t5_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t5_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t5_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t5__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.mpv_low_quantity_t5__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mpv_high_quantity_t5__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit3__c}"/> </span></td>
+
+                        <td><apex:inputField value="{!campPrice.t5_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 5th ROW -->
+
+
+                    <!-- Unit: 6th ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t6_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t6_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t6_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t6__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.mpv_low_quantity_t6__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mpv_high_quantity_t6__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit3__c}"/> </span></td>
+
+                        <td><apex:inputField value="{!campPrice.t6_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 6th ROW -->
+                    <!--CR 2946116: rsharma - Change number of tiers for pricing type clodulets- Start -->
+                     <!-- Unit: 7th ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t7_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t7_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t7_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t7__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.mpv_low_quantity_t7__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mpv_high_quantity_t7__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit3__c}"/> </span></td>
+
+                        <td><apex:inputField value="{!campPrice.t7_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 7th ROW -->
+                     <!-- Unit: 8th ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t8_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t8_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t8_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t8__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.mpv_low_quantity_t8__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mpv_high_quantity_t8__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit3__c}"/> </span></td>
+
+                        <td><apex:inputField value="{!campPrice.t8_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 8th ROW -->
+                     <!-- Unit: 9th ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t9_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t9_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t9_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t9__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.mpv_low_quantity_t9__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mpv_high_quantity_t9__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit3__c}"/> </span></td>
+
+                        <td><apex:inputField value="{!campPrice.t9_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 9th ROW -->
+                     <!-- Unit: 10th ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t10_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t10_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t10_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t10__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.mpv_low_quantity_t10__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mpv_high_quantity_t10__c}"
+                            label="High" style="width:30px;" /> 
+                            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit3__c}"/> </span></td>
+
+                        <td><apex:inputField value="{!campPrice.t10_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 10th ROW -->
+                    <!--CR 2946116: rsharma - Change number of tiers for pricing type clodulets- End -->
+
+                </table>
+            </apex:pageBlock>
+            <!--Modified by Ruchika Sharma For CR 2733834 - Online Channel: Overage support for Cloudlets-->
+            <!-- Page Block for Overage begins-->
+
+            <div class="overagePercent"><apex:pageBlock rendered="{!campProd.Usage_Type__c=='Cloudlets'}"
+                title="Overage Rates(Per Month) in USD">
+
+                <apex:pageBlockSection id="clov" columns="3">
+
+
+                    <apex:pageBlockSectionItem > Price (USD)</apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+        
+            <!-- CR 2801910 : Ruchika Sharma: Added Default value to cloudlet unit field, so that they can be queried -->
+                    <apex:pageBlockSectionItem >
+                        <apex:inputField value="{!campPrice.t1_overage_price__c}" />
+                        <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:inputField value="{!campPrice.t2_overage_price__c}" />
+                         <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:inputField value="{!campPrice.t3_overage_price__c}" />
+                         <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit3__c}"/>
+                    </apex:pageBlockSectionItem>
+
+                </apex:pageBlockSection>
+
+
+
+            </apex:pageBlock></div>
+
+            <!--Page Block Section for Overage ends here-->
+
+            <!-- pageblock for Cloudlet -->
+            
+          
+            
+            <!--Added by Rahul for MP 1.0 : New billing model - Client Reputation --->
+            <!-- pageblock for Cloudlet after this. has 6 tiers and 3 units of measure -->
+            <apex:pageBlock rendered="{!campProd.Usage_Type__c=='Client Reputation'}"
+                title="Client Reputation">
+
+
+
+
+                <table>
+
+                    <tr align="Center">
+                        <th align="Center"><apex:outputLabel >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GB</apex:outputLabel>
+                        </th>
+
+                        <th><apex:outputLabel ></apex:outputLabel></th>
+
+
+                        <th><apex:outputLabel >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mbps</apex:outputLabel>
+                        </th>
+
+
+
+
+                        <th><apex:outputLabel >
+                        </apex:outputLabel></th>
+
+
+
+                        <th><apex:outputLabel >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Price(USD)</apex:outputLabel>
+                        </th>
+                    </tr>
+
+                    <!-- Unit: ONE ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t1_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t1_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                            
+                            &nbsp;<apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t1_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t1__c}"
+                            label="High" style="width:30px;" /> 
+                            
+                            &nbsp;<apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/>  </span></td>
+
+                        <td><apex:inputField value="{!campPrice.t1_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: ONE ROW -->
+
+
+
+                    <!-- Unit: 2nd ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t2_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t2_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                           
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t2_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t2__c}"
+                            label="High" style="width:30px;" /> 
+                           
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+                        
+                        <td><apex:inputField value="{!campPrice.t2_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 2nd ROW -->
+
+
+
+
+
+                    <!-- Unit: 2nd ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t3_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t3_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                          
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t3_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t3__c}"
+                            label="High" style="width:30px;" /> 
+                           
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+
+                        <td><apex:inputField value="{!campPrice.t3_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 3rd ROW -->
+
+
+
+                    <!-- Unit: 4th ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t4_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t4_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                           
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t4_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t4__c}"
+                            label="High" style="width:30px;" /> 
+                            
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+                       
+
+                        <td><apex:inputField value="{!campPrice.t4_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 4th ROW -->
+
+
+                    <!-- Unit: 5th ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t5_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t5_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                            
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t5_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t5__c}"
+                            label="High" style="width:30px;" /> 
+                           
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+
+                        <td><apex:inputField value="{!campPrice.t5_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 5th ROW -->
+
+
+                    <!-- Unit: 6th ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t6_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t6_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                            
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t6_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t6__c}"
+                            label="High" style="width:30px;" /> 
+                            
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+                        
+                        <td><apex:inputField value="{!campPrice.t6_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 6th ROW -->
+                    
+                     <!-- Unit: 7th ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t7_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t7_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                            
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t7_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t7__c}"
+                            label="High" style="width:30px;" /> 
+                           
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campPrice.t7_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 7th ROW -->
+                     <!-- Unit: 8th ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t8_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t8_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                           
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t8_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t8__c}"
+                            label="High" style="width:30px;" /> 
+                           
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+                       
+                        <td><apex:inputField value="{!campPrice.t8_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 8th ROW -->
+                     <!-- Unit: 9th ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t9_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t9_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                            
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t9_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t9__c}"
+                            label="High" style="width:30px;" /> 
+                            
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+                       
+                        <td><apex:inputField value="{!campPrice.t9_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 9th ROW -->
+                     <!-- Unit: 10th ROW -->
+                    <tr>
+
+                        <td><apex:inputField value="{!campProd.t10_usage_quant_low__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.t10_usage_quant_high__c}"
+                            label="High" style="width:30px;" /> 
+                            
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit1__c}"/> </span></td>
+
+
+                        <td><apex:inputField value="{!campProd.t10_commit_quantity__c}" label="Low"
+                            style="width:30px;" /></td>
+
+
+                        <td>to &nbsp;&nbsp;&nbsp; <span style="padding-right: 75px;">
+                        <apex:inputField value="{!campProd.mbps_high_quantity_t10__c}"
+                            label="High" style="width:30px;" /> 
+                           
+                            &nbsp; <apex:outputField value="{!campPrice.Cloudlet_Pricing_unit2__c}"/> </span></td>
+
+
+                        
+
+                        <td><apex:inputField value="{!campPrice.t10_price__c}"
+                            label="Price(USD)" style="width:120px;" /></td>
+                    </tr>
+                    <!-- Unit: 10th ROW -->
+                   
+                </table>
+            </apex:pageBlock>
+
+
+
+
+        </apex:actionRegion>
+
+
+
+
+        <apex:commandButton action="{!save}" value="Save Product"
+            status="usgstat" />
+        <apex:commandButton action="{!saveandaddpro}"
+            value="Save and Add New Currency" status="usgstat" />
+        <apex:commandButton action="{!cancel}" value="Cancel" status="usgstat" />
+    </apex:form>
+</apex:page>

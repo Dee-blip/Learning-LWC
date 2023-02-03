@@ -1,0 +1,326 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId"
+	access="global" controller="HD_ActionMenu_Provider">
+	<aura:attribute name="recordId" type="String" default="{!recordId}" />
+	<aura:handler name="init" value="{!this}" action="{!c.actionManagerRules}" />
+	<aura:attribute name="incident" type="BMCServiceDesk__Incident__c"   />
+    <aura:attribute name="isaccessible" type="Boolean" />
+    <aura:attribute name="disableAccess" type="Boolean" default="true"/>
+    <aura:attribute name="ApprovaldisableAccess" type="Boolean" default="false"/>
+    <aura:attribute name="MyActionMsg" type="String" default="Select an action from the list below, available options change as the ticket moves through it's life-cycle."/>
+
+	<aura:handler event="force:refreshView" action="{!c.actionManagerRules}" />
+    <aura:handler event="c:HD_EmailReceivedEvent" action="{!c.actionManagerRules}"/>
+	
+    <aura:attribute name="startTime" type="DateTime" />
+    <aura:attribute name="actionName" type="String" />
+   	<aura:registerEvent name="HD_ActionAuditEvent" type="c:HD_ActionAuditEvent"/>   
+
+
+	<section class="slds-popover slds-size--2-of-2" role="dialog"
+		aria-describedby="dialog-body-id-43">
+		<div class="slds-popover__body slds-p-around--medium" id="dialog-body-id-43">
+			<h3 class="slds-text-title--caps slds-m-bottom--x-small" role="presentation">My
+				Actions
+			</h3>
+            <p>
+				<!--aura:unescapedHtml value="{!v.MyActionMsg}"/-->
+				<ui:outputRichText value="{!v.MyActionMsg}"/>
+			</p>
+		</div>
+		<footer class="slds-popover__footer slds-p-horizontal--none">
+			<ul>
+				<li class="slds-border--bottom hide-menu" aura:id="Assign-Ticket">
+					<button
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="assignTicket" text="This is a test" disabled="{!v.disableAccess}">
+						<lightning:icon class="" iconName="utility:people"
+							size="small" />
+						Assign
+					</button>
+					<div class="slds-is-collapsed action-backgroud" aura:id="assignTicket">
+						<div class="action-background">
+							<c:HD_Assign_Owner_Ticket recordId="{!v.recordId}" />
+						</div>
+					</div>
+				</li>
+				<li class="slds-border--bottom hide-menu" aura:id="Transfer-Ticket">
+
+					<button
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="transferTicket" disabled="{!v.disableAccess}">
+						<lightning:icon class="" iconName="utility:change_owner"
+							size="small" />
+						Transfer
+					</button>
+					<div class="slds-is-collapsed" aura:id="transferTicket">
+						<div class="action-background">
+							<c:HD_Assign_Ticket recordId="{!v.recordId}" incident="{!v.incident}" incType="{!v.incident.BMCServiceDesk__Type__c}"/>
+						</div>
+
+					</div>
+
+				</li>
+
+				<li class="slds-border--bottom hide-menu" aura:Id="Change-Priority">
+					<button
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="changePriority" disabled="{!v.disableAccess}">
+						<lightning:icon class="" iconName="utility:priority"
+							size="small" />
+						Change Priority
+					</button>
+					<div class="slds-is-collapsed " aura:id="changePriority">
+						<div class="action-background">
+				            <c:HD_Change_Priority recordId="{!v.recordId}"  /> 
+						</div>
+					</div>
+				</li>
+
+				<li class="slds-border--bottom hide-menu" aura:Id="Change-Category">
+					<button
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="changeCategory" disabled="{!v.disableAccess}">
+						<lightning:icon class="" iconName="utility:change_record_type"
+							size="small" />
+						Change Category
+					</button>
+					<div class="slds-is-collapsed " aura:id="changeCategory">
+						<div class="action-background">
+                            
+							<c:HD_Change_Category recordId="{!v.recordId}" />
+						</div>
+					</div>
+				</li>
+
+				<li class="slds-border--bottom hide-menu" aura:id="Resolve-Ticket">
+					<button
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="resolveTicket" disabled="{!v.disableAccess}">
+						<lightning:icon class="" iconName="utility:package_org"
+							size="small" />
+						Resolve 
+					</button>
+
+					<div class="slds-is-collapsed" aura:id="resolveTicket">
+						<div class="action-background">
+							<c:HD_Resolve_Ticket recordId="{!v.recordId}" />
+						</div>
+
+					</div>
+				</li>
+				<li class="slds-border--bottom hide-menu" aura:Id="Close-Ticket">
+					<button
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="closeTicket" disabled="{!v.disableAccess}">
+						<lightning:icon class="" iconName="utility:clear"
+							size="small" />
+						Close 
+					</button>
+					<div class="slds-is-collapsed " aura:id="closeTicket">
+						<div class="action-background">
+							<c:HD_Close_Ticket recordId="{!v.recordId}" />
+						</div>
+
+					</div>
+				</li>
+
+				
+
+				<li class="slds-border--bottom hide-menu" aura:Id="Send-Email">
+					<button
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="sendEmail" disabled="{!v.disableAccess}">
+						<lightning:icon class="" iconName="utility:email"
+							size="small" />
+						Send Email
+					</button>
+					<div class="slds-is-collapsed " aura:id="sendEmail">
+						<div class="action-background">
+							<c:HD_Send_Email recordId="{!v.recordId}" /> 
+						</div>
+					</div>
+				</li>
+
+				<li class="slds-border--bottom hide-menu" aura:Id="Attach-File">
+					<button
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="attachFile" disabled="{!v.disableAccess}">
+						<lightning:icon class="" iconName="utility:attach"
+							size="small" />
+						Attach File
+					</button>
+					<div class="slds-is-collapsed " aura:id="attachFile">
+						<div class="action-background">
+							<c:HD_AttachFile recordId="{!v.recordId}" />
+						</div>
+					</div>
+				</li>
+
+				<li class="slds-border--bottom hide-menu" aura:Id="Clone-Ticket">
+					<button
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="cloneTicket" disabled="{!v.disableAccess}">
+						<lightning:icon class="" iconName="utility:overflow"
+							size="small" />
+						Clone 
+					</button>
+					<div class="slds-is-collapsed " aura:id="cloneTicket">
+						<div class="action-background">
+							<c:HD_Lightning_Clone_Action recordId="{!v.recordId}" />
+						</div>
+					</div>
+				</li>
+                
+                <li class="slds-border--bottom hide-menu" aura:Id="Submit-Approval">
+					<button id="submitapprovalbutton"
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="submitApproval" disabled="{!v.ApprovaldisableAccess}">
+						<lightning:icon class="" iconName="utility:note"
+							size="small" />
+						 Approval Actions
+					</button>
+					<div class="slds-is-collapsed " aura:id="submitApproval">
+						<div class="action-background">
+                            
+                            <c:HD_Approval_Action recordId="{!v.recordId}" />
+                        </div>
+					</div>
+				</li>
+
+				<li class="slds-border--bottom hide-menu" aura:Id="Link-Items">
+					<button
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="linkItems" disabled="{!v.disableAccess}">
+						<lightning:icon class="" iconName="utility:relate"
+							size="small" />
+						Create and Link Items
+					</button>
+					<div class="slds-is-collapsed " aura:id="linkItems">
+						<div class="action-background">
+							<c:HD_CreateProblem_Incident recordId="{!v.recordId}" />
+							<br />
+							<c:HD_CreateLinkTask recordId="{!v.recordId}" />
+						</div>
+					</div>
+				</li>
+
+
+
+				<li class="slds-border--bottom hide-menu" aura:Id="Link-Incidents">
+					<button
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="linkIncidents" disabled="{!v.disableAccess}">
+						<lightning:icon class="" iconName="utility:link"
+							size="small" />
+						Link Incidents
+					</button>
+					<div class="slds-is-collapsed " aura:id="linkIncidents">
+						<div class="action-background">
+							<c:HD_LinkIncidents recordId="{!v.recordId}" />
+						</div>
+					</div>
+				</li>
+
+				<li class="slds-border--bottom hide-menu" aura:Id="Client-Note">
+					<button
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="clientNote" disabled="{!v.disableAccess}">
+						<lightning:icon class="" iconName="utility:new_direct_message"
+							size="small" />
+						Add Customer Facing Note
+					</button>
+					<div class="slds-is-collapsed " aura:id="clientNote">
+						<div class="action-background">
+							<div class="action-background">
+								<c:HD_Add_ClientNote_Action recordId="{!v.recordId}" />
+							</div>
+                        </div>
+					</div>
+				</li>
+                <li class="slds-border--bottom hide-menu" aura:Id="Hold-Ticket">
+					<button
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="holdTicket" disabled="{!v.disableAccess}">
+						<lightning:icon class="" iconName="utility:clock"
+							size="small" />
+						Hold Ticket
+					</button>
+					<div class="slds-is-collapsed " aura:id="holdTicket">
+						<div class="action-background">
+							<c:HD_HoldTicket recordId="{!v.recordId}" />
+						</div>
+					</div>
+				</li>
+               
+                <li class="slds-border--bottom hide-menu" aura:Id="Reopen-Ticket">
+					<button
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="reopenTicket" disabled="{!v.disableAccess}">
+						<lightning:icon class="" iconName="utility:clear"
+							size="small" />
+						Reopen
+					</button>
+					<div class="slds-is-collapsed " aura:id="reopenTicket">
+						<div class="action-background">
+							<c:HD_Reopen_Ticket_Action recordId="{!v.recordId}"  />
+						</div>
+					</div>
+				</li>
+                
+                
+                
+                <li class="slds-border--bottom hide-menu" aura:Id="Update-CCtext">
+					<button
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="updateCCtxt" disabled="{!v.disableAccess}">
+						<lightning:icon class="" iconName="utility:insert_tag_field"
+							size="small" />
+                        Update Email CC
+					</button>
+					<div class="slds-is-collapsed " aura:id="updateCCtxt">
+						<div class="action-background">
+                           
+                         <c:HD_Edit_CC recordId="{!v.recordId}"/>
+						</div>
+					</div>
+				</li>
+                
+                <li class="slds-border--bottom hide-menu" aura:Id="Email-Config">
+					<button
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="emailConfig" disabled="{!v.disableAccess}">
+						<lightning:icon class="" iconName="utility:package_org"
+							size="small" />
+                         Email Configuration
+					</button>
+					<div class="slds-is-collapsed " aura:id="emailConfig">
+						<div class="action-background">
+                           
+                         <c:HD_Email_Config recordId="{!v.recordId}" />
+						</div>
+					</div>
+				</li>
+                
+                 
+                <li class="slds-border--bottom hide-menu" aura:Id="Print-Ticket">
+					<button
+						class="slds-button slds-lookup__item-action slds-lookup__item-action--label"
+						onclick="{!c.myAction}" data-key="printTicket" disabled="">
+						<lightning:icon class="" iconName="utility:save"
+							size="small" />
+                        Print Ticket
+					</button>
+					<div class="slds-is-collapsed " aura:id="printTicket">
+						<div class="action-background">
+                           
+                            <c:HD_Print_Ticket recordId="{!v.recordId}"  />
+						</div>
+					</div>
+				</li>
+
+			</ul>
+		</footer>
+	</section>
+    
+    <c:HD_ActionAudit recordId="{!v.recordId}" startTime="{!v.startTime}" actionName="{!v.actionName}"/>
+</aura:component>

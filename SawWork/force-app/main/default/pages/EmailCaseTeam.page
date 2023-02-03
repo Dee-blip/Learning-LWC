@@ -1,0 +1,17 @@
+<apex:page standardController="Case" extensions="SCEmailCaseTeamCtrl" showHeader="true">
+ <apex:emailPublisher entityId="{!case.id}"
+  toAddresses="{! stringAllEmailAddress}"
+  fromVisibility="selectable"
+  ccVisibility="editableWithLookup"
+  fromAddresses="{!$Setup.SCAnswerCustomerEmailAddress__c.FromEmailAddresses__c}"
+  showTemplates="true"
+  showAdditionalFields="false"
+  enableQuickText="true"
+  autoCollapseBody="true"
+  emailBodyFormat="textAndHTML"
+  verticalResize="false"
+  expandableHeader="true"
+  emailBodyHeight="400em"
+  width="530px"
+  subject=""/>
+</apex:page>

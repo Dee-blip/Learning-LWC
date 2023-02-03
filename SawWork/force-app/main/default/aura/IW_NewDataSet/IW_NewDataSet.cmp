@@ -1,0 +1,63 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" controller="IW_CreateNewDataSet">
+    <!--<aura:handler name="init" value="{! this }" action="{! c.init }"/>-->
+    <!--<div>
+        <lightning:button label="Create Data Set"
+                          variant="brand"
+                          onclick="{!c.init}"
+                          >
+        </lightning:button>
+    </div>-->
+    <aura:attribute name="msgTheme" type="String" default="slds-theme_error"/>
+    <aura:attribute name="isDispMsg" type="String" default="none" />
+    
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:donewaiting" action="{!c.hideSpinner}"/>
+    
+    <aura:if isTrue="{!v.Spinner1}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+    
+    <div class="slds-container" align="center">
+        
+        
+        <div class="slds-modal__header">
+            <h2 class="slds-text-heading--medium">Data Set</h2>
+        </div>
+        <div style="min-width:30rem;">
+            <div class="{!'slds-notify slds-notify_alert slds-theme_alert-texture '+v.msgTheme}" role="alert" style="{!'display:'+v.isDispMsg}" id="msgPanelComp">
+                <span class="slds-assistive-text">error</span>    
+                <h2 id="msgPanel">test</h2>               
+                <button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse" title="Close">
+                    <lightning:icon iconName="utility:close" size="x-small" alternativeText="Indicates close" variant="inverse"/>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="slds-modal__content slds-p-around--large slds-grid slds-wrap" align= "center" >
+            <div class = "slds-grid slds-gutters" >
+                <p class="slds-text-heading--small" align="center">A Data Set will be created for next year with all the existing active Regions/Geography.</p>
+            </div>
+        </div>
+        <div class="slds-modal__footer">
+            <lightning:button variant="neutral" label="Cancel" onclick="{!c.cancelDialog}" aura:id="cancelBtnId" />
+            <lightning:button label="Create Data Set"
+                              variant="brand"
+                              onclick="{!c.init}"
+                              >
+            </lightning:button>
+        </div>
+        
+    </div>
+    
+    
+    
+</aura:component>

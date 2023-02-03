@@ -1,0 +1,4 @@
+<design:component >
+    <design:attribute name="blogId" label="Blog Id" default="{!recordId}"/>
+    <design:attribute name="urlName" label="URL Name" default="{!urlName}" Description="Mention the url name if adding this component on article detail page"/>
+</design:component>

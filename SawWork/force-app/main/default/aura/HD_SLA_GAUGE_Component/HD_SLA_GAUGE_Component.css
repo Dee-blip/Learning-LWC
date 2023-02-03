@@ -1,0 +1,24 @@
+.THIS.popover-pos{
+    margin-top: 24px;
+    position: absolute;
+    z-index : 6001;
+    right: 53px;
+    width: 80%;
+    min-width:60rem;
+}
+
+.THIS.gauge:hover{
+   cursor: pointer; 
+   cursor: hand;
+}
+.THIS .below
+{
+top: 5px;
+position: relative;
+}
+
+.THIS .above
+{
+position: relative;
+bottom: -18px;
+}

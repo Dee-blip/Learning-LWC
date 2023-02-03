@@ -1,0 +1,379 @@
+<!--SF1_ListContracts-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global"
+    controller="SF1_ListContractsController">
+    <!--aura:component controller="ListContractsController"-->
+    <!--aura:attribute name="contract" type="Merge_Contract_Header__c"/-->
+    <aura:attribute name="acc" type="String" />
+    <aura:attribute name="selectedContracts" type="String[]" />
+    <aura:attribute name="contracts" type="Object[]" />
+    <aura:attribute name="contractsMap" type="Map" />
+    <aura:attribute name="selectedCurrency" type="Set" />
+    <aura:attribute name="doneLoading" type="Boolean" default="false" />
+    <aura:attribute name="isContractCurrencyMismatch" type="Boolean" default="false" />
+    <aura:attribute name="noContractsFound" type="Boolean" default="false" />
+
+    <!-- new variables for 17_8 -->
+    <aura:attribute name="acct" type="Account" />
+    <!-- MOB-158 changes for sorting...-->
+    <aura:attribute name="resultsetsize" type="Integer" default="0" />
+    <aura:attribute name="results" type="Object[]" />
+    <aura:attribute name="pagelimit" type="Integer" default="10" />
+    <aura:attribute name="page" type="Integer" default="0" />
+
+    <!-- ASC DESC -->
+    <aura:attribute name="ascDescVal" type="String" default="asc" />
+    <aura:attribute name="sortField" type="String" default="Name" />
+
+    <!-- Pagination Events -->
+    <aura:handler event="c:SF1_CompEventPagination" name="compEventPagination" action="{!c.pagerecords}" />
+    <aura:handler event="c:SF1_CompEventOuputField" name="compEventOutputField" action="{!c.customSort}" />
+
+    <aura:attribute name="isContractChange" type="Boolean" default="false" />
+    <aura:attribute name="showContract" type="Boolean" default="false" />
+
+    <!-- <aura:handler event="c:MyOutputClickEvt" action="{!c.customSort}"/> -->
+
+    <!-- end -->
+
+    <!-- Events -->
+    <!--aura:handler name="init" value="{!this}" action="{!c.doInit}" /-->
+    <!--aura:handler event="c:accountChangeEvent" action="{!c.handleAccountChange}" /-->
+    <aura:handler event="c:opportunityTypeChangeEvent" action="{!c.handleRenderContracts}" />
+
+    <!-- Events Fired -->
+    <aura:registerEvent name="contractSelectionChangeEvent" type="c:onContractSelectionChange" />
+    <aura:registerEvent name="onSelectContractChange" type="c:onSelectContractChange" />
+
+    <aura:if isTrue="{!(v.doneLoading &amp;&amp; !v.isContractChange)}">
+        <c:l2qListContracts aura:Id="listcontract" recordId="{!v.acct.Id}"
+            onselectcontractevent="{!c.updateSelectedContracts}" />
+    </aura:if>
+
+    <aura:if isTrue="{!v.showContract}">
+        <div class="slds-m-around--large">
+            <!-- LDS markup for a checkbox (https://www.lightningdesignsystem.com/components/forms/) -->
+            <!--div class="slds-p-top_large"> </div-->
+            <!--legend class="slds-p-top_large slds-form-element__legend slds-form-element__label slds-section__title">Contracts</legend  -->
+            <h3 class="slds-section__title">Select Contract(s)</h3>
+            <aura:if isTrue="{!v.noContractsFound}">
+                <ui:message title="Information:" severity="info" closable="false">
+                    <div class="slds-text-body_small" style="font-style: italic">
+                        No Contract Record(s) found for the Associated Account.
+                    </div>
+                </ui:message>
+            </aura:if>
+            <aura:if isTrue="{!!v.noContractsFound}">
+                <table class="slds-table slds-table--bordered slds-table--resizable-cols slds-table--fixed-layout"
+                    role="grid" style="font-size: 95%;">
+                    <thead style="font-size: 95%;">
+                        <tr class="slds-line-height--reset" style="font-size: 95%;">
+                            <th scope="col" style="width:2.25rem;" class="slds-text-align--right">
+                                <!--div class="slds-th__action slds-th__action- -form">
+                                <span class="slds-checkbox">
+                                    <input type="checkbox" name="options" id="checkbox-119" onchange="{!c.updateAllCheckboxes}"/>
+                                    <label class="slds-checkbox__label" for="checkbox-119">
+                                        <span class="slds-checkbox- -faux"></span>
+                                        <span class="slds-form-element__label slds-assistive-text">Select All</span>
+                                    </label>
+                                </span>
+                            </div-->
+                            </th>
+                            <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col"
+                                style="font-size: 95%; width:9.50rem;">
+                                <div title="title:Original Contract Id" id="id:Original_Contract_Id__c"
+                                    aura:id="aura:id:Original_Contract_Id__c">
+                                    <a href="{javascript:void(0);}" class="slds-th__action slds-text-link--reset"
+                                        tabindex="0">
+                                        <span class="slds-assistive-text">Sort </span>
+                                        <!-- <span class="slds-truncate" title="Original Contract Id">Original Contract Id</span>  -->
+                                        <c:MyOutputField class="slds-truncate" value="Contract"
+                                            recordid="Original_Contract_Id__c" />
+                                        <!-- <div class="slds-icon_container">
+                                            <lightning:icon iconName="utility:arrowdown" size="x-small" alternativeText="arrowdown" class="slds-icon slds-icon- -x-small slds-icon-text-default slds-is-sortable__icon"/>
+                                        </div> -->
+                                        <div class="slds-icon_container">
+                                            <aura:if
+                                                isTrue="{!and(v.sortField == 'Original_Contract_Id__c', v.ascDescVal == 'desc')}">
+                                                <lightning:icon iconName="utility:arrowdown" size="xx-small" />
+                                            </aura:if>
+
+                                            <aura:if
+                                                isTrue="{!and(v.sortField == 'Original_Contract_Id__c', v.ascDescVal == 'asc')}">
+                                                <lightning:icon iconName="utility:arrowup" size="xx-small" />
+                                            </aura:if>
+                                        </div>
+                                        <span class="slds-assistive-text" aria-live="assertive"
+                                            aria-atomic="true">Sorted {!if(v.ascDescVal == 'asc', 'ascending',
+                                            'descending')}</span>
+                                        <span class="slds-assistive-text" aria-live="assertive"
+                                            aria-atomic="true"></span>
+                                    </a>
+                                    <!--  <div class="slds-resizable">
+                                        <input type="range" min="50" max="3840" class="slds-resizable__input slds-assistive-text keyboardMode- -skipArrowNavigation keyboardMode- -pauseOnFocus" aria-label="Original Contract Id column width"/>
+                                        <span class="slds-resizable__handle">
+                                            <span class="slds-resizable__divider" style="height: 538px;"></span>
+                                        </span>
+                                    </div> -->
+                                </div>
+                            </th>
+                            <!-- <th class="slds-is-sortable slds-is-resizable slds-text-title- -caps" scope="col" style="font-size: 95%;width:8.50rem;"> style="font-size: 95%; width:8.50rem;" -->
+                            <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col"
+                                style="font-size: 95%; width:8.50rem;">
+                                <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset"
+                                    tabindex="0">
+                                    <span class="slds-assistive-text">Sort </span>
+                                    <c:MyOutputField class="slds-truncate" value="Parent Contract"
+                                        recordid="Parent_Contract__c" />
+                                    <div class="slds-icon_container">
+                                        <aura:if
+                                            isTrue="{!and(v.sortField == 'Parent_Contract__c', v.ascDescVal == 'desc')}">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" />
+                                        </aura:if>
+
+                                        <aura:if
+                                            isTrue="{!and(v.sortField == 'Parent_Contract__c', v.ascDescVal == 'asc')}">
+                                            <lightning:icon iconName="utility:arrowup" size="xx-small" />
+                                        </aura:if>
+                                    </div>
+                                    <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true">Sorted
+                                        {!if(v.ascDescVal == 'asc', 'ascending', 'descending')}</span>
+                                    <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true"></span>
+                                </a>
+                            </th>
+                            <!-- <th class="slds-is-sortable slds-is-resizable slds-text-title- -caps" scope="col" style="font-size: 95%; width:5.00rem;"> style="font-size: 95%; width:6.00rem;" -->
+                            <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col"
+                                style="font-size: 95%; width:5.35rem;">
+                                <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset"
+                                    tabindex="0">
+                                    <span class="slds-assistive-text">Sort </span>
+                                    <c:MyOutputField class="slds-truncate" value="Currency" recordid="Currency__c" />
+                                    <div class="slds-icon_container">
+                                        <aura:if isTrue="{!and(v.sortField == 'Currency__c', v.ascDescVal == 'desc')}">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" />
+                                        </aura:if>
+                                        <aura:if isTrue="{!and(v.sortField == 'Currency__c', v.ascDescVal == 'asc')}">
+                                            <lightning:icon iconName="utility:arrowup" size="xx-small" />
+                                        </aura:if>
+                                    </div>
+                                    <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true">Sorted
+                                        {!if(v.ascDescVal == 'asc', 'ascending', 'descending')}</span>
+                                </a>
+                            </th>
+                            <!-- <th class="slds-is-sortable slds-is-resizable slds-text-title- -caps" scope="col" style="font-size: 95%;width:7.50rem;"> style="font-size: 95%; width:8.50rem;">-->
+                            <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col"
+                                style="font-size: 95%; width:7.50rem;">
+                                <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset"
+                                    tabindex="0">
+                                    <span class="slds-assistive-text">Sort </span>
+                                    <c:MyOutputField class="slds-truncate" value="Contract Type"
+                                        recordid="Contract_Type__c" />
+                                    <div class="slds-icon_container">
+                                        <aura:if
+                                            isTrue="{!and(v.sortField == 'Contract_Type__c', v.ascDescVal == 'desc')}">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" />
+                                        </aura:if>
+                                        <aura:if
+                                            isTrue="{!and(v.sortField == 'Contract_Type__c', v.ascDescVal == 'asc')}">
+                                            <lightning:icon iconName="utility:arrowup" size="xx-small" />
+                                        </aura:if>
+                                    </div>
+                                    <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true">Sorted
+                                        {!if(v.ascDescVal == 'asc', 'ascending', 'descending')}</span>
+                                </a>
+                            </th>
+                            <!-- style="font-size: 95%; width:10.25rem;" -->
+                            <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col"
+                                style="font-size: 95%; width:9.00rem;">
+                                <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset"
+                                    tabindex="0">
+                                    <span class="slds-assistive-text">Sort </span>
+                                    <c:MyOutputField class="slds-truncate" value="Parent Account"
+                                        recordid="Parent_Account_Name__c" />
+                                    <div class="slds-icon_container">
+                                        <aura:if
+                                            isTrue="{!and(v.sortField == 'Parent_Account_Name__c', v.ascDescVal == 'desc')}">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" />
+                                        </aura:if>
+                                        <aura:if
+                                            isTrue="{!and(v.sortField == 'Parent_Account_Name__c', v.ascDescVal == 'asc')}">
+                                            <lightning:icon iconName="utility:arrowup" size="xx-small" />
+                                        </aura:if>
+                                    </div>
+                                    <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true">Sorted
+                                        {!if(v.ascDescVal == 'asc', 'ascending', 'descending')}</span>
+                                </a>
+                            </th>
+                            <!-- style="font-size: 95%; width:7.00rem;" -->
+                            <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col"
+                                style="font-size: 95%; width:7.00rem;">
+                                <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset"
+                                    tabindex="0">
+                                    <span class="slds-assistive-text">Sort </span>
+                                    <c:MyOutputField class="slds-truncate" value="Solution Set"
+                                        recordid="Solution_Set__c" />
+                                    <div class="slds-icon_container">
+                                        <aura:if
+                                            isTrue="{!and(v.sortField == 'Solution_Set__c', v.ascDescVal == 'desc')}">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" />
+                                        </aura:if>
+                                        <aura:if
+                                            isTrue="{!and(v.sortField == 'Solution_Set__c', v.ascDescVal == 'asc')}">
+                                            <lightning:icon iconName="utility:arrowup" size="xx-small" />
+                                        </aura:if>
+                                    </div>
+                                    <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true">Sorted
+                                        {!if(v.ascDescVal == 'asc', 'ascending', 'descending')}</span>
+                                </a>
+                            </th>
+                            <!-- width:10.00rem; -->
+                            <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col"
+                                style="font-size: 95%;">
+                                <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset"
+                                    tabindex="0">
+                                    <span class="slds-assistive-text">Sort </span>
+                                    <c:MyOutputField class="slds-truncate" value="Effective End Date"
+                                        recordid="Effective_End_Date__c" />
+                                    <div class="slds-icon_container">
+                                        <aura:if
+                                            isTrue="{!and(v.sortField == 'Effective_End_Date__c', v.ascDescVal == 'desc')}">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" />
+                                        </aura:if>
+                                        <aura:if
+                                            isTrue="{!and(v.sortField == 'Effective_End_Date__c', v.ascDescVal == 'asc')}">
+                                            <lightning:icon iconName="utility:arrowup" size="xx-small" />
+                                        </aura:if>
+                                    </div>
+                                    <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true">Sorted
+                                        {!if(v.ascDescVal == 'asc', 'ascending', 'descending')}</span>
+                                </a>
+                            </th>
+                            <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col"
+                                style="font-size: 95%;">
+                                <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset"
+                                    tabindex="0">
+                                    <span class="slds-assistive-text">Sort </span>
+                                    <c:MyOutputField class="slds-truncate" value="Effective Start Date"
+                                        recordid="Effective_Start_Date__c" />
+                                    <div class="slds-icon_container">
+                                        <aura:if
+                                            isTrue="{!and(v.sortField == 'Effective_Start_Date__c', v.ascDescVal == 'desc')}">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" />
+                                        </aura:if>
+                                        <aura:if
+                                            isTrue="{!and(v.sortField == 'Effective_Start_Date__c', v.ascDescVal == 'asc')}">
+                                            <lightning:icon iconName="utility:arrowup" size="xx-small" />
+                                        </aura:if>
+                                    </div>
+                                    <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true">Sorted
+                                        {!if(v.ascDescVal == 'asc', 'ascending', 'descending')}</span>
+                                </a>
+                            </th>
+                            <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col"
+                                style="font-size: 95%; width:6.25rem;">
+                                <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset"
+                                    tabindex="0">
+                                    <span class="slds-assistive-text">Sort </span>
+                                    <c:MyOutputField class="slds-truncate" value="Auto Renew"
+                                        recordid="Is_Auto_Renew__c" />
+                                    <div class="slds-icon_container">
+                                        <aura:if
+                                            isTrue="{!and(v.sortField == 'Is_Auto_Renew__c', v.ascDescVal == 'desc')}">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" />
+                                        </aura:if>
+                                        <aura:if
+                                            isTrue="{!and(v.sortField == 'Is_Auto_Renew__c', v.ascDescVal == 'asc')}">
+                                            <lightning:icon iconName="utility:arrowup" size="xx-small" />
+                                        </aura:if>
+                                    </div>
+                                    <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true">Sorted
+                                        {!if(v.ascDescVal == 'asc', 'ascending', 'descending')}</span>
+                                </a>
+                            </th>
+                            <!-- <th scope="col" style="width:3.25rem;"> style="font-size: 95%;"-->
+                            <aura:if isTrue="{!!v.isContractChange}">
+                                <th class="slds-is-sortable slds-is-resizable slds-text-title--caps" scope="col"
+                                    style="font-size: 95%; width:9.50rem;">
+                                    <div class="slds-th__action">
+                                        <span class="slds-truncate" title="Contract Products">Contract Products</span>
+                                        <span class="slds-assistive-text">Contract Products</span>
+                                    </div>
+                                </th>
+                            </aura:if>
+                        </tr>
+                    </thead>
+                    <aura:iteration items="{!v.contracts}" var="contract">
+                        <tbody id="contractList-body">
+                            <tr class="slds-hint-parent">
+                                <td class="slds-text-align--right" style="width:3.25rem;">
+                                    <input class="slds-checkbox" type="checkbox" aura:id="contract-originalContractID"
+                                        name="{!contract.Id}" checked="{!contract.checked}"
+                                        id="{! 'checkbox-row-contract' + contract.Original_Contract_Id__c}"
+                                        onchange="{!c.updateCheckbox}" />
+                                </td>
+                                <th scope="row">
+                                    <div class="slds-truncate" title="{!contract.Original_Contract_Id__c}">
+                                        <a href="javascript:void(0);" id="{!contract.Id}"
+                                            onclick="{!c.gotoRecord}">{!contract.Original_Contract_Id__c}</a>
+                                    </div>
+                                </th>
+                                <td role="gridcell">
+                                    <div class="slds-truncate" title="{!contract.Parent_Contract__r.Name}">
+                                        <a href="javascript:void(0);" id="{!contract.Parent_Contract__c}"
+                                            onclick="{!c.gotoRecord}">{!contract.Parent_Contract__r.Name}</a>
+                                    </div>
+                                    <!-- <div class="slds-truncate" title="{!contract.Parent_Contract__r.Name}">{!contract.Parent_Contract__r.Name}</div> -->
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate" title="{!contract.Currency__c}">{!contract.Currency__c}
+                                    </div>
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate" title="{!contract.Contract_Type__c}">
+                                        {!contract.Contract_Type__c}</div>
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate" title="{!contract.Parent_Account_Name__r.Name}">
+                                        <a href="javascript:void(0);" id="{!contract.Parent_Account_Name__c}"
+                                            onclick="{!c.gotoRecord}">{!contract.Parent_Account_Name__r.Name}</a>
+                                    </div>
+                                    <!-- <div class="slds-truncate" title="{!contract.Parent_Account_Name__r.Name}">{!contract.Parent_Account_Name__r.Name}</div> -->
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate" title="{!contract.Solution_Set__c}">
+                                        {!contract.Solution_Set__c}</div>
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate" title="{!contract.Effective_End_Date__c}">
+                                        {!contract.Effective_End_Date__c}</div>
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate" title="{!contract.Effective_Start_Date__c}">
+                                        {!contract.Effective_Start_Date__c}</div>
+                                </td>
+                                <td role="gridcell">
+                                    <div class="slds-truncate" title="{!contract.Is_Auto_Renew__c}">
+                                        {!contract.Is_Auto_Renew__c}</div>
+                                </td>
+                                <aura:if isTrue="{!!v.isContractChange}">
+                                    <td role="gridcell">
+                                        <!-- <a href="javascript:void(0);" class="slds-th__action slds-text-link- -reset" tabindex="0"> -->
+                                        <div class="slds-truncate" title="{!contract.Contract_Products__r.length}">
+                                            <button class="slds-button slds-button_neutral" name="{!contract.Id}"
+                                                onclick="{!c.openModal}">View
+                                                ({!contract.Contract_Products__r.length})</button>
+                                        </div>
+                                        <!-- </a> -->
+                                    </td>
+                                </aura:if>
+                            </tr>
+                        </tbody>
+                    </aura:iteration>
+                </table>
+                <div aura:id="ModalDialogPlaceholder" />
+                <div class="c-container" style="padding:10px">
+                    <c:Pagination pagelimit="{!v.pagelimit}" page="{!v.page}" resultsetsize="{!v.resultsetsize}" />
+                </div>
+            </aura:if>
+        </div>
+    </aura:if>
+</aura:component>

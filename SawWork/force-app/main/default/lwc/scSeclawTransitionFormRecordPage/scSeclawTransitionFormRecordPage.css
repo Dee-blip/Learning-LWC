@@ -1,0 +1,27 @@
+label {
+    color: var(--lwc-colorTextLabel, rgb(62, 62, 60));
+    font-size: 1rem;
+}
+
+.form-div {
+    min-height: 6rem;
+}
+
+.seclaw-form-field {
+    margin-top: var(--lwc-varSpacingVerticalSmall, 0.75rem);
+    margin-bottom: var(--lwc-varSpacingVerticalLarge, 1.5rem);
+}
+
+.seclaw-form-heading-top {
+    margin-top: var(--lwc-varSpacingVerticalXSmall, 0.5rem);
+    margin-bottom: var(--lwc-varSpacingVerticalMedium, 1rem);
+}
+
+.seclaw-form-heading {
+    margin-top: var(--lwc-varSpacingVerticalXLarge, 2rem);
+    margin-bottom: var(--lwc-varSpacingVerticalMedium, 1rem);
+}
+
+.spacing-div {
+    height: var(--lwc-varSpacingVerticalXSmall, 0.5rem);
+}

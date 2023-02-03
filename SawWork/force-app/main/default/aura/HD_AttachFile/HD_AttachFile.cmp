@@ -1,0 +1,28 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="HD_AttachFileController">
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="attachMsg" type="String"/>
+    
+    <aura:handler event="aura:waiting" action="{!c.waiting}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.doneWaiting}"/>
+    <aura:dependency resource="markup://force:editRecord" type="EVENT" />
+    <div class="container">
+        <div aura:id="Accspinner" class="slds-spinner_container slds-hide">
+		<div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+			<span class="slds-assistive-text">Processing</span>
+			<div class="slds-spinner__dot-a"></div>
+			<div class="slds-spinner__dot-b"></div>
+		</div>
+	</div>
+        <input type="file" class="file" aura:id="file" multiple="true"/>
+        <br/>
+        <ui:button label="Save" press="{!c.save}"/>
+        
+        <div aura:id="uploading" class="notUploading">
+            <lightning:icon iconName="utility:sync" size="x-small" alternativeText="upload"/>Uploading...  
+    	</div>
+        <div aura:id="messages" class="notUploading customMessage">
+        <ui:outputText value="{!v.attachMsg}"></ui:outputText>
+            </div>
+    </div>
+    
+</aura:component>

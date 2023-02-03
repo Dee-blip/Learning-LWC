@@ -1,0 +1,191 @@
+<aura:component controller="IRCaseActExpMLController"
+                implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
+    <aura:handler name="init" action="{!c.getActExpManualLists}" value="{!this}" />
+    <aura:handler name="render" action="{!c.onRender}" value="{!this}"/>
+    <aura:attribute name="activeManualLists" type="List" />
+    <aura:attribute name="expiredManualLists" type="List" />
+    <aura:attribute name="activeMListTitle" type="Aura.Component[]">
+        <h2 style="border-bottom: 1px solid rgb(221, 219, 218);"><b>Active Contract Manual Lists</b></h2>
+    </aura:attribute>
+    <aura:attribute name="expiredMListTitle" type="Aura.Component[]">
+        <h2 style="border-bottom: 1px solid rgb(221, 219, 218);"><b>Expired Contract Manual Lists</b></h2>
+    </aura:attribute>
+
+    <div class="slds-section slds-is-open" aura:id="manualListSection">
+       <!--section header--> 
+       <h3 class="slds-section__title">
+           <button aria-controls="manualLists" class="slds-button slds-section__title-action">
+               <span onclick="{!c.toggleSection}" data-auraId="manualListSection" title="Contract Manual Lists">
+                   <lightning:icon iconName="utility:switch"
+                                   size="x-small"
+                                   class="slds-section__title-action-icon slds-button__icon_left"
+                                   alternativeText="button icon"
+                                   />
+                   Contract Manual Lists(Lightning)
+                   <!--<span class="" title="Contract Manual Lists">Contract Manual Lists</span>-->
+               </span>
+
+           </button>
+       </h3>
+       <!--section body-->
+       <div class="slds-section__content"  id="manualLists">
+       	<lightning:card title="{!v.activeMListTitle}">
+            <aura:if isTrue="{!v.activeManualLists.length == 0}">
+                <p class="slds-p-horizontal_small"> No active manual lists present. </p>
+            </aura:if>
+            <div class="slds-scrollable" aura:id="scrollable">
+                <aura:iteration items="{!v.activeManualLists}" var="aml">
+                        <ul class="uiAbstractList slds-border_bottom">
+                            <li class="slds-var-p-horizontal_medium slds-var-p-vertical_xx-small desktop forceReadOnlyRelatedListStencil forceRecordLayout">
+                                <div>
+                                    <ul class="">
+                                        <li>
+                                           <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                               <div class="slds-item--label slds-col recordCell" aura:id="label" title="Manual List Id">Manual List Id:</div>
+                                               <div class="slds-item--detail slds-col recordCell"><span><a data-mlid="{!aml.Id}" href="{!'/lightning/r/Merge_Contract_Manual_List__c/'+aml.Id+'/view'}"
+                                                                                                            target="_blank">{!aml.Manual_List_Id__c}</a></span></div>
+                                           </div>
+                                        </li>
+                                        <li>
+                                           <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                              <div class="slds-item--label slds-col recordCell" aura:id="label" title="Reason Code:">Reason Code:</div>
+                                              <div class="slds-item--detail slds-col recordCell"><span>{!aml.Reason_Code__c}</span></div>
+                                           </div>
+                                        </li>
+                                        <li>
+                                           <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                              <div class="slds-item--label slds-col recordCell" aura:id="label" title="Review Frequency:">Review Frequency:</div>
+                                              <div class="slds-item--detail slds-col recordCell"><span>{!aml.Review_Frequency__c}</span></div>
+                                           </div>
+                                        </li>
+                                        <li>
+                                           <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                              <div class="slds-item--label slds-col recordCell" aura:id="label" title="Review Date:">Review Date:</div>
+                                              <div class="slds-item--detail slds-col recordCell"><span>{!aml.Review_Date__c}</span></div>
+                                           </div>
+                                        </li>
+                                        <li>
+                                           <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                              <div class="slds-item--label slds-col recordCell" aura:id="label" title="Priority:">Priority:</div>
+                                              <div class="slds-item--detail slds-col recordCell"><span>{!aml.Priority__c}</span></div>
+                                           </div>
+                                        </li>
+                                        <li>
+                                           <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                              <div class="slds-item--label slds-col recordCell" aura:id="label" title="Description:">Description:</div>
+                                              <div class="slds-item--detail slds-col recordCell"><span>{!aml.Description__c}</span></div>
+                                           </div>
+                                        </li>
+                                        <li>
+                                           <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                              <div class="slds-item--label slds-col recordCell" aura:id="label" title="Owner:">Owner:</div>
+                                              <div class="slds-item--detail slds-col recordCell"><span>{!aml.Owner__c}</span></div>
+                                           </div>
+                                        </li>
+                                        <li>
+                                           <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                              <div class="slds-item--label slds-col recordCell" aura:id="label" title="End Date:">End Date:</div>
+                                              <div class="slds-item--detail slds-col recordCell"><span>{!aml.End_Date__c}</span></div>
+                                           </div>
+                                        </li>
+                                        <li>
+                                           <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                              <div class="slds-item--label slds-col recordCell" aura:id="label" title="Accrual Flag:">Accrual Flag:</div>
+                                              <div class="slds-item--detail slds-col recordCell"><span>{!aml.Accrual_Flag__c}</span></div>
+                                           </div>
+                                        </li>
+                                        <li>
+                                           <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                              <div class="slds-item--label slds-col recordCell" aura:id="label" title="Sub Reason Code:">Sub Reason Code:</div>
+                                              <div class="slds-item--detail slds-col recordCell"><span>{!aml.Sub_Reason_Code__c}</span></div>
+                                           </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </aura:iteration>
+            </div>
+    	</lightning:card>
+
+        <lightning:card title="{!v.expiredMListTitle}">
+        	<aura:if isTrue="{!v.expiredManualLists.length == 0}">
+                <p class="slds-p-horizontal_small"> No expired manual lists present. </p>
+            </aura:if>
+            <div class="slds-scrollable" aura:id="scrollable">
+                	<aura:iteration items="{!v.expiredManualLists}" var="eml">
+                    	<ul class="uiAbstractList slds-border_bottom">
+                        <li class="slds-var-p-horizontal_medium slds-var-p-vertical_xx-small desktop forceReadOnlyRelatedListStencil forceRecordLayout">
+                            <div>
+                                <ul class="">
+                                    <li>
+                                       <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                           <div class="slds-item--label slds-col recordCell" aura:id="label" title="Manual List Id">Manual List Id:</div>
+                                          <div class="slds-item--detail slds-col recordCell"><span><a data-mlid="{!aml.Id}" href="{!'/lightning/r/Merge_Contract_Manual_List__c/'+eml.Id+'/view'}"
+                                                                                                                target="_blank">{!eml.Manual_List_Id__c}</a></span></div>
+                                       </div>
+                                    </li>
+                                    <li>
+                                       <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                          <div class="slds-item--label slds-col recordCell" aura:id="label" title="Reason Code:">Reason Code:</div>
+                                          <div class="slds-item--detail slds-col recordCell"><span>{!eml.Reason_Code__c}</span></div>
+                                       </div>
+                                    </li>
+                                    <li>
+                                       <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                          <div class="slds-item--label slds-col recordCell" aura:id="label" title="Review Frequency:">Review Frequency:</div>
+                                          <div class="slds-item--detail slds-col recordCell"><span>{!eml.Review_Frequency__c}</span></div>
+                                       </div>
+                                    </li>
+                                    <li>
+                                       <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                          <div class="slds-item--label slds-col recordCell" aura:id="label" title="Review Date:">Review Date:</div>
+                                          <div class="slds-item--detail slds-col recordCell"><span>{!eml.Review_Date__c}</span></div>
+                                       </div>
+                                    </li>
+                                    <li>
+                                       <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                          <div class="slds-item--label slds-col recordCell" aura:id="label" title="Priority:">Priority:</div>
+                                          <div class="slds-item--detail slds-col recordCell"><span>{!eml.Priority__c}</span></div>
+                                       </div>
+                                    </li>
+                                    <li>
+                                       <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                          <div class="slds-item--label slds-col recordCell" aura:id="label" title="Description:">Description:</div>
+                                          <div class="slds-item--detail slds-col recordCell"><span>{!eml.Description__c}</span></div>
+                                       </div>
+                                    </li>
+                                    <li>
+                                       <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                          <div class="slds-item--label slds-col recordCell" aura:id="label" title="Owner:">Owner:</div>
+                                          <div class="slds-item--detail slds-col recordCell"><span>{!eml.Owner__c}</span></div>
+                                       </div>
+                                    </li>
+                                    <li>
+                                       <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                          <div class="slds-item--label slds-col recordCell" aura:id="label" title="End Date:">End Date:</div>
+                                          <div class="slds-item--detail slds-col recordCell"><span>{!eml.End_Date__c}</span></div>
+                                       </div>
+                                    </li>
+                                    <li>
+                                       <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                          <div class="slds-item--label slds-col recordCell" aura:id="label" title="Accrual Flag:">Accrual Flag:</div>
+                                          <div class="slds-item--detail slds-col recordCell"><span>{!eml.Accrual_Flag__c}</span></div>
+                                       </div>
+                                    </li>
+                                    <li>
+                                       <div class="slds-list--horizontal forceListRecordItem slds-grid slds-gutters">
+                                          <div class="slds-item--label slds-col recordCell" aura:id="label" title="Sub Reason Code:">Sub Reason Code:</div>
+                                          <div class="slds-item--detail slds-col recordCell"><span>{!eml.Sub_Reason_Code__c}</span></div>
+                                       </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                	</aura:iteration>
+                </div>
+    	</lightning:card>
+       </div>
+   </div>
+</aura:component>

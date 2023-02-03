@@ -1,0 +1,27 @@
+.THIS {
+}
+
+.THIS .pageHeading {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 30px;
+    text-align: center;
+}
+
+.THIS .form-control {
+    margin-left: 2cm;
+    font-size: 15px;
+}
+
+.THIS .form-group {
+    margin-left: 10%;
+    font-size: 15px;
+}
+
+.THIS .button-class {
+    margin-left: 45%;
+}
+
+.THIS .error-class {
+    margin-left: 10%;
+    margin-right: 10%;
+}

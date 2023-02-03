@@ -1,0 +1,79 @@
+<!--=====================================================================================================+
+    Component name      :   SC_NewCase_Lightning_RecordTypeSelection.cmp 
+    Author              :   Supreeth,Sumukh,Himanshu
+    Created             :   10-OCT-18
+    Purpose             :   For Record Type Selection when User Clicks On New Button 
+       from Home Page Dashboard. Reason is, Standard Record Type 
+       Selection page will not come.
+                            
+    Last Modified Developer           Purpose            
+    ============= ========================  =======
+    10-OCT-18     Supreeth,Sumukh,Himanshu  Initial Development(Jira Ticket# ESESP-1529)
++=====================================================================================================-->
+
+<aura:component controller="SC_Case_LightningUtility" implements="lightning:actionOverride,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    
+    <!-- Gets the record type details -->
+    <aura:handler name="init" value="{!this}" action="{!c.fetchListOfRecordTypes}"/>
+    
+    <!-- attribute which holds the list of record types got from Apex -->
+    <aura:attribute name="lstOfRecordType" type="List" />
+    
+    <!--Name of default recordType  for that page-->
+    <aura:attribute name="defaultRecordType" type="String" />
+    
+    <!--Attribute to disable save until page loads-->
+    <aura:attribute name="SaveDisabled" type="boolean" default="true"/>
+    
+    
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <!-- CSS classes for the Record Type page -->
+    <div style="background:rgb(221, 219, 218);">
+        <div class="inlinePanel hasFixedFooter" style="width: 720px; padding: 0rem !important; ">
+            <div class="actionBody" >
+                <div class="windowViewMode-maximized active lafPageHost">
+                    <div class="slds-brand-band slds-brand-band_cover slds-brand-band_none forceBrandBand" style="padding: 0px !important;">
+                        <div class="forceChangeRecordType">
+                            <h2 class="inlineTitle slds-p-top--large slds-p-horizontal--medium slds-p-bottom--medium slds-text-heading--medium" style="border-bottom: 1px solid rgb(221, 219, 218);">
+                                New Case
+                            </h2>
+                            <div class="modal__content">
+                                <div class="changeRecordTypeLeftBody">
+                                    <div class="changeRecordTypeCenter">
+                                        <div class="changeRecordTypeRow">
+                                            <div class="changeRecordTypeTopDownOneColumn">
+                                                <div class="slds-form-element slds-no-space firefox-fieldset-bug-fix changeRecordTypeLabel" >Select a record type for this Case</div>
+                                                <fieldset class="slds-form-element">
+                                                    <div class="slds-form-element__control">
+                                                                                                                 <lightning:radioGroup name="radioGroup"
+                                              options="{!v.lstOfRecordType }"
+                                              value="{!v.defaultRecordType}" 
+                                              type="radio"
+                                              class="slds-radio topdown-radio-container slds-clearfix"/>
+                                                        
+                                                    </div>
+                                                </fieldset>
+                                            </div>&nbsp; &nbsp;
+                                        </div>                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!--<div class="inlineFooter" aura:id="footer">-->
+                <div class="forceChangeRecordTypeFooter" aura:id="footer">
+                    <lightning:button onclick="{!c.close}">Cancel</lightning:button>
+                    <lightning:button variant="brand" onclick="{!c.NewCaseDetailPage}" disabled="{!v.SaveDisabled}">Next</lightning:button>
+                </div>
+            <!--</div>-->
+        </div>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+    </div>
+</aura:component>

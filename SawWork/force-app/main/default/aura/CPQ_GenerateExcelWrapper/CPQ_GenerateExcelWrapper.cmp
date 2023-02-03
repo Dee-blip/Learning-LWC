@@ -1,0 +1,4 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>  
+    <c:cpq_p2r_excel_manipulate_data_wrapper_cmp recordId="{!v.recordId}" aura:id="excelGenerator"/>
+</aura:component>

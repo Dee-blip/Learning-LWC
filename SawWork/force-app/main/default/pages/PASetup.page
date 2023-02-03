@@ -1,0 +1,957 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false">
+    <html lang="en" ng-app="approvalApp">
+
+    <head>
+        <title>Setup Product Approvals</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+        <style type="text/css">
+        .isa_success,
+        .isa_error {
+            margin: 10px 0px;
+            padding: 12px;
+        }
+        
+        .isa_success {
+            color: #4F8A10;
+            background-color: #DFF2BF;
+        }
+        
+        .isa_error {
+            color: #D8000C;
+            background-color: #FFBABA;
+        }
+        
+        .isa_success i,
+        .isa_error i {
+            margin: 10px 22px;
+            font-size: 2em;
+            vertical-align: middle;
+        }
+        </style>
+    </head>
+
+    <body ng-controller="approvalCtrl">
+        <div class="container" style="background: #f6f6f6;">
+            <h2>Setup Product Approvals</h2>
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#preStep">Pre-Step</a></li>
+                <li><a data-toggle="{{levelSet ? 'tab' : ''}}" href="#createQ">Create Queue</a></li>
+                <li><a data-toggle="{{enableSurvey ? 'tab' : ''}}" href="#createSurvey">Create Survey</a></li>
+                <li><a data-toggle="{{enableWF ? 'tab' : ''}}" href="#createWF">Create Workflow</a></li>
+                <li><a data-toggle="{{enableAP ? 'tab' : ''}}" href="#createAP">Create Approval Process</a></li>
+                <li><a data-toggle="{{enableDS ? 'tab' : ''}}" href="#createDS">Create Deployment Step</a></li>
+                <li><a data-toggle="tab" href="#faq">FAQ</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="preStep" class="tab-pane fade in active">
+                    <div class="form-group">
+                        <br />
+                        <div>
+                            <label>2 Level Approval ? :
+                                <input type="checkbox" ng-model="is2Level" data-toggle="tooltip" data-placement="bottom" title="If you are setting up 2 level approval." ng-disabled="levelSet"></input>
+                            </label>
+                            <br />
+                            <div class="text-center">
+                                <button type="button" class="btn btn-success cont" ng-click="levelSet=true">Next</button>
+                            </div>
+                        </div>
+                        <div>
+                            <br />
+                            <label>Note: Fields marked with * are mandatory.</label>
+                        </div>
+                    </div>
+                </div>
+                <div id="createQ" class="tab-pane fade">
+                    <div class="form-group">
+                        <br />
+                        <div>
+                            <div class="isa_error" ng-show="isFailure">
+                                <i class="fa fa-times-circle"></i> {{message}}
+                            </div>
+                            <div class="isa_success" ng-show="isSuccess">
+                                <i class="fa fa-check"></i> {{message}}
+                            </div>
+                        </div>
+                        <br />
+                        <div>
+                            <label>Queue Label *:</label>
+                            <input data-toggle="tooltip" data-placement="bottom" title="Enter a Name for the queue. Please ensure not to use the name already taken." ng-model="queueLabel" class="form-control" type="text" placeholder="Suggestion: Keep Queue name same as Product Name" ng-change="generateQueueName()" ng-disabled="disableQueueCreation"></input>
+                            <br />
+                            <label>Queue Name *:</label>
+                            <input ng-model="queueName" class="form-control" type="text" placeholder="Auto generated, Do not change queue name" ng-disabled="true" data-toggle="tooltip" data-placement="bottom" title="Unique queue name for internal use."></input>
+                            <br />
+                            <label>Queue Email *:</label>
+                            <select ng-model="queueEmail" ng-disabled="disableQueueCreation" ng-options="email for email in queueEmailIds" data-toggle="tooltip" data-placement="bottom" title="crm-test@akamai.com for CRMQA. productapprovals@akamai.com for production.">
+                            </select>
+                            <br />
+                            <br />
+                            <label>Send Email to Members:
+                                <input type="checkbox" ng-model="sendMail" ng-disabled="disableQueueCreation" data-toggle="tooltip" data-placement="bottom" title="Please keep it checked else mail would not trigger."></input>
+                            </label>
+                            <br />
+                            <div class="text-center">
+                                <!-- <button type="button" class="btn btn-success" ng-click="createQueue()" ng-disabled="!queueLabel || !queueName || !queueEmail || disableQueueCreation">Create Queue</button> -->
+                                <button type="button" class="btn btn-success" ng-click="createQueue()" ng-hide="disableQueueCreation">Create Queue</button>
+                                <button type="button" class="btn btn-success cont" ng-show="disableQueueCreation" ng-click="setSurveyName()">Next</button>
+                            </div>
+                        </div>
+                        <div>
+                            <br />
+                            <label>Note: Fields marked with * are mandatory.</label>
+                        </div>
+                    </div>
+                </div>
+                <div id="createSurvey" class="tab-pane fade">
+                    <div class="form-group">
+                        <br />
+                        <div>
+                            <div class="isa_error" ng-show="surveyInput.isFailure || surveyQuestionInput.isFailure">
+                                <p ng-show="surveyInput.isFailure"><i class="fa fa-times-circle"></i> {{surveyInput.message}}</p>
+                                <p ng-show="surveyQuestionInput.isFailure">
+                                    <br /><i class="fa fa-check"></i> {{surveyQuestionInput.message}}</p>
+                            </div>
+                            <div class="isa_success" ng-show="surveyInput.isSuccess || surveyQuestionInput.isSuccess">
+                                <p ng-show="surveyInput.isSuccess"><i class="fa fa-check"></i> {{surveyInput.message}}</p>
+                                <p ng-show="surveyQuestionInput.isSuccess">
+                                    <br /><i class="fa fa-check"></i> {{surveyQuestionInput.message}}</p>
+                            </div>
+                            <!-- <div class="isa_error" ng-show="surveyQuestionInput.isFailure">
+                                <i class="fa fa-times-circle"></i> {{surveyQuestionInput.message}}
+                            </div>
+                            <div class="isa_success" ng-show="surveyQuestionInput.isSuccess">
+                                <i class="fa fa-check"></i> {{surveyQuestionInput.message}}
+                            </div> -->
+                        </div>
+                        <br />
+                        <div ng-hide="surveyInput.isSuccess">
+                            <label>Survey Name *:</label>
+                            <input ng-model="surveyInput.name" class="form-control" type="text" placeholder="Suggestion: Keep Survey name same as Product Name" data-toggle="tooltip" data-placement="bottom" title="Unique name for the Survey."></input>
+                            <br />
+                            <label>Entry Question:</label>
+                            <input ng-model="surveyInput.entryQ" ng-change="entryQuestion()" class="form-control" type="text" placeholder="Entry Question, if any" data-toggle="tooltip" data-placement="bottom" title="If there exist an entry question."></input>
+                            <br />
+                            <label>Show Entry Question:
+                                <input type="checkbox" ng-model="surveyInput.showEntryQ"></input>
+                            </label>
+                            <br />
+                            <label>Auto Approve:
+                                <input type="checkbox" ng-model="surveyInput.autoApprove"></input>
+                            </label>
+                            <br />
+                            <div class="text-center">
+                                <button type="button" class="btn btn-success" ng-click="createSurvey()">Create Survey</button>
+                            </div>
+                        </div>
+                        <div ng-show="surveyInput.isSuccess">
+                            <label>Add Questions to Survey {{surveyInput.name}}</label>
+                            <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#addQuestionModal">Add Question</button>
+                            <br />
+                            <br />
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="border: 1px solid black;padding-left: 5px;"> Question </td>
+                                    <td style="border: 1px solid black;padding-left: 5px;"> Required? </td>
+                                    <td style="border: 1px solid black;padding-left: 5px;"> Question Type </td>
+                                    <td style="border: 1px solid black;padding-left: 5px;"> Answers </td>
+                                </tr>
+                                <tr ng-repeat="question in surveyQuestions">
+                                    <td style="border: 1px solid black;padding-left: 5px;">{{question.question}}</td>
+                                    <td style="border: 1px solid black;padding-left: 5px;">{{question.required}}</td>
+                                    <td style="border: 1px solid black;padding-left: 5px;">{{question.questionType}}</td>
+                                    <td style="border: 1px solid black;padding-left: 5px;">{{question.answers}}</td>
+                                </tr>
+                            </table>
+                            <br />
+                            <!-- <div ng-repeat="question in surveyQuestions">
+                                <label>{{question.orderNumber+1}}. {{question.question}}</label>
+                                <br />
+                                <label>Required: {{question.required}}</label>
+                                <br />
+                                <label>Question Type: {{question.questionType}}</label>
+                                <br />
+                                <label>Answers: {{question.answers}}</label>
+                                <br />
+                                <br />
+                            </div> -->
+                            <div class="text-center">
+                                <button type="button" class="btn btn-success cont" ng-click="enableWF = true">Next</button>
+                            </div>
+                        </div>
+                        <div>
+                            <br />
+                            <label>Note: Fields marked with * are mandatory.</label>
+                        </div>
+                    </div>
+                </div>
+                <div id="createWF" class="tab-pane fade">
+                    <div class="form-group">
+                        <br />
+                        <div>
+                            <div class="isa_error" ng-show="workflowInput.isFailure">
+                                <i class="fa fa-times-circle"></i> {{workflowInput.message}}
+                            </div>
+                            <div class="isa_success" ng-show="workflowInput.isSuccess">
+                                <i class="fa fa-check"></i> {{workflowInput.message}}
+                            </div>
+                        </div>
+                        <br />
+                        <div>
+                            <label>Workflow Name *:</label>
+                            <input ng-model="workflowInput.name" class="form-control" type="text" placeholder="Suggestion: Keep Workflow name same as Product Name" ng-disabled="workflowInput.disable" data-toggle="tooltip" data-placement="bottom" title="Unique Workflow name."></input>
+                            <br />
+                            <label>Primary Contact:</label>
+                            <input ng-model="workflowInput.primaryContact" class="form-control" type="text" placeholder="Technical Sales - Primary" ng-disabled="true"></input>
+                            <br />
+                            <label>Survey Id:</label>
+                            <input ng-model="workflowInput.survey" class="form-control" type="text" placeholder="Add a valid Survey Id" ng-disabled="true"></input>
+                            <br />
+                            <label>Auto Approval:
+                                <input type="checkbox" ng-model="workflowInput.autoApproval" ng-disabled="workflowInput.disable"></input>
+                            </label>
+                            <br />
+                            <br />
+                            <label>Product Manager *:</label>
+                            <input ng-model="workflowInput.productManager" class="form-control" type="text" placeholder="Comma separated names" ng-disabled="workflowInput.disable" data-toggle="tooltip" data-placement="bottom" title="Product manager names separated by Comma."></input>
+                            <br />
+                            <label>Is Escalatable:
+                                <input type="checkbox" ng-model="workflowInput.isEscalatable" ng-disabled="workflowInput.disable"></input>
+                            </label>
+                            <br />
+                            <br />
+                            <label>Draftable Before Approval:
+                                <input type="checkbox" ng-model="workflowInput.isDraftable" ng-disabled="workflowInput.disable"></input>
+                            </label>
+                            <br />
+                            <br />
+                            <label>Lockable Before Approval:
+                                <input type="checkbox" ng-model="workflowInput.isLockable" ng-disabled="workflowInput.disable"></input>
+                            </label>
+                            <br />
+                            <br />
+                            <label>EscalationDelegateEmail *:</label>
+                            <input ng-model="workflowInput.escalationDelegateEmail" class="form-control" type="text" placeholder="Valid Email Address" ng-disabled="workflowInput.disable" data-toggle="tooltip" data-placement="bottom" title="Valid email address of escalation point of contact."></input>
+                            <br />
+                            <label>EscalationDelegateEmail2:</label>
+                            <input ng-model="workflowInput.escalationDelegateEmail2" class="form-control" type="text" placeholder="Valid Email Address" ng-disabled="workflowInput.disable" data-toggle="tooltip" data-placement="bottom" title="Valid email address for second level escalation delegate."></input>
+                            <br />
+                            <label>First Escalation Window</label>
+                            <input ng-model="workflowInput.firstEscalationWindow" class="form-control" type="number" placeholder="Number of days after which first escalation mail gets triggered" ng-disabled="workflowInput.disable" data-toggle="tooltip" data-placement="bottom"></input>
+                            <br />
+                            <label>Second Escalation Window</label>
+                            <input ng-model="workflowInput.secondEsclationWindow" class="form-control" type="number" placeholder="Number of days after which second escalation mail gets triggered" ng-disabled="workflowInput.disable" data-toggle="tooltip" data-placement="bottom"></input>
+                            <br />
+                            <div class="text-center">
+                                <button type="button" class="btn btn-success" ng-click="createWorkflow()" ng-disabled="workflowInput.disable" ng-hide="workflowInput.isSuccess">Create Workflow</button>
+                                <button type="button" class="btn btn-success cont" ng-show="workflowInput.isSuccess" ng-click="enableAP=true">Next</button>
+                            </div>
+                        </div>
+                        <div>
+                            <br />
+                            <label>Note: Fields marked with * are mandatory.</label>
+                        </div>
+                    </div>
+                </div>
+                <div id="createAP" class="tab-pane fade">
+                    <div class="form-group">
+                        <br />
+                        <div>
+                            <div class="isa_error" ng-show="approvalProcessInput.isFailure">
+                                <i class="fa fa-times-circle"></i> {{approvalProcessInput.message}}
+                            </div>
+                            <div class="isa_success" ng-show="approvalProcessInput.isSuccess">
+                                <i class="fa fa-check"></i> {{approvalProcessInput.message}}
+                            </div>
+                        </div>
+                        <br />
+                        <div>
+                            <label>Process Name *:</label>
+                            <input ng-model="approvalProcessInput.name" class="form-control" type="text" placeholder="Suggestion: Keep Approval Process name same as Product Name" ng-change="generateProcessName()" ng-disabled="approvalProcessInput.disable" data-toggle="tooltip" data-placement="bottom" title="Unique approval process name."></input>
+                            <br />
+                            <label>Unique Name *:</label>
+                            <input ng-model="approvalProcessInput.apiName" class="form-control" type="text" placeholder="Auto generated, Manually correct if characters other than Alphanumeric and _ are present." ng-disabled="true"></input>
+                            <br />
+                            <label>Approval Workflow Id *:</label>
+                            <input ng-model="approvalProcessInput.workflowId" class="form-control" type="text" placeholder="Valid workflow Id" ng-disabled="true"></input>
+                            <br />
+                            <label>Active:
+                                <input type="checkbox" ng-model="approvalProcessInput.isActive" ng-disabled="approvalProcessInput.disable"></input>
+                            </label>
+                            <!-- <br />
+                            <br /> -->
+                            <!-- <label>2 Level Approval?
+                                <input type="checkbox" ng-model="approvalProcessInput.multiLevel" ng-disabled="approvalProcessInput.disable"></input>
+                            </label> -->
+                            <br />
+                            <br />
+                            <label>Queue API Name *:</label>
+                            <input ng-model="approvalProcessInput.queueName" class="form-control" type="text" placeholder="Queue API Name" ng-disabled="true"></input>
+                            <br />
+                            <div ng-show="is2Level">
+                                <label>Second Level Queue API Name *: </label>
+                                <input ng-model="approvalProcessInput.level2Queue" class="form-control" type="text" placeholder="Queue API Name" ng-disabled="true"></input>
+                                <br />
+                            </div>
+                            <div class="text-center">
+                                <button type="button" class="btn btn-success" ng-click="createApprovalProcess()" ng-disabled="approvalProcessInput.disable" ng-hide="approvalProcessInput.isSuccess">Create Approval Process</button>
+                                <button type="button" class="btn btn-success cont" ng-show="approvalProcessInput.isSuccess" ng-click="enableDS=true">Next</button>
+                            </div>
+                        </div>
+                        <div>
+                            <br />
+                            <label>Note: Fields marked with * are mandatory.</label>
+                        </div>
+                    </div>
+                </div>
+                <div id="createDS" class="tab-pane fade">
+                    <!-- <div class="text-center">
+                        <button type="button" class="btn btn-success" ng-click="createDS()">Create Deployment Step</button>
+                    </div> -->
+                    <br />
+                    <label> Deployment Step 1</label>
+                    <br />
+                    <label> Create a deployment Step with manifest as mentioned below.</label>
+                    <br />
+                    <ol>
+                        <li>
+                            <ul>
+                                <li>Object/Folder/Changelist Name (API): <b>Product_Approvals__c</b></li>
+                                <li>Component Name (API): <b>{{approvalProcessInput.queueName}}</b></li>
+                                <li>Component Type: <b>Queue</b></li>
+                            </ul>
+                            <br />
+                        </li>
+                        <li ng-if="approvalProcessInput.level2Queue">
+                            <ul>
+                                <li>Object/Folder/Changelist Name (API): <b>Product_Approvals__c</b></li>
+                                <li>Component Name (API): <b>{{approvalProcessInput.level2Queue}}</b></li>
+                                <li>Component Type: <b>Queue</b></li>
+                            </ul>
+                            <br />
+                        </li>
+                        <li>
+                            <ul>
+                                <li>Object/Folder/Changelist Name (API): <b>Product_Approvals__c</b></li>
+                                <li>Component Name (API): <b>{{approvalProcessInput.apiName}}</b></li>
+                                <li>Component Type: <b>ApprovalProcess</b></li>
+                            </ul>
+                        </li>
+                    </ol>
+                    <br />
+                    <br />
+                    <label> Deployment Step 2</label>
+                    <br />
+                    <label>Create a Datafix DS, Follow below instructions</label>
+                    <br />
+                    <ol>
+                        <li>Click the button and Download CSV.
+                            <button type="button" class="btn" ng-click="generateCSV()">Download CSV</button>
+                            <br />
+                        </li>
+                        <li>Attach the Survey.csv to datafix DS.</li>
+                        <li>Edit datafix DS and put following text in post deployment step.
+                            <br />
+                            <p>
+                                ===================This is Maintenance DS=======================
+                                <br /> - Login with Data Loader.
+                                <br /> - Select Operation "Insert".
+                                <br /> - Select Salesforce object "Survey (Survey__c)".
+                                <br /> - Select CSV file "Survey.csv"
+                                <br /> - Click Next.
+                                <br /> - Create or edit a map.
+                                <br /> - Auto match fields to columns.
+                                <br /> - Ok, Next, finish.
+                                <br />
+                                <br />
+                                <br /> Go to All tabs -> surveys -> {{surveyInput.name}}.
+                                <br /> Add following Questions to the survey. All questions are required.
+                                <ul>
+                                    <li ng-repeat="question in surveyQuestions">
+                                        {{question.question}}
+                                        <br /> [{{question.questionType}}]
+                                        <br />
+                                        <p ng-hide="question.questionType == 'Free Text'">Answers Separated by new line.
+                                            <br />{{question.answers}}</p>
+                                        <br />
+                                    </li>
+                                </ul>
+                                ----------------------For CRMQA------------------------
+                                <br /> Go to All tabs -> Approval Workflows.
+                                <br /> Create new Workflow with following details:
+                                <br /> Name: {{workflowInput.name}}
+                                <br /> Survey: Select Survey {{surveyInput.name}}
+                                <br /> Primary Contact: {{workflowInput.primaryContact}}
+                                <br /> Auto Approval: {{workflowInput.autoApproval}}
+                                <br /> ProductManager: Bharath Murumalla
+                                <br /> Is Escalatable: {{workflowInput.isEscalatable}}
+                                <br /> Draftable Before Approval: {{workflowInput.isDraftable}}
+                                <br /> Lockable Before Approval: {{workflowInput.isLockable}}
+                                <br /> EscalationDelegateEmail: bmurumul@akamai.com
+                                <br /> EscalationDelegateEmail2: bmurumul@akamai.com
+                                <br /> AKAM Workflow ID: {{approvalProcessInput.workflowId}}
+                                <br />
+                                <br /> ----------------------For Production------------------------
+                                <br /> Go to All tabs -> Approval Workflows.
+                                <br /> Create new Workflow with following details:
+                                <br /> Name: {{workflowInput.name}}
+                                <br /> Survey: Select Survey {{surveyInput.name}}
+                                <br /> Primary Contact: {{workflowInput.primaryContact}}
+                                <br /> Auto Approval: {{workflowInput.autoApproval}}
+                                <br /> ProductManager: {{workflowInput.productManager}}
+                                <br /> Is Escalatable: {{workflowInput.isEscalatable}}
+                                <br /> Draftable Before Approval: {{workflowInput.isDraftable}}
+                                <br /> Lockable Before Approval: {{workflowInput.isLockable}}
+                                <br /> EscalationDelegateEmail: {{workflowInput.escalationDelegateEmail}}
+                                <br /> EscalationDelegateEmail2: {{workflowInput.escalationDelegateEmail2}}
+                                <br /> AKAM Workflow ID: {{approvalProcessInput.workflowId}}
+                                <br />
+                            </p>
+                        </li>
+                    </ol>
+                </div>
+                <div id="faq" class="tab-pane fade">
+                    <div class="form-group">
+                        <br />
+                        <div>
+                            <ol>
+                                <li ng-repeat="faq in faqs">
+                                    <label>{{faq.question}}</label>
+                                    <br /> Answer:
+                                    <p ng-bind-html="faq.answer" style="display: inline;"></p>
+                                    <br />
+                                    <br />
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular-sanitize.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.4/papaparse.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsforce/1.7.0/jsforce.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js"></script>
+        <script type="text/javascript" src="/soap/ajax/38.0/connection.js"></script>
+        <script type="text/javascript" src="/soap/ajax/38.0/apex.js"></script>
+        <script type="text/javascript">
+        $j = jQuery.noConflict();
+        $j('.cont').click(function() {
+
+            var nextId = $j(this).parents('.tab-pane').next().attr("id");
+            $j('[href="#' + nextId + '"]').tab('show');
+
+        });
+        $j(document).ready(function() {
+            $j('[data-toggle="tooltip"]').tooltip();
+        });
+
+        var approvalApp = angular.module('approvalApp', ['ngSanitize']);
+        // add the controller
+        approvalApp.controller('approvalCtrl', function($scope) {
+            var conn = new jsforce.Connection({
+                accessToken: '{!$API.Session_Id}'
+            });
+            $scope.is2Level = false;
+            $scope.isSuccess = false;
+            $scope.isFailure = false;
+            $scope.sendMail = true;
+            $scope.queueEmailIds = ["crm-test@akamai.com", "productapprovals@akamai.com"];
+            $scope.queueEmail = $scope.queueEmailIds[0];
+            var queuePreText = '{"fullName":"Replace::QueueName","doesSendEmailToMembers":"Replace::SendMail","email":"Replace::QueueMail","name":"Replace::QueueLabel","queueSobject":{"sobjectType":"Product_Approvals__c"}}';
+
+            $scope.generateQueueName = function() {
+                if (!$scope.queueLabel) {
+                    $scope.queueName = '';
+                    return;
+                }
+                $scope.queueName = $scope.queueLabel.replace(/\s/g, "_").replace(/-/g, "_");
+                $scope.isSuccess = false;
+                $scope.isFailure = false;
+            }
+
+            var isAlphanumeric = function(strToValidate) {
+                if (strToValidate.includes("__"))
+                    return false;
+
+                var pattern = /\W/g;
+                var result = strToValidate.match(pattern);
+                if (result)
+                    return false;
+
+                return true;
+            }
+
+            var isValidEmail = function(email) {
+                var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(email);
+            }
+
+            var validateQueueInput = function() {
+                if (!isAlphanumeric($scope.queueName)) {
+                    $scope.isFailure = true;
+                    $scope.message = 'Queue Name should only contain Alphanumeric characters and _ . No consecutive underscores can be added.';
+                    return false;
+                }
+                if (!isValidEmail($scope.queueEmail)) {
+                    $scope.isFailure = true;
+                    $scope.message = 'Invalid Email address.';
+                    return false;
+                }
+                return true;
+            }
+
+            $scope.createQueue = function() {
+
+                if (!validateQueueInput()) {
+                    return;
+                }
+                blockUICall();
+
+                var queueJSON = JSON.parse(queuePreText.replace("Replace::QueueName", $scope.queueName).replace("Replace::SendMail", $scope.sendMail).replace("Replace::QueueMail", $scope.queueEmail).replace("Replace::QueueLabel", $scope.queueLabel));
+                console.log(queueJSON);
+                conn.metadata.create('Queue', queueJSON, function(err, result) {
+                    if (err) {
+                        console.log(err);
+                        $scope.isFailure = true;
+                        $scope.message = err;
+                        $scope.$digest();
+                        unblockUICall();
+                        return;
+                    }
+                    console.log(result);
+                    $scope.isSuccess = result.success;
+                    $scope.isFailure = !result.success;
+
+                    if (result.success) {
+                        if (!$scope.is2Level) {
+                            $scope.disableQueueCreation = true;
+                        }
+                        if ($scope.approvalProcessInput.queueName == "") {
+                            $scope.approvalProcessInput.queueName = $scope.queueName;
+                            $scope.message = result.success ? "Queue 1 Created." + ($scope.is2Level ? "Create another Queue for second level" : "") : result.errors.message;
+                        } else if ($scope.approvalProcessInput.level2Queue == "") {
+                            $scope.approvalProcessInput.level2Queue = $scope.queueName;
+                            $scope.disableQueueCreation = true;
+                            $scope.message = result.success ? "Queue 2 Created." : result.errors.message;
+                        }
+                    }
+                    $scope.queueName = "";
+                    $scope.queueLabel = "";
+                    console.log($scope.approvalProcessInput.queueName);
+                    $scope.$digest();
+                    unblockUICall();
+                });
+            }
+
+            $scope.surveyInput = {
+                name: "",
+                entryQ: "",
+                showEntryQ: false,
+                autoApprove: true,
+                isSuccess: false,
+                isFailure: false,
+                message: "",
+                surveyQTypes: ["Single Select--Vertical", "Single Select--Horizontal", "Multi-Select--Vertical", "Free Text"]
+            }
+
+            $scope.surveyQuestionInput = {
+                questionType: "",
+                question: "",
+                required: true,
+                answers: "",
+                orderNumber: 0,
+                isSuccess: false,
+                isFailure: false,
+                message: ""
+            }
+
+            $scope.surveyQuestions = [];
+            $scope.surveyId = "";
+
+            $scope.setSurveyName = function() {
+                $scope.surveyInput.name = $scope.approvalProcessInput.queueName;
+                $scope.workflowInput.name = $scope.approvalProcessInput.queueName;
+                $scope.approvalProcessInput.name = $scope.approvalProcessInput.queueName;
+                $scope.generateProcessName($scope.approvalProcessInput.name);
+                $scope.enableSurvey = true;
+            }
+
+            $scope.createSurvey = function() {
+                if (!$scope.surveyInput.name) {
+                    $scope.surveyInput.isFailure = true;
+                    $scope.surveyInput.message = "Survey Name is mandatory";
+                    return;
+                }
+                blockUICall();
+                conn.sobject("Survey__c").create({
+                    Name: $scope.surveyInput.name,
+                    Entry_Question_Details__c: $scope.surveyInput.entryQ,
+                    Show_Entry_Question__c: $scope.surveyInput.showEntryQ,
+                    Auto_Approve_on__c: $scope.surveyInput.autoApprove,
+                    RecordTypeId: "012G0000000yDjjIAE",
+                    Submit_Response__c: "empty"
+                }, function(err, result) {
+                    if (err || !result.success) {
+                        console.error(err, result);
+                        $scope.surveyInput.isFailure = true;
+                        $scope.surveyInput.message = err;
+                        $scope.$digest();
+                        unblockUICall();
+                        return;
+                    }
+                    console.log("Created Survey id : " + result.id);
+                    $scope.surveyInput.isSuccess = result.success;
+                    $scope.surveyInput.isFailure = !result.success;
+                    $scope.surveyInput.message = result.success ? "Survey Created. Id: " + result.id : result.errors.message;
+                    $scope.surveyId = result.id;
+                    $scope.workflowInput.survey = result.id;
+                    $scope.$digest();
+                    unblockUICall();
+                });
+            }
+
+            $scope.entryQuestion = function() {
+                $scope.surveyInput.showEntryQ = $scope.surveyInput.entryQ ? true : false;
+                $scope.surveyInput.autoApprove = !$scope.surveyInput.showEntryQ;
+            }
+
+            $scope.addQuestion = function() {
+                if ($scope.surveyQuestionInput.question) {
+                    if ($scope.surveyQuestionInput.question.length > 255) {
+                        $scope.surveyQuestionInput.isSuccess = false;
+                        $scope.surveyQuestionInput.isFailure = true;
+                        $scope.surveyQuestionInput.message = 'Max Supported length of question is 255 Characters.';
+                        return;
+                    }
+                }
+                conn.sobject("Survey_Question__c").create({
+                    Name: $scope.surveyQuestionInput.question.substring(0, 80),
+                    OrderNumber__c: $scope.surveyQuestionInput.orderNumber,
+                    Question__c: $scope.surveyQuestionInput.question,
+                    Required__c: $scope.surveyQuestionInput.required,
+                    Survey__c: $scope.surveyId,
+                    Type__c: $scope.surveyQuestionInput.questionType,
+                    Choices__c: $scope.surveyQuestionInput.answers
+                }, function(err, result) {
+                    if (err || !result.success) {
+                        console.error(err, result);
+                        $scope.surveyQuestionInput.isSuccess = false;
+                        $scope.surveyQuestionInput.isFailure = true;
+                        $scope.surveyQuestionInput.message = err;
+                        $scope.$digest();
+                        return;
+                    }
+                    console.log("Created Survey Question id : " + result.id);
+                    $scope.surveyQuestionInput.isSuccess = result.success;
+                    $scope.surveyQuestionInput.isFailure = !result.success;
+                    $scope.surveyQuestionInput.message = result.success ? "Survey Question Created. Id: " + result.id : result.errors.message;
+                    $scope.surveyQuestions.push(JSON.parse(JSON.stringify($scope.surveyQuestionInput)));
+
+                    $scope.surveyQuestionInput.questionType = "";
+                    $scope.surveyQuestionInput.question = "";
+                    $scope.surveyQuestionInput.required = true;
+                    $scope.surveyQuestionInput.answers = "";
+                    $scope.surveyQuestionInput.orderNumber = $scope.surveyQuestionInput.orderNumber + 1;
+                    console.log($scope.surveyQuestions);
+                    $scope.$digest();
+                });
+            }
+
+            $scope.workflowInput = {
+                autoApproval: false,
+                escalationDelegateEmail: "",
+                escalationDelegateEmail2: "",
+                firstEscalationWindow: 1,
+                secondEsclationWindow: 1,
+                isEscalatable: true,
+                isDraftable: true,
+                isLockable: false,
+                name: "",
+                primaryContact: "Technical Sales - Primary",
+                productManager: "",
+                survey: "",
+                isSuccess: false,
+                isFailure: false,
+                message: "",
+                disable: false
+            }
+
+            var validateWorkflowInput = function() {
+                var msg = "";
+                if (!$scope.workflowInput.name) {
+                    $scope.workflowInput.isFailure = true;
+                    $scope.workflowInput.message = 'Workflow Name is mandatory.';
+                    return false;
+                }
+
+                if (!$scope.workflowInput.productManager) {
+                    $scope.workflowInput.isFailure = true;
+                    $scope.workflowInput.message = 'Product Manager is mandatory.';
+                    return false;
+                }
+
+                if (!$scope.workflowInput.escalationDelegateEmail) {
+                    $scope.workflowInput.isFailure = true;
+                    $scope.workflowInput.message = 'escalationDelegateEmail is mandatory.';
+                    return false;
+                }
+
+                if (!isValidEmail($scope.workflowInput.escalationDelegateEmail)) {
+                    $scope.workflowInput.isFailure = true;
+                    $scope.workflowInput.message = 'Invalid escalationDelegateEmail.';
+                    return false;
+                }
+
+                if ($scope.workflowInput.escalationDelegateEmail2) {
+                    if (!isValidEmail($scope.workflowInput.escalationDelegateEmail2)) {
+                        $scope.workflowInput.isFailure = true;
+                        $scope.workflowInput.message = 'Invalid escalationDelegateEmail2.';
+                        return false;
+                    }
+                    return true;
+                }
+                return true;
+            }
+
+            $scope.createWorkflow = function() {
+                if (!validateWorkflowInput()) {
+                    return;
+                }
+                blockUICall();
+                conn.sobject("Approval_Workflow__c").create({
+                    Auto_Approval__c: $scope.workflowInput.autoApproval,
+                    EscalationDelegateEmail__c: $scope.workflowInput.escalationDelegateEmail,
+                    EscalationDelegateEmail2__c: $scope.workflowInput.escalationDelegateEmail2,
+                    First_Escalation_Window__c: $scope.workflowInput.firstEscalationWindow,
+                    Second_Escalation_Window__c: $scope.workflowInput.secondEsclationWindow,
+                    Is_Escalatable__c: $scope.workflowInput.isEscalatable,
+                    isDraftable__c: $scope.workflowInput.isDraftable,
+                    isLockable__c: $scope.workflowInput.isLockable,
+                    Name: $scope.workflowInput.name,
+                    Primary_Contact__c: $scope.workflowInput.primaryContact,
+                    ProductManager__c: $scope.workflowInput.productManager,
+                    Survey__c: $scope.workflowInput.survey
+                }, function(err, result) {
+                    if (err || !result.success) {
+                        console.error(err, result);
+                        $scope.workflowInput.isFailure = true;
+                        $scope.workflowInput.message = err;
+                        $scope.$digest();
+                        unblockUICall();
+                        return;
+                    }
+                    console.log("Created Workflow Id : " + result.id);
+                    $scope.workflowInput.isSuccess = result.success;
+                    $scope.workflowInput.isFailure = !result.success;
+                    conn.query("Select AKAM_Workflow_ID__c from Approval_Workflow__c where Id='" + result.id + "'", function(queryError, queryResult) {
+                        if (queryError || !queryResult.done) {
+                            console.error(queryError, queryResult);
+                            $scope.workflowInput.isFailure = true;
+                            $scope.workflowInput.message = queryError;
+                            $scope.$digest();
+                            unblockUICall();
+                            return;
+                        }
+                        $scope.workflowInput.message = "Workflow Created. AKAM_Workflow_ID__c = " + queryResult.records[0].AKAM_Workflow_ID__c;
+                        $scope.approvalProcessInput.workflowId = queryResult.records[0].AKAM_Workflow_ID__c;
+                        $scope.workflowInput.message += result.success ? " and  Id= " + result.id : result.errors.message;
+                        $scope.workflowInput.disable = true;
+                        $scope.$digest();
+                        unblockUICall();
+                    });
+                });
+            }
+
+            $scope.approvalProcessInput = {
+                name: "",
+                apiName: "",
+                workflowId: "",
+                isActive: true,
+                queueName: "",
+                level2Queue: "",
+                isSuccess: "",
+                isFailure: "",
+                message: "",
+                disable: false
+            }
+
+            $scope.createApprovalProcess = function() {
+                if (!$scope.approvalProcessInput.apiName) {
+                    $scope.approvalProcessInput.isFailure = true;
+                    $scope.approvalProcessInput.message = 'Approval Process name is mandatory.';
+                    return;
+                }
+
+                if (!isAlphanumeric($scope.approvalProcessInput.apiName)) {
+                    $scope.approvalProcessInput.isFailure = true;
+                    $scope.approvalProcessInput.message = 'Approval Process Unique Name should only contain Alphanumeric characters and _ . No consecutive underscores can be added.';
+                    return;
+                }
+
+                blockUICall();
+                var approvalProcessPretext;
+                if ($scope.is2Level) {
+                    approvalProcessPretext = '{"fullName":"Product_Approvals__c.' + $scope.approvalProcessInput.apiName + '","active":"' + $scope.approvalProcessInput.isActive + '","allowRecall":"false","allowedSubmitters":{"type":"allInternalUsers"},"approvalPageFields":{"field":["Name","Owner","Opportunity__c","Opportunity_Owner__c","User_Technical__c","Type_name__c"]},"approvalStep":[{"allowDelegate":"false","approvalActions":{"action":[{"name":"PA_Approval_Step_Update","type":"FieldUpdate"},{"name":"PA_Assigned_Time_Update","type":"FieldUpdate"}]},"assignedApprover":{"approver":{"name":"' + $scope.approvalProcessInput.queueName + '","type":"queue"},"whenMultipleApprovers":"FirstResponse"},"entryCriteria":{"criteriaItems":{"field":"Product_Approvals__c.Skip_Approval__c","operation":"equals","value":"False"}},"ifCriteriaNotMet":"ApproveRecord","label":"Step 1 - PM","name":"Step_1_PM"},{"allowDelegate":"false","assignedApprover":{"approver":{"name":"' + $scope.approvalProcessInput.level2Queue + '","type":"queue"},"whenMultipleApprovers":"FirstResponse"},"label":"Step 2 - ENGG","name":"Step_2_ENGG","rejectBehavior":{"type":"RejectRequest"}}],"emailTemplate":"Product_Approvals/PA_SS_Approval_HTML","enableMobileDeviceAccess":"false","entryCriteria":{"criteriaItems":{"field":"Product_Approvals__c.Workflow_ID__c","operation":"equals","value":"' + $scope.approvalProcessInput.workflowId + '"}},"finalApprovalActions":{"action":[{"name":"PA_SS_approved","type":"FieldUpdate"},{"name":"PA_SS_Approved_Email","type":"Alert"}]},"finalApprovalRecordLock":"true","finalRejectionActions":{"action":[{"name":"PA_Rejected","type":"FieldUpdate"},{"name":"PA_SS_Rejected_Email","type":"Alert"}]},"finalRejectionRecordLock":"false","initialSubmissionActions":{"action":{"name":"PA_SS_submit_for_approval","type":"FieldUpdate"}},"label":"' + $scope.approvalProcessInput.name + '","recordEditability":"AdminOrCurrentApprover","showApprovalHistory":"true"}';
+                } else {
+                    approvalProcessPretext = '{"fullName":"Product_Approvals__c.' + $scope.approvalProcessInput.apiName + '","active":"' + $scope.approvalProcessInput.isActive + '","allowRecall":"false","allowedSubmitters":[{"type":"allInternalUsers"},{"type":"owner"}],"approvalPageFields":{"field":["Name","Owner","Opportunity__c","Order_Approval__c","Status__c","User_Technical__c","Opportunity_Owner__c"]},"approvalStep":{"allowDelegate":"false","assignedApprover":{"approver":{"name":"' + $scope.approvalProcessInput.queueName + '","type":"queue"},"whenMultipleApprovers":"FirstResponse"},"entryCriteria":{"criteriaItems":{"field":"Product_Approvals__c.Skip_Approval__c","operation":"equals","value":"False"}},"ifCriteriaNotMet":"ApproveRecord","label":"Approval Step","name":"Approval_Step"},"emailTemplate":"Product_Approvals/PA_SS_Approval_HTML","enableMobileDeviceAccess":"false","entryCriteria":{"criteriaItems":{"field":"Product_Approvals__c.Workflow_ID__c","operation":"equals","value":"' + $scope.approvalProcessInput.workflowId + '"}},"finalApprovalActions":{"action":[{"name":"PA_SS_approved","type":"FieldUpdate"},{"name":"PA_SS_Approved_Email","type":"Alert"}]},"finalApprovalRecordLock":"true","finalRejectionActions":{"action":[{"name":"PA_Rejected","type":"FieldUpdate"},{"name":"PA_SS_Rejected_Email","type":"Alert"}]},"finalRejectionRecordLock":"false","initialSubmissionActions":{"action":[{"name":"PA_Assigned_Time_Update","type":"FieldUpdate"},{"name":"PA_SS_submit_for_approval","type":"FieldUpdate"}]},"label":"' + $scope.approvalProcessInput.name + '","recordEditability":"AdminOnly","showApprovalHistory":"false"}';
+                }
+
+                var apJSON = JSON.parse(approvalProcessPretext);
+                conn.metadata.create('ApprovalProcess', apJSON, function(err, result) {
+                    if (err) {
+                        console.log(err);
+                        $scope.approvalProcessInput.isFailure = true;
+                        $scope.approvalProcessInput.message = err;
+                        $scope.$digest();
+                        unblockUICall();
+                        return;
+                    }
+                    console.log(result);
+                    $scope.approvalProcessInput.isSuccess = result.success;
+                    $scope.approvalProcessInput.isFailure = !result.success;
+                    $scope.approvalProcessInput.message = result.success ? "Approval Process Created" : result.errors.message;
+                    $scope.approvalProcessInput.disable = true;
+                    $scope.$digest();
+                    unblockUICall();
+                });
+            }
+
+            $scope.generateProcessName = function() {
+                $scope.approvalProcessInput.apiName = $scope.approvalProcessInput.name.replace(/\s/g, "_").replace(/-/g, "_");
+            }
+
+            $scope.generateCSV = function() {
+                var csvTextArray = [];
+                var csvTextObj = {
+                    Auto_Approve_on__c: $scope.surveyInput.autoApprove,
+                    Entry_Question_Details__c: $scope.surveyInput.entryQ,
+                    Name: $scope.surveyInput.name,
+                    RecordTypeId: "012G0000000yDjjIAE",
+                    Show_Entry_Question__c: $scope.surveyInput.showEntryQ,
+                    Submit_Response__c: "empty"
+                };
+                csvTextArray.push(csvTextObj);
+                var csv = Papa.unparse(csvTextArray);
+                var element = document.createElement('a');
+                element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv));
+                element.setAttribute('download', 'Survey.csv');
+
+                element.style.display = 'none';
+                document.body.appendChild(element);
+
+                element.click();
+
+                document.body.removeChild(element);
+            }
+
+            var blockUICall = function() {
+                $j = jQuery.noConflict();
+                $j(function() {
+                    $j.blockUI({
+                        css: {
+                            border: 'none',
+                            padding: '15px',
+                            backgroundColor: '#000',
+                            '-webkit-border-radius': '10px',
+                            '-moz-border-radius': '10px',
+                            opacity: .5,
+                            color: '#fff'
+                        }
+                    });
+                });
+            }
+
+            var unblockUICall = function() {
+                $j = jQuery.noConflict();
+                $j.unblockUI();
+            }
+
+            $scope.faqs = [];
+
+            $scope.faqs.push({
+                question: "What is Queue Email ?",
+                answer: "Queue Email is a group email. People in the email group are copied in the approval mails automatically."
+            });
+            $scope.faqs.push({
+                question: "What is a Survey ?",
+                answer: "Survey is a Salesforce object designed to store the pre-defined questionnaire which Salesrep need to answer before seeking approval."
+            });
+            $scope.faqs.push({
+                question: "What is an Entry Question ?",
+                answer: "It is an entry level question, which helps Salesrep decide if they need to go for PM approval or not."
+            });
+            $scope.faqs.push({
+                question: "What is Auto approve flag on Survey ?",
+                answer: "If there is no entry question, sales has a choice to by pass PM approval and auto approve."
+            });
+            $scope.faqs.push({
+                question: "What is Question type in Survey Questions ?",
+                answer: "There are four question types as explained below:<br />Single Select--Vertical : Renders as Radio button aligned vertically. One of the possible answers can be selected.<br />Single Select--Horizontal: Renders as Radio button aligned horizontally. On of the possible answers can be selected.<br />Multi-Select--Vertical: Renders as checkbox aligned vertically. Multiple answers can be selected.<br />Free Text: User can anser the question using plain text."
+            });
+            $scope.faqs.push({
+                question: "What is Workflow ?",
+                answer: "Workflow is a Salesforce object. This is base object for Approval process. Same is tied to product as well."
+            });
+            $scope.faqs.push({
+                question: "What is Workflow Id?",
+                answer: "A unique id that helps tie Workflow to product."
+            });
+            $scope.faqs.push({
+                question: "What is Auto Approval flag in Workflow?",
+                answer: "Auto approval flag determines if approvals will be triggered or not. If true approvals will not trigger."
+            });
+            $scope.faqs.push({
+                question: "How to Add users to Queue?",
+                answer: "Raise a helpdesk ticket."
+            });
+
+            $scope.faqs.push({
+                question: "How to Raise Helpdesk Ticket?",
+                answer: "Go to: <a href='https://ac.akamai.com/community/enterprise/helpdesk/self-service' target='_blank'>https://ac.akamai.com/community/enterprise/helpdesk/self-service</a>.<br />Submit a ticket under category Enterprise Application -> CRM.akamai.com -> Others/I don't know.<br />Give short Description as 'Add users to Queue'.<br />Describe your issue as: Give path to Queue. Mention users you want to add to queue.<br />Example:<br /> Short Description: Add User to Queue in QA.<br />Describe Your issue: Go to Setup -> Queues -> 'EdgeComputing'. <br /> Add following users to Queue<br />1. John Doe <br />2. Dave Joe"
+            });
+        });
+        </script>
+        <div class="modal fade" id="addQuestionModal" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Enter Question Details</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Select Question Type *:
+                                <select ng-model="surveyQuestionInput.questionType" ng-options="type for type in surveyInput.surveyQTypes" data-toggle="tooltip" data-placement="bottom" title="For details on question types please refer FAQ.">
+                                </select>
+                            </label>
+                            <br />
+                            <br />
+                            <label>Question *</label>
+                            <textarea ng-model="surveyQuestionInput.question" style="width: 100%" data-toggle="tooltip" data-placement="bottom" title="Max 255 Characters."></textarea>
+                            <br />
+                            <br />
+                            <label>Required Question *:</label>
+                            <input type="checkbox" ng-model="surveyQuestionInput.required"></input>
+                            <br />
+                            <br />
+                            <label ng-hide="surveyQuestionInput.questionType == 'Free Text'">Please enter the list of answers/responses in the field below. Each value should be separated by a new line. *</label>
+                            <textarea ng-hide="surveyQuestionInput.questionType == 'Free Text'" ng-model="surveyQuestionInput.answers" style="width: 100%" data-toggle="tooltip" data-placement="bottom" title="Possible answers separated by new line."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="addQuestion()">Add</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    </html>
+</apex:page>

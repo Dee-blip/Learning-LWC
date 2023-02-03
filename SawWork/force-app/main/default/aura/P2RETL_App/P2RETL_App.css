@@ -1,0 +1,48 @@
+.THIS .button1 { 
+    
+    margin:0px !Important;
+    border:0px !Important;
+    padding:0px !Important;
+    color: white !Important;
+    background:#54698d !Important;
+    box-shadow: 0 5px 10px #333 !Important;
+    font-weight:normal !Important;
+    font-size: 14px !Important;
+    border-radius: 15px !Important;
+    width:160px !Important;
+    height:40px !Important;
+    text-align:center !Important;
+}
+
+.THIS .button1:hover {
+    background-color: #253045 !Important;
+}
+
+.THIS .button1:active {
+    background-color: #253045 !Important;
+    box-shadow: 0 5px #666 !Important;
+    transform: translateY(2px) !Important;
+}
+
+
+.THIS .button2{
+    
+    
+    
+    margin:0px !Important;
+    border:0px !Important;
+    padding:0px !Important;
+    color: white !Important; 
+    background-color: #253045 !Important;
+    box-shadow: 0 5px 10px #333 !Important;
+    font-weight:normal !Important;
+    font-size: 14px !Important;
+    border-radius: 15px !Important;
+    width:160px !Important;
+    height:40px !Important;
+    text-align:center !Important;
+    
+
+
+    
+}

@@ -1,0 +1,102 @@
+.datatableStyle
+{
+    overflow: auto;
+    padding-top: 1.5vh;
+    font-size: 11px;
+}
+
+.hotCustomerIcon
+{
+    font-size: 20px !important;
+}
+
+.labelHidden > label
+{
+    display: none !important;
+}
+
+.chatIcon
+{
+    font-size: 20px !important;
+}
+
+.rightAlign
+{
+    text-align: right;
+}
+
+.headerStyle
+{
+    padding-left: 2vh;
+    padding-top: 2vh;
+    padding-right: 2vh;
+    padding-bottom: 1vh;
+}
+
+.blue
+{
+    /*background : lightskyblue !important;*/
+    background: #bae0f7 !important;
+}
+
+
+.yellow
+{
+    /*background : #e8d015; #f9f91b
+    background: #f2cf5b;
+    background: #dfdf14;*/
+    background: #ffff71 !important;
+}
+
+.orange
+{
+    background: orange !important;
+}
+
+.red
+{
+    /*background :  red;*/
+    background: #ff6e6e !important;
+}
+
+.white
+{
+    background :  white !important;
+}
+
+.green
+{
+    background: #40bc40 !important;
+}
+
+/*.slds-checkbox */
+.caseSevClass .slds-checkbox
+{
+	display: inline !important;
+}	
+
+.escBlueText .slds-button
+{
+    color : #006dcc !important;
+}
+
+.escBlueText:hover 
+{
+    text-decoration: underline;
+    text-decoration-color:  #006dcc ;
+}
+
+
+.panelCase {
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
+
+.datatableStyle .slds-scrollable_y
+{
+    height: inherit !important;
+}
+
+.special-notes-modal .slds-rich-text-area__content{
+    min-height: 19rem;
+}

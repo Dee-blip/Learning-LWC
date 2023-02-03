@@ -1,0 +1,6 @@
+<root delay='10'>
+	<entry id='1' url='www.akamai.com' src='xml/zero_imp.xml'/>
+	<entry id='2' url='blogs.akamai.com' src='xml/zero_imp.xml'/>
+	<entry id='3' url='www.gamesontheedge.com' src='xml/zero_imp.xml'/>
+	<entry id='4' url='wwwns.akamai.com' src='xml/zero_imp.xml'/>
+</root>

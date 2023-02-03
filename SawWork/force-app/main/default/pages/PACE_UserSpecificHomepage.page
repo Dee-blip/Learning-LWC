@@ -1,0 +1,405 @@
+<apex:page controller="PACE_UserSpecificHomepageController" >
+<script type="text/javascript">
+  function loading(graphicid,val,contentid) {
+    if (val) {
+      document.getElementById(graphicid).style.display = 'block';
+      document.getElementById(contentid).style.display = 'none';
+    }
+    else {
+      document.getElementById(graphicid).style.display = 'none';
+      document.getElementById(contentid).style.display = 'block';
+    }
+  }
+  
+  function setVisibility(id, isVisible){
+            document.getElementById(id).style.visibility= isVisible ? 'visible' :  'hidden';
+           
+        }
+       
+        function show(id){setVisibility(id,true);}
+        function hide(id){setVisibility(id,false);}
+</script>
+<h4> Hi {!userName}</h4><br/>
+<h4> {!myDateTime}</h4><br/>
+<!-- <h4> {!myMonth} &nbsp;{!myDate}, &nbsp;{!myyear}</h4> -->
+<br/>
+<br/>
+<apex:form id="tid" rendered="{!!isUserProfilePM}">
+
+<apex:commandLink value="Go to My View" id="general_view" action="{!changestate}"/>
+    <br/>
+    <br/>
+        <apex:pageBlock title="ACTIVE PROGRAMS">
+        <div style="width:100%;">
+            <div style="width:50%;float:left;">
+              <apex:pageBlock id="counter123">
+              <apex:outputLabel >Product Lline:&nbsp;&nbsp;&nbsp;
+                <apex:selectList value="{!productline}"  required="true" multiselect="false" size="1" title="Select a Product Line" >
+                        <apex:selectOptions value="{!plitems}"/>
+                <apex:actionSupport event="onchange"  action="{!getData}"  rerender="myBlock,counter123" status="counterStatus"/>
+              </apex:selectList>
+            <!--    Here is the value {!productline} selected -->
+                </apex:outputLabel>
+               </apex:pageBlock>
+              <!--  <apex:actionStatus id="counterStatus123"  startText=" (incrementing...)"  stopText=" (done)"/>-->
+             </div>
+             
+              <div style="width:50%;float:right;">
+             <apex:pageBlock id="counter">
+             <apex:outputLabel >Division:&nbsp;&nbsp;&nbsp;
+            <apex:selectList value="{!division}"  required="true" multiselect="false" size="1" title="Select a Product Line" >
+                        <apex:selectOptions value="{!items}"/>
+            <apex:actionSupport event="onchange"  action="{!getData}"  rerender="myBlock,counter,test" status="counterStatus"/>
+            </apex:selectList>
+        <!--    Here is the value {!division} selected 
+            Program Empty {!isProgramEmpty}-->
+            </apex:outputLabel>
+        </apex:pageBlock>
+       <!-- <apex:actionStatus id="counterStatus"  startText=" (incrementing...)"  stopText=" (done)"/> -->
+
+          
+            </div>
+        </div>
+       <apex:actionStatus id="counterStatus" onstart="loading('contentLoading',true,'myBlock123')" onstop="loading('contentLoading',false,'myBlock123')" />
+
+<div id="contentLoading" style="display:none;">
+    <div style="text-align: center;">
+     <!-- <img src="/img/loading.gif" alt="Loading graphic" height="50px" width="120px" />-->
+     <apex:image url="{!$Resource.loading}" width="100" height="100"/>
+    </div>
+  </div>
+<div id="myBlock123" style="display:block;">  
+            <apex:pageBlock id="myBlock" rendered="true" >
+               <apex:outputPanel layout="block" style="overflow:auto;height:250px" rendered="{!!(programMProgramList.size=0)}"> 
+                    <apex:pageBlockTable value="{!programMProgramList}" var="p"   rendered="true">
+                         <apex:column headerValue=" Program Name">
+                         <apex:outputLink value="/{!p.id}"><apex:outputText value="{!p.Name}" /></apex:outputLink>
+                         </apex:column>
+                         <apex:repeat value="{!$ObjectType.PACE_Program__c.FieldSets.ProgramsHomePage}" var="f">  
+                        <apex:column headerValue="{!f.label}" value="{!p[f]}"/>
+                        </apex:repeat>
+                          
+                   </apex:pageBlockTable>
+                </apex:outputPanel>   
+                
+                <apex:outputText rendered="{!programMProgramList.size=0}">   Programs Not Found  </apex:outputText>
+            </apex:pageBlock>
+</div>    
+        </apex:pageBlock>
+        
+        <br/>
+        <br/>
+        
+        
+        <apex:pageBlock title="ACTIVE CATALOG UPDATE ITEMS">
+        
+              <apex:pageBlock id="counter_catupdate">
+              <apex:outputLabel >Activation Month:&nbsp;&nbsp;&nbsp;
+                <apex:selectList value="{!activation}"  required="true" multiselect="false" size="1" title="Select a Activation" >
+                        <apex:selectOptions value="{!actitems}"/>
+                <apex:actionSupport event="onchange"  action="{!getData}"  rerender="cat_update,counter_catupdate" status="counterStatus_catupdate"/>
+              </apex:selectList>
+            <!--    Here is the value {!activation} selected -->
+                </apex:outputLabel>
+               </apex:pageBlock>
+               <!--  <apex:actionStatus id="counterStatus_catupdate"  startText=" (incrementing...)"  stopText=" (done)"/> -->
+          <apex:actionStatus id="counterStatus_catupdate" onstart="loading('contentLoading_catup',true,'myBlock_catup')" onstop="loading('contentLoading_catup',false,'myBlock_catup')" />
+
+        <div id="contentLoading_catup" style="display:none;">
+            <div style="text-align: center;">
+            <apex:image url="{!$Resource.loading}" width="100" height="100"/>
+            </div>
+        </div>
+        <div id="myBlock_catup" style="display:block;">  
+          <apex:pageBlock id="cat_update" rendered="true">
+               <apex:outputPanel layout="block" style="overflow:auto;height:250px" rendered="{!!(programMcatalogUpdateList.size=0)}">
+                    <apex:pageBlockTable value="{!programMcatalogUpdateList}" var="cu"   rendered="true">
+                    <apex:column headerValue=" Catalog Update Name">
+                       <apex:outputLink value="/{!cu.id}"><apex:outputText value="{!cu.Name}" /></apex:outputLink>
+                    </apex:column>
+                     <apex:repeat value="{!$ObjectType.Launch_Item__c.FieldSets.CatalogUpdateHomePage}" var="f">  
+                        <apex:column headerValue="{!f.label}" value="{!cu[f]}"/>
+                        </apex:repeat>
+                          
+                   </apex:pageBlockTable>
+               </apex:outputPanel>
+               <apex:outputText rendered="{!programMcatalogUpdateList.size=0}">   Catalog Update Not Found  </apex:outputText>    
+            </apex:pageBlock>
+         </div>
+        </apex:pageBlock>
+        
+        
+    
+            <br/>
+            <br/>
+        
+        
+        <apex:pageBlock title="APPROVAL STATUS">
+        
+              <apex:pageBlock id="counter_approval">
+              <apex:outputLabel > Catalog Update
+                <apex:selectList value="{!activeli}"  required="true" multiselect="false" size="1" title="Select a Catalog Update" >
+                        <apex:selectOptions value="{!activeitems}"/>
+                <apex:actionSupport event="onchange"  action="{!getApprovalTesks}"  rerender="approval,counter_approval" status="counterStatus_approval"/>
+              </apex:selectList>
+            <!--    Here is the value {!activeli} selected -->
+                </apex:outputLabel>
+               </apex:pageBlock>
+               <!-- <apex:actionStatus id="counterStatus_approval"  startText=" (incrementing...)"  stopText=" (done)"/> -->
+         <apex:actionStatus id="counterStatus_approval" onstart="loading('contentLoading_approval',true,'myBlock_approval')" onstop="loading('contentLoading_approval',false,'myBlock_approval')" />
+
+        <div id="contentLoading_approval" style="display:none;">
+            <div style="text-align: center;">
+            <apex:image url="{!$Resource.loading}" width="100" height="100"/>
+            </div>
+        </div>
+        <div id="myBlock_approval" style="display:block;">       
+           <apex:pageBlock id="approval" rendered="true">
+                    <apex:pageBlockTable value="{!launchItemApproval}" var="rc"   rendered="{!!(launchItemApproval.size=0)}">
+                    <apex:column headerValue=" Function">
+                       <apex:outputLink value="/{!rc.id}"><apex:outputText value="{!rc.Function__c}" /></apex:outputLink>
+                    </apex:column>
+                         <apex:column headerValue="Representative" value="{!rc.Approver__c}"/>
+                         <apex:column headerValue="Status" value="{!rc.Status__c}"/>
+                         <apex:column headerValue="Comments" value="{!rc.Comments__c}"/>
+                        
+                   </apex:pageBlockTable>
+                        <apex:outputText rendered="{!launchItemApproval.size=0}"> Approval Tasks not found/initiated for Catalog Update Selected.</apex:outputText>
+            </apex:pageBlock>
+          </div> 
+        </apex:pageBlock> 
+        
+        
+            
+            
+            <br/>
+            <br/>
+        
+        <apex:pageBlock title="UPCOMING EVENTS">
+        
+              <apex:pageBlock id="counter_upcome">
+              <apex:outputLabel >Month:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <apex:selectList value="{!reviewmonth}"  required="true" multiselect="false" size="1" title="Select Month" >
+                        <apex:selectOptions value="{!monthitems}"/>
+                <apex:actionSupport event="onchange"  action="{!getData}"  rerender="upcome,counter_upcome" status="counterStatus_upcome"/>
+              </apex:selectList>
+           <!--     Here is the value {!reviewmonth} selected -->
+                </apex:outputLabel>
+               </apex:pageBlock>
+             <!--   <apex:actionStatus id="counterStatus_upcome"  startText=" (incrementing...)"  stopText=" (done)"/>-->
+         <apex:actionStatus id="counterStatus_upcome" onstart="loading('contentLoading_upcome',true,'myBlock_upcome')" onstop="loading('contentLoading_upcome',false,'myBlock_upcome')" />
+
+        <div id="contentLoading_upcome" style="display:none;">
+            <div style="text-align: center;">
+            <apex:image url="{!$Resource.loading}" width="100" height="100"/>
+            </div>
+        </div>
+        <div id="myBlock_upcome" style="display:block;">    
+          <apex:pageBlock id="upcome" rendered="true" >
+               <apex:outputPanel layout="block" style="overflow:auto;height:150px" rendered="{!!(progrmMreviewCalendarList.size=0)}">
+                    <apex:pageBlockTable value="{!progrmMreviewCalendarList}" var="rc"   rendered="true">
+                    <apex:column headerValue=" Review Name">
+                       <apex:outputLink value="/{!rc.id}"><apex:outputText value="{!rc.Name}" /></apex:outputLink>
+                    </apex:column>
+                         <apex:column headerValue="Review Type" value="{!rc.Review_Type__c}"/>
+                         
+                   </apex:pageBlockTable>
+                </apex:outputPanel>
+            <apex:outputText rendered="{!progrmMreviewCalendarList.size=0}">   No Upcoming Events Found  </apex:outputText>                
+            </apex:pageBlock>
+         </div>   
+        </apex:pageBlock>
+        
+        
+            <br/>
+            <br/>
+        
+    
+        
+        <apex:pageBlock title="CONTINGENCIES">
+        
+          <apex:pageBlock id="contingencies" rendered="true" >
+                    <apex:pageBlockTable value="{!progrmMcontingencyList}" var="rc"   rendered="{!!(progrmMcontingencyList.size=0)}">
+                    <apex:column headerValue="Contingencies">
+                       <apex:outputLink value="/{!rc.id}"><apex:outputText value="{!rc.Name}" /></apex:outputLink>
+                    </apex:column>
+                    <apex:repeat value="{!$ObjectType.Contingency__c.FieldSets.ContingencyHomePage}" var="f">  
+                        <apex:column headerValue="{!f.label}" value="{!rc[f]}"/>
+                        </apex:repeat>
+                       
+                   </apex:pageBlockTable>
+                   <apex:outputText rendered="{!progrmMcontingencyList.size=0}"> No Contingencies found.</apex:outputText>
+            </apex:pageBlock>
+        </apex:pageBlock>
+        
+        
+        
+            <br/>
+            <br/>
+          
+   </apex:form>
+   
+   
+   <apex:form id="pm"  rendered="{!isUserProfilePM}">
+   <span class="brandZeronaryFgr"><apex:commandLink value="Go to General View" id="general_view" action="{!changestate}"/></span>
+   <br/>
+   <br/>
+   <apex:pageBlock title="MY PROGRAMS">
+        
+            <apex:pageBlock id="myProgram" rendered="true" >
+                    <apex:pageBlockTable value="{!programManProgramList}" var="p"   rendered="{!!(programManProgramList.size=0)}">
+                          <apex:column headerValue=" Program Name">
+                       <apex:outputLink value="/{!p.id}"><apex:outputText value="{!p.Name}" /></apex:outputLink>
+                    </apex:column>
+                    <apex:repeat value="{!$ObjectType.PACE_Program__c.FieldSets.ProgramsHomePage}" var="f">  
+                    <apex:column headerValue="{!f.label}" value="{!p[f]}"/>
+                    </apex:repeat>
+                          
+                   </apex:pageBlockTable>
+                     <apex:outputText rendered="{!programManProgramList.size=0}">  You do not have any programs.  </apex:outputText>
+            </apex:pageBlock>
+      </apex:pageBlock>
+      
+      
+            <br/>
+            <br/>
+      
+      
+       <apex:pageBlock title="MY CATALOG UPDATE ITEMS">   
+        <apex:pageBlock id="my_cat_update" rendered="true">
+                    <apex:pageBlockTable value="{!productMancatalogUpdateList}" var="cu"   rendered="{!!(productMancatalogUpdateList.size=0)}">
+                    <apex:column headerValue=" Catalog Update Name">
+                       <apex:outputLink value="/{!cu.id}"><apex:outputText value="{!cu.Name}" /></apex:outputLink>
+                    </apex:column>
+                     <apex:repeat value="{!$ObjectType.Launch_Item__c.FieldSets.CatalogUpdateHomePage}" var="f">  
+                        <apex:column headerValue="{!f.label}" value="{!cu[f]}"/>
+                        </apex:repeat>
+                          
+                   </apex:pageBlockTable>
+                   <apex:outputText rendered="{!productMancatalogUpdateList.size=0}">  You do not have any Catalog Updates.  </apex:outputText> 
+            </apex:pageBlock>
+       </apex:pageBlock>
+       
+       
+       
+            <br/>
+            <br/>
+            
+            
+          <apex:pageBlock title="APPROVAL STATUS">
+        
+              <apex:pageBlock id="counter_Myapproval">
+              <apex:outputLabel > Catalog Update
+                <apex:selectList value="{!activeli}"  required="true" multiselect="false" size="1" title="Select a Catalog Update" >
+                        <apex:selectOptions value="{!activemyitems}"/>
+                <apex:actionSupport event="onchange"  action="{!getApprovalTesks}"  rerender="Myapproval,counter_Myapproval" status="counterStatus_Myapproval"/>
+              </apex:selectList>
+              <!--  Here is the value {!activeli} selected -->
+                </apex:outputLabel>
+               </apex:pageBlock>
+              <!--  <apex:actionStatus id="counterStatus_Myapproval"  startText=" (incrementing...)"  stopText=" (done)"/>-->
+              
+            <apex:actionStatus id="counterStatus_Myapproval" onstart="loading('contentLoading_Myapproval',true,'myBlock_Myapproval')" onstop="loading('contentLoading_Myapproval',false,'myBlock_Myapproval')" />
+
+        <div id="contentLoading_Myapproval" style="display:none;">
+            <div style="text-align: center;">
+            <apex:image url="{!$Resource.loading}" width="100" height="100"/>
+            </div>
+        </div>
+        <div id="myBlock_Myapproval" style="display:block;">   
+           <apex:pageBlock id="Myapproval" ><!-- rendered="{!!isApprovalTesksEmpty}"><!--{!launchItemApproval.size!=0}"-->
+                    <apex:pageBlockTable value="{!launchItemApproval}" var="rc"   rendered="{!!(launchItemApproval.size=0)}">
+                    <apex:column headerValue=" Function">
+                   
+                       <apex:outputLink value="/{!rc.id}"><apex:outputText value="{!rc.Function__c}"/></apex:outputLink>
+                    </apex:column>
+                         <apex:column headerValue="Representative" value="{!rc.Approver__r.Name}{!IF(rc.Delegate_Approver__c!='',' / ','')}{!rc.Delegate_Approver__r.Name}"/>
+                         <apex:column headerValue="Status" value="{!rc.Status__c}"/>
+                         <apex:column headerValue="Comments" value="{!rc.Comments__c}"/>
+                        
+                   </apex:pageBlockTable>
+                   <apex:outputText rendered="{!launchItemApproval.size=0}">  Approval Tasks not found/initiated for Catalog Update Selected.  </apex:outputText> 
+            </apex:pageBlock> 
+         </div>
+
+        </apex:pageBlock>   
+     
+        
+        
+       
+            <br/>
+            <br/>
+            
+            
+            
+        
+
+         
+         
+            
+             <apex:pageBlock title="UPCOMING EVENTS">
+        
+              <apex:pageBlock id="counter_myupcome">
+              <apex:outputLabel >Month
+                <apex:selectList value="{!reviewmonth}"  required="true" multiselect="false" size="1" title="Select Month" >
+                        <apex:selectOptions value="{!mymonthitems}"/>
+                <apex:actionSupport event="onchange"  action="{!getData}"  rerender="my_upcome,counter_myupcome,my_upcome_check" status="counterStatus_myupcome"/>
+              </apex:selectList>
+            <!--    Here is the value {!reviewmonth} selected -->
+                </apex:outputLabel>
+               </apex:pageBlock>
+             <!--   <apex:actionStatus id="counterStatus_upcome"  startText=" (incrementing...)"  stopText=" (done)"/>-->
+         <apex:actionStatus id="counterStatus_myupcome" onstart="loading('contentLoading_myupcome',true,'myBlock_myupcome')" onstop="loading('contentLoading_myupcome',false,'myBlock_myupcome')" />
+
+        <div id="contentLoading_myupcome" style="display:none;">
+            <div style="text-align: center;">
+            <apex:image url="{!$Resource.loading}" width="100" height="100"/>
+            </div>
+        </div>
+        <div id="myBlock_myupcome" style="display:block;">    
+          <apex:pageBlock id="my_upcome" rendered="true" >
+               <apex:outputPanel layout="block" style="overflow:auto;height:150px" rendered="{!!(progrmMreviewCalendarList.size=0)}">
+                    <apex:pageBlockTable value="{!progrmMreviewCalendarList}" var="rc"   rendered="true">
+                    <apex:column headerValue=" Review Name">
+                       <apex:outputLink value="/{!rc.id}"><apex:outputText value="{!rc.Name}" /></apex:outputLink>
+                    </apex:column>
+                         <apex:column headerValue="Review Type" value="{!rc.Review_Type__c}"/>
+                         
+                   </apex:pageBlockTable>
+                </apex:outputPanel>
+                <apex:outputText id="my_upcome_check" rendered="{!progrmMreviewCalendarList.size=0}">   No Upcoming Events Found  </apex:outputText>
+            </apex:pageBlock>
+
+         </div>   
+        </apex:pageBlock>
+        
+        
+        
+            <br/>
+            <br/>
+  
+         <apex:pageBlock title="CONTINGENCIES">
+        
+          <apex:pageBlock id="my_contingencies" rendered="true">
+             
+                    <apex:pageBlockTable value="{!myContingenctList}" var="rc"   rendered="{!!(myContingenctList.size=0)}" >
+                    <apex:column headerValue="Contingencies">
+                       <apex:outputLink value="/{!rc.id}"><apex:outputText value="{!rc.Name}" /></apex:outputLink>
+                    </apex:column>
+                    <apex:repeat value="{!$ObjectType.Contingency__c.FieldSets.ContingencyHomePage}" var="f">  
+                        <apex:column headerValue="{!f.label}" value="{!rc[f]}"/>
+                        </apex:repeat>
+                       
+                   </apex:pageBlockTable>
+                   <apex:outputText rendered="{!myContingenctList.size=0}">  You do not have Contingencies.  </apex:outputText>  
+          </apex:pageBlock>
+       
+        </apex:pageBlock>
+        
+            <br/>
+            <br/>
+      
+      
+      
+   </apex:form>
+</apex:page>

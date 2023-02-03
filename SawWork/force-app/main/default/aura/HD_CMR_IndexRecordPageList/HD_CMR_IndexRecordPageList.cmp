@@ -1,0 +1,117 @@
+<aura:component  implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
+    
+    
+    <!-- aura dependency -->
+    <aura:dependency resource="markup://c:HD_IncidentCell" type="COMPONENT" />
+    <!-- aura dependency -->
+    
+    
+    <!-- aura attribute -->
+    <aura:attribute name="adjustColumns" type="Boolean" default="false"/>
+    <aura:attribute name="iterationLoaded" type="Boolean"  default="false"/>
+    <aura:attribute name="records" type="List" />
+    <aura:attribute name="colLabels" type="List" />
+    <aura:attribute name="colApis" type="List"/>
+   	<aura:attribute name="arrowDirection" type="string" default="arrowdown" />
+    <aura:attribute name="sortDirection" type="String" default="DESC"  />
+    <aura:attribute name="selectedTabsoft" type="String" default="Number"/>
+    <aura:attribute name="mouseStart" type="String" />
+    <aura:attribute name="oldWidth" type="String" />
+    <!-- aura attribute -->
+    
+    <!--aura handler -->
+    <aura:handler name="change" value="{!v.colLabels}" action="{!c.adjust}" />
+	<!--aura handler -->
+    
+   	<!--aura registered events-->
+    <aura:registerEvent name="getChangeListEvent" type="c:getIncidentList"/>
+    <aura:registerEvent name="showPreview" type="c:HD_CMR_ShowPreview" />
+    <!--aura registered events-->
+    
+
+    
+	
+    
+    <div class="slds-grid"  id="outerDiv" onclick="{!c.adjust}" ondragend="{!c.adjust}" style = "/*margin-top: 136px;*/">
+    	
+        <div class="listViewContent slds-table--header-fixed_container" data-aura-rendered-by="334:0">
+            <div class="slds-scrollable_y  slds-col slds-p-horizontal--medium slds-border--right margin-top " aura:id="tableid" id="qwerty"  data-aura-class="changeRecords">
+            <!--slds-table_col-bordered-->
+                <table class="tableMargin slds-table slds-table--bordered slds-table--striped  slds-table_fixed-layout slds-table_col-bordered" role = "grid" style="height: 0;" >
+                    <thead >
+                        <tr class="slds-text-heading--label slds-line-height--reset custom-postion">
+                            <th  id="incNumColHead"  class="staticHead slds-is-sortable slds-is-resizable slds-text-title--caps slds-is-sorted slds-is-sorted--asc slds-border--right" aria-sort="ascending" scope="col" data-field = "-1" onclick="{!c.sortColumn}">
+                                
+                                <div class="fixHead slds-truncate" id="incNumColHeadValue">
+                                    
+                                       <a  class="slds-th__action slds-text-link--reset" tabindex="0">
+                                    	<span class="slds-truncate" title="Name">Number
+                                            <aura:if isTrue="{! and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'Number') }">&nbsp;  &#9660; </aura:if>  
+                                            <aura:if isTrue="{! and(v.arrowDirection != 'arrowdown', v.selectedTabsoft == 'Number') }"> &nbsp;  &#9650; </aura:if>           
+                                        </span>
+                                    </a>
+                                    <div class="slds-resizable">
+                                            <label for="cell-resize-handle-588" class="slds-assistive-text">Name column width</label>
+                                            <input type="range" min="50" max="100" class="slds-resizable__input slds-assistive-text"  tabindex="0" />
+                                            <span draggable = "true" class="slds-resizable__handle" onmousedown="{!c.calculateWidth}" ondrag="{!c.setNewWidth}">
+                                                <span class="slds-resizable__divider"></span>
+                                            </span>
+                                        </div>
+                                </div>
+                                
+                            </th>
+                            
+                           <aura:iteration items="{!v.colLabels}" var="colL" indexVar="indx" loaded="{!v.iterationLoaded}">
+                                <th aura:id = "thId" id ="{!'thid'+indx}" 
+                                    class="staticHead initialSortAsc sortable ascending slds-is-sortable slds-is-resizable slds-text-title--caps slds-border--right" 
+                                    scope="col" data-field = "{!indx}" onclick="{!c.sortColumn}" onresize="{!c.adjust}">
+                                    
+                                    <div class="fixHead slds-truncate slds-border--left" id ="{!'dvid'+indx}">
+                                        <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset" tabindex="0">
+                                            <span class="slds-truncate" title="{!colL}">{!colL}
+                                                <aura:if isTrue="{! and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == colL) }">&nbsp;  &#9660; </aura:if>  
+                                                <aura:if isTrue="{! and(v.arrowDirection != 'arrowdown', v.selectedTabsoft == colL) }"> &nbsp;  &#9650; </aura:if>                        
+                                                
+                                                <!--<lightning:icon iconName="utility:arrowup " size="xx-small" />  -->            
+                                            </span>
+                                        </a>
+                                        <div class="slds-resizable">
+                                            <label for="cell-resize-handle-588" class="slds-assistive-text">Name column width</label>
+                                            <input type="range" min="50" max="100" class="slds-resizable__input slds-assistive-text"  tabindex="0" />
+                                            <span draggable = "true" class="slds-resizable__handle" onmousedown="{!c.calculateWidth}" ondrag="{!c.setNewWidth}">
+                                                <span class="slds-resizable__divider"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                </th>
+                               
+                            </aura:iteration>
+                            
+                        </tr>
+                    </thead>
+                    <tbody class="slds-text-body_small">
+                        <aura:iteration items="{!v.records}" var="changeRecord" indexVar="idx">
+                            <tr  data-id="{!changeRecord.Id}" onclick = "{!c.onSelect}" data-record="{!idx}" class = "{!changeRecord.Response_Threshold_Crossed__c ? 'hd-custom-priority-ticket custom-cursor slds-hint-parent' : 'custom-cursor slds-hint-parent'}" >
+                                <th scope="row">
+                                    <div class="slds-truncate" title="{!changeRecord.Name}"><a class = "custom-anchor" data-id="{!changeRecord.Id}"  target="_blank" href="{!'/one/one.app?#/sObject/'+ changeRecord.Id + '/view'}" onclick = "{!c.onClick}">{!changeRecord.Name}</a>
+                                        
+                                    </div>
+                                </th>
+                                <aura:iteration items="{!v.colApis}" var="col" indexVar="idx">
+                                    <c:HD_IncidentCell incident="{!changeRecord}" fieldName="{!col}" />
+                                </aura:iteration>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                    
+                </table>
+            </div>
+        </div>
+        
+        
+        
+        
+        <center><lightning:spinner variant="brand" size="large" aura:id="ltngSpinner" class="slds-hide" /></center>
+    </div>
+</aura:component>

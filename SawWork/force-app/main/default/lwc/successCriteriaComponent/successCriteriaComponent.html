@@ -1,0 +1,18 @@
+<template>
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-04" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div style="max-width:60rem;min-width:60rem;" class="slds-modal__container" >
+            <header class="slds-modal__header">
+                <lightning-button-icon  icon-name="utility:close" size="large" onclick={handleCloseSuccessCriteria} alternative-text="close" variant="brand" class="slds-modal__close"></lightning-button-icon>
+                <h2 style="font-weight:600;color:#514f4D;" id="modal-heading-01" class="slds-modal__title slds-hyphenate">Business Goals</h2>
+            </header>
+            <lightning-card title="">
+                <lightning-button slot="actions" disabled={disableSave} label="Save" onclick={saveRecord}></lightning-button> 
+                <div class="slds-box">  
+                    <lightning-datatable  
+                        data={successCriteriaList} columns={cols} key-field="business_goal" selected-rows={preSelectedRows}>  
+                    </lightning-datatable>  
+                </div>  
+            </lightning-card>
+        </div>
+    </section>
+</template>

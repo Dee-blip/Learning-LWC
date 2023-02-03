@@ -1,0 +1,8 @@
+<aura:event type="APPLICATION" description="Applevel event to used to get service outage matching cmr list" >
+<aura:attribute name="e_startdate" type="DateTime"/>
+<aura:attribute name="e_enddate" type="DateTime"/>
+<aura:attribute name="e_services" type="String"/>
+<aura:attribute name="e_subservices" type="String"/>
+<aura:attribute name="e_conditions" type="String"/> 
+<aura:attribute name="e_serviceoutage" type="Object"/>    
+</aura:event>

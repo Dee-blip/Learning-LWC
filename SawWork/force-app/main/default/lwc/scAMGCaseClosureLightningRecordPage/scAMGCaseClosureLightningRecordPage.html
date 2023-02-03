@@ -1,0 +1,159 @@
+<template>
+    
+    <template if:true={showSpinner}>
+            <div class="demo-only demo-only demo-only_viewport demo--inverse" style="height:6rem">
+            <div class="slds-spinner_container slds-is-fixed">
+            <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+            <span class="slds-assistive-text">Loading</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+            </div>
+            </div>
+            </div>
+            </template>
+
+            <template if:true={spinner}>
+                    <div class="demo-only demo-only demo-only_viewport demo--inverse" style="height:6rem">
+                    <div class="slds-spinner_container slds-is-fixed">
+                    <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                    </div>
+                    </div>
+                    </div>
+                    </template>
+
+                    
+<div class="slds-scrollable" style="width:2000px;height:1000px;"> 
+                 
+<lightning-card title="Case Closure Page" style="text-align: center;" ><br />
+    <div>
+    <table style="width:100%">
+            <thead>
+                <tr class="slds-grid slds-wrap">
+                <th style="width:7.5%" class="slds-size_1-of-12">Akam Case Id</th>
+                <th style="width:7%" class="slds-size_1-of-12">Account</th>
+                <th style="width:6%" class="slds-size_1-of-12">Subject</th>
+                <th style="width:7%" class="slds-size_1-of-12">Service</th>
+                <th style="width:8%" class="slds-size_1-of-12">Request Type</th>
+                <th style="width:8.7%" class="slds-size_1-of-12">Request Sub Type</th>                        
+                <th style="width:5%" class="slds-size_1-of-12">LOE Hours</th>
+                <th style="width:5.5%" class="slds-size_1-of-12">LOE Minutes</th>
+                <th style="width:7%" class="slds-size_1-of-12">Action Taken</th>
+                <th style="width:7.3%" class="slds-size_1-of-12">Self Serviceable?</th>
+                <th style="width:9.5%" class="slds-size_1-of-12">Recommended Action</th>
+                <th style="width:7.8%" class="slds-size_1-of-12">Solution Summary</th>
+                <th style="width:5.5%" class="slds-size_1-of-12">PRISM Used</th>
+                <th style="width:7.7%" class="slds-size_1-of-12">Customer Facing</th>
+            </tr>
+            
+            </thead>
+    </table></div>
+            
+          <div>  
+        <template for:each={lCaseId} for:item='item'>
+            <lightning-record-edit-form record-id={item} record-type-id={recTypeAMG} onload={handleLoad} object-api-name="Case" key={item}>
+                <table style="width:100%">
+                    <tr class="slds-grid slds-wrap">
+                        
+                    <td style="width:7.5%" class="slds-size_1-of-12" >
+                        <div>
+                        <lightning-input-field field-name="AKAM_Case_ID__c" variant="label-hidden" disabled data-id={item} >
+                        </lightning-input-field>
+                        </div>
+                        
+                    </td>
+                    <td style="width:7%" class="slds-size_1-of-12">
+                        <div>
+                        <lightning-input-field field-name="AccountId" variant="label-hidden" data-id={item} >
+                        </lightning-input-field>
+                        </div>
+                    </td>
+                    <td style="width:6%" class="slds-size_1-of-12">
+                        <div>
+                        <lightning-input-field field-name="Subject" variant="label-hidden" data-id={item}>
+                        </lightning-input-field>
+                        </div>
+                    </td>
+
+                    <td style="width:7%" class="slds-size_1-of-12">
+                        <div>
+                        <lightning-input-field field-name="Service__c" variant="label-hidden" data-id={item} required>
+                        </lightning-input-field>
+                        </div>
+                    </td>
+                    <td style="width:8%" class="slds-size_1-of-12">
+                        <div>
+                        <lightning-input-field field-name="Request_Type__c" variant="label-hidden" data-id={item} required>
+                        </lightning-input-field></div>
+                    </td>
+                    <td style="width:8.7%" class="slds-size_1-of-12">
+                        <div>
+                        <lightning-input-field field-name="Request_Sub_Type__c" variant="label-hidden" data-id={item} required>
+                        </lightning-input-field></div>
+                    </td>
+                    <td style="width:5%" class="slds-size_1-of-12">
+                        <div>
+                        <lightning-input-field field-name="LOE_Hours__c" variant="label-hidden" data-id={item} required>
+                        </lightning-input-field>
+                        </div>
+                    </td>
+                    <td style="width:5.5%" class="slds-size_1-of-12">
+                        <div>
+                        <lightning-input-field field-name="LOE_Minutes__c" variant="label-hidden" data-id={item} required>
+                        </lightning-input-field>
+                        </div>
+                    </td>                        
+                    <td style="width:7%" class="slds-size_1-of-12">
+                        <div>
+                        <lightning-input-field field-name="Resolution_Field__c" variant="label-hidden" data-id={item} required>
+                        </lightning-input-field>
+                        </div>
+                    </td>
+                    <td style="width:7.3%" class="slds-size_1-of-12">
+                        <div>
+                        <lightning-input-field field-name="ResolvableByPartner__c" variant="label-hidden" data-id={item}>
+                        </lightning-input-field></div>
+                    </td>
+                    <td style="width:9.5%" class="slds-size_1-of-12">
+                        <div>
+                        <lightning-input-field field-name="Recommended_Partner_Action__c" variant="label-hidden" data-id={item} required>
+                        </lightning-input-field></div>
+                    </td>
+                    <td style="width:7.8%" class="slds-size_1-of-12"><div>
+                        <lightning-input-field field-name="Solution_Summary__c" variant="label-hidden" data-id={item} required>
+                        </lightning-input-field></div>
+                    </td>
+                    <td style="width:5.5%" class="slds-size_1-of-12"><div>
+                        <lightning-input-field field-name="PRISM_Used__c" variant="label-hidden" data-id={item}>
+                        </lightning-input-field></div>
+                    </td>
+                    
+                    <td style="width:7.7%" class="slds-size_1-of-12"><div>
+                        <lightning-input-field field-name="Do_Not_Show_In_Portal_Picklist__c" variant="label-hidden" data-id={item}>
+                        </lightning-input-field></div>
+                    </td>
+
+                
+            </tr>
+
+            </table>
+            <lightning-messages>
+                </lightning-messages>
+                <!--lightning-button class="slds-m-top_small" variant="brand" type="submit" name="update" label="Update">
+        </lightning-button-->
+   
+            </lightning-record-edit-form>                    
+        </template></div>
+        <br/>
+        <div style="padding-bottom: 50px">
+        <lightning-button label="Cancel" title="Successful action" onclick={handleCancelAction} class="slds-m-left_x-small"></lightning-button>
+        <lightning-button variant="brand" label="Submit" title="Successful action" onclick={handleSubmitAction} class="slds-m-left_x-small"></lightning-button>
+    </div>
+    
+</lightning-card>
+</div>
+
+    
+</template>

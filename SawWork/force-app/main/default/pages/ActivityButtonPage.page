@@ -1,0 +1,14 @@
+<!--SFDC-1659-->
+<apex:page controller="ActivityButtonPageController" action="{!init}">
+<apex:pageMessages >
+
+</apex:pageMessages>
+<!--SFDC-2043-->
+<apex:form >
+<br/>
+<apex:commandLink action="{!backToOrderApprovalPage}" value="Back to Order Approval Page" id="orderApprovalLink" rendered="{!oATask}"/>
+<br/><br/>
+<apex:commandLink action="{!backToAccountPage}" value="Back to Associated Account Page" id="accountLink" rendered="{!oATask}"/>
+</apex:form>
+
+</apex:page>

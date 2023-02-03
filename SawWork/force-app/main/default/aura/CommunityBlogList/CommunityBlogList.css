@@ -1,0 +1,16 @@
+.THIS .slds-button__icon{
+    color:black;
+}
+.THIS.slds-page-header.cCommunityBlogList{
+    background: white;
+}
+.THIS .searchBtnCls{
+    float: right;
+    height: 36px;
+    background: rgb(216, 237, 255);
+    margin-top: -36px;
+    width: 35px;
+    background-color: #f2f2f2;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}

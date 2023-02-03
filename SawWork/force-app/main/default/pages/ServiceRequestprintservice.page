@@ -1,0 +1,42 @@
+<apex:page renderAs="PDF" applyBodyTag="false" standardController="HD_SRMPrintService__c" extensions="HD_SRMPrintServiceExtension" standardStylesheets="false">
+
+<body style="font-family: {!HD_SRMPrintService__c.Font_Family__c}; font-size: {!HD_SRMPrintService__c.Font_Size__c}pt;">
+
+<img src="{!URLFOR($Resource.HDscriptcss,'/akamlogo.png')}" width="200"></img>
+<hr></hr>
+<br/>
+<apex:outputText value="{!Finaltemplate}" escape="false" rendered="{!IF(HD_SRMPrintService__c.Template_formate__c = '',false,true)}" />
+<br/>
+<hr style="display:{!IF(HD_SRMPrintService__c.Template_formate__c = '','none','')}"></hr>
+<apex:pageBlock mode="detail">
+
+<apex:pageBlockSection columns="2" title="{!HD_SRMPrintService__c.Request_Definition__r.Name}" collapsible="false" rendered="true">
+
+<apex:repeat value="{!reqdet}" var="rd">
+
+<apex:OutputField value="{!rd.BMCServiceDesk__FKClient__c}" label="Request For "/>
+<apex:OutputField value="{!rd.Owner.Name}" label="Request By "/> 
+<apex:OutputField value="{!rd.BMCServiceDesk__FKClient__r.EmployeeNumber}" label="Employee Number "/>
+<apex:OutputField value="{!rd.BMCServiceDesk__FKClient__r.Phone}" label="Phone "/> 
+<apex:OutputField value="{!rd.BMCServiceDesk__FKClient__r.Email}" label="Email "/> 
+<apex:OutputField value="{!rd.BMCServiceDesk__FKClient__r.Department}" label="Department"/>
+<apex:OutputField value="{!rd.BMCServiceDesk__FKClient__r.Division}" label="Division "/>
+<apex:OutputField value="{!rd.BMCServiceDesk__DateRequired__c}" label="Date Required  "/> 
+<apex:OutputField value="{!rd.BMCServiceDesk__DateExpected__c}" label="Date Expected  "/>
+<apex:OutputField value="{!rd.BMCServiceDesk__Quantity__c}" label="Quantity  " rendered="false"/> 
+<apex:OutputField value="{!rd.BMCServiceDesk__CustomerPrice__c}" label="Unit Price" rendered="false"/> 
+<apex:OutputField value="{!rd.BMCServiceDesk__TotalPrice__c}" label="Total Price " rendered="false"/> 
+
+</apex:repeat>
+</apex:pageBlockSection>
+
+<apex:pageBlockSection columns="2" title="Request Details" collapsible="false" rendered="{!HD_SRMPrintService__c.Include_Request_Details__c}">
+<apex:repeat value="{!reqindet}" var="inputdetails">
+<apex:Outputtext value="{!inputdetails.BMCServiceDesk__Response__c}" label="{!inputdetails.BMCServiceDesk__Input__c}" rendered="{!NOT(inputdetails.BMCServiceDesk__FKFulfillmentInputs__r.HD_Secure_Field__c && currentUser.HD_View_Helpdesk_Confidential_Data__c)}" style="{!IF(CONTAINS(inputdetails.BMCServiceDesk__Response__c,'Data is encrypted'),'color:red;font-style: italic;','')}"></apex:Outputtext>
+<apex:Outputtext value="{!inputdetails.HD_Secure_Response__c}" label="{!inputdetails.BMCServiceDesk__Input__c}" rendered="{!inputdetails.BMCServiceDesk__FKFulfillmentInputs__r.HD_Secure_Field__c && inputdetails.HD_Ffi_Response_Type__c !='Text Area' && (currentUser.HD_View_Helpdesk_Confidential_Data__c)}" style="color:red;"></apex:Outputtext>
+<apex:Outputtext value="{!inputdetails.BMCServiceDesk__Response__c}" label="{!inputdetails.BMCServiceDesk__Input__c}" rendered="{!inputdetails.BMCServiceDesk__FKFulfillmentInputs__r.HD_Secure_Field__c && inputdetails.HD_Ffi_Response_Type__c =='Text Area' && (currentUser.HD_View_Helpdesk_Confidential_Data__c)}" style="color:red;"></apex:Outputtext>
+</apex:repeat>
+</apex:pageBlockSection>
+</apex:pageBlock>
+</body>
+</apex:page>

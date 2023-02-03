@@ -1,0 +1,27 @@
+.sidebar {
+    position : fixed;
+    float: right;
+    margin-left: auto;
+    margin-right: 1%;
+    overflow-y: auto;
+    height: 65%;
+}
+
+.header.flexipageHeader.slds-page-header.uiBlock.oneAnchorHeader { 
+    display: none; 
+}
+
+.questionnaire-settings-card {
+    display: block;
+    box-shadow: 0 8px 12px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+}
+
+.line-break-section {
+    margin : 3%;
+}
+
+.question-buttons {
+        display: flex;
+        white-space: nowrap;
+}

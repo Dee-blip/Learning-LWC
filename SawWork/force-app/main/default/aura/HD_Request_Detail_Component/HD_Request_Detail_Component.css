@@ -1,0 +1,88 @@
+.THIS .infoIcon{
+    cursor: pointer;
+    position: relative;
+
+}
+
+.THIS .infoIcon:hover + .tooltip{
+   display:block;
+}
+
+.THIS .tooltip{
+  position: absolute;
+  display:none;
+/*   display:none; */
+}
+
+.THIS .tooltip:hover{
+    display: block;
+}
+
+.THIS .h70{
+    height: 70px;
+}
+
+.THIS .infoIcon .inputInfo{
+
+    display: none;
+}
+
+.THIS .infoIcon:hover .inputInfo{
+    position: absolute;
+    display: block;
+}
+
+.THIS .hideMe {
+        display: none;
+}
+
+.THIS .showMe {
+    display: block;
+}
+
+.THIS .custom-bkcolor-coral{
+	color:coral;
+}
+.THIS .padding-bottonm-top{
+    padding-top : 0em;
+    padding-bottom : 0em;
+}
+
+.THIS .one-em-top{
+    margin-top : -1em;
+}
+
+.THIS .two-em-top{
+    margin-bottom : -2em;
+}
+
+.THIS .heading-color{
+	color:cadetblue;
+}
+
+.THIS pre{
+   font-family: 'Slabo 27px', sans-serif;
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+.THIS .sr-header{
+     color:rgb(112, 110, 107);
+     font-size:1.75rem;
+     text-transform: uppercase;
+     font-weight: 300;
+
+}
+
+.THIS .sr_link{
+    font-size:1rem;
+    float:right;
+    padding-top:1rem;
+}
+
+.THIS .index-fix{
+    z-index: 0 !important;
+}

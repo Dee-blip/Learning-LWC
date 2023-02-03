@@ -1,0 +1,16 @@
+<aura:event type="APPLICATION" access="global">
+  <aura:attribute name="accountDetails" type="Account"/>
+  <aura:attribute name="previousAccountId" type="String"/>
+  <aura:attribute name="showHome" type="Boolean"/>
+  <aura:attribute name="oldCurrency" type="String" />
+  <aura:attribute name="showcheckFieldForWithContractBL" type="Boolean"/>
+  <aura:attribute name="showcheckFieldForWithoutContractBL" type="Boolean"/>
+  <aura:attribute name="showWithContractBL" type="Boolean"/>
+  <aura:attribute name="showWithoutContractBL" type="Boolean"/>
+  <aura:attribute name="showCreateOppty" type="Boolean"/>
+  <aura:attribute name="selectedContractIDs" type="String[]"/>
+  <aura:attribute name="showOpenOpportunitiesWithBL" type="Boolean"/>
+  <aura:attribute name="currencyMismatch" type="Boolean" default="false"/>
+  <aura:attribute name="showCurrencySelection" type="Boolean"/>
+  <aura:attribute name="opptyType" type="String" default=""/>
+</aura:event>

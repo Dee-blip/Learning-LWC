@@ -1,0 +1,42 @@
+function EB_jsMailerAccount(MailerAccountId, TemplateId)
+{
+	if((TemplateId)== ''){
+		alert('Update template operation cannot be performed when Template Field is Null');
+	}
+	else
+	{
+		alert('This operation would update the Email Templates of all the Mailer Contacts associated with the Mailer Account. Please do not interrupt the operation, you would be notified, upon successful completion.');
+		var exceptionMessage = sforce.apex.execute("EB_UtilMailer","update_template", { 
+		template:TemplateId, 
+		ID:MailerAccountId 
+		} 
+		);
+		if(exceptionMessage == '') 
+		{ 
+		alert('Email Templates of all the Mailer Contacts associated with the Mailer Account have been successfully updated.');
+		window.location.reload(true); 
+		}
+		else 
+		{ 
+		alert(exceptionMessage); 
+		window.location.reload(true); 
+		}
+	}
+}
+
+function EB_jsMailerAccountPreview(akamAccountId1)
+{
+		previewUrl = sforce.apex.execute("EB_UtilAccountPreview","getAkamContactId",{
+		akamAccountId:akamAccountId1
+		}
+		);
+		if(previewUrl == '')
+		{
+			alert('The Email Template has been deleted');
+		}
+		else
+		{
+			window.open(previewUrl);
+		}
+	
+}

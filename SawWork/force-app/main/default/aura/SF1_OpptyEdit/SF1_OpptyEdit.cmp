@@ -1,0 +1,39 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global">
+    <aura:handler name="onSaveSuccess" event="force:recordSaveSuccess" action="{!c.cancelHandle}"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <br/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    
+    <aura:dependency resource="markup://force:recordSave" type="EVENT"/>
+    <aura:dependency resource="markup://force:recordEdit" type="COMPONENT"/>
+    
+    <!--aura:registerEvent name="opptyTypeChangeEvent" type="c:onContractSelectionChange"/-->
+    
+    
+    <!--loading spinner start... style=Brand Medium (blue dots)-->
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading...</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    <div class="slds-align_absolute-center">
+        <lightning:button variant="brand" label="Save" onclick="{! c.handleSave }" />
+        <lightning:button variant="brand" label="Cancel" onclick="{! c.cancelHandle }" />
+    </div>
+    <br/>
+    
+    <force:recordEdit aura:id="edit" recordId="{!v.recordId}" />
+    <br/>  
+    
+    <div class="slds-align_absolute-center">
+        <lightning:button variant="brand" label="Save" onclick="{! c.handleSave }" />
+        <lightning:button variant="brand" label="Cancel" onclick="{! c.cancelHandle }" />
+    </div>
+    <br/>
+</aura:component>

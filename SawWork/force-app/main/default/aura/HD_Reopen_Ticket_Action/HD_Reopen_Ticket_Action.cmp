@@ -1,0 +1,19 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="HD_IncidentDetailController">
+    <aura:attribute name="actionName" type="String"  />
+    <aura:attribute name="recordId" type="ID"/>
+    
+    <div>
+        <div>
+            <div aura:id="Accspinner" class="slds-spinner_container slds-hide">
+                <div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+                    <span class="slds-assistive-text">Processing</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    	<div>
+    	<ui:button label="Reopen" press="c.reopenTicketAction"/>
+        </div>
+    </div>
+</aura:component>

@@ -1,0 +1,26 @@
+<aura:component controller="PartnerCommunityRecordsController" 
+                extends="c:PartnerCommunityParentComponent"
+                implements="forceCommunity:availableForAllPageTypes" 
+                access="global">
+    
+    <aura:attribute name="newButtonLink" type="String" default="default value" />
+    <aura:attribute name="objectname" type="String" default="record" />
+    <aura:attribute name="showButton" type="Boolean" default="false" />
+    <aura:attribute name="objectLabel" type="String" />
+    <aura:attribute name="type" type="String" />
+    <aura:attribute name="objectAPIName" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:navigation aura:id="navService"/>
+    <aura:attribute name="pageReference" type="Object"/>
+    <aura:attribute name="url" type="String"/>
+    <aura:if isTrue="{!v.showButton}">
+        <div class='slds-clearfix'>
+            <div class="slds-float_right new-rec-button">
+                <lightning:button variant="brand-outline" label="{! 'New ' + v.objectLabel}" title="{! 'New ' + v.objectname}" onclick="{!c.navigateToNew}" />
+            </div>
+        </div>
+    </aura:if>
+    
+    
+</aura:component>

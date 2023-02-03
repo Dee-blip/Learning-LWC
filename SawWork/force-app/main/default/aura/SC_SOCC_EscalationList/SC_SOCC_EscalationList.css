@@ -1,0 +1,54 @@
+.THIS .ContactIcon svg{
+        fill: #8c48bb !important;
+}
+
+.THIS .editIcon svg{
+    fill: #0bbbae !important;
+}
+
+.THIS .delIcon svg{
+    fill: #ec6874 !important;
+}
+
+.THIS .copyIcon svg{
+    fill: #5e71e2 !important;
+}
+
+
+.THIS .mobile svg{
+    fill: #00b1a4 !important;
+}
+
+.THIS .phone svg{
+    fill: #ec6774 !important;
+}
+
+.THIS table { 
+    table-layout: fixed; 
+}
+.THIS .cell-content{ 
+    overflow: hidden; 
+    max-width: 100%; 
+    text-overflow: ellipsis;
+    white-space: normal !important;
+}
+
+.THIS .el-name-cell-content{
+    max-width: 100%; 
+    white-space: pre-wrap !important;
+}
+
+.THIS thead tr th {
+    background: rgb(28, 88, 115)!important;
+    color:white !important;
+}
+
+.THIS .sectionHeading{
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: rgb(8, 7, 7);
+}
+
+.THIS .a-tag{
+    color: #006dcc;
+}

@@ -1,0 +1,201 @@
+<!--
+  @File Name          : SC_SOCC_Situation_to_Handler_Mapping.cmp
+  @Description        : 
+  @Author             : Pinkesh Rathore/Sumukh Subramanya
+  @Group              : 
+  @Last Modified By   : 
+  @Last Modified On   : 11/27/2019, 11:40:40 AM
+  @Modification Log   : 
+  Ver       Date            Author      		              Modification
+  1.0    11/26/2019   ChangeMeIn@UserSettingsUnder.SFDoc     Initial Version
+         02/18/2021			Tejaswini 				      ESESP-4825=Runbooks Phase II: Sprint 1 - Increasing the size of S-H modal
+         03/10/2021         Tejaswini                     ESESP-5037:Runbooks Phase II: Sprint 2 - Column header sorting on S-H UI
+
+-->
+<aura:component controller="SC_SOCC_RUN_BOOK" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+    
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="ExistingSHMap" type="Object"/>
+    
+     <!--Attributes for SituationOptions -->
+    <aura:attribute name="situationOptions" type="SC_SOCC_Situation_Catalog__c[]"/>
+    <aura:attribute name="selectedSituation" type="SC_SOCC_Situation_Catalog__c"/>
+    
+     <!--Attributes for HandlerOptions -->
+    <aura:attribute name="HandlerOptions" type="Handler__c[]"/>
+    <aura:attribute name="selectedHandler" type="String"/>
+    
+    <!--Attribute for Disabling -->
+     <aura:attribute name="isdisabled" type="Boolean" default="false"/>
+    
+    <!--Attribute for No Handlers -->
+    <aura:attribute name="nohandlers" type="Boolean" default="false"/>
+    
+    
+    <!--Attribute for Duplicate Prevention -->
+    <aura:attribute name="SHMapExistingArray" type="List[]"/>
+    
+    <!-- Attribute for Storing Existing Situations -->
+     <aura:attribute name="SituationArray" type="List[]"/>
+    
+    <!--Event Registration -->
+    <aura:registerEvent name="appEvent" type="c:shmaprefresh"/>
+    <aura:handler event="c:shmaprefresh" action="{!c.doInit}"/>
+    
+    <!--nav service -->
+    <lightning:navigation aura:id="navService"/>
+    
+    <!--aura attributes
+    <aura:attribute name="accountColumns" type="List"/>
+    <aura:attribute name="accountData" type="SC_SOCC_Situation_to_Handler_Mapping__c[]"/>
+    <aura:attribute name="sortBy" type="String"/>
+    <aura:attribute name="sortDirection" type="String"/>--> 
+    
+    <aura:attribute name="arrowDirection" type="string" default="arrowdown" />
+	<aura:attribute name="isAsc" type="boolean" default="false" /> 
+	<aura:attribute name="selectedTabsoft" type="string" default="Situation__r.Name" />
+    
+    <!--handlers-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:html tag="style">
+        .slds-modal__container{
+        	width: 70% !important;
+			max-width: 70% !important;
+        }
+    </aura:html>
+    
+   
+    <lightning:recordViewForm recordId="{!v.recordId}" 
+                              objectApiName="Policy_Domain__c">
+        
+        <div class="slds-grid">
+            <div class="slds-col slds-size_2-of-3">
+                <lightning:outputField fieldName="Name" class="slds-text-title_bold" />
+                <lightning:outputField fieldName="Additional_Product__c" class="slds-text-title_bold" />
+            </div>
+            <div class="slds-col slds-size_1-of-3">
+                <lightning:outputField fieldName="Product__c" class="slds-text-title_bold" />
+            </div>
+        </div>
+        
+    </lightning:recordViewForm>
+    
+    <!-- Block to add New Situation to Handler Mappings -->
+       <div>
+            <h1 class="slds-align--absolute-center slds-badge_inverse slds-box--x-small slds-m-top--small" style="background-color:cadetblue">Create Situation to Handler Mapping</h1>
+            <lightning:select name="situationdropdown" label="Situation:" aura:id="SituationSelect" value="{!v.selectedSituation}" onchange="{!c.situationCatalogValueHandler}">
+                <aura:iteration items="{!v.situationOptions}" var="item">
+                    <option value="{!item.Id}">{!item.Name}</option>
+                </aura:iteration>
+            </lightning:select>
+       </div>
+    <!-- Ends:Block to add New Situation to Handler Mappings -->
+    
+    <!-- Block to Show Handler Based on Select Situations -->
+        <div class="slds-grid">
+            <div class="slds-col slds-size_2-of-3">
+            <lightning:select name="Handlerdropdown" label="Handler:" aura:id="HandlerSelect" value="{!v.selectedHandler}" disabled="{!v.isdisabled}">
+                <aura:iteration items="{!v.HandlerOptions}" var="item">
+                    <option value="{!item.Id}">{!item.Name}</option>
+                </aura:iteration>
+            </lightning:select>
+            <aura:if isTrue = "{!v.nohandlers}">
+            <h2 style="color:red" class="slds-align--absolute-center">No Handlers defined for this Situation</h2>
+            </aura:if>
+            </div>
+            
+            <div class="slds-col slds-size_1-of-3">
+                <lightning:button class="slds-align--absolute-center buttonalign" variant="brand" label="Create Handler" title="Brand action" onclick="{!c.createHandler}"/>
+            </div>
+            
+       </div>
+     
+    <!-- Ends Block to Show Handler Based on Select Situations -->
+    
+    <!-- Button to Create Situation to Handler Mappings-->
+        <div>
+          <lightning:button class="slds-m-top--medium" variant="brand" label="Create Situation to Handler Mapping" title="Brand action" onclick="{!c.createSHMapping}" disabled="{!v.isdisabled}"/>
+        </div>
+    <!-- Ends Button to Create Situation to Handler Mappings-->
+    
+    <!--Table that shows existing Situation to Handler -->
+         <div>
+            <h1 class="slds-align--absolute-center slds-badge_inverse slds-box--x-small slds-m-top--small" style="background-color:cadetblue">Existing Situation to Handler Mappings</h1>
+            
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                <thead>
+                    <tr class="slds-text-title--caps">
+                       
+                        <th  class="slds-is-sortable" width="45%" scope="col"  onclick="{!c.sortTheColumn}" data-field="Situation__r.Name" >
+                           <!-- <a href="javascript:void(0);"  onclick="{!c.sortSituationName}"
+								data-record="{!sr.Id}"/>  -->	
+        					<span class="slds-assistive-text">Sort</span>
+                            <span class="slds-truncate" title="First Name" style="font-size: 75%">Situation</span>
+                            <aura:if isTrue="{! and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'Situation__r.Name') }"> &#9660;</aura:if>
+        					<aura:if isTrue="{! and(v.arrowDirection != 'arrowdown', v.selectedTabsoft == 'Situation__r.Name') }"> &#9650;</aura:if> 
+                            <!-- Arrow codes : &#8595; , &#8593;  <div style="float:left !important; height:5%;">  &#9660;</div> -->
+                        </th>
+                        <th   class="slds-is-sortable" width="25%" scope="col" onclick="{!c.sortTheColumn}" data-field="Handler__r.Name">
+                            
+                            <span class="slds-assistive-text">Sort</span>
+                            <span class="slds-truncate" title="First Name" style="font-size: 75%">Handler</span>
+                            <aura:if isTrue="{! and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'Handler__r.Name') }"> &#9660;</aura:if>
+        					<aura:if isTrue="{! and(v.arrowDirection != 'arrowdown', v.selectedTabsoft == 'Handler__r.Name') }"> &#9650;</aura:if> 
+                           
+                        </th>
+                        <th  class="slds-is-sortable" width="15%" scope="col" onclick="{!c.sortTheColumn}" data-field="CreatedBy.Name">
+                            
+    						<span class="slds-assistive-text">Sort</span>
+                            <span class="slds-truncate" title="First Name" style="font-size: 75%">Created By</span>
+                            <aura:if isTrue="{! and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'CreatedBy.Name') }"> &#9660; </aura:if>
+        					<aura:if isTrue="{! and(v.arrowDirection != 'arrowdown', v.selectedTabsoft == 'CreatedBy.Name') }"> &#9650; </aura:if> 
+                            
+                        </th>
+                        <th  class="slds-is-sortable" width="15%" scope="col" onclick="{!c.sortTheColumn}" data-field="CreatedDate" >
+                            
+    						<span class="slds-assistive-text">Sort</span>
+        					<span class="slds-truncate" title="Department" style="font-size: 75%">Created Date</span>
+                            <aura:if isTrue="{! and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'CreatedDate') }"> &#9660;</aura:if>
+                            <aura:if isTrue="{! and(v.arrowDirection != 'arrowdown', v.selectedTabsoft == 'CreatedDate') }"> &#9650; </aura:if> 
+                            
+						</th>
+                    </tr>
+                </thead>
+                <tbody aura:id="tablebody">
+                    <aura:iteration items="{!v.ExistingSHMap}" var="SHMapRec" indexVar="index">
+                        <tr aura:id="subEle" data-id="{!index}" class="slds-hint-parent ">
+                           
+                            <td width="45%" title="{!SHMapRec.Situation__r.Name}">
+                                <div class="slds-truncate">
+                                    <lightning:buttonicon iconName="utility:delete" variant="bare"  onclick="{!c.deleteSHMapping}" alternativeText="Edit Task" value="{!SHMapRec.Id}" />
+                                    <lightning:formattedText value="{!SHMapRec.Situation__r.Name}" />
+                                    
+                                </div>
+                            </td>
+                            <td width="25%" title="{!SHMapRec.Handler__r.Name}">
+                                <div class="slds-truncate">
+                                    <lightning:formattedText value="{!SHMapRec.Handler__r.Name}"/>
+                                </div>
+                            </td>
+                            <td width="15%" title="{!SHMapRec.CreatedBy.Name}">
+                                <div class="slds-truncate">
+                                    <lightning:formattedText value="{!SHMapRec.CreatedBy.Name}" />
+                                </div>
+                            </td>
+                            <td width="15%" title="{!SHMapRec.CreatedDate}">
+                                <div class="slds-truncate">
+                                    <lightning:formattedText value="{!SHMapRec.CreatedDate}" />
+                                </div>
+                            </td>
+                        </tr>
+                    </aura:iteration>
+                    
+                </tbody>
+                
+            </table>
+             
+           
+        </div>
+    <!--Ends :Table that shows existing Situation to Handler -->
+    
+</aura:component>

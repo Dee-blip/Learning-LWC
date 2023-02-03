@@ -1,0 +1,9 @@
+<apex:page standardController="Draft_Invoice__c" lightningStylesheets="true">
+
+<style type="text/css">
+        p { font-weight: bold; color: #FF0000; margin: 5px;}
+    </style>
+
+    <p>DRAFT INVOICE DOES NOT REFLECT APPLICABLE TAXES</p>
+
+</apex:page>

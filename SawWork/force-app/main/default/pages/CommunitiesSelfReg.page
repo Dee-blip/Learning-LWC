@@ -1,0 +1,50 @@
+<apex:page id="communitiesSelfRegPage" showHeader="true" controller="CommunitiesSelfRegController" title="{!$Label.site.site_login}">
+    <apex:define name="body">  
+      <center>
+<apex:form id="theForm" forceSSL="true">
+                    
+                    <apex:pageMessages id="error" escape="false" />
+                    <table style="margin-top:1em;width: 600px;">
+                      <tr>
+                          <td style="width:200px;"><apex:outputLabel value="First Name" for="firstName"/></td>
+                          <td style="width:400px;"><apex:inputText required="true" id="firstName" value="{!firstName}" label="First Name"/></td>
+                      </tr>
+                      <tr>
+                      <td><apex:outputLabel value="Last Name" for="lastName"/></td>
+                      <td><apex:inputText required="true" id="lastName" value="{!lastName}"  label="Last Name"/></td>
+                      </tr>
+                      <tr>
+                      <td><apex:outputLabel value="Nickname" for="communityNickname"/></td>
+                      <td><apex:inputText required="true" id="communityNickname" value="{!communityNickname}" label="Nickname"/></td>
+                      </tr>
+                      <tr>
+                      <td><apex:outputLabel value="Email" for="email"/></td>
+                      <td><apex:inputText required="true" id="email" value="{!email}" label="Email" /></td>
+                      </tr>
+                      <tr>
+                      <td><apex:outputLabel value="Password" for="password"/></td>
+                      <td><apex:inputSecret required="true" id="password" value="{!password}" label="Password"/></td>
+                      </tr>
+                      <tr>
+                      <td><apex:outputLabel value="Confirm Password" for="confirmPassword"/></td>
+                      <td><apex:inputSecret required="true" id="confirmPassword" value="{!confirmPassword}" label="Confirm Password"/></td>
+                      </tr>
+                      <tr>    
+                      <td>I agree to the &nbsp;<apex:outputLink target="_blank" value="/Community_Terms_and_Conditions" id="TermsAndConditions">Terms and Conditions</apex:outputLink></td>
+                      <td>&nbsp;&nbsp;&nbsp;<apex:inputCheckbox id="AgreeToTermsAndConditions" value="{!AgreeToTermsAndConditions}"/></td>
+                      </tr>
+                     <tr>
+                         <td colspan="2">&nbsp;</td>
+                     </tr>
+                     <tr>
+                      <td colspan="2" align="center"><apex:commandButton action="{!registerUser}" value="{!$Label.site.submit}" id="submit"/></td>
+                     </tr>
+                    </table> 
+
+
+</apex:form>
+     </center>
+      <br/>
+    </apex:define>
+
+</apex:page>

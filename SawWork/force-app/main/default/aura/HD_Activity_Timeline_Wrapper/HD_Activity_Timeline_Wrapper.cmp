@@ -1,0 +1,8 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global"
+    controller="HD_History_reply_ButtonCtrl">
+    <aura:handler event="force:refreshView" action="{! c.handleForceRefreshViewForLWC }"></aura:handler>
+    <aura:registerEvent name="HD_Email_Composer_Docked_Event" type="c:HD_Email_Composer_Docked_Event" />
+    <aura:attribute name="recordId" type="String" />
+    <c:hd_Activity_Timeline aura:id="activityTimeline" recordId="{!v.recordId}"
+        onreplymailaction="{!c.replyMailController}"></c:hd_Activity_Timeline>
+</aura:component>

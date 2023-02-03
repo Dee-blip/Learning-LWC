@@ -1,0 +1,67 @@
+.THIS .buttonalign {
+margin-top:20px;
+}
+
+.THIS table {
+    table-layout:fixed;
+    width:100%;
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    
+    
+}
+.THIS td th
+{
+    border: 1px solid #ddd;
+    padding: 8px;
+    
+}
+
+.THIS tr:nth-child(even)
+{
+    background-color: #f2f2f2;
+}
+
+.THIS th
+{
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: rgb(0,112,212) !important;
+  color: white !important;
+  font-weight:bold;
+    
+}
+
+.THIS tr {
+  opacity: 0;
+  animation-name: fadeIn;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+  
+  
+  
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    
+    
+    
+  }
+  
+  to {
+    opacity: 1;
+    
+   
+  }
+}
+
+@keyframes tablefromtop {
+    from {
+         opacity:0;
+    }
+    to{
+        opacity:1;
+    }
+}

@@ -1,0 +1,23 @@
+<!-- SFDC-6038 -->
+<apex:page showHeader="true" sidebar="true" extensions="L2Q_FundClaimFlowController" standardController="SFDC_MDF_Claim__c">
+    <apex:includeLightning />
+    <div id="lightning" />
+    <!-- <apex:pageMessages id="msgId"/> ?flowLayout=twoColumn -->
+    <script>
+    var currentUrl = window.location.href;
+    var frId = '{!curFRId}';
+    // SFDC-6506
+    if({!isPartnerUser}) {
+        window.location.href = '/partners/flow/Create_FC?linkNavigatorPrefix=/partners/&retURL=/partners/a24/o&SelectedFRId=' + frId;//+'&flowLayout=twoColumn';
+    // SFDC-6506
+    } else if ( frId!= '') {
+            window.location = '/flow/Create_FC?linkNavigatorPrefix=/&retURL=/a24/o&SelectedFRId=' + frId;
+        } else {
+            var flowUrl = "/flow/Create_FC?linkNavigatorPrefix=/&retURL=/a24/o&SelectedFRId=" + frId + "&internalUserSelectedAccount=";
+            $Lightning.use("c:GSM_GenericFormApplication", function () {
+                $Lightning.createComponent("c:L2Q_FlowIntermediateComponent", { titleVar: "Create Fund Claim", lookupFilter: "IsPartnerCustom__c = true", lookupFieldLabel: "Select Partner Account", redirectionUrl: flowUrl }, "lightning", function (cmp) {
+                });
+            });
+        }
+    </script>
+</apex:page>

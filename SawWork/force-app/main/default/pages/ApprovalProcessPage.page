@@ -1,0 +1,114 @@
+<apex:page controller="ApprovalProcessPageController">
+    <style type = "text/css">
+        .dataCol textAlignRight {text-align: right;}
+
+    </style>
+<apex:pageMessages />
+
+<apex:form rendered="{!isApprover}" id="approvalForm">
+    <apex:pageBlock title="Opportunity {!opp.Name}">
+        <apex:outputLink value="/{!opp.Id}">«Back to Opportunity: {!opp.Name}</apex:outputLink>
+    </apex:pageBlock>
+    <apex:pageMessage detail="{!rebateRejectionMessage}" rendered="{!opp.Rebate_TC_Status__c=='Rejected'}" Severity="info"></apex:pageMessage>
+    <apex:pageBlock title="Approve/Reject Approval Request">
+        <apex:pageBlockSection columns="2" rendered="{!isPAEStep && mode==0}">
+            <apex:repeat value="{!$ObjectType.Opportunity.FieldSets.Approval_Process_Field_set}" var="fs">
+
+                <apex:pageBlockSectionItem dataStyle="text-align:right;width:10%;" >
+                    <apex:outputLabel value="{!fs.Label}" />
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputField value="{!opp[fs]}"/>
+                </apex:pageBlockSectionItem>
+            </apex:repeat>
+
+            <apex:pageBlockSectionItem dataStyle="text-align:right;width:10%;" rendered="{!!isReject}">
+                <apex:outputLabel value="{!$ObjectType.Opportunity.Fields.Rebate_Justification__c.Label}"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem rendered="{!!isReject}">
+                <apex:inputTextArea value="{!opp.Rebate_Justification__c}" cols="80"/>
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem dataStyle="text-align:right;width:10%;">
+                <apex:outputLabel value="Comments to Partner Contact (Will appear in email to Partner)"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:inputTextArea value="{!approvalComments}" cols="80"/>
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem dataStyle="text-align:right;width:10%;" rendered="{!!isReject}">
+                <apex:outputLabel value="{!$ObjectType.Opportunity.Fields.Managed_By__c.Label}"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem rendered="{!!isReject}">
+                <apex:actionRegion >
+                    <apex:inputField value="{!opp.Managed_By__c}" >
+                        <apex:actionSupport event="onchange" rerender="partnerPOC,partnerPOCLabel"/>
+                    </apex:inputField>
+                </apex:actionRegion>
+            </apex:pageBlockSectionItem>
+
+
+            <apex:pageBlockSectionItem dataStyle="text-align:right;width:10%;">
+                <apex:outputPanel id="partnerPOCLabel">
+                    <apex:outputLabel rendered="{!CONTAINS(opp.Managed_By__c, 'Partner') && opp.Managed_By__c != null}" value="{!$ObjectType.Opportunity.Fields.Partner_Led_POC__c.Label}"/>
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem >
+                <apex:outputPanel id="partnerPOC">
+                    <apex:inputField value="{!opp.Partner_Led_POC__c}" rendered="{!CONTAINS(opp.Managed_By__c, 'Partner') && opp.Managed_By__c != null}"/>
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+
+
+        </apex:pageBlockSection>
+
+        <apex:pageBlockSection columns="2" rendered="{!mode==1}">
+        <apex:repeat value="{!$ObjectType.Opportunity.FieldSets.Approval_Process_Field_set_Public_Sector}" var="fs">
+
+            <apex:pageBlockSectionItem dataStyle="text-align:right;width:10%;" >
+                <apex:outputLabel value="{!fs.Label}" />
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem >
+                <apex:outputField value="{!opp[fs]}"/>
+            </apex:pageBlockSectionItem>
+        </apex:repeat>
+
+        <apex:pageBlockSectionItem dataStyle="text-align:right;width:10%;" rendered="{!!isReject}">
+            <apex:outputLabel value="{!$ObjectType.Opportunity.Fields.MDF_Justification__c.Label}"/>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem rendered="{!!isReject}">
+            <apex:inputTextArea value="{!opp.MDF_Justification__c}" cols="80"/>
+        </apex:pageBlockSectionItem>
+
+        <apex:pageBlockSectionItem dataStyle="text-align:right;width:10%;">
+            <apex:outputLabel value="Comments to Partner Contact (Will appear in email to Partner)"/>
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:inputTextArea value="{!approvalComments}" cols="80"/>
+        </apex:pageBlockSectionItem>
+
+    </apex:pageBlockSection>
+       <apex:pageBlockSection rendered="{!!isPAEStep}">
+           <apex:pageBlockSectionItem dataStyle="text-align:right;width:10%;">
+                    <apex:outputLabel value="Approve/Reject Comments"/>
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem >
+                <apex:inputTextArea value="{!approvalComments}" cols="80"/>
+            </apex:pageBlockSectionItem>
+        </apex:pageBlockSection>
+
+        <div align="center">
+            <apex:commandButton action="{!approve}" value="Approve" rendered="{!!isReject}"/>
+            <apex:commandButton action="{!reject}" value="Reject" rendered="{!isReject}"/>
+            <apex:commandButton action="{!cancel}" value="Cancel" immediate="true"/>
+        </div>
+
+    </apex:pageBlock>
+    <apex:pageBlock >
+        <apex:iframe src="{!approvalHistoryURL}"/>
+    </apex:pageBlock>
+</apex:form>
+</apex:page>

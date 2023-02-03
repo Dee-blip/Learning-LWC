@@ -1,0 +1,44 @@
+<!-- =====================================================================================================+
+
+|  HISTORY  |                                                                            
+
+|  DATE           DEVELOPER   CR          DESCRIPTION                                                       
+
+|  ===========    =========   =======     =========== 
+                                                       
+|  14-Jul-2016    Aditya     3431681      Special Instructions for GSS 
+//05-March-2019     Aditya  ESESP-1901                                           
++===================================================================================================== -->
+<apex:page standardController="Case" extensions="SpecialInstructionsListController" id="page" standardStylesheets="false">
+  <apex:includeScript value="/support/console/28.0/integration.js"/> 
+  <apex:includeScript value="{!$Resource.JQuery_New}"/>    
+    <style>
+      .consolecls {
+          color : #54698d;
+          font-weight: normal;
+      }
+      .detailCls{
+        color : #454A4D;
+        font-weight: bold;
+        }  
+
+  </style>  
+  <apex:form id="form">
+            <apex:pageBlock mode="maindetail" id="block" >
+                <apex:pageBlockSection columns="1" id="section" >
+                    <apex:pageBlockSectionItem id="item" >
+                        <img src= "{!If((splInstrList.size != 0 && !isAMGCase),$Resource.SpecialInstruction,If((splInstrList.size != 0 && isAMGCase),$Resource.AMGSpecialInstr,$Resource.BlankImage))}"/> 
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+  </apex:form>
+  <script type="text/javascript">
+        if (sforce.console.isInConsole()) {
+            document.getElementById('page:form:block:section:item:label').className = 'consolecls';            
+        }   
+        else{
+           document.getElementById('page:form:block:section:item:label').className = 'detailCls'; 
+        }
+    
+  </script>  
+</apex:page>

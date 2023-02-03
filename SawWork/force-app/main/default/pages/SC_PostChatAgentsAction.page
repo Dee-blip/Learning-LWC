@@ -1,0 +1,240 @@
+<!-----------------------------------------------------------------------------------
+ * Page Name            : SC_PostChatAgentsAction
+ * Developer Name       : Pinkesh Rathore
+ * Date                 : 15th Oct,2018
+ * JIRA                 : ESESP-420
+ * Controller Class     : SC_PostChatAgentsAction_Ctrl
+ --------------------------------------------------------------------------------- -->
+
+<apex:page standardController="Case" extensions="SC_PostChatAgentsAction_Ctrl"> 
+    <head> 
+
+        <apex:includeScript value="/soap/ajax/28.0/connection.js"/>
+        <apex:includeScript value="/support/console/38.0/integration.js"/>
+        <apex:includeScript value="{!$Resource.JQuery_New}"/>
+        
+        <style type="text/css">
+         .Invalid {
+            color: #c31b24;
+            background-color: #f3f3ec;
+            font-size: 2.5em;
+            text-align: center;
+            margin: 10px 10px 10px 10px;
+            padding: 12px;
+            border-radius: 10px;
+            }
+            
+         .Completed {
+            color: #1fab18;
+            background-color: #e8e8d5;
+            font-size: 2.5em;
+            text-align: center;
+            margin: 10px 10px 10px 10px;
+            padding: 12px;
+            border-radius: 10px;
+            }
+        .loadingClass{
+            display: none;
+            position: absolute;
+            top: 100px;
+            left: 40%;
+            width: 100px;
+            height: 30px;
+            padding: 4px 5px 0px;
+            border: 3px solid #e4e4e4;
+            box-shadow: 1px 1px 10px #ababab;
+            border-radius: 8px;
+            background-color: #9d9fa5;
+            text-align: center;
+            color:white;
+            overflow: auto;
+            vertical-align: super;
+            }
+        </style>
+        
+        <script type="text/javascript">
+        $j = jQuery.noConflict();
+        $j(window).load(function() {
+            var scenario = '{!scenario}';
+            if(scenario == 'Invalid'){
+                $j("#Invalid").show();
+            }
+            else if(scenario == 'Completed'){
+                $j("#Completed").show();
+            }
+            else{
+                $j("[id*='form']").show();
+            }
+            
+            $j("[class*='whyNotResolvedItem']").toggle();
+            $j("[class*='technicalDetails']").toggle();
+        });
+        
+        //for modal
+        function openModal() {
+            console.log('OpenModel');
+            $j(".loadingClass").show();
+        }
+        
+        function closeModal() {
+            console.log('CloseModel');
+            $j(".loadingClass").hide();
+        }
+        
+        
+        function updateContent()
+        {    
+            console.log('changing');
+            var recordTypeName = '{!currentCase.RecordType.Name}';
+            console.log('{!currentCase.RecordType.Name}');
+            $j("[id*='resolutionShortDescription']").toggle();
+            $j("[class*='whyNotResolvedItem']").toggle();
+            if(recordTypeName == 'Technical'){
+                $j("[class*='technicalDetails']").toggle();
+            }
+        }
+        //To open in console
+        function openLinkConsole(SF_Id,Numb) 
+        { 
+            Tab_Id = Numb;
+            var nativeURLClosedCase = '/'+SF_Id + '/s?cas7=Closed&retURL=/' + SF_Id;
+            var consoleURLClosedCase = 'https://'+window.location.hostname+'/console#' + encodeURIComponent(nativeURLClosedCase);
+            if(sforce.console.isInConsole()){
+                sforce.console.openConsoleUrl(null, consoleURLClosedCase,true,[Tab_Id],null,openSuccess);
+                }
+            else{
+                window.top.location.href = 'https://'+window.location.hostname + nativeURLClosedCase;  
+                }
+        }   
+        //To open in console
+        function refreshConsoleTab() 
+        { 
+            //getFocusedPrimaryTabId  getEnclosingTabId
+            sforce.console.getFocusedPrimaryTabId(showTabId);            
+        }
+       	var showTabId = function showTabId(result) 
+        {
+            var tabId = result.id;
+            //refreshPrimaryTabById   refreshSubtabById
+            sforce.console.refreshPrimaryTabById(tabId , true);
+        };
+
+        var openSuccess = function(result) 
+        {
+            //Report whether opening the new tab was successful
+            if (result.success == false)
+                alert('The corresponding tab is already opened');
+        }
+
+        //Submit URL
+        function submitForm(){
+            var isResolved = $j("input[id*='isResolved']")[0].checked ? $j("input[id*='isResolved']")[0].value : $j("input[id*='isResolved']")[1].value;
+            var recordTypeName = '{!currentCase.RecordType.Name}';
+            console.log("submitForm isResolved new " + isResolved);
+            console.log("submitForm recordTypeName " + recordTypeName);
+            //var caseId = {!$CurrentPage.parameters.Id};
+            if(isResolved == 'Resolved' && recordTypeName == 'Technical'){
+                console.log("submitForm inside if ");
+                techincalCaseResolved();
+            }
+            else if(isResolved == 'Resolved' && recordTypeName == 'AMG'){
+                console.log("inside amgCaseResolved");
+                amgCaseResolved();
+            }
+            else if(isResolved == 'Not Resolved' && recordTypeName == 'Technical'){
+                console.log("inside techincalCaseNotResolved");
+                techincalCaseNotResolved();
+            }
+            else if(isResolved == 'Not Resolved' && recordTypeName == 'AMG'){
+                console.log("inside amgCaseNotResolved");
+                amgCaseNotResolved();
+            }
+            //return false;
+            
+        }
+        
+        </script>
+    </head>
+    
+    <apex:form id="form" style="display:none">
+        <!--Action status to show processing-->
+        <apex:actionStatus id="statusId">
+            <apex:facet name="start">
+                <div class="fadeModal"/>     
+                <div class="loadingClass">
+                    <img id="creatingMailerModalId" src="{!$Resource.CMCLoadingImage}" width="25" height="25" style="display:inline;"/>&nbsp;&nbsp;<b style="vertical-align: super;" id="textModalId">Saving..</b>
+                </div>
+            </apex:facet>
+            <apex:facet name="stop"> </apex:facet>
+        </apex:actionStatus>
+        <!-- End Modal-->
+        
+        
+        <apex:pageBlock >
+            <apex:pageMessages id="PageMessages"></apex:pageMessages>
+            
+            <apex:actionFunction id="techincalCaseResolved" action="{!techincalCaseResolved}" name="techincalCaseResolved" reRender="PageMessages" oncomplete="closeModal(); if ({!NOT(hasError)}) openLinkConsole('{!caseId}', 'Close Case'); return false;"/>
+            <apex:actionFunction id="amgCaseResolved" action="{!amgCaseResolved}" name="amgCaseResolved" reRender="PageMessages" oncomplete="closeModal(); if ({!NOT(hasError)}) openLinkConsole('{!caseId}', 'Close Case'); return false;"/>
+            <apex:actionFunction id="techincalCaseNotResolved" action="{!techincalCaseNotResolved}" name="techincalCaseNotResolved" reRender="PageMessages"  oncomplete="closeModal(); refreshConsoleTab(); return false;"/>
+            <apex:actionFunction id="amgCaseNotResolved" action="{!amgCaseNotResolved}" name="amgCaseNotResolved" reRender="PageMessages" oncomplete="closeModal(); refreshConsoleTab(); return false;"/>
+            
+            <apex:pageBlockSection columns="1">
+                <apex:selectRadio value="{!isResolved}" id="isResolved" onchange="updateContent();">
+                    <apex:selectOptions value="{!resolutionValues}"/>
+                </apex:selectRadio>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection columns="2" >
+                <apex:pageBlockSectionItem id="whyNotResolvedItem" dataStyleClass="whyNotResolvedItem" labelStyleClass="whyNotResolvedItem">
+                    <apex:outputLabel value="Why Not Resolved" for="whyNotResolved"/>
+                    <apex:selectList id="whyNotResolved" value="{!whyNotResolved}" size="1">
+                        <apex:selectOptions value="{!reasonsWhyNotResolved}"></apex:selectOptions>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem id="severityItem" dataStyleClass="technicalDetails" labelStyleClass="technicalDetails">
+                    <apex:outputLabel value="Severity  " for="severity"/>
+                    <apex:selectList id="severity" value="{!severity}" size="1">
+                        <apex:selectOptions value="{!severityValues}"></apex:selectOptions>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem id="customerExpectationsItem" dataStyleClass="technicalDetails" labelStyleClass="technicalDetails">
+                    <apex:outputLabel value="Customer Expectations" for="customerExpectations"/>
+                    <apex:inputTextarea id="customerExpectations" value="{!customerExpectations}"></apex:inputTextarea>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem id="troubleshootingToDateItem" dataStyleClass="technicalDetails" labelStyleClass="technicalDetails">
+                    <apex:outputLabel value="Troubleshooting To Date" for="troubleshootingToDate"/>
+                    <apex:inputTextarea id="troubleshootingToDate" value="{!troubleshootingToDate}"></apex:inputTextarea>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection id="resolutionShortDescription" columns="2">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Resolution Short Description" for="resolutionShortDescription"/>
+                    <apex:inputTextarea id="resolutionShortDescription" value="{!resolutionShortDescription}"></apex:inputTextarea>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockButtons >
+                <apex:commandButton onclick="openModal(); submitForm(); return false;" value="Submit" id="Submit" />
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+    
+    <!-- Div for Scenario = Invalid -->
+    <div class="Invalid" id="Invalid" style="display:none">
+        <p>
+            This action is not valid for this case.
+        </p>  
+    </div>
+    
+    <!-- Div for Scenario = Completed -->
+    <div class="Completed" id="Completed" style="display:none">
+        <p>
+            This action is already completed for this case.
+        </p>  
+    </div>
+    
+</apex:page>

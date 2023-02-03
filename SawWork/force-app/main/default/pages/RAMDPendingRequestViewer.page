@@ -1,0 +1,178 @@
+<!--
+ -Created by kusharma on 28/11/17.
+ -->
+
+<apex:page id="RAMDPendingRequestViewer" controller="RAMDPendingRequestProcessorCtrl" sideBar="false"
+           tabStyle="Account" showHeader="true" standardStylesheets="true">
+    <!--<script src="{!URLFOR($Resource.BootstrapCommonFiles, '/bootstrap-3.3.2-dist/js/bootstrap.min.js')}"></script>-->
+    <!--<apex:stylesheet value="{!URLFOR($Resource.BootstrapCommonFiles, '/bootstrap-3.3.2-dist/css/bootstrap.min.css')}"/>-->
+    <apex:includeScript value="{!$Resource.JQuery_New}"/>
+    <apex:includescript value="{! URLFOR($Resource.LicenseReportStaticResource, 'js/jquery.dataTables.min.js')}"/>
+    <apex:stylesheet value="{! URLFOR($Resource.LicenseReportStaticResource, 'css/jquery.dataTables.css')}"/>
+
+    <script type="text/javascript">
+
+			j$ = jQuery.noConflict();
+
+            j$(document).ready( function () {
+				var contactTable = j$('[id$="userLicensDetail"]').DataTable({
+
+				});
+			});
+
+           function createDataTable() {
+        		var contactTable = j$('[id$="userLicensDetail"]').DataTable({
+                    "destroy": true,
+                    "order": [1,'asc'],
+                    "processing": true,
+                    "pageLength": 25
+				});
+    		}
+
+            function removeAdditionText(){
+                document.getElementById('org.ajax4jsf.oncomplete').style.display = "none";
+            }
+
+            function setFocusOnLoad(){ /*NOOP*/ }
+
+    </script>
+
+    <apex:pageMessages id="pgMsgs"/>
+    <br/>
+    <b>
+        <center>RAMD Orange Zone Accounts Verification</center>
+    </b>
+    <style>
+        .hCenter {
+                left: 100px;
+                line-height: 200px;
+                margin: auto;
+                margin-top: -100px;
+                position: absolute;
+                top: 50%;
+                width: 60%;
+        }
+
+
+    </style>
+    <apex:form id="parentInputForm">
+        <apex:outputPanel id="recordToModifyId">
+            <apex:pageBlock id="parentPgBlk">
+                <apex:pageBlockSection columns="2" collapsible="true" id="pageBlockSectionId" title="Account Search">
+                    <apex:inputTextarea id="akamAccId" value="{!newPendingRecToDisplay}" required="false"
+                                        label="Akam Account ID" rows="2" style="width:90%"/>
+                </apex:pageBlockSection>
+
+                <div align="center" draggable="false">
+                    <apex:commandButton value="Search Account" action="{!actionSupportCall}" id="idSearchButton"
+                                        oncomplete="createDataTable(); removeAdditionText();"
+                                        reRender="recordToModifyId,dataTableForRecs,saveBtnPnl,pgMsgs"
+                                        status="FilterLoading"/>
+                </div>
+
+                <apex:pageBlockSection id="accDetailPgBlkSec" columns="2" title="Account Details">
+                    <apex:outputText id="accountNameId" value="{! currentRecToDisplay.name}"
+                                     label="Account Name"/>
+                    <apex:outputText label="Akam Account Id" id="akamAccountId"
+                                     value="{! currentRecToDisplay.akamAccountId}"/>
+                    <apex:outputText id="accountCountryId" value="{! currentRecToDisplay.accountCountry}"
+                                     label="Account Country"/>
+                    <apex:outputText id="accountOZoneStatusId" label="Account Orange Zone Status"
+                                     value="{! currentRecToDisplay.accountOZoneStatus}"/>
+                </apex:pageBlockSection>
+
+                <apex:pageBlockSection id="salesPrimaryPgBlkSec" columns="2" title="Sales Primary Details">
+                    <apex:outputText id="salesPrimaryNameId" value="{! currentRecToDisplay.salesPrimaryName}"
+                                     label="Sales Primary Name"/>
+                    <apex:outputText id="salesPrimaryCountryId" value="{! currentRecToDisplay.salesPrimaryCountry}"
+                                     label="Sales Primary Country"/>
+                    <apex:outputText id="salesPrimaryNameOldId" value="{! currentRecToDisplay.oldSalesPrimary}"
+                                     label="Old Sales Primary Name"/>
+                    <apex:outputText id="salesPrimaryCountryOldId"
+                                     value="{! currentRecToDisplay.oldSalesPrimaryCountry}"
+                                     label="Old Sales Primary Country"/>
+                </apex:pageBlockSection>
+
+                <apex:pageBlockSection title="User Selection Section" id="userSelSecId" columns="2">
+                    <apex:selectList multiselect="false" size="1" value="{!currentRecToDisplay.oZoneResponse}"
+                                     label="Orange Zone Status">
+                        <apex:selectOptions value="{!currentRecToDisplay.lOZoneOpts}"/>
+                    </apex:selectList>
+                    <apex:selectList multiselect="false" size="1" value="{!currentRecToDisplay.oZoneCountry}"
+                                     label="Orange Zone Country">
+                        <apex:selectOptions value="{! lOZoneCountries}"/>
+                    </apex:selectList>
+                    <apex:selectList multiSelect="false" size="1" value="{! currentRecToDisplay.accountOZoneReason}"
+                                     label="Orange Zone Reason">
+                        <apex:selectOptions value="{! lOZoneReasons}"/>
+                    </apex:selectList>
+                    <apex:inputCheckbox id="valOverrideId" value="{!currentRecToDisplay.oZoneValidationOverride}"
+                                        label="Orange Zone Validation Override"/>
+                    <apex:inputTextarea id="valOverrideReasonId"
+                                        value="{!currentRecToDisplay.oZoneValidationOverrideReason}" style="width:90%"
+                                        label="Validation Override Reason"/>
+                </apex:pageBlockSection>
+                <apex:outputPanel id="saveBtnPnl">
+                    <center>
+                        <apex:commandButton id="saveBtnId" value="Save" action="{! saveAccountRec}"
+                                            status="FilterLoading" rendered="{! currentRecToDisplay != null && currentRecToDisplay.ramdProcessorId != '' }"
+                                            onComplete="createDataTable();window.scrollTo(0, 0);removeAdditionText();"
+                                            reRender="recordToModifyId,dataTableForRecs,pgMsgs,tablePgBlkSec"/>
+                    </center>
+                </apex:outputPanel>
+
+                <apex:pageBlockSection id="tablePgBlkSec" title="Pending Records" columns="1">
+                    <apex:outputPanel id="dataTableForRecs" rendered="true">
+                        <body>
+                        <table id="userLicensDetail" class="display"
+                               style="white-space: nowrap;table-layout: fixed;width:100%">
+                            <thead>
+                            <tr style="height:30px">
+                                <th>Account Name</th>
+                                <th>Akam Account Id</th>
+                                <th>Account Country</th>
+                                <th>Sales Primary</th>
+                                <th>Sales Primary Country</th>
+                                <th>Orange Zone Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <apex:repeat value="{! lPendingRecsListToDisplay}" var="varWrapper" id="dataTableId">
+                                <tr style="height:30px">
+                                    <td>
+                                        <apex:commandLink id="clId" value="{!varWrapper.name}"
+                                                          action="{! actionSupportCall}" status="FilterLoading"
+                                                          onComplete="createDataTable();window.scrollTo(0, 0);removeAdditionText();"
+                                                          reRender="accDetailPgBlkSec,salesPrimaryPgBlkSec,userSelSecId,saveBtnId,saveBtnPnl,recordToModifyId">
+                                            <apex:param value="{! varWrapper.akamAccountId}"
+                                                        assignTo="{!newPendingRecToDisplay}"
+                                                        name="akamAccountId"/>
+                                        </apex:commandLink>
+                                    </td>
+                                    <td>{!varWrapper.akamAccountId}</td>
+                                    <td>{!varWrapper.accountCountry}</td>
+                                    <td>{!varWrapper.salesPrimaryName}</td>
+                                    <td>{!varWrapper.salesPrimaryCountry}</td>
+                                    <td>{!varWrapper.accountOZoneStatus}</td>
+                                </tr>
+                                <apex:actionSupport id="onClickSupport" event="onclick"
+                                                    action="{! actionSupportCall}"/>
+                            </apex:repeat>
+                            </tbody>
+                        </table>
+                        </body>
+                    </apex:outputPanel>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+        </apex:outputPanel>
+
+        <apex:actionStatus id="FilterLoading">
+            <apex:facet name="start">
+                <c:enhancedActionStatus BackColor="#FFF0F0" borderColor="#ffffff" borderSize="3" height="50px"
+                                        width="150px" ImageUrl="/changemgmt/img/spinner24.gif" Message="Please Wait"
+                                        messageStyle="color:darkred;font-size:11pt;font-weight:bold;"/>
+            </apex:facet>
+        </apex:actionStatus>
+
+    </apex:form>
+</apex:page>

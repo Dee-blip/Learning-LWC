@@ -1,0 +1,163 @@
+<!--
+  @description       : This component is used to view/edit contacts on chime form
+  @author            : apyati
+  @team              : GSM
+  @last modified on  : 09-20-2021
+  @last modified by  : apyati
+  Modifications Log
+  Ver   Date         Author   Modification
+ * 1.0   09-07-2021   apyati   Created for SFDC-8655 
+-->
+<template>
+
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-04" aria-modal="true"
+        aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div style="max-width:60rem;min-width:60rem;" class="slds-modal__container">
+
+            <div class="slds-modal__header">
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={handleClose}
+                    alternative-text="close" variant="bare-inverse" class="slds-modal__close"></lightning-button-icon>
+                <div class="slds-grid">
+                    <div class="slds-col slds-text-align_left">
+                        <header class="slds-card__header slds-text-heading_medium header-font-weight">CHIME Contacts
+                        </header>
+                    </div>
+                    <div class="slds-col slds-text-align_right">
+                        <lightning-button label="New Contact" slot="actions" onclick={createNew} disabled={disableButtons}></lightning-button>
+                        <lightning-button-icon icon-name="action:refresh" size="medium" alternative-text="Refresh"
+                            class="slds-m-left_xx-small" onclick={handleIconRefresh}></lightning-button-icon>
+                    </div>
+                </div>
+            </div>
+
+
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+            </template>
+
+
+            <div class="slds-modal__content slds-p-horizontal_medium slds-p-bottom_medium" id="modal-content-id-1">
+
+                <!---
+                <span class="searchLookup">
+                    <lightning-input variant="label-hidden" placeholder="Search Contact" type="search"
+                        onchange={handleSearch}>
+                    </lightning-input>
+                </span>-->
+
+                <lightning-tabset variant="default" active-tab-value={defaultTabOnInitialization}>
+                    <template for:each={tabs} for:item="tabObj">
+                        <lightning-tab label={tabObj.tab} value={tabObj.tab} key={tabObj.tab} onactive={handleActiveTab}
+                            title={tabObj.helpText}>
+
+                            <template if:true={showErrorMessage}>
+                                <div class="slds-col align-center error-message">
+                                    {showErrorMessage}
+                                </div>
+                            </template>
+
+                            <template if:true={data}>
+                                <div class="slds-card">
+                                    <c-paginator records={data} total-records={data.length} show-search-box="true"
+                                        onpaginatorchange={handlePaginatorChange}>
+                                    </c-paginator>
+
+                                    <div class="datatable-height  datatable-wrap">
+                                        <lightning-datatable columns={columns} data={recordsToDisplay} key-field="Id"
+                                            onrowselection={handleRowSelected} oncellchange={handleCellChange}
+                                            sorted-by={sortBy} sorted-direction={sortDirection} onsort={doSorting}
+                                            suppress-bottom-bar>
+                                        </lightning-datatable>
+                                    </div>
+                                </div>
+
+
+
+                                <!-- Common buttons to be displayed on the tabs -->
+
+                                <template if:true={displayDataTableFooter}>
+
+                                    <div class="slds-col slds-modal__footer">
+
+                                        <template if:true={displaysave}>
+                                            <lightning-button variant="Brand" label="Save" title="Save"
+                                                onclick={handleSave} class="slds-var-m-left_x-small"
+                                                disabled={disableButtons}>
+                                            </lightning-button>
+                                        </template>
+
+                                        <template if:true={displaycancel}>
+                                            <lightning-button variant="Neutral" label="Cancel" title="Cancel"
+                                                onclick={handleCancel} class="slds-var-m-left_x-small">
+                                            </lightning-button>
+                                        </template>
+
+                                        <!-- Display button only when active tab is Assigned Contacts -->
+                                        <template if:true={displayRemoveBTN}>
+                                            <lightning-button variant="Brand" label="Remove" title="Remove"
+                                                onclick={handleRemove} class="slds-var-m-left_x-small"
+                                                disabled={disableButtons}>
+                                            </lightning-button>
+                                        </template>
+
+                                        <!-- Display button only when active tab is Unassigned Contacts -->
+                                        <template if:true={displayAddBTN}>
+                                            <lightning-button variant="Brand" label="Add" title="Add"
+                                                onclick={handleAdd} class="slds-var-m-left_x-small"
+                                                disabled={disableButtons}>
+                                            </lightning-button>
+                                        </template>
+
+                                    </div>
+
+                                </template>
+
+                            </template>
+
+                            <!-- Show No Products to display message when there are no records under the active tab -->
+                            <template if:true={NoDataAfterRendering}>
+                                <div class="datatable-height flex-align-center">
+                                    No Contacts to display
+                                </div>
+                            </template>
+                        </lightning-tab>
+                    </template>
+                </lightning-tabset>
+
+
+                <!---
+                    
+                    <template if:true = {listRecs}>  
+                            
+                        <div style="height: 300px;">  
+
+                            <lightning-datatable key-field="Id"  
+                                                    data={listRecs}  
+                                                    columns={columns}  
+                                                    hide-checkbox-column="true"  
+                                                    show-row-number-column="true"
+                                                    default-sort-direction={defaultSortDirection}
+                                                    sorted-direction={sortDirection}
+                                                    sorted-by={sortedBy}
+                                                    onsort={onHandleSort}
+                                                    onrowaction={handleRowAction}>  
+                            </lightning-datatable> 
+                        </div>
+                    </template>  
+                
+                    <template if:true = {error}>  
+                        {error}>
+                    </template>  -->
+
+            </div>
+        </div>
+    </section>
+
+    <div class="slds-backdrop slds-backdrop_open"></div>
+    <!----
+    <template if:true={showSearchContacts}>
+        <c-l2q-chime-search-contact chime-id={parentId} account-id={accountId} onsearchcancel={handleSearchCancel}
+            onsearchsave={handleSearchSave}></c-l2q-chime-search-contact>
+    </template>-->
+
+</template>

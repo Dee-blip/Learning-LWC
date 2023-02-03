@@ -1,0 +1,29 @@
+<!-- CR 1367210 - Chatter Notification 
+Created - 11/29/2011
+Author: Sharath
+-->
+<apex:page controller="EB_CtrlChatterNotfication" >
+<apex:stylesheet value="{!$Resource.EB_ActionPollerStyleSheet}"/>
+<apex:form id="status">
+
+<h1 class="tdTopHeader" align="center"> Chatter Notification for {!mailerName}</h1>
+<p class="pResponse">
+As you had opted to send out chatter notifications to internal account teams, all account teams associated with the customers that were impacted due to the ongoing Service Incident are being notified . 
+</p>
+
+<apex:outputLabel rendered="{!renderFinish}">
+<p class="pResponse">
+Please click on the finish link below to navigate to the mailer . 
+</p>
+
+</apex:outputLabel>
+
+<hr width="100%"/>
+<p style="text-align:right;">
+<apex:commandLink value="Finish" action="{!redirectToMailer}" style="color:blue;" rendered="{!renderFinish}" />
+</p>
+</apex:form>
+<apex:form >
+<apex:actionPoller action="{!sendChatterNotification}" reRender="status" interval="5"/>
+</apex:form>
+</apex:page>

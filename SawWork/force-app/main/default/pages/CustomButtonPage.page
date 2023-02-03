@@ -1,0 +1,5 @@
+<apex:page controller="CustomButtonController" action="{!execute}">
+
+<h1>Loading.....</h1>
+
+</apex:page>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- akamai performance comp cory clarke / tendercreative.com -->
+<config name="akamai_performance" version="1.0.0" debug="true">
+  <xml_url>http://wwwdv.akamai.com/python/waaclient.py/waaclient?url=</xml_url>
+  <xml_graph_url>http://wwwdv.akamai.com/top_left.xml</xml_graph_url>
+  <xml_weeklong_url>http://www.akamai.com/cgi/pubdv4/run_report.cgi?url=</xml_weeklong_url>
+  <xml_report_url>http://www.akamai.com/cgi/pubdv4/generate_report.cgi?id=</xml_report_url>
+  <xml_previous_url>http://www.akamai.com/cgi/pubdv4/reportlist.cgi?</xml_previous_url>
+  <email_url target="_blank" replace="">http://www.akamai.com/cgi/dv4/dv4_www.cgi</email_url>
+  <print_url target="_blank" replace="">http://www.akamai.com/cgi/dv4/dv4_www.cgi</print_url>
+  <timeout>120000</timeout>
+  <timeoutMessage>Your request has timed out. Please enter the url again.</timeoutMessage>
+  <!-- tooltip messages -->
+  <message0>Compares estimated performance over Akamai with actual performance direct to Origin. Breaks down total page download time in to connection time, first byte time and download time.</message0>
+  <message1>Provides a benchmark for expected performance improvement over one week from a given city to the region in which the Origin is based.</message1>
+  <message2>Compares estimated performance between Akamai and Origin, per city.</message2>
+  <message3>Dots on the map indicate the locations of Akamai testing agents. Click on these dots to simulate end user connection times from those locations.</message3>
+  <message4>Compares estimated average performance between Akamai and Origin, per continent.</message4>
+  <message5>Email the results.</message5>
+  <message6>Print the results.</message6>
+  <message7>Provides a benchmark for expected performance improvement over one week from a given city to the region in which the Origin is based.</message7>
+  <message8>Save as PDF</message8>
+  <!-- Loading messages -->
+  <loading_messages>
+    <message><![CDATA[Measuring the site's default performance]]></message>
+    <message><![CDATA[Analyzing performance over Akamai]]></message>
+    <message><![CDATA[Calculating performance improvement metrics]]></message>
+    <message><![CDATA[Presenting performance improvement]]></message>
+  </loading_messages>
+</config>

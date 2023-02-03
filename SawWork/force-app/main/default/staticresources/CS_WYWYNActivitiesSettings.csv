@@ -1,0 +1,5 @@
+"NAME","VALUE__C"
+"EmailTemplateId","00XA0000001NIvD"
+"EmailSubject","Akamai"
+"BouncedEmailErrorMessage",", email address has bounced"
+"InvalidEmailErrorMessage","Invalid Email address##BOUNCED_MSG##. Please go to Contact detail page and confirm Email address."

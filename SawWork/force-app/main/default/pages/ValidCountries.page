@@ -1,0 +1,15 @@
+<apex:page controller="ValidCountriesController" tabStyle="Account" showHeader="false" >
+  <apex:sectionHeader title="Valid Countries" />
+  <apex:pageBlock title="List of valid Countries">
+      <apex:repeat value="{!countries}" var="country">
+          <h2>{!country.label}</h2> <br/>
+          <apex:pageBlockSection rendered="{!country.Check_State__c}" title="List of valid States for {!country.label}" collapsible="true">
+              <apex:repeat value="{!states}" var="state">
+                   <apex:pageBlockSectionItem rendered="{!IF(country.label==state.Associated_Country__c,true,false)}">                   
+                      <h4>- {!state.label}</h4><br/>
+                  </apex:pageBlockSectionItem>
+              </apex:repeat>
+          </apex:pageBlockSection>
+      </apex:repeat>
+  </apex:pageBlock>
+</apex:page>

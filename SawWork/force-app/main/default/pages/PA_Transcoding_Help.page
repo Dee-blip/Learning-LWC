@@ -1,0 +1,5 @@
+<apex:page standardController="Product_Approvals__c">
+   
+   <b>Note for Approvers</b>
+This is help text 
+</apex:page>

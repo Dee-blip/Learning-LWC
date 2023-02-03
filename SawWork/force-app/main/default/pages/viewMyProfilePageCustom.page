@@ -1,0 +1,107 @@
+<apex:page controller="viewMyProfilePageCustomController">
+    <apex:form id="InformationForm">
+        <apex:actionStatus id="btnClickStatus">
+            <apex:facet name="start">
+                <c:enhancedActionStatus BackColor="#ffffff" borderColor="#ffffff"
+                    borderSize="2" height="50px" width="150px"
+                    ImageUrl="/changemgmt/img/spinner24.gif" Message="Loading..."
+                    messageStyle="color:darkred;font-size:11pt;font-weight:bold;" />
+            </apex:facet>
+        </apex:actionStatus>
+        <apex:pageMessages />
+        <apex:pageBlock title="My Profile" rendered="{!mode=='view'}">
+            <apex:pageBlockButtons location="Top">
+                <apex:commandButton action="{!Edit}" value="Edit"
+                    reRender="InformationForm" />
+                    <apex:outputLink rendered="{!isLevel3Partner==false}" value="{!changePasswordUrl}" id="changeMyPasswordLink" target="_blank">Change My Password</apex:outputLink>
+                <!-- <apex:commandButton action="{!ChangeMyPassword}"
+                    value="Change My Password" reRender="InformationForm" />-->
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="User Information" collapsible="false"
+                columns="1">
+                <apex:outputField value="{!currentUser.Email}" label="Luna Username" />
+                <apex:outputField value="{!currentUser.TimeZoneSidKey}" />
+                <apex:outputField value="{!currentUser.LocaleSidKey}" />
+                <apex:outputField value="{!currentUser.LanguageLocaleKey}" />
+                <apex:outputField value="{!currentUser.CommunityNickname}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Contact Information"
+                collapsible="false" columns="2">
+                <apex:outputField value="{!currentContact.Name}" />
+                <apex:outputField value="{!currentContact.Email}" />
+                <apex:outputField value="{!currentContact.Title}" />
+                <apex:outputField value="{!currentContact.Phone}" />
+                <apex:outputField value="{!currentUser.Extension}" />
+                <!--<apex:outputField value="{!currentUser.Address}" />-->
+                <apex:outputField value="{!currentContact.Fax}"/>
+                <apex:outputField value="{!currentContact.MobilePhone}" />
+                
+                <!--<apex:outputField value="{!currentUser.StartDay}"/>-->
+                <!--<apex:outputField value="{!currentUser.EndDay}"/>-->
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:pageBlock title="My Profile" rendered="{!mode=='edit'}">
+            <apex:pageBlockButtons location="Top">
+                <apex:commandButton action="{!Save}" value="Save"
+                    status="btnClickStatus" reRender="InformationForm" />
+                <apex:commandButton action="{!Cancel}" value="Cancel"
+                    immediate="true" />
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="User Information" collapsible="false"
+                columns="1">
+                <apex:outputField value="{!currentUser.Email}" label="Username" />
+                <apex:inputField value="{!currentUser.TimeZoneSidKey}" />
+                <apex:inputField value="{!currentUser.LocaleSidKey}" />
+                <apex:inputField value="{!currentUser.LanguageLocaleKey}" />
+                <apex:outputField value="{!currentUser.CommunityNickname}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Contact Information"
+                collapsible="false" columns="2">
+                <apex:outputField value="{!currentContact.Name}" />
+                <apex:outputField value="{!currentContact.Email}" />
+                <apex:outputField value="{!currentContact.Title}" />
+                <apex:outputField value="{!currentContact.Phone}" />
+                <apex:outputField value="{!currentUser.Extension}" />
+                <!--<apex:outputField value="{!currentUser.Address}" />-->
+                <apex:outputField value="{!currentContact.Fax}"/>
+                <apex:outputField value="{!currentContact.MobilePhone}" />
+                
+                <!--<apex:outputField value="{!currentUser.StartDay}"/>-->
+                <!--<apex:outputField value="{!currentUser.EndDay}"/>-->
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="" collapsible="false" columns="1">
+                <apex:outputText style="font-weight:bold;">
+                            You can only update: Time Zone, Locale and Language. To update the other fields please reach out to your System Admin or your Akamai Sales Rep.
+                        </apex:outputText>
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons location="Bottom">
+                <apex:commandButton action="{!Save}" value="Save"
+                    status="btnClickStatus" reRender="InformationForm" />
+                <apex:commandButton action="{!Cancel}" value="Cancel"
+                    immediate="true" />
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+
+        <apex:pageBlock rendered="{!mode=='change_password'}">
+            <script type="text/javascript">
+                function hideLoadingImage(){
+                    document.getElementById('loading_image').style.display = "none";
+                    document.getElementById('changeMyPasswordFrame').style.display = "";
+                }
+                
+                function loadProfilePage(){
+                    document.getElementById('changeMyPasswordFrame').src="{!changePasswordUrl}";
+                    
+                }
+                
+            </script>
+            <apex:commandLink action="{!Cancel}" value="<< Return to My Profile"/>
+                <br/>
+                <img id="loading_image" src="/changemgmt/img/spinner24.gif" />
+                <!--<iframe height="10px" id="lunaSPloginFrame" name="lunaSPloginFrame" src="{!lunaPortalUrl}" width="100%" scrolling="true" style="display:none;" onload="loadProfilePage()"></iframe>-->
+                <iframe height="600px" id="changeMyPasswordFrame" name="changeMyPasswordFrame" src="{!changePasswordUrl}" style="display:none;" width="100%" scrolling="true" onload="hideLoadingImage()"></iframe>
+                <br/>
+                <apex:commandLink action="{!Cancel}" value="<< Return to My Profile"/>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

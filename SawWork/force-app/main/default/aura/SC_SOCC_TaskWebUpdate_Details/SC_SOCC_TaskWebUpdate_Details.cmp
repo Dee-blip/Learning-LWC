@@ -1,0 +1,88 @@
+<!--
+Author          : Sumukh SS
+Description     : SOCC LUNA task functionality  
+
+Date                 Developer             JIRA #          Description  
+==============================================================================                                                     
+01 Sep 2019     	Sumukh SS		 ESESP-2198     SOCC Lightning Migration
+-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" controller="SC_SOCC_Case_LightningUtility" access="global">
+    
+    <aura:attribute name="TaskWebUpdateList" type="List"/>
+    <aura:attribute name="OpenCount" type="string"/>
+    <aura:attribute name="mycolumns" type="List"/>
+        <lightning:workspaceAPI aura:id="workspace"/>
+
+    <aura:handler event="force:refreshView" action="{!c.doInit}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <div class="slds-box slds-theme_default">
+        <lightning:accordion allowMultipleSectionsOpen="true" >
+            <lightning:accordionSection name="Task Luna Updates" label="{!v.OpenCount + ' Customer Updates'}" >
+                
+                
+                <aura:iteration items="{!v.TaskWebUpdateList}" var="taskupdate" indexVar="index">
+                    
+                    
+                    <div class="skip-feed-wrapper slds-box" style="background-color: white;border: #035382 1px solid;padding-bottom: 7px;padding-top: 8px;">
+                        
+                        <article class="cuf-feedElement cuf-feedItem">
+                            <div class="cuf-feedItemHeader cuf-media l-first">
+                                <div class="slds-grid" data-id="{!index}" onclick="{!c.closesection}">
+                                    <div class="slds-col slds-media slds-media_center slds-size_1-of-12">
+                                        <lightning:buttonicon iconName="utility:chevronright" aura:id="buttonli" value="{!index}" variant="bare"/>
+                                        
+                                    </div>
+                                    <div aura:id="subEle" class="slds-col slds-size_11-of-12 " data-id="{!index}" style="font-weight: bold">
+                                        <h1 style="overflow-x: hidden;
+                                                   text-overflow: ellipsis;max-height:20px">{!taskupdate.Description}</h1>
+                                    </div>
+                                </div>
+                                <div class="slds-media slds-hide" aura:id="testli" data-id="{!index}" >
+                                    <div class="slds-size_1-of-1">
+                                        <div class="slds-size_1-of-1 slds-grid slds-grid_vertical-stretch slds-grid_align-spread slds-has-flexi-truncate supportCompactFeedItemHeader">
+                                            <div class="preamble slds-col slds-col_bump-right">
+                                                <div class="slds-grid slds-wrap">
+                                                    <!--From Address-->
+                                                    <div class="slds-container_fluid">
+                                                        <div class="slds-grid slds-grid_vertical-stretch">
+                                                            <div class="slds-col preamble_left slds-var-p-right_x-small slds-truncate">
+                                                                <span class="cuf-entityLinkId entityLinkHover forceChatterEntityLink">
+                                                                    
+                                                                    <p class="cuf-actorLink cuf-entityLink">
+                                                                        
+                                                                        <b>From: </b> <a id="{!taskupdate.WhoId}" onclick="{!c.openNewTab}">{!taskupdate.ContactName}</a>
+                                                                    </p>
+                                                                    <p class="cuf-actorLink cuf-entityLink">
+                                                                        <b>Date: </b> <lightning:formattedDateTime value="{!taskupdate.CreatedDate}" year="numeric" month="numeric" day="numeric"  hour="2-digit" minute="2-digit"/>
+                                                                        
+                                                                    </p>
+                                                                    
+                                                                </span>
+                                                                
+                                                            </div>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="DescWrap">
+                                                        <p class="cuf-actorLink cuf-entityLink">
+                                                            <b>Description: </b> <a id="{!taskupdate.Id}" onclick="{!c.openNewTab}">{!taskupdate.Description}</a>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </aura:iteration>
+                
+            </lightning:accordionSection>
+        </lightning:accordion>
+    </div>
+</aura:component>

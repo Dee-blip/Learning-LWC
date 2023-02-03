@@ -1,0 +1,12 @@
+.THIS.box {
+   border: 1px solid rgb(217, 219, 221);  
+   border-radius:4px;
+  }
+  .THIS .header 
+  {
+    background-color: #f1f1f1;
+    padding: 20px 10px;
+    /* border-bottom: 1px solid rgb(217, 219, 221);  */
+    border-bottom: 1px solid #1589ee;
+    
+  }

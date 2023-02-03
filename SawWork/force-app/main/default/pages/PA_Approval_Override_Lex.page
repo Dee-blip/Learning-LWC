@@ -1,0 +1,32 @@
+<apex:page standardController="Product_Approvals__c" >
+    <apex:includeScript value="{!$Resource.JQuery111}/jquery-1.11.2/dist/jquery.min.js"/>
+    <apex:includeScript value="/soap/ajax/36.0/connection.js"/>
+	<apex:includeScript value="/soap/ajax/36.0/apex.js"/>
+    <apex:includeLightning />
+    <apex:slds />
+
+    <script type = "text/javascript">
+    window.onload=function()      
+    {        
+        sforce.connection.sessionId = '{!$Api.Session_ID}';
+        var jsResponse = sforce.apex.execute("ProductApprovalHandler","approvalOverride", {approvalId:"{! Product_Approvals__c.Id}"});
+        j= jQuery.noConflict();
+        j('div.loader').text(jsResponse);
+    };
+	</script>
+
+   <apex:form >
+       <div class="loader">
+           
+           Please wait while the request is being processed....
+       <div style="height: 6rem;" >
+        
+        <div role="status" class="slds-spinner slds-spinner_large slds-spinner_brand">
+            <span class="slds-assistive-text">Loading</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+        </div>
+	    </div>
+       </div>
+   </apex:form>
+</apex:page>

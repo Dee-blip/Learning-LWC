@@ -1,0 +1,24 @@
+NAME,TOGGLE__C,DISABLED_ALERT_MESSAGE__C
+AccountReassignment1.0,FALSE,This feature is currently unavailable. Sorry for the inconvenience. Please contact your System Administrator for assistance.
+LaunchItemApproval,TRUE,This feature is currently unavailable. Sorry for the inconvenience. Please contact your System Administrator for assistance.
+isContractShareEnabled,TRUE,This feature is currently unavailable. Sorry for the inconvenience. Please contact your System Administrator for assistance.
+isOOTBForecastingEnabled,TRUE,This feature is currently unavailable. Please contact CRM Admins <eae-ops@akamai.com> for assistance.
+isMigrateForecastingDataEnabled,FALSE,This feature is currently unavailable. Please contact CRM Admins <eae-ops@akamai.com> for assistance.
+isCronErrorMailViaCode,TRUE,This feature is currently unavailable. Sorry for the inconvenience. Please contact your System Administrator for assistance.
+pendingESignWithExpiredOFAlert,TRUE,This feature is currently unavailable. Sorry for the inconvenience. Please contact your System Administrator for assistance.
+IsCastIronMonitoringEnabled,FALSE,This feature is currently unavailable. Sorry for the inconvenience. Please contact your System Administrator for assistance.
+UserRoleUpdateThroughAssignmentRule,TRUE,
+UpdateContactOwnerForInActiveUsers,TRUE,
+UpdateChannelManagerToOpptySalesTeam,TRUE,This feature is currently unavailable. Sorry for the inconvenience. Please contact your System Administrator for assistance.
+AutoPDRAUpdateOnAcctInsert,TRUE,
+AccountReassignment,TRUE,"For 2014 Account Transition, the reassignment of Accounts is temporarily deactivated. This service will be back very soon. If you need immediate assistance please contact your Sales Operations Manager."
+Oppty Products-Other Drop & Add,FALSE,NA
+Product Wizard - Product Grouping,FALSE,NA
+RSMSignatureRequest,TRUE,"This feature is currently unavailable. To know more about this feature, please contact System Administrator for assistance."
+WYWYNActivitiesPageToggle,TRUE,This feature is currently unavailable. Please contact your System Administrator for assistance.
+UserActivationSendEmail,FALSE,This feature is currently unavailable. Sorry for the inconvenience. Please contact your System Administrator for assistance.
+SFExchangeRateToggle,FALSE,This feature is currently unavailable. Sorry for the inconvenience. Please contact your System Administrator for assistance.
+AnaplanSubTerritoryEmailToggle,TRUE,This feature is currently unavailable. Sorry for the inconvenience. Please contact your System Administrator for assistance.
+PostRefreshActivitySwitch,FALSE,This feature is currently unavailable. Sorry for the inconvenience. Please contact your System Administrator for assistance.
+Partner Sellable Country Toggle,TRUE,NA
+IsMP3Enabled,TRUE,This feature is currently unavailable. Sorry for the inconvenience. Please contact your System Administrator for assistance.

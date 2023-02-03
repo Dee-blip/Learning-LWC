@@ -1,0 +1,68 @@
+<!----------------------------------------------------------------------------------------
+ * Page Name 			: SC_KCSScorecard_EditPage
+ * Controller			: SC_KCSScorecard_CreationCtrl
+ * Developer Name 		: Vamsee Surya
+ * Date 				: 25th May,2017
+ * JIRA 				: ESESP-550 
+------------------------------------------------------------------------------------------>
+<!-- Separate Edit Page is required because to override the Edit button StandardController should be that object : 
+	 In this case it is not possible to get the ArticleId from ID parameter-->
+<apex:page standardController="SC_KCS_Scorecard__c" extensions="SC_KCSScorecard_CreationCtrl" sidebar="True" title="Scorecard" tabStyle="Account">
+    <!--Vaild Section-->
+    <apex:outputPanel rendered="{!isValid}">
+        <apex:pageBlock >
+            <apex:pagemessages Id="pageMsg"/>
+            	<!--Article Information Section-->
+                <apex:pageBlockSection title="Article Information" collapsible="false" columns="1" >
+                    <apex:outputField value="{!scorecardObject.Article_Created_By__c}"  label="Article Author "/>
+                    <apex:outputField value="{!scorecardObject.Article_Author_KCS_Level__c}"/>
+                    <apex:outputField value="{!scorecardObject.Article_Author_Manager__c}" />
+                    <apex:outputField value="{!scorecardObject.Coach__c}"/>
+                    <apex:outputField value="{!scorecardObject.Article_Id__c}"  label="Article Number "/>
+                    <apex:outputField value="{!scorecardObject.Article_Title__c}"/>
+                    <apex:outputField value="{!scorecardObject.Article_Created_Date__c}"  label="Article Created Date "/>
+                </apex:pageBlockSection>
+                
+            	<!--Scorecard Section-->
+                <apex:pageBlockSection title="Scorecard" collapsible="false" columns="1">
+                    <Apex:form >
+         				<!--Saving Status-->
+                        <center>
+                            <apex:actionstatus id="actStatusId">
+                                <apex:facet name="start">
+                                    <div class="waitingSearchDiv" style="background-color: #fbfbfb; height: 100%; opacity: 0.65; width: 100%;position:fixed;z-index:1000;">
+                                        <div class="waitingHolder" style="top: 50%; width: 91px; position: fixed;z-index: 1001; left: 45%;">
+                                            <img class="waitingImage" src="/img/loading.gif" title="Please Wait.." /> 
+                                            <span class="waitingDescription">Saving..</span>
+                                        </div>
+                                    </div>
+                                 </apex:facet>
+                            </apex:actionstatus> 
+                        </center>
+                        
+                        <!--Scorecard Criteria Section-->
+                        <apex:pageblockTable value="{!scorecardCriteriaList}" var="eachCriteria" >
+                             <apex:column style="width:5%;"><apex:facet name="header">Criteria #</apex:facet><apex:outputField value="{!eachCriteria.Criteria_Number__c}"  /></apex:column>
+                             <apex:column style="width:45%;"><apex:facet name="header">Criteria Name </apex:facet><apex:outputField value="{!eachCriteria.Criteria_Name__c}"  /></apex:column>
+                             <apex:column style="width:20%;"><apex:facet name="header">Response </apex:facet><apex:inputField value="{!eachCriteria.Response__c}" required="true"/></apex:column>
+                             <apex:column style="width:15%;"><apex:facet name="header">Points </apex:facet><apex:outputField value="{!eachCriteria.Points__c}"  /></apex:column>
+                             <apex:column ><apex:facet name="header">Fixed </apex:facet><apex:inputField value="{!eachCriteria.Fixed__c}" /></apex:column>
+                        </Apex:pageblockTable>
+                        
+                        <br/><b>Notes</b>
+                        <apex:inputField value="{!scorecardObject.Notes__c}" label="Notes" style="width:100%;margin-top:10px;"/>
+                        
+                        <apex:commandButton value="Save" action="{!UpdateScorecard}" style="margin-left:45%;margin-top:4%;width:50px;" status="actStatusId" oncomplete="" reRender="pageMsg"/>
+     
+                    </Apex:form>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+    </apex:outputPanel>
+    
+    <!--Invalid Section-->
+    <apex:outputPanel rendered="{!!isValid}">
+        <center> 
+            <apex:outputText style="font-weight: bold;" value="{!errorMessage}"/>
+        </center>
+    </apex:outputPanel>
+</apex:page>

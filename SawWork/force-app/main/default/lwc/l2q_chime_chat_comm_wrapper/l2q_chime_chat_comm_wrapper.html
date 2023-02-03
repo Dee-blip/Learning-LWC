@@ -1,0 +1,9 @@
+<template>
+    <template if:true={hasChimeAccess}>
+        <div style="padding:8px; background-color:white;border-radius:5px">
+            <c-sc-community-comments record-id={chimeid} visibility="Public" -application-name="CHIME"
+                -parent-object="CHIME__c">
+            </c-sc-community-comments>
+        </div>
+    </template>
+</template>

@@ -1,0 +1,19 @@
+<apex:page controller="CS_CreateSurveyRecordsController" id="Page1" wizard="false" tabStyle="CS_Survey__c">
+    <apex:form id="form1">
+        <apex:pageBlock >
+        <apex:pageMessages id="errorMessage">
+        </apex:pageMessages>
+            <apex:pageBlockSection title="Please enter the list of AKAM Contact Ids, one value per line" showHeader="true" collapsible="false" id="section1" columns="1">
+                <apex:panelGroup id="contactPane">
+                    <apex:inputTextarea id="contactsList" value="{!akamContactsList}" rows="25" style="font-family: 'courier new'; font-size: 12px" cols="50" disabled="false"/>
+               </apex:panelGroup>
+           </apex:pageBlockSection>
+
+               <br />
+               <br /> 
+           <apex:pageBlockButtons location="bottom">
+               <apex:commandButton Value="Delete records" action="{!removeContactsFromSurvey}" oncomplete="javascript:alert('Total number of Survey Contacts deleted: {!countOfSurveyContacts}. \n Total number of Survey Accounts deleted: {!countOfSurveyAccounts}. ')"  />
+           </apex:pageBlockButtons>
+       </apex:pageBlock>
+   </apex:form> 
+</apex:page>

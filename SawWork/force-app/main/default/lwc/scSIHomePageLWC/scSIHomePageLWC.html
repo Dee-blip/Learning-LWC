@@ -1,0 +1,668 @@
+<template>
+	<!-- Spinner loading conditionally-->
+	<template if:true={loadSpinner}>
+		<div class="forceModalSpinner testModal" style="z-index: 99 !important">
+			<div class="modal-glass" style="opacity: 0.2;">&nbsp;</div>
+			<div class="forceInlineSpinner indicatorContainer" aria-hidden="false" role="alert" data-aura-class="forceInlineSpinner">
+				<div class="forceDotsSpinner" data-aura-class="forceDotsSpinner">
+					<div class="slds-spinner slds-spinner_brand slds-spinner_medium" role="status">
+						<span class="slds-assistive-text">Loading...</span>
+						<div class="slds-spinner__dot-a"></div>
+						<div class="slds-spinner__dot-b"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+    </template>
+    
+	<!--My Incident Section-->
+	<!--Custom Header-->
+	<div class="slds-card slds-page-header"
+	style="height: auto;max-height: 80vh;padding-top: 0px;padding-bottom: 4px;">
+	<div class="slds-grid slds-gutters">
+		<header class="slds-media slds-media_center slds-has-flexi-truncate">
+			
+
+			<div class="slds-media__figure slds-col slds-size_1-of-4">
+
+				<ul class="slds-list_horizontal slds-media_center">
+					<li>
+						<template if:true={myIncidentSectionExpanded}>
+							<lightning-button-icon icon-name="utility:chevrondown" variant="bare"
+								style="padding-right: 6px; padding-left: 2px;" alternative-text="Collapse"
+								title="Collapse" onclick={myIncidentSectionView}>
+							</lightning-button-icon>
+						</template>
+
+						<template if:false={myIncidentSectionExpanded}>
+							<lightning-button-icon icon-name="utility:chevronright" variant="bare"
+								style="padding-right: 6px; padding-left: 2px;" alternative-text="Collapse"
+								title="Collapse" onclick={myIncidentSectionView}>
+							</lightning-button-icon>
+						</template>
+					</li>
+					<li style="margin-right: 5px;">
+						<lightning-icon icon-name="standard:omni_supervisor" size="medium" alternative-text="case"
+							title="case">
+						</lightning-icon>
+					</li>
+					<li>
+						<div class="slds-media__body">
+							<div class="slds-page-header__name">
+								<div class="slds-page-header__name-title">
+									<h3>
+										<span class="slds-text-heading_small slds-truncate"><b>{noOfMyIncidentsLabel}</b></span>
+									</h3>
+								</div>
+							</div>
+							
+							
+						</div>
+
+					</li>
+				</ul>
+			</div>
+
+			<template if:true={myIncidentSectionExpanded}>
+			<div class="slds-media slds-col slds-size_1-of-4 customStatus" style="margin-top:8px;margin-bottom:8px;">
+				
+				
+					<lightning-button-menu class="iconStyle" icon-name="utility:filterList" label ="Status" tooltip="Filter by Status">
+						<lightning-checkbox-group name="statusCheckboxGroupMyIncident" options={StatusoptionsMyIncident}
+							onchange={handleCheckboxChange} value={statusvalueMyIncident}></lightning-checkbox-group>
+					</lightning-button-menu>
+					<div style="margin-left:2px">
+					<lightning-button-menu class="iconStyle" icon-name="utility:filterList" label="Severity" tooltip="Filter by Severity">
+						<lightning-checkbox-group name="impactCheckboxGroupMyIncident" options={ImpactoptionsMyIncident}
+							onchange={handleCheckboxChange} value={impactvalueMyIncident}></lightning-checkbox-group>
+					</lightning-button-menu>
+					</div>
+					
+			</div>
+		
+			<!--<div class="slds-col slds-size_1-of-6 slds-align_absolute-center custom">
+				
+					<lightning-button-menu class="iconStyle" icon-name="utility:filterList" label="Severity" tooltip="Filter by Severity">
+						<lightning-checkbox-group name="impactCheckboxGroupMyIncident" options={ImpactoptionsMyIncident}
+							onchange={handleCheckboxChange} value={impactvalueMyIncident}></lightning-checkbox-group>
+					</lightning-button-menu>
+					
+			</div>-->
+			<div class="slds-col slds-size_1-of-4 applyAllStyle" >
+				<lightning-button label="Apply All"  name="Apply All" variant="Brand" onclick={handleApplyAll}></lightning-button>
+			</div>
+			<div class="slds-col slds-size_1-of-4" style="padding: 0px;">
+				<div class="slds-grid">
+					<div class="slds-col slds-size_3-of-4" style="margin-top:-13px;">
+						<div onkeypress={keycheck} >
+							<lightning-input type="text" placeholder="Search In My Incidents and Press Enter..." name="searchMyIncidents" onblur={handleSearch} value={searchKeyMyIncidentsSection} class="cust slds-align__absolute-center"></lightning-input>
+							
+						</div>
+					</div>
+					<div class="slds-col slds-size_1-of-4 refresh">
+						
+						<lightning-button-icon tooltip="Refresh" icon-name="action:refresh" onclick={handleApplyAll} variant="brand" name="refreshMyIncidents" alternative-text="Refresh" title="Refresh"></lightning-button-icon>
+					</div>
+				</div>
+				
+				
+					
+				
+			</div>
+			<!--<div class="slds-col slds-size_1-of-6 slds-align_absolute-center">
+				<lightning-button-icon tooltip="Refresh" icon-name="action:refresh" onclick={handleApplyAll} variant="brand" name="refreshMyIncidents" alternative-text="Refresh" title="Refresh"></lightning-button-icon>
+		
+			</div>-->
+			</template>
+		</header>
+	</div>
+	</div>
+	<template if:true={myIncidentSectionExpanded}>
+	<div class="dataTable">	
+	<lightning-card>
+								<!--<lightning-datatable
+                        
+                                key-field="Id"
+								
+								data={currentPageData}
+                                hide-checkbox-column = "true"
+                                columns={columns}
+                                onsort={updateColumnSorting}
+                                onrowaction={handleRowAction}
+                                
+                                sorted-by={sortBy}
+                                sorted-direction={sortDirection}
+								></lightning-datatable>-->
+								<c-sc-s-i-cell-edit-custom-datatype
+									  
+									key-field="Id"
+									data={currentPageData}
+									hide-checkbox-column = "true"
+									columns={columns}
+									onsort={updateColumnSorting}
+                                	onrowaction={handleRowAction}
+                                	sorted-by={sortBy}
+                                	sorted-direction={sortDirection}
+									onshowtitles ={handleShowTitlePopup}
+								></c-sc-s-i-cell-edit-custom-datatype>
+
+								<lightning-layout-item size="12" margin="around-small">
+									
+									<div class="slds-align_absolute-center slds-m-top_medium">
+									   <ul class="slds-button-group-row">
+										 <template if:true={hasPrev}>
+											 <li class="slds-button-group-item prev" >
+												<lightning-button variant ="neutral" label="Prev" name="prevMyIncident"  onclick={onPrev}></lightning-button>
+												
+											 </li>
+										 </template>
+										 <template if:true={arePagesMoreThanOneMyIncidentSection}>
+										  <template for:each={pagesList} for:item= "pageNumber">
+											 <li class="slds-button-group-item pageButtons" key={pageNumber}>
+												 
+												<lightning-button variant ="neutral" label={pageNumber} name="myIncidentPageButton"  onclick={onPageClick}></lightning-button>
+												
+											 </li>
+										  </template>
+										 </template> 
+										 <template if:true={hasNext}>
+											 <li class="slds-button-group-item next" >
+												<lightning-button variant ="neutral" label="Next" name="nextMyIncident"  onclick={onNext}></lightning-button>
+												
+											 </li>
+										 </template>
+									   </ul>
+									   <template if:true={arePagesMoreThanOneMyIncidentSection}>
+										<span style="margin-left:15px;font-size:15px;color:#1876F2;">Page {pageMyIncident} of {pages.length}</span>
+										</template>
+									</div>
+								</lightning-layout-item>
+	</lightning-card>
+	</div>						
+	</template>	
+	<!--Queue Section-->
+	<div class="slds-card slds-page-header"
+	style="height: auto;margin-top: 10px;max-height: 80vh;padding-top: 0px;padding-bottom: 4px;">
+	<div class="slds-grid slds-gutters">
+		<header class="slds-media slds-media_center slds-has-flexi-truncate">
+			
+
+			<div class="slds-media__figure slds-col slds-size_1-of-4">
+
+				<ul class="slds-list_horizontal slds-media_center">
+					<li>
+						<template if:true={queueSectionExpanded}>
+							<lightning-button-icon icon-name="utility:chevrondown" variant="bare"
+								style="padding-right: 6px; padding-left: 2px;" alternative-text="Collapse"
+								title="Collapse" onclick={queueSectionView}>
+							</lightning-button-icon>
+						</template>
+
+						<template if:false={queueSectionExpanded}>
+							<lightning-button-icon icon-name="utility:chevronright" variant="bare"
+								style="padding-right: 6px; padding-left: 2px;" alternative-text="Collapse"
+								title="Collapse" onclick={queueSectionView}>
+							</lightning-button-icon>
+						</template>
+					</li>
+					<li style="margin-right: 5px;">
+						<lightning-icon icon-name="standard:drafts" size="medium" alternative-text="case"
+							title="case">
+						</lightning-icon>
+					</li>
+					<li>
+						<div class="slds-media__body">
+							<div class="slds-page-header__name">
+								<div class="slds-page-header__name-title">
+									<h3>
+										<span class="slds-text-heading_small slds-truncate"><b>{noOfQueueIncidentsLabel}</b></span>
+									</h3>
+								</div>
+							</div>
+						
+						</div>
+
+					</li>
+				</ul>
+			</div>
+
+			<template if:true={queueSectionExpanded}>	
+			<div class="slds-media slds-col slds-size_1-of-4 customStatus" style="margin-top:8px;margin-bottom:8px;">
+				
+				
+					<lightning-button-menu class="iconStyle" icon-name="utility:filterList" label ="Status" tooltip="Filter by Status">
+						<lightning-checkbox-group name="statusCheckboxGroupQueue" options={StatusoptionsQueue}
+										onchange={handleCheckboxChange} value={statusvalueQueue}></lightning-checkbox-group>
+					</lightning-button-menu>
+					<div style="margin-left:2px">
+					<lightning-button-menu class="iconStyle" icon-name="utility:filterList" label="Severity" tooltip="Filter by Severity">
+						<lightning-checkbox-group name="impactCheckboxGroupQueue" options={ImpactoptionsQueue}
+										onchange={handleCheckboxChange} value={impactvalueQueue}></lightning-checkbox-group>
+					</lightning-button-menu>
+					</div>
+					<div class="queueDropdown" style="margin-left:2px;">
+					
+					
+						<lightning-button-menu class="iconStyle" icon-name="utility:filterList" label ="Queue" tooltip="Filter by Queue">
+							<lightning-checkbox-group name="queueCheckboxGroupQueue" options={queueOptions}
+											onchange={handleCheckboxChange} value={queuevalueQueue}></lightning-checkbox-group>
+						</lightning-button-menu>
+						
+					</div>
+
+					
+			</div>
+
+			<!--<div class="slds-col slds-size_1-of-6 slds-align_absolute-center custom">
+				<div style="margin-left:100px;">
+				<lightning-button-menu class="iconStyle" icon-name="utility:filterList" label="Severity" tooltip="Filter by Severity">
+					<lightning-checkbox-group name="impactCheckboxGroupQueue" options={ImpactoptionsQueue}
+									onchange={handleCheckboxChange} value={impactvalueQueue}></lightning-checkbox-group>
+				</lightning-button-menu>
+				</div>
+				<span class="queueDropdown" style="margin-left:10px;">
+					
+					
+					<lightning-button-menu class="iconStyle" icon-name="utility:filterList" label ="Queue" tooltip="Filter by Queue">
+						<lightning-checkbox-group name="queueCheckboxGroupQueue" options={queueOptions}
+										onchange={handleCheckboxChange} value={queuevalueQueue}></lightning-checkbox-group>
+					</lightning-button-menu>
+					
+				</span>
+				
+			</div>-->
+
+			<!--<div class="slds-col slds-size_1-of-7 slds-align_absolute-center customStatus">
+				<span style="margin-top:-17px">
+					
+					
+					<lightning-button-menu class="iconStyle" icon-name="utility:filterList" label ="Queue" tooltip="Filter by Queue">
+						<lightning-checkbox-group name="queueCheckboxGroupQueue" options={queueOptions}
+										onchange={handleCheckboxChange} value={queuevalueQueue}></lightning-checkbox-group>
+					</lightning-button-menu>
+					
+				</span>
+			</div>-->
+			
+			
+			<div class="slds-col slds-size_1-of-4 applyAllStyle" >
+				
+				<lightning-button class="" label="Apply All" name="Apply AllQueue" variant="Brand" onclick={handleApplyAll}></lightning-button>
+				<span style="margin-left:10px;">
+				<lightning-button-icon icon-name="utility:save" alternative-text="Apply All and Save Filters" class="" title="Apply All and Save Filters" tooltip="Apply All and Save Filters" variant="Brand" size="large" onclick={handleSaveFilter}></lightning-button-icon>
+				</span>
+			</div>
+			<!--<div class="slds-col slds-size_1-of-8 slds-align_absolute-center applyAllStyle" >
+				
+				<lightning-button-icon icon-name="utility:save" alternative-text="Apply All and Save Filters" class="slds-align_absolute-center" title="Apply All and Save Filters" tooltip="Apply All and Save Filters" variant="Brand" size="large" onclick={handleSaveFilter}></lightning-button-icon>
+				
+			</div>-->
+			<div class="slds-col slds-size_1-of-4" style="padding: 0px;">
+				<div class="slds-grid">
+					<div class="slds-col slds-size_3-of-4" style="margin-top:-13px">
+						<div onkeypress={keycheck} >
+							<lightning-input type="text" placeholder="Search Incidents In Queue and press Enter..." name="searchQueue" onblur={handleSearch} value={searchKeyQueueSection} class="cust slds-align__absolute-center"></lightning-input>
+						</div>
+					</div>
+					<div class="slds-col slds-size_1-of-4 refresh">
+						<lightning-button-icon tooltip="Refresh" icon-name="action:refresh" onclick={handleApplyAll} variant="brand" name="refreshQueue" alternative-text="Refresh" title="Refresh"></lightning-button-icon>
+					</div>
+				</div>
+				
+			</div>
+			<!--<div class="slds-col slds-size_1-of-6 slds-align_absolute-center">
+				<lightning-button-icon tooltip="Refresh" icon-name="action:refresh" onclick={handleApplyAll} variant="brand" name="refreshQueue" alternative-text="Refresh" title="Refresh"></lightning-button-icon>
+		
+			</div>-->
+			</template>
+		</header>
+	</div>
+	</div>
+	<template if:true={queueSectionExpanded}>
+		<div class="dataTable">
+		<lightning-card>
+			<template if:true={isIRAPTUser}>
+					
+				<!--<lightning-datatable
+							
+							key-field="Id"
+							data={currentPageDataQueue}
+							hide-checkbox-column = "true"
+							columns={columnsQueueSection}
+							onsort={updateColumnSortingIncidentsInQueueSection}
+							sorted-by={sortByQueueSection}
+							onrowaction={handleAssignment}
+							sorted-direction={sortDirectionQueueSection}></lightning-datatable>-->
+							<c-sc-s-i-cell-edit-custom-datatype
+							   
+							key-field="Id"
+							data={currentPageDataQueue}
+							hide-checkbox-column = "true"
+							columns={columnsQueueSection}
+							onrowaction={handleAssignment}
+							sorted-by={sortByQueueSection}
+							sorted-direction={sortDirectionQueueSection}
+							onsort={updateColumnSortingIncidentsInQueueSection}
+							onshowtitles ={handleShowTitlePopup}
+							
+							></c-sc-s-i-cell-edit-custom-datatype> 
+			</template>
+			<!--Data table if logged-in user in non-IRAPT-->
+			<template if:false={isIRAPTUser}>
+				<!--<lightning-datatable
+								class="allIncidents"
+								key-field="Id"
+								data={currentPageDataQueue}
+								hide-checkbox-column = "true"
+								columns={columnsQueueSectionNonIrapt}
+								onsort={updateColumnSortingIncidentsInQueueSection}
+								sorted-by={sortByQueueSection}
+								onrowaction={handleAssignment}
+								sorted-direction={sortDirectionQueueSection}>
+					</lightning-datatable>-->
+					<c-sc-s-i-cell-edit-custom-datatype
+							class="allIncidents"   
+							key-field="Id"
+							data={currentPageDataQueue}
+							hide-checkbox-column = "true"
+							columns={columnsQueueSectionNonIrapt}
+							onrowaction={handleAssignment}
+							sorted-by={sortByQueueSection}
+							sorted-direction={sortDirectionQueueSection}
+							onsort={updateColumnSortingIncidentsInQueueSection}
+							onshowtitles ={handleShowTitlePopup}
+							
+							></c-sc-s-i-cell-edit-custom-datatype> 
+					
+			</template>
+			
+				<lightning-layout-item size="12" margin="around-small">
+					<div class="slds-align_absolute-center slds-m-top_medium">
+					   <ul class="slds-button-group-row">
+						 <template if:true={hasPrevQueue}>
+							 <li class="slds-button-group-item prevQueue" >
+								<lightning-button variant ="neutral" label="Prev" name="prevQueue"  onclick={onPrev}></lightning-button>
+								
+							 </li>
+						 </template>
+						 <template if:true={arePagesMoreThanOneQueueSection}>
+						  <template for:each={pagesListQueue} for:item= "pageNumber">
+							 <li class="slds-button-group-item pageButtonsQueue" key={pageNumber}>
+								<lightning-button variant ="neutral" label={pageNumber} name="queuePageButton"  onclick={onPageClick}></lightning-button>
+								
+							 </li>
+						  </template>
+						</template>
+						 <template if:true={hasNextQueue}>
+							 <li class="slds-button-group-item nextQueue" >
+								<lightning-button variant ="neutral" label="Next" name="nextQueue"  onclick={onNext}></lightning-button>
+								
+							 </li>
+						 </template>
+					   </ul>
+					   <template if:true={arePagesMoreThanOneQueueSection}>
+						<span style="margin-left:15px;font-size:15px;color:#1876F2;">Page {pageQueue} of {pagesQueue.length}</span>
+						</template>
+					</div>
+				</lightning-layout-item>
+			
+		</lightning-card>
+		</div>	
+
+	</template>
+	<!--All Incident Section-->
+	<div class="slds-card slds-page-header"
+	style="height: auto;margin-top: 10px;max-height: 80vh;padding-top: 0px;padding-bottom: 4px;">
+	<div class="slds-grid slds-gutters">
+		<header class="slds-media slds-media_center slds-has-flexi-truncate">
+			
+
+			<div class="slds-media__figure slds-col slds-size_1-of-4">
+
+				<ul class="slds-list_horizontal slds-media_center">
+					<li>
+						<template if:true={allIncidentSectionExpanded}>
+							<lightning-button-icon icon-name="utility:chevrondown" variant="bare"
+								style="padding-right: 6px; padding-left: 2px;" alternative-text="Collapse"
+								title="Collapse" onclick={allIncidentSectionView}>
+							</lightning-button-icon>
+						</template>
+
+						<template if:false={allIncidentSectionExpanded}>
+							<lightning-button-icon icon-name="utility:chevronright" variant="bare"
+								style="padding-right: 6px; padding-left: 2px;" alternative-text="Collapse"
+								title="Collapse" onclick={allIncidentSectionView}>
+							</lightning-button-icon>
+						</template>
+					</li>
+					<li style="margin-right: 5px;">
+						<lightning-icon icon-name="standard:orders" size="medium" alternative-text="case"
+							title="case">
+						</lightning-icon>
+					</li>
+					<li>
+						<div class="slds-media__body">
+							<div class="slds-page-header__name">
+								<div class="slds-page-header__name-title">
+									<h3>
+										<span class="slds-text-heading_small slds-truncate"><b>{noOfAllIncidentsLabel}</b></span>
+									</h3>
+								</div>
+							</div>
+							<p class="slds-page-header__name-meta">Last 2 month Service Incidents
+							</p>
+							
+						</div>
+
+					</li>
+				</ul>
+			</div>
+
+			<template if:true={allIncidentSectionExpanded}>	
+			<div class="slds-media slds-col slds-size_1-of-4 customStatus" style="margin-top:8px;margin-bottom:8px;">
+				
+				
+					<lightning-button-menu class="iconStyle" icon-name="utility:filterList" label ="Status" tooltip="Filter by Status">
+						<lightning-checkbox-group name="statusCheckboxGroupAllIncident" options={StatusoptionsAllIncident}
+									onchange={handleCheckboxChange} value={statusvalueAllIncident}></lightning-checkbox-group>
+					</lightning-button-menu>
+					<div style="margin-left:2px">
+					<lightning-button-menu class="iconStyle" icon-name="utility:filterList" label="Severity" tooltip="Filter by Severity">
+						<lightning-checkbox-group name="impactCheckboxGroupAllIncident" options={ImpactoptionsAllIncident}
+									onchange={handleCheckboxChange} value={impactvalueAllIncident}></lightning-checkbox-group>
+					</lightning-button-menu>
+					</div>
+					
+			</div>
+		
+			<!--<div class="slds-col slds-size_1-of-4 slds-align_absolute-center custom">
+				
+					<lightning-button-menu class="iconStyle" icon-name="utility:filterList" label="Severity" tooltip="Filter by Severity">
+						<lightning-checkbox-group name="impactCheckboxGroupAllIncident" options={ImpactoptionsAllIncident}
+									onchange={handleCheckboxChange} value={impactvalueAllIncident}></lightning-checkbox-group>
+					</lightning-button-menu>
+					
+			</div>-->
+			<div class="slds-col slds-size_1-of-4 applyAllStyle" >
+				<lightning-button label="Apply All" name="Apply AllallIncidents" variant="Brand" onclick={handleApplyAll}></lightning-button>
+				<span style="font-size:15px;font-weight:700;margin-left: 40px;margin-top:25px">
+					<a href="/lightning/o/SC_SI_Service_Incident__c/list?filterName=SC_SI_All_Open_Incidents_Not_In_Queues" target="_blank"> View Complete list</a>
+					<!--<lightning-formatted-url value="/lightning/o/SC_SI_Service_Incident__c/list?filterName=00B2g000001AAkyEAG" tooltip="" label="Visit salesforce.com" target="_blank" ></lightning-formatted-url>-->
+					
+				</span>
+			</div>
+			<div class="slds-col slds-size_1-of-4" style="padding: 0px;">
+				<div class="slds-grid">
+					<div class="slds-col slds-size_3-of-4" style="margin-top:-13px;">
+						<div onkeypress={keycheck} >
+							<lightning-input type="text" placeholder="Search In All Incidents and press Enter..." name="searchAllIncidents" onblur={handleSearch} value={searchKeyAllIncidentsSection} class="cust slds-align__absolute-center"></lightning-input>
+						</div>
+					</div>
+					<div class="slds-col slds-size_1-of-4 refresh">
+						<lightning-button-icon tooltip="Refresh" icon-name="action:refresh" onclick={handleApplyAll} variant="brand" name="refreshAllIncidents" alternative-text="Refresh" title="Refresh"></lightning-button-icon>
+					</div>
+				</div>
+				
+			</div>
+
+
+
+			
+			<!--<div class="slds-col slds-size_1-of-4 slds-align_absolute-center">
+				<lightning-button-icon tooltip="Refresh" icon-name="action:refresh" onclick={handleApplyAll} variant="brand" name="refreshAllIncidents" alternative-text="Refresh" title="Refresh"></lightning-button-icon>
+		
+			</div>-->
+			</template>
+		</header>
+	</div>
+	</div>
+	<template if:true={allIncidentSectionExpanded}>
+		<div class="dataTable">
+		<lightning-card>
+			<!--<lightning-datatable
+                        class="allIncidents"
+                                key-field="Id"
+                                data={currentPageDataAllIncident}
+                                hide-checkbox-column = "true"
+                                columns={columnsAllIncidents}
+                                onsort={updateColumnSortingAllIncidentsSection}
+                                sorted-by={sortByAllIncidentsSection}
+								sorted-direction={sortDirectionAllIncidentsSection}></lightning-datatable>-->
+								<c-sc-s-i-cell-edit-custom-datatype
+									class="allIncidents"  
+									key-field="Id"
+									data={currentPageDataAllIncident}
+									hide-checkbox-column = "true"
+									columns={columnsAllIncidents}
+									onsort={updateColumnSortingAllIncidentsSection}
+                                	sorted-by={sortByAllIncidentsSection}
+                                	sorted-direction={sortDirectionAllIncidentsSection}
+									onshowtitles ={handleShowTitlePopup}
+								></c-sc-s-i-cell-edit-custom-datatype> 
+			
+		
+								
+									<lightning-layout-item size="12" margin="around-small">
+										<div class="slds-align_absolute-center slds-m-top_medium">
+										   <ul class="slds-button-group-row">
+											 <template if:true={hasPrevAllIncident}>
+												 <li class="slds-button-group-item prevAllIncidentSection" >
+													<lightning-button variant ="neutral" label="Prev" name="prevAllIncident" onclick={onPrev}></lightning-button>
+												</li>
+											 </template>
+											 <template if:true={arePagesMoreThanOneAllIncidentSection}>
+											  <template for:each={pagesListAllIncident} for:item= "pageNumber">
+												 <li class="slds-button-group-item pageButtonsAllIncident" key={pageNumber}>
+													<lightning-button variant ="neutral" label={pageNumber} name="allIncidentPageButton" onclick={onPageClick}></lightning-button>
+													
+												 </li>
+											  </template>
+											 </template> 
+											 <template if:true={hasNextAllIncident}>
+												 <li class="slds-button-group-item nextAllIncident" >
+													<lightning-button variant ="neutral" label="Next" name="nextAllIncident" onclick={onNext}></lightning-button>
+													
+												 </li>
+											 </template>
+										   </ul>
+										   <template if:true={arePagesMoreThanOneAllIncidentSection}>
+											<span style="margin-left:15px;font-size:15px;color:#1876F2;">Page {pageAllIncident} of {pagesAllIncident.length}</span>
+											</template>
+										</div>
+									</lightning-layout-item>
+				
+								
+		</lightning-card>
+		</div>
+	</template>		
+
+	<!--Custom Header-->
+
+
+	
+	
+	<template if:true={openAssignPopUp}>
+		<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+			<div class="slds-modal__container">
+				<header class="slds-modal__header slds-modal__header_empty">
+					<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+						<svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+							<use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+						</svg>
+						<span class="slds-assistive-text">Close</span>
+					</button>
+				</header>
+				<div class="slds-modal__content slds-p-around_medium" style="height:80px;font-weight:600" id="modal-content-id-1">
+					<p class="slds-align_absolute-center" style="margin-top:15px;font-size:17px">Please confirm that you want to assign this Service Incident to yourself.</p>
+				</div>
+				<footer class="slds-modal__footer slds-modal__footer_directional">
+					<button class="slds-button slds-button_neutral" onclick={handlePopUpCancel}>Cancel</button>
+					<button class="slds-button slds-button_brand" onclick={handlePopUpContinue}>Confirm</button>
+				</footer>
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open"></div>
+	</template>
+	<template if:true={openNotesPopUp}>
+		<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+			<div class="slds-modal__container">
+				<header class="slds-modal__header">
+					<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+						<svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+							<use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+						</svg>
+						<span class="slds-assistive-text">Close</span>
+					</button>
+					<h2 id="modal-heading-03" class="slds-modal__title slds-hyphenate">Transition Notes</h2>
+				</header>
+				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+					
+					<div>
+						<span style="font-weight:800">Suggested BIL : </span><span>{suggestedBIL}</span>
+					</div>
+					<div>
+						<span style="font-weight:800">Notes : </span><span>{notes}</span>
+					</div>
+					
+						
+					
+				</div>
+				<footer class="slds-modal__footer">
+					<button class="slds-button slds-button_brand" onclick={handlePopUpCancel}>Close</button>
+				</footer>
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open"></div>
+	</template>
+
+	<template if:true={showTitlePopUp}>
+		<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+			<div class="slds-modal__container">
+				<header class="slds-modal__header">
+					<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+						<svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+							<use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+						</svg>
+						<span class="slds-assistive-text">Close</span>
+					</button>
+					<h2 id="modal-heading-04" class="slds-modal__title slds-hyphenate">Title</h2>
+				</header>
+				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+					
+					<div>
+						<span style="font-weight:800"></span><span>{titlePopUpValue}</span>
+					</div>
+					
+					
+						
+					
+				</div>
+				<footer class="slds-modal__footer">
+					<button class="slds-button slds-button_brand" onclick={handleTitlePopUpCancel}>Close</button>
+				</footer>
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open"></div>
+	</template>
+	
+</template>

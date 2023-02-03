@@ -1,0 +1,21 @@
+<!-- MIGRATED THE HTML HOMEPAGE COMPONENT TO THE VISUALFORCE AS PART OF THE CR 2762976 -->
+
+<apex:page controller="WelcomeToPartnerPortal">
+
+  <style type="text/css">
+        h2 { font-weight: bold; font-size: 90%; }
+        a {font-size: 90%;}
+        a:link {text-decoration: none;}
+        div, html, body {background: #F1F3F5; line-height: 170%;}
+    </style>
+    
+    <div>
+         <h2>Welcome, {!$User.FirstName&' '&$User.LastName}</h2>
+         <br/>
+         &nbsp; <apex:outputLink value="/partners/{!currentContact.AccountId}" target="_parent">My Company Profile</apex:outputLink><br/>
+         &nbsp; <apex:outputLink value="/partners/{!myProfileLink}" target="_parent">My Profile</apex:outputLink><br/>
+         <h2>Channel Manager</h2><br/>
+         &nbsp;<a href="mailto:{!currentContact.Account.Owner.Email}" target="_blank">{!currentContact.Account.Owner.Name}</a> 
+    </div>
+    
+</apex:page>

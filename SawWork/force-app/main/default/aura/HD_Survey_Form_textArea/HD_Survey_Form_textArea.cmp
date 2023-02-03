@@ -1,0 +1,9 @@
+<aura:component >
+    <aura:attribute name="value" type="String"/>
+    <aura:attribute name="title" type="String"/>
+    <div class="slds-form-element">
+        <label class="slds-form-element__label slds-form-element__legend" for="input-id-02">{!v.title}</label>
+        <lightning:textarea aura:id="" name="input3" placeholder="type here..." value="{!v.value}" maxlength="240" label=" Note: Maximum length of 240 characters"/>
+        <c:HD_Survey_Form_textArea_length value="{! v.value}"/><!-- plugin for character count of this component -->
+    </div>
+</aura:component>

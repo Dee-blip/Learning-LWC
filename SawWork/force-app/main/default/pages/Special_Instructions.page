@@ -1,0 +1,116 @@
+<apex:page sidebar="false" standardController="Case" extensions="SpecialInstructionsListController"  showHeader="false" standardStylesheets="false"  id="pg" lightningstylesheets="true">
+    <!-- Include js file for sevice cloud -->
+    <apex:includeScript value="/support/console/28.0/integration.js"/>
+    <apex:includeScript value="{!$Resource.JQuery_New}"/>
+    <apex:includeScript value="{!$Resource.Collapser}"/>
+    <apex:includeScript value="/support/console/30.0/publisher.js"/>
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrap, '/css/bootstrap.min.css')}"/>
+    <style>
+    
+         th div {
+         font-size :10px;
+         }
+       
+        .bPageBlock{ 
+            background-color:#FFFFFF !important;
+            border-top: 0px !important; 
+            border-bottom: 0px !important; 
+            border-left: 0px !important; 
+            border-radius: 0px 0px 0px 0px;
+            border-right: 0px !important; 
+        }
+       
+        .pane-header {
+            background: url("{!URLFOR($Resource.PaneHeaderImage)}") repeat-x scroll left 1px #FFFFFF;
+            border-radius: 10px 10px 0 0;
+        }
+        body{
+            padding: 0px;
+        }
+        
+        .innerWrapper {
+            max-width: 450px !important;
+            overflow: scroll !important;
+        }
+        .styleTitle {
+            font-weight:normal;
+            font-family:sans-serif;
+            font-size:12px;
+            color:#1382cf;
+            line-height:30px;
+            vertical-align: top;
+
+        }
+    </style>
+    
+    <apex:form id="frm1" style="width:100%;"> 
+        <apex:messages styleClass="errorMsg" />
+         <apex:pageBlock id="pbSpecialInstructions">
+            <table class="table" style="width:100%;">
+                <tbody>                
+                    <tr>
+                        <td style="width:100%;border:0px;">
+                            <apex:panelGroup id="caseSection">
+                                <div style="border: 1px solid #DDDDDD;border-radius: 10px;">
+                                    
+                                    <apex:outputPanel layout="block" style="height:40px; padding-top:10px;font-weight:bold;" styleClass="pane-header">
+                                        <div style="float:left; margin-left:10px; font-size:16px;">Special Instructions</div> 
+                                        <div style="float:Right; margin-right:5px;margin-top:13px; font-size:13px;color: #3597dc"> Total : {!instCount} </div>                                       
+                                    </apex:outputPanel>
+                                    
+                                    <apex:outputLabel value="No Special Instructions Available." rendered="{!splInstrList.size = 0 && caseWithAccount}" style="font-weight:400;font-style:italic;color:#788792;font-size:13px;line-height:40px;margin-right:5px;" ></apex:outputLabel>
+                                    <apex:outputLabel value="No Account Selected." rendered="{! !caseWithAccount}" style="font-weight:400;font-style:italic;color:#788792;font-size:13px;line-height:40px;margin-right:5px;" ></apex:outputLabel>
+                                    
+                                    <div style=" height : 550px;overflow:auto;">
+                                        <apex:pageBlockTable value="{!splInstrIdInstrMap}" var="splInstrVar" cellpadding="5" cellspacing="5" 
+                                                             styleClass="table table-striped" style="margin-bottom:0px;">                                                                                     
+                        
+                                            <apex:column headervalue="Icon" width="7.5%">
+                                            <apex:image value="https://{!logoUrl}{!specialInstructionLogoNameMap[splInstrIdInstrMap[splInstrVar]['Flag_Icon__c']]}" rendered="{!splInstrIdInstrMap[splInstrVar]['Flag_Icon__c'] != null}" style="height :25px;"/>
+                                            </apex:column>
+                                            <div style="border: 1px solid #DDDDDD;border-radius: 10px;"></div>
+      
+                                            <apex:column width="25%" style="font-size:12px">
+                                                <apex:facet name="header">Title</apex:facet>
+                                                <apex:outputLink onclick="openCaseInSubtab('{!splInstrIdInstrMap[splInstrVar]}');return false;" target="_blank" styleClass="styleTitle">{!splInstrIdInstrMap[splInstrVar]['Title_Formula__c']}</apex:outputLink>
+                                            </apex:column>  
+                                            
+                                            <apex:column width="67.5%"  >                                             
+                                               <apex:facet name="header">Instructions</apex:facet> 
+                                                <div style ="font-size:12px;">  
+                                                    <h class ="showHide"> <apex:outputText value="{! instructionsMap[splInstrVar]}" escape="false"/></h>
+                                                </div>
+                                            </apex:column>                                        
+                                        </apex:pageBlockTable>                                         
+                                    </div>             
+                                </div>
+                            </apex:panelGroup>
+                        </td>   
+                    </tr>
+                </tbody>
+            </table>
+        </apex:pageBlock>
+        
+       <script> 
+        
+        //Collapser Code to show and Hide with 30 Char
+        $('.showHide').collapser({
+        mode: 'chars',
+        truncate: 30
+        });
+        
+        function openCaseInSubtab(recId){
+            var redirectUrl = recId;
+            if (sforce.console.isInConsole()) {
+                sforce.console.getEnclosingTabId(function(enclosingResult){
+                    sforce.console.getEnclosingPrimaryTabId(function(primaryResult){
+                        sforce.console.openSubtab(primaryResult.id, redirectUrl, true, '', null);
+                    });
+                });
+            } else {
+                window.open('/'+redirectUrl);
+            }
+        } 
+        </script>
+    </apex:form>
+</apex:page>

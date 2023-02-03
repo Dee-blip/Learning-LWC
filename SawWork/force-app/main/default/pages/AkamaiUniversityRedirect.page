@@ -1,0 +1,14 @@
+<apex:page controller="AkamaiUniversityRedirectController" action="{!captureAULogin}">
+<!-- CR 3018377   -->
+<br/><br/> 
+
+If Akamai University does not appear in a new window please <a id="mylink" href="{!value}" target="{!target}">click here</a> to launch. 
+<script>
+function OpenLink(){
+window.open('{!value}','{!target}');
+}
+window.onload=OpenLink;
+//window.open('{!value}','width=1080,height=768,toolbar=yes, location=yes,directories=yes,status=yes,menubar=yes,scrollbars=yes,copyhistory=yes,resizable=yes') {!target}
+</script> 
+
+</apex:page>

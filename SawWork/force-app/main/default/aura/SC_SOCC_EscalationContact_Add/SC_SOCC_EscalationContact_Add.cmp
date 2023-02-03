@@ -1,0 +1,209 @@
+<!--
+History :
+Date                 Developer                JIRA #            Description                                                       
+23 Sep 2019         Pinkesh/Sumukh                          SOCC CAR 2 - RunBooks 
+17 Jun 2021         Tejaswini               ESESP-5132      SOCC-Availability changes
+-->
+<aura:component > 
+    <!-- attributes coming from the parent component -->
+    <!-- Policy Domain Id-->
+    <aura:attribute name="pdId" type="String"/>
+    <!-- To store existing + newly selected Authorized Contact Ids -->
+    <aura:attribute name="lAuthConId" type="List"/>
+    <!-- List of all required Authrized Contact for table data --> 
+    <aura:attribute name="lAuthorizedContactTableData" type="List"/>
+    
+    <!-- List of Attributes -->
+    <!-- 1. List of filtered Authrized Contact for table data --> 
+    <aura:attribute name="lFilteredAuthorizedContactTableData" type="List"/>
+    
+    <!-- List of values for Action If Unreachable -->
+    <aura:attribute name="lActionIfUnreachable" type="List" />
+
+    <!-- Search term-->
+    <aura:attribute name="searchTerm" type="String"/>
+    <!-- to check/uncheck all checkboxes -->
+    <aura:attribute name="isSelectAll" type="boolean" default="false"/>
+
+    <!-- For Warning Message-->
+    <aura:attribute name="hasWarning" type="Boolean" default="false"/>
+    <aura:attribute name="warnedContacts" type="List"/>
+    
+    <!-- init method to trigger event and pass parameters -->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+    <!-- Registering event SC_SOCC_SendSelectedAuthCon to send back List of selected Authorized Contacts to parent component -->
+    <aura:registerEvent name="sendSelectedAuthCon" type="c:SC_SOCC_SendSelectedAuthCon"/>
+   
+    <!-- Main Modal -->
+     <div class="demo-only"  style="height: 100%;">
+            <section  class="slds-modal slds-fade-in-open">
+                <aura:if isTrue="{!v.hasWarning == false}">
+                    <div class="slds-modal__container" style="width: 100%; max-width: 85rem;">
+                        <!-- Modal Header -->
+                        <div class="slds-modal__header slds-grid">
+                            <!-- Cross button to close the Modal -->
+                            <button class="slds-button slds-modal__close" title="Close" 
+                                    onclick="{!c.closeMe}">
+                                <lightning:icon class="white slds-icon_small" iconName="utility:close"/> 
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+
+                            <div class="slds-col slds-float_left">
+                                <span><h2 class="sectionHeading">Add Escalation Contacts</h2></span>
+                            </div>
+                            <div class="slds-col">
+                                <span class="slds-float_right"><lightning:input type="search" value="{!v.searchTerm}" onchange="{!c.dofilter}" placeholder="Search Name or Email "/></span>
+                            </div>
+                            
+                            <!--
+                            <lightning:card title="Add Escalation Contacts">
+                                <aura:set attribute="actions">
+                                    <lightning:input value="{!v.searchTerm}" placeholder="Search Contact by "/> 
+                                </aura:set>
+                            </lightning:card>
+                            -->
+                            
+                        </div>
+                        <!--Modal Body -->
+                        <div class="slds-modal__content slds-p-around_medium" style="padding-top: 0rem;"> 
+                            <!-- Table to show data -->
+                            <table class="slds-table slds-table_cell-buffer slds-table_bordered" style="width:100%">
+                                <!--Table Header-->
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th class="table-fixed-cell" style="width: 5%;">           
+                                            <label class="slds-checkbox">
+                                                <ui:inputCheckbox value="{!v.isSelectAll}" change="{!c.handleSelectAllAuthContact}" aura:id="selectAll"/>
+                                                <span class="slds-checkbox--faux" />
+                                                <span class="slds-form-element__label"></span>
+                                            </label>
+                                        </th>
+                                        <th class="slds-text-title_caps table-fixed-cell" scope="col" style="width: 18%;">
+                                            <div class="cell-content" >Contact Name</div>
+                                        </th>
+                                        <th class="slds-text-title_caps table-fixed-cell" scope="col" style="width: 18%;">
+                                            <div class="cell-content" >Email</div>
+                                        </th>
+                                        <th class="slds-text-title_caps table-fixed-cell" scope="col" style="width: 13%;">
+                                            <div class="cell-content" >Primary Contact Method</div>
+                                        </th>
+                                        <th class="slds-text-title_caps table-fixed-cell" scope="col" style="width: 13%;">
+                                            <div class="cell-content" >Secondary Contact Method</div>
+                                        </th>
+                                        <th class="slds-text-title_caps table-fixed-cell" scope="col">
+                                            <div class="cell-content" >ACTION IF UNAVAILABLE</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                
+                                <tbody id="AuthConTable">
+                                    <aura:iteration items="{!v.lFilteredAuthorizedContactTableData}" var="authConRec">
+                                        <tr class="slds-hint-parent">
+                                            <td>
+                                                <label class="slds-checkbox">
+                                                    <ui:inputCheckbox aura:id="checkContact" value="{!authConRec.isSelected}" text="{!authConRec.authCon.Id}" change="{!c.handleSelectAuthContact}"/>
+                                                    <span class="slds-checkbox--faux" />
+                                                    <span class="slds-form-element__label"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <div class="cell-content">
+                                                    {!authConRec.authCon.Contact_Name__r.Name}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="cell-content">
+                                                    {!authConRec.authCon.Contact_Name__r.Email}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="slds-grid cell-content">
+                                                    <aura:if isTrue="{!authConRec.authCon.Contact_Name__r.Primary_Contact_Method__c == 'Mobile'}">
+                                                        <span>
+                                                            <lightning:buttonicon iconName="utility:phone_portrait" class="mobile" variant="bare" title="Mobile" alternativeText="Mobile" />
+                                                        </span>
+                                                        &nbsp;
+                                                        <span>{!authConRec.authCon.Contact_Name__r.MobilePhone}</span>
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!authConRec.authCon.Contact_Name__r.Primary_Contact_Method__c == 'Phone'}">
+                                                        <span>
+                                                            <lightning:buttonicon iconName="utility:dialing" class="phone" variant="bare" title="Phone" alternativeText="Phone" />
+                                                        </span>
+                                                        &nbsp;
+                                                        <span>{!authConRec.authCon.Contact_Name__r.Phone}</span>
+                                                    </aura:if>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="slds-grid cell-content">
+                                                    <aura:if isTrue="{!authConRec.authCon.Contact_Name__r.Secondary_Contact_Method__c == 'Mobile'}">
+                                                        <span>
+                                                            <lightning:buttonicon iconName="utility:phone_portrait" class="mobile" variant="bare" title="Mobile" alternativeText="Mobile" />
+                                                        </span>
+                                                        &nbsp;
+                                                        <span>{!authConRec.authCon.Contact_Name__r.MobilePhone}</span>
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!authConRec.authCon.Contact_Name__r.Secondary_Contact_Method__c == 'Phone'}">
+                                                        <span>
+                                                            <lightning:buttonicon iconName="utility:dialing" class="phone" variant="bare" title="Phone" alternativeText="Phone" />
+                                                        </span>
+                                                        &nbsp;
+                                                        <span>{!authConRec.authCon.Contact_Name__r.Phone}</span>
+                                                    </aura:if>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <lightning:select name="Action If Unreachable" label="Action If Unreachable" value="{!authConRec.Action_If_Unreachable__c}" variant="label-hidden">
+                                                    <aura:iteration items="{!v.lActionIfUnreachable}" var="eachAction">
+                                                        <option text="{!eachAction.label}" value="{!eachAction.value}" selected="{!eachAction.selected}"/>
+                                                    </aura:iteration>
+                                                </lightning:select>
+                                            </td>
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!--Footer-->
+                        <footer class="slds-modal__footer"> 
+                            <button class="slds-button slds-button_neutral" onclick="{!c.closeMe}">Cancel</button>
+                            <button class="slds-button slds-button_brand" onclick="{!c.addAuthContacts}">Add</button>
+                        </footer>
+                    </div>
+                </aura:if>
+                <!--Warning Message Modal-->
+                <aura:if isTrue="{!v.hasWarning}">
+                    <div class="slds-modal__container">
+                            <!-- Modal Header -->
+                            <div class="slds-modal__header slds-grid">
+                                <!-- Cross button to close the Modal -->
+                                <button class="slds-button slds-modal__close" title="Close" 
+                                        onclick="{!c.closeMe}">
+                                    <lightning:icon class="white slds-icon_small" iconName="utility:close"/> 
+                                    <span class="slds-assistive-text">Close</span>
+                                </button>
+                                <div class="slds-col">
+                                    <span><h2 class="sectionHeading" style="text-align: center;">Primary Contact Method Not Set!</h2></span>
+                                </div>
+                            </div>
+                            <!--Modal Body -->
+                            <div class="slds-modal__content slds-p-around_large slds-text-heading_small">
+                                <h2>You're trying to add the following contacts, who do not have Primary Contact Method selected. Do you wish to continue?</h2>
+                                <ul class="slds-list--dotted">
+                                    <aura:iteration items="{!v.warnedContacts}" var="eachContact">
+                                        <li class="slds-p-around_x-small">{!eachContact}</li>
+                                    </aura:iteration>
+                                </ul>
+                            </div>
+                            <!--Footer-->
+                            <footer class="slds-modal__footer"> 
+                                <button class="slds-button slds-button_neutral" onclick="{!c.hideWarningModal}">Go Back</button>
+                                <button class="slds-button slds-button_brand" onclick="{!c.confirmAddAuthContacts}">Yes!</button>
+                            </footer>
+                        </div>
+                </aura:if>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+</aura:component>

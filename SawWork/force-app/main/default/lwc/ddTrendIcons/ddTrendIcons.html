@@ -1,0 +1,16 @@
+<template>
+    <svg version="1.1" baseProfile="full" width="300" height="180" xmlns="http://www.w3.org/2000/svg">
+
+        <g>
+            <template for:each={svgIconMeta} for:item="iMeta">
+                <g id={iMeta.color} key={iMeta.color}>
+                    <circle class={iMeta.class} cx={iMeta.cx} cy={iMeta.cy} r={iMeta.radius}></circle>
+                    <template if:true={iMeta.highlight}>
+                        <text x={iMeta.cx} y="110" font-size="30" text-anchor="middle" fill="white">{iMeta.label}</text>
+                    </template>
+                </g>
+            </template>
+        </g>
+    </svg>
+
+</template>

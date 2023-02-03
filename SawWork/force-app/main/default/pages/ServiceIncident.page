@@ -1,0 +1,19 @@
+<apex:page controller="SI_RedirectController" sidebar="false" showChat="false" showHeader="false">
+<script>
+window.load=load();
+  function load(){
+  var loc ='{!getLocation}';
+  if(loc!='')
+  window.location=loc;
+ 
+  }
+</script>
+<apex:outputPanel >
+<apex:outputLabel >
+The Service Incident Number seems to be Incorrect. Perhaps you missed prefixing them with Zeroes? 
+</apex:outputLabel>
+<!--apex:dataTable value="{!IncidentList}" var="a">
+<apex:column headerValue="Service Incident" value="{!a.SI_Incident_Link__c}"/>
+</apex:dataTable-->
+</apex:outputPanel>
+</apex:page>

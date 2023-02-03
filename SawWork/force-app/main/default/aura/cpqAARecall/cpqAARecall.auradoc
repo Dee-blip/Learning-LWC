@@ -1,0 +1,9 @@
+<aura:documentation>
+	<aura:description>
+		<code>c:cpqAARecall</code> component is used to recall the quote advanced approval process. It provides a
+		confirmation screen to users and refreshes the detail page after record is recalled successfully.
+	</aura:description>
+	<!-- <aura:example name="ExampleName" ref="exampleComponentName" label="Label">
+		Example Description
+	</aura:example> -->
+</aura:documentation>

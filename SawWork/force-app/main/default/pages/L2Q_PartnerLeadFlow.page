@@ -1,0 +1,19 @@
+<!-- Begin SFDC-6464  -->
+<apex:page standardController="Lead" extensions="L2Q_PartnerFlowController">
+    <apex:includeLightning />
+    <div id="lightning" />
+    <script>
+        let existingParam = window.location.href;
+        existingParam = existingParam.substring(existingParam.lastIndexOf('/'));
+        existingParam = existingParam.replace('L2Q_PartnerLeadFlow', 'L2Q_LeadCreation');
+        var recordId = "{!JSENCODE(recordId)}";
+        var isPartneruser = {!IF(isPartneruser, "true", "false")};
+        if (isPartneruser) {
+            window.location.href = '{!JSENCODE($Label.L2Q_LeadFlowUrl)}' + '&parentId=' + recordId;
+        }
+        else {
+            window.location.href = '/apex' + existingParam;
+        }
+    </script>
+</apex:page>
+<!-- End SFDC-6464  -->

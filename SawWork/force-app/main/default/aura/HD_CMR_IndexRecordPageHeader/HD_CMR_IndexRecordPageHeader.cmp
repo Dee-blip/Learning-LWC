@@ -1,0 +1,168 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
+    
+    <!-- aura attribute -->
+    <aura:attribute name="recordLable" type="String" default="Mention the object Name"/>
+    <aura:attribute name="listViewOptions" type="List"/>
+    <aura:attribute name="filterId" type="String" />
+    <aura:attribute name="sortDirection" type="String" default="DESC"  /> 
+    <aura:attribute name="sortBy" type="String" default="Name"/>
+    <aura:attribute name="noOfPages" type="Integer" default="10"/>
+    <aura:attribute name="noOfRecords" type="Integer" default="10"/>
+    <aura:attribute name="pageInput" type="String" default="1"/>
+    <aura:attribute name="warnings" type="String[]"/>
+    <aura:attribute name="isCABManager" type="Boolean"  default="false"/>
+    
+    <!-- aura attribute -->
+    
+    <!-- aura handler -->
+    <aura:handler name="change" value="{!v.listViewOptions}" action="{!c.handleListViewOptions}"/> 
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:handler name="change" value="{!v.pageInput}" action="{!c.onPageInputChange}"/>
+    <aura:handler name="change" value="{!v.noOfPages}" action="{!c.onNoOfPagesChange}"/>
+    <!-- aura handler -->
+    
+    <!-- aura registered events -->
+    <aura:registerEvent name="HD_CMR_View_Change" type="c:HD_CMR_View_Change"/>
+    <aura:registerEvent name="getChangeListEvent" type="c:getIncidentList"/>
+    <aura:registerEvent name ="renderCustomizeForm" type="c:HD_CMR_RenderCustomizeFormEvent" />
+    <!-- aura registered events -->
+    
+    <div >
+        
+        <!-- Under Dev -->
+		<div class="header slds-page-header slds-page-header--object-home" style = "/*position: fixed;
+                                                                                    z-index: 3000;width: 100%;*/">
+        <div class="slds-grid">
+            <div class="slds-col slds-has-flexi-truncate">
+                <div class="slds-text-heading--label" style="font-size:20px;padding-bottom:20px;">Change Management Request</div> 
+            </div>     
+            
+            <div class="slds-col">   
+                <span class="slds-form-element__legend" style="padding-left:10px;fint-size:16px;">View As: &nbsp;</span>
+                <div class="slds-radio--button-group">
+                    
+                    <span class="slds-button slds-radio--button">
+                        <input type="radio" name="radio" id="changeRecCal"   checked = "checked" onclick="{!c.changeView}"/>
+                        <label class="slds-radio--button__label" for="changeRecCal">
+                            <span class="slds-radio--faux"> 
+                                <span id="cal-icon" style="display:true"><lightning:icon iconName="utility:dayview" size="x-small"  /></span>
+                                <span id="cal-icon-inverse" style="display:none" ><lightning:icon iconName="utility:dayview" size="x-small" variant="inverse" /></span>
+                                &nbsp;Calendar 
+                            </span>
+                        </label>
+                    </span>
+                    
+                    <span class="slds-button slds-radio--button">
+                        <input type="radio" name="radio" id="changeRecList"   checked = "checked" />
+                        <label class="slds-radio--button__label" for="changeRecList">
+                            <span class="slds-radio--faux" > 
+                                <span id="lst-icon" style="display:none"><lightning:icon iconName="utility:list" size="x-small"  /></span>
+                                <span id="lst-icon-inverse" style="display:true" ><lightning:icon iconName="utility:list" size="x-small" variant="inverse" /></span>
+                                
+                                &nbsp;List</span>
+                        </label>
+                    </span>
+                    
+                </div>
+            </div>
+            
+            <div class="slds-col slds-no-flex slds-float-right slds-align-top slds-p-bottom--xx-small">
+                <div class="slds-button-group" role="group">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.showCreateForm}">New CMR</button>
+                    <aura:if isTrue="{!v.isCABManager}">
+                      <button class="slds-button slds-button--neutral" onclick="{!c.openServiceOutage}">Service Outage</button>
+                    </aura:if>
+                </div>  
+            </div>
+        </div>
+       
+		<!-- Under dev-->
+        
+        
+            
+            
+           
+            <div class="slds-grid">
+                <div class="slds-col slds-align-bottom" data-aura-class="filtersPagination">
+                    <p class="slds-text-body--small"><ui:outputText value="{!v.noOfRecords}" /> Records
+                    	
+                        <aura:if isTrue="{!v.noOfRecords > 2000}">
+                           <div class="slds-text-color_error">Record List >2000. For faster experience, please try optimizing the list view using created date. </div>
+                        </aura:if>
+                    </p>
+                    <lightning:buttonIcon iconName="utility:filterList" variant="bare" size="medium" alternativeText="Settings"  />
+                    <ui:inputSelect class="dynamic custom-inputSelect slds-m-right--medium slds-m-left--small" aura:id="ListViews" change="{!c.onListViewChange}"/>
+                    Records <ui:inputSelect class="no_of_records slds-m-right--medium custom-min-width75" aura:id="no_of_records" change="{!c.onRecordsChange}"/>
+                    Page <ui:inputText aura:id="pageInput" class="slds-input no_of_records  " value="{!v.pageInput}" />
+                    of <ui:outputText value="{!v.noOfPages}" />
+                    <lightning:buttonIcon class="slds-m-left--medium" iconName="utility:chevronleft" size="large" alternativeText="Previous Page" aura:id="prevPage" onclick="{!c.prevPage}"/>
+                    <span class="slds-assistive-text">Previous Page</span>
+                    <lightning:buttonIcon class="slds-button slds-m-left--medium" iconName="utility:chevronright" size="large" alternativeText="Next Page" aura:id="nextPage" onclick="{!c.nextPage}"/>
+                    <span class="slds-assistive-text">Next Page</span>
+                    <ui:inputDefaultError aura:id="warn" value="{!v.warnings}" />
+                </div>      
+                <div class="slds-col slds-no-flex slds-grid slds-align-bottom" data-aura-class="searchSettings">
+                    
+                    <div class="slds-global-header__item slds-global-header__item--search">
+                        <div class="slds-form-element slds-lookup">
+                            <ui:inputText aura:id="searchInput" class="slds-input slds-lookup__search-input" placeholder="Search"/>
+                        </div>
+                    </div>
+                    <button class="slds-button slds-m-left--xx-small slds-button--icon-border" aria-haspopup="true" title="Search with ticket number" onclick = "{!c.onSearchTicket}">
+                        <lightning:buttonIcon iconName="utility:search"  alternativeText="Settings"  />
+                        <span class="slds-assistive-text">Search Records</span>
+                    </button>
+                    <button class="slds-button slds-m-left--xx-small slds-button--icon-border" aria-haspopup="true" title="Clear Input" onclick = "{!c.onClear}">
+                        <lightning:buttonIcon iconName="utility:undo"  alternativeText="Settings"  />
+                        <span class="slds-assistive-text">Clear input</span>
+                    </button>
+                    
+                    
+                    <div aura:id="menulist" class="slds-dropdown-trigger slds-dropdown-trigger--click slds-is-hide slds-m-left--medium">
+                        <button class="slds-button slds-m-left--xx-small slds-button--icon-border" aria-haspopup="true" title="List View Controls" onclick="{!c.toggle}">
+                            <lightning:buttonIcon iconName="utility:settings"  alternativeText="Settings"  />
+                            <span class="slds-assistive-text">List View Controls</span>
+                        </button>
+                        <div aura:id="ListViewOption" class="slds-dropdown slds-dropdown--right slds-nubbin--top-right dropDownNone" >
+                            <ul class="slds-dropdown__list" role="menu" onclick = "{!c.toggle}">
+                                <li class="slds-dropdown__item" role="presentation" onclick="{!c.showCustomizeColumnsForm}">
+                                    <a>
+                                        <span class="slds-truncate">
+                                            <lightning:icon iconName="utility:table" size="xx-small" alternativeText="Customize Columns List"/>                  
+                                            Customize Columns
+                                        </span>
+                                        
+                                    </a>
+                                </li>
+                                
+                                <li class="slds-dropdown__item" role="presentation">
+                                    <!--a href="{!'/ui/list/FilterEditPage?id='+v.filterId}" target="_blank" role="menuitem" tabindex="-1"-->
+                                    <a href="javascript:void(0)" target="_blank" role="menuitem" tabindex="-1" onclick="{!c.goToEditListView}">
+                                        <span class="slds-truncate">
+                                            <lightning:icon iconName="utility:edit " size="xx-small" alternativeText="Edit List View Filter"/>                  
+                                            Edit List View
+                                        </span>
+                                        
+                                    </a>
+                                </li>
+                                <li class="slds-dropdown__item" role="presentation">
+                                    <a href="/ui/list/FilterEditPage?ftype=01IG0000001okVe" target="_blank" role="menuitem" tabindex="-1">
+                                        <span class="slds-truncate">
+                                            <lightning:icon iconName="utility:new " size="xx-small" alternativeText="Create new List View Filter"/>
+                                            New List view
+                                        </span>
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                        </div>
+                    </div>
+                    <button class="slds-button slds-m-left--xx-small slds-button--icon-border" title="Refresh" onclick="{!c.onChange}">
+                        <lightning:buttonIcon iconName="utility:rotate" alternativeText="Refresh"  />
+                        <span class="slds-assistive-text">Refresh</span>
+                    </button> 
+                </div>
+            </div> 
+        </div>
+    </div>
+</aura:component>

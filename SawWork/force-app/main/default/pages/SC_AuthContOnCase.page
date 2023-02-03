@@ -1,0 +1,77 @@
+<!-- ---------------------------------------------------------------------------------
+     * Page Name            : SC_AuthContOnCase
+     * Controller           : SC_AuthContOnCaseCtrlr
+     * Developer Name       : Vandhana Krishnamurthy
+     * Date                 : 20th November,2017
+     * JIRA                 : ESESP-820 (SOCC)
+     * Test Class			: SC_PolicyDomain_Test
+--------------------------------------------------------------------------------- --> 
+
+<apex:page standardController="Case" extensions="SC_AuthContOnCaseCtrlr" docType="HTML-5.0">
+        
+  <div id="overlay">
+      
+      <style type="text/css">
+          th, td { border: 1px solid black }
+      </style>
+      
+        <head>
+            
+            <!--Required Libraries-->
+            <apex:includeScript value="/support/console/41.0/integration.js"/>
+            
+        </head>
+       
+      <apex:form id="FormStart">
+          
+          <apex:pageBlock id="page">
+              
+              <apex:outputLabel style="align: center" value="No Authorised Contacts to display" rendered="{!if(noOfRecords=0,true,false)}"></apex:outputLabel>
+              
+              <apex:outputPanel rendered="{!if(noOfRecords>0,true,false)}">
+                  <!--Table-->
+                  
+                  <apex:PageBlockTable value="{!allAuthCont}" var="authCont" style="text-align: center;">
+                      <apex:column headerValue="Contact Name" style="text-align: left;">
+                          <a href="#" onClick="openPrimaryTabSF('/{!authCont.Contact_Name__c}','{!authCont.Contact_Name__r.Name}');return false">
+                              {!authCont.Contact_Name__r.Name}
+                          </a> 
+                      </apex:column>
+                      <apex:column headerValue="PD Lead" value="{!authCont.PD_Lead__c}"/>
+                      <apex:column headerValue="Instruct" value="{!authCont.Instruct__c}"/>
+                      <apex:column value="{!authCont.Maintenance_Email__c}"/>
+                      <apex:column value="{!authCont.Emergency_Voice__c}"/>
+                      <apex:column value="{!authCont.Emergency_Text__c}"/>
+                      <apex:column value="{!authCont.Emergency_Email__c}"/>
+                      
+                  </apex:PageBlockTable>
+                          
+                  <div align="center" >
+                      <apex:commandLink style="text-decoration: none;" value="|<<" reRender="page" action="{!first}" title="First Page"/>&nbsp;&nbsp;&nbsp;&nbsp;
+                      <apex:commandLink style="text-decoration: none;" value="<" reRender="page" action="{!previous}" title="Previous Page"/>&nbsp;&nbsp;&nbsp;&nbsp;
+                      <apex:outputText >Showing {!pageNumber} of {!totalPageNumber}</apex:outputText>&nbsp;&nbsp;&nbsp;&nbsp;
+                      <apex:commandLink style="text-decoration: none;" value=">" reRender="page" action="{!next}" title="Next Page"/>&nbsp;&nbsp;&nbsp;&nbsp;
+                      <apex:commandLink style="text-decoration: none;" value=">>|" reRender="page" action="{!last}" title="Last Page"/>
+                  </div>
+              </apex:outputPanel>
+              
+        </apex:pageBlock>
+        <script>
+            
+        j$ = jQuery.noConflict();
+        
+        function openPrimaryTabSF(navUrl,tabName){
+            
+            if (sforce.console.isInConsole()) {
+                sforce.console.openPrimaryTab(null, navUrl, true,tabName, openSuccess,'salesforceTab');
+            }
+            else{
+                window.open(navUrl,'_blank');
+            }
+        }
+        function openSuccess() {}
+            
+        </script>
+        </apex:form>
+  </div>  
+</apex:page>

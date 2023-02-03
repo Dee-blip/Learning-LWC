@@ -1,0 +1,155 @@
+<aura:component controller="SF1_Controller_AddPartnerContact" implements="force:hasRecordId,force:lightningQuickAction">
+
+  <aura:attribute name="recordId" type="Id"/>
+  <aura:attribute name="contactUserList" type="User[]"/>
+  <aura:attribute name="selectedContactUserId" type="Id"/>
+  <aura:attribute name="uncheckBoxes" type="boolean" default="false"/>
+  <aura:attribute name="isLightning" type="boolean" default="true"/>
+  <aura:attribute name="partnerError" type="String" default=""/>
+  <aura:attribute name="otherError" type="String" default=""/>
+  <aura:attribute name="sucessMessage" type="String" default=""/>
+  <aura:attribute name="opptyName" type="String" default=""/>
+
+  <!-- Initialization event -->
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+  <c:SF1_CustomLoader />
+  <aura:if isTrue="{!!v.isLightning }">
+
+    <aura:if isTrue="{!v.partnerError == '' ? true : false }">
+
+      <ul class="slds-has-dividers_around-space ">
+
+        <li class="slds-item slds-color__background_gray-2">
+          <article class="slds-tile slds-tile_board">
+            <lightning:tile >
+
+              <ul >
+                <li class="slds-item  slds-has-flexi-truncate">
+                  <div class="slds-grid slds-wrap slds-grid_pull-padded">
+
+                    <div class="slds-p-horizontal_small slds-size_1-of-8">
+                      <div class="slds-col_bump-left slds-text-align_right">
+                        <lightning:icon iconName="standard:opportunity" size="medium" alternativeText="Primary Opportunity"/>
+                      </div>
+                    </div>
+                    <div class="slds-p-horizontal_small slds-size_7-of-8 slds-has-flexi-truncate">
+                      <strong><ui:outputText value="{! v.opptyName }"/></strong>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </lightning:tile>
+
+          </article>
+        </li>
+
+        <li>
+          &nbsp;
+        </li>
+
+      </ul>
+
+      <header class="slds-docked-composer__header slds-shrink-none">
+        <article class="slds-tile slds-tile_board ">
+          <div class="slds-grid">
+            <div class="slds-col slds-size_1-of-8">
+              <lightning:icon iconName="standard:user" size="medium" alternativeText="Select user"/>
+            </div>
+            <div class="slds-col slds-size_7-of-8 slds-truncate">
+              <h1 class="slds-text-heading--small ">
+
+                <div class="slds-truncate">Select Partner</div>
+
+              </h1>
+            </div>
+
+          </div>
+        </article>
+
+      </header>
+      <ul class="slds-has-dividers_around-space " style="margin-top:2.5%;margin-left:2%;">
+
+        <aura:iteration items="{!v.contactUserList}" var="eachUser">
+          <li class="slds-item slds-color__background_gray-2">
+            <article class="slds-tile slds-tile_board">
+              <lightning:tile >
+
+                <ul >
+                  <li class="slds-item  slds-has-flexi-truncate">
+                    <div class="slds-grid slds-wrap slds-grid_pull-padded">
+
+                      <div class="slds-p-horizontal_small slds-size_1-of-8">
+                        <div class="slds-col_bump-left slds-text-align_right">
+                          <lightning:icon iconName="standard:user" size="small" alternativeText="Primary Opportunity"/>
+                        </div>
+                      </div>
+                      <div class="slds-p-horizontal_small slds-size_5-of-8 slds-has-flexi-truncate">
+                        <strong><ui:outputText value="{! eachUser.Name }"/></strong>
+                      </div>
+                      <div class="slds-p-horizontal_small slds-size_2-of-8">
+                        <div class="slds-col_bump-left slds-text-align_right">
+                          <lightning:input type="checkbox-button" label=" " name="{! eachUser.Id }" checked="{!v.uncheckBoxes}" onchange="{!c.clickOnCheckBox}"/>
+
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </lightning:tile>
+
+              <lightning:tile >
+                <ul >
+                  <li class="slds-item slds-has-flexi-truncate">
+                    <div class="slds-grid slds-wrap slds-grid_pull-padded">
+                      <div class="slds-p-horizontal_small slds-size_1-of-8">
+                        <strong>Role:</strong>
+                      </div>
+                      <div class="slds-p-horizontal_small slds-size_7-of-8 slds-has-flexi-truncate">
+                        <aura:if isTrue="{!eachUser.UserRole.Name != null }">
+                          <div class="slds-has-flexi-truncate">
+                            <ui:outputText value="{!eachUser.UserRole.Name}"/>
+                          </div>
+
+                        </aura:if>
+
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </lightning:tile>
+            </article>
+          </li>
+        </aura:iteration>
+      </ul>
+
+      <aura:if isTrue="{!v.otherError != '' ? true : false}">
+
+        <ui:message title="Error" severity="error" closable="false">
+          {!v.otherError}
+        </ui:message>
+
+      </aura:if>
+      <aura:if isTrue="{!v.sucessMessage != '' ? true : false}">
+
+        <ui:message title="Success" severity="confirm" closable="false">
+          {!v.sucessMessage}
+        </ui:message>
+
+      </aura:if>
+      <footer class="slds-docked-composer__footer slds-shrink-none">
+
+        <div class="slds-align_absolute-center">
+
+          <lightning:button aura:id="updateButton" type="button" disabled="true" class="slds-button slds-button_brand" onclick="{! c.addToSalesTeam }">Add to Sales Team</lightning:button>
+
+        </div>
+      </footer>
+      <aura:set attribute="else">
+        <ui:message title="Error" severity="error" closable="false">
+          {!v.partnerError}
+        </ui:message>
+      </aura:set>
+    </aura:if>
+  </aura:if>
+</aura:component>

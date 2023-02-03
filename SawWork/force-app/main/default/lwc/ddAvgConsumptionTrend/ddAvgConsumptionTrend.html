@@ -1,0 +1,42 @@
+<template>
+    <div class="slds-p-bottom_x-small flex-container">
+        <div class="slds-wrap">
+            <div class="title  slds-p-horizontal_x-small" slot="title">
+                Average Consumption
+            </div>
+        </div>
+
+        <div class="slds-grid slds-grid_align-spread slds-p-horizontal_medium trend-item">
+            <div class="slds-grid slds-grid_vertical-align-center trend-item-label">
+                <p class="slds-truncate">
+                    PS hours
+                </p>
+            </div>
+            <div class="trend-item-value">
+                {deal.PS_Hours_Per_Month__c}
+            </div>
+        </div>
+
+        <div class="slds-grid slds-grid_align-spread slds-p-horizontal_medium trend-item">
+            <div class="slds-grid slds-grid_vertical-align-center trend-item-label">
+                <p class="slds-truncate">
+                    SOCC hours
+                </p>
+            </div>
+            <div class="trend-item-value">
+                {deal.SOCC_Hours_Per_Month__c}
+            </div>
+        </div>
+
+        <div class="slds-grid slds-grid_align-spread slds-p-horizontal_medium trend-item">
+            <div class="slds-grid slds-grid_vertical-align-center trend-item-label">
+                <p class="slds-truncate">
+                    AkaTec hours
+                </p>
+            </div>
+            <div class="trend-item-value">
+                {deal.AkaTec_Hours_Per_Month__c}
+            </div>
+        </div>
+    </div>
+</template>

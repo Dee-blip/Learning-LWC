@@ -1,0 +1,47 @@
+<!-- This Component is used to display the all related Cases on SI -->
+
+<template>
+
+    <!-- Spinner -->
+    <template if:true={showSpinner}>
+        <lightning-spinner alternative-text="Loading" size="medium" variant="brand" position="absolute">
+        </lightning-spinner>
+    </template>
+
+
+    <!-- Header  -->
+    <div class="slds-page-header slds-page-header_related-list">
+        <div class="slds-page-header__row">
+            <div class="slds-page-header__col-title">
+                <lightning-breadcrumbs>
+                    <lightning-breadcrumb label="Service Incidents" onclick={handleSIClick}>
+                    </lightning-breadcrumb>
+                    <lightning-breadcrumb label={name} onclick={handleRecClick}>
+                    </lightning-breadcrumb>
+                </lightning-breadcrumbs>
+                <div class="slds-media">
+                    <div class="slds-media__body">
+                        <div class="slds-page-header__name">
+                            <div class="slds-page-header__name-title">
+                                <h1>
+                                    <span class="slds-page-header__title slds-truncate" title="Impacted Cases">Impacted
+                                        Cases</span>
+                                    </br>
+                                </h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Datatable -->
+    <div style="height: 500px;">
+        <lightning-datatable key-field="id" data={caseList} columns={columns} onrowaction={handleRowAction}
+            hide-checkbox-column default-sort-direction={defaultSortDirection} sorted-direction={sortDirection}
+            sorted-by={sortedBy} onsort={onHandleSort}>
+        </lightning-datatable>
+    </div>
+</template>

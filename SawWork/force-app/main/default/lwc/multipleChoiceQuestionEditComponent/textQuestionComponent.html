@@ -1,0 +1,179 @@
+<template>
+    <template if:false={questionCopy.Exclusion_marker__c}>
+        <article class={questionCardClasses}>
+            <div class="slds-page-header slds-p-left_large question-header">
+                <div class="slds-grid">
+                    <div class="serialNumber slds-p-left_large slds-p-top_small slds-p-bottom_small">
+                        <p>{questionCopy.Section_Serial_Number__c}.{questionCopy.Serial_Number__c}</p>
+                    </div>
+                    <div>
+                        <lightning-button 
+                            variant="Neutral" 
+                            title=""
+                            icon-name="utility:arrow_top"
+                            icon-position="center"
+                            onclick={handleQuestionMoveUp}>
+                        </lightning-button>
+                    </div>
+                    <div class="slds-col_bump-right slds-p-top_xx-small slds-p-left_medium">
+                        <lightning-button 
+                            variant="Neutral" 
+                            title=""
+                            icon-name="utility:arrow_bottom"
+                            icon-position="center"
+                            onclick={handleQuestionMoveDown}>
+                        </lightning-button>
+                    </div>
+                    <div>
+                        <template if:true={showpreview}>
+                            <lightning-button 
+                                variant="Neutral" 
+                                label="Edit" 
+                                title="Edit"
+                                icon-name="utility:edit"
+                                icon-position="left"
+                                onclick={handleEditView}>
+                            </lightning-button>
+                        </template>
+                    </div>
+                    <div>
+                        <template if:false={showpreview}>
+                            <lightning-button 
+                                variant="Neutral" 
+                                label="Preview" 
+                                title="preview"
+                                icon-name="utility:preview"
+                                icon-position="left"
+                                onclick={handlePreview}>
+                            </lightning-button>
+                        </template>
+                    </div>
+                    
+                    <template if:false={deleteQuestion}>
+                        <div>
+                            <lightning-button 
+                                variant="Neutral" 
+                                title="Edit"
+                                icon-name="utility:delete"
+                                icon-position="center"
+                                onclick={handleDeleteQuestion}>
+                            </lightning-button>
+                        </div>
+                    </template>
+                    
+                    <template if:true={deleteQuestion}>
+                        <div class="slds-p-left_large slds-box slds-box_xx-small">
+                            <lightning-button 
+                                variant="brand" 
+                                title="Edit"
+                                icon-name="utility:delete"
+                                icon-position="center"
+                                onclick={handleDeleteQuestion}>
+                            </lightning-button>
+                            <lightning-button 
+                                variant="destructive-text"
+                                label="Confirm Delete" 
+                                title="Confirm Delete"
+                                onclick={handleDeleteQuestionConfirm}>
+                            </lightning-button>
+                            <lightning-button 
+                                label="Cancel" 
+                                title="Cancel"
+                                onclick={handleDeleteQuestion}>
+                            </lightning-button>
+                        </div>
+                    </template>
+                </div>
+            </div>
+            <!--Question header component-->
+    
+            <!--The component edit mode-->
+            <template if:false={showpreview}>
+                
+                <div class="slds-grid slds-p-left_large slds-p-top_medium slds-p-bottom_medium">
+                    <div class="slds-col slds-size_8-of-12">
+                        
+                        <div>
+                            <lightning-input-rich-text disabled-categories="INSERT_CONTENT" 
+                                                        placeholder="Enter the question"
+                                                        value={questionCopy.Question_Text__c} 
+                                                        onblur={handleQuestionTextChange}>
+                            </lightning-input-rich-text>
+                        </div>
+                            
+                        <div class="">
+                            <lightning-textarea 
+                                name="input3" 
+                                label="Help Text" 
+                                placeholder="Enter the help text(optional)" 
+                                value={questionCopy.Help_Text__c}
+                                onchange={handleQuestionHelpTextChange}>
+                            </lightning-textarea>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_4-of-12 slds-p-large slds-p-left_large slds-p-right_medium  slds-p-top_large">
+                        <article class="question-details">
+                            <div class="slds-grid slds-wrap slds-p-left_medium">
+                                <div class="slds-col slds-size_1-of-4 slds-p-top_small">
+                                    <lightning-icon icon-name="utility:settings" alternative-text="Approved" title="Approved"></lightning-icon>
+                                </div>
+                                <div class="question-properties-header slds-text-heading_small slds-col slds-size_3-of-4 slds-p-top_medium slds-p-bottom_large">
+                                    Question Properties
+                                </div>
+                                
+                                <div class="slds-align_absolute-center slds-text-heading_small slds-col slds-size_4-of-4 slds-p-top_medium">
+                                    <lightning-radio-group name={requiredTypeName}
+                                                          options={requiredOptions}
+                                                          value={requiredTypeValue}
+                                                          onchange={handleMandatoryChange}
+                                                          type="button"></lightning-radio-group>
+                                </div>
+
+                                <div class="slds-align_absolute-center slds-text-heading_small slds-col slds-size_4-of-4 slds-p-top_medium slds-p-bottom_large">
+                                    <lightning-radio-group name={stageTypeName}
+                                                          options={stageOptions}
+                                                          value={questionCopy.Form_Stage__c}
+                                                          onchange={handleStageChange}
+                                                          type="button"></lightning-radio-group>
+                                </div>
+                                <div class="slds-align_absolute-center slds-grid slds-gutters slds-p-bottom_small">
+                                    <div class="slds-col">
+                                      <span class="slds-p-bottom_large">
+                                        <lightning-input type="toggle"
+                                         label="POC Question" name="toogle1" 
+                                         message-toggle-active="" 
+                                         message-toggle-inactive="" 
+                                         checked={questionCopy.POC_question__c}
+                                         onchange={handleChangePOCQues}></lightning-input>
+                                      </span>
+                                    </div>
+                                    <div class="slds-col">
+                                      <span class="slds-p-bottom_large">
+                                    <lightning-input type="toggle" 
+                                    label="Full Integration Question" 
+                                    name="toogle2" 
+                                    message-toggle-active="" 
+                                    message-toggle-inactive="" 
+                                    checked={questionCopy.Full_Integration_Question__c}
+                                    onchange={handleChangeFullIntegrationQues}></lightning-input>
+                                      </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </template>
+            <!--End of edit view-->
+    
+            <!--The component to show preview-->
+            <template if:true={showpreview}>
+                <c-multiple-choice-question-preview-component 
+                    question={questionCopy}
+                    fromadmin={showpreview}>
+                </c-multiple-choice-question-preview-component>
+            </template>
+            <!--End of Preview template-->
+        </article>
+    </template>
+</template>

@@ -1,0 +1,197 @@
+<template>
+
+    <template if:true={showExternalTeamModal}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open modalZIndex">
+            <div class="slds-modal__container" style="min-width: 80%">
+                <header class="slds-modal__header">
+
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Close" onclick={closeExternalTeamModal}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                            size="small"></lightning-icon>
+                    </button>
+
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                        New External Team</h2>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2"
+                    style="height: 50%;overflow: scroll;">
+                    <c-sc-external-team-escalation case-rec-id={caserecid}></c-sc-external-team-escalation>
+
+                </div>
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+
+    <div style="zoom:90%">
+
+        <div class="slds-card slds-page-header"
+            style="height: auto;margin-top: 15px;max-height: 80vh;padding-top: 0px;padding-bottom: 4px;">
+            <div class="slds-grid slds-gutters">
+
+                <!-- *************************** HEADER **********************************************-->
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div>
+                        <template if:true={showspinner}>
+                            <div style="opacity: 0.7;" class="slds-spinner_container">
+                                <lightning-spinner alternative-text="Loading" variant="brand" size="medium">
+                                </lightning-spinner>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="slds-media__figure slds-col slds-size_1-of-5">
+
+
+                        <ul class="slds-list_horizontal slds-media_center">
+                            <li>
+                                <template if:true={displayCase}>
+                                    <lightning-button-icon icon-name="utility:chevrondown" variant="bare"
+                                        style="padding-right: 6px; padding-left: 2px;" alternative-text="Collapse"
+                                        title="Collapse" onclick={hideOpenEscTable}>
+                                    </lightning-button-icon>
+                                </template>
+
+                                <template if:false={displayCase}>
+                                    <lightning-button-icon icon-name="utility:chevronright" variant="bare"
+                                        style="padding-right: 6px; padding-left: 2px;" alternative-text="Collapse"
+                                        title="Collapse" onclick={showOpenEscTable}>
+                                    </lightning-button-icon>
+                                </template>
+                            </li>
+
+                            <li style="margin-right: 5px;">
+                                <lightning-icon icon-name="standard:work_plan_rule" size="medium"
+                                    alternative-text="Escalations" title="Escalations">
+                                </lightning-icon>
+                            </li>
+
+                            <li>
+                                <div class="slds-media__body">
+                                    <div class="slds-page-header__name">
+                                        <div class="slds-page-header__name-title">
+                                            <h2>
+                                                <span class="slds-text-heading_small slds-truncate"><b>Open
+                                                        Escalations ({TotalCount})</b></span>
+                                            </h2>
+                                        </div>
+                                    </div>
+                                    <p class="slds-page-header__name-meta">Updated <lightning-relative-date-time
+                                            value={MyOpenEscnow}></lightning-relative-date-time>
+                                    </p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+
+                    <div class="slds-col slds-size_1-of-5" style="padding: 0px; padding-top:0px;margin-left: 47%;">
+                        <div class="slds-form-element__control">
+                            <lightning-input   type="search" 
+                        onchange={handleEscKeyUp}  placeholder="Search for Escalations..">
+                        </lightning-input>
+                        </div>
+                    </div>
+
+                    <div class="slds-media slds-col slds-size_2-of-9" style="padding-top: 12px;">
+                        <lightning-button-menu icon-name="utility:filterList" menu-alignment="right">
+                            <div class="slds-panel__body" style="padding-bottom: 0;width:max-content">
+
+                                <div class="slds-media__body">
+                                    <div>
+                                        <h3><b>Severity</b></h3>
+                                    </div>
+                                    <div class="slds-p-around--x-small">
+                                        <lightning-checkbox-group name="Severity" options={severityoptions}
+                                            value={severityvalue} class="inlinecheckbox" onchange={handlesevChange}>
+                                        </lightning-checkbox-group>
+
+                                    </div>
+                                </div>
+                                <div class="slds-has-divider_top-space" role="separator"></div>
+
+                                <div class="slds-media__body">
+                                    <div>
+                                        <h3><b>Geography</b></h3>
+                                    </div>
+                                    <div class="slds-p-around--x-small">
+                                        <lightning-checkbox-group name="Geo" options={geooptions}
+                                            value={geovalue} onchange={handlegeoChange}>
+                                        </lightning-checkbox-group>
+
+                                    </div>
+                                </div>
+                                <div class="slds-has-divider_top-space" role="separator"></div>
+
+                                <div class="slds-media__body">
+                                    <div>
+                                        <h3><b>Status</b></h3>
+                                    </div>
+                                    <div class="slds-p-around--x-small">
+                                        <lightning-checkbox-group name="Status" options={statusoptions}
+                                        value={statusvalue} onchange={handlestatusChange}>
+                                        </lightning-checkbox-group>
+
+                                    </div>
+                                </div>
+                                <div class="slds-has-divider_top-space" role="separator"></div>
+
+                                <div class="slds-modal__footer"
+                                    style="padding: 5px; text-align: center;border: none; background-color: white;box-shadow: none;">
+                                    <button type="button" class="slds-button slds-button_brand"
+                                        onclick={applyFilters}>Apply</button>
+                                </div>
+                            </div>
+                        </lightning-button-menu>
+                    </div>
+
+
+                    <div class="slds-col" style="padding-top: 12px;">
+                        <lightning-button-menu icon-name="utility:settings" variant="border-filled"
+                            menu-alignment="right" nubbin>
+                            <div class="slds-panel__body" style="padding-bottom: 0">
+
+                                <div class="slds-media__body" style="width: max-content">
+                                    <div class="slds-grid slds-grid_align-spread">
+                                        <h3><b>Columns to display</b></h3>
+                                    </div>
+
+                                    <div class="slds-p-around--x-small">
+                                        <lightning-checkbox-group options={MyOpenEscColOptions}
+                                            value={MyOpenEscColvalue} onchange={handleMyEscColChange}>
+                                        </lightning-checkbox-group>
+                                    </div>
+                                </div>
+                            </div>
+                        </lightning-button-menu>
+                    </div>
+
+                    <div class="slds-col rightAlign" style="padding-top:12px;">
+                        <button class="slds-button" onclick={applyFilters}>
+                            <lightning-icon icon-name="action:refresh" alternative-text="Refresh Dashboard"
+                                size="x-small">
+                            </lightning-icon>
+                        </button>
+                    </div>
+
+                </header>
+            </div>
+        </div>
+
+
+
+        <!-- LWC Datatable Styling -->
+        <div class="datatableStyle" style="padding-top: 0px; border-radius: 4px;">
+            <div id="divForDatatable" class="panelOpenEsc" style="height:50vh;">
+                <lightning-datatable data={data} columns={transformedColumns} hide-checkbox-column=false key-field=id
+                    default-sort-direction={defaultSortDirection} sorted-direction={sortDirection} sorted-by={sortedBy}
+                    onsort={onHandleSort} onrowaction={handleEscRowActions} wrap-text-max-lines=2 onresize={onColumnWidthResize}></lightning-datatable>
+            </div>
+        </div>
+    </div>
+</template>

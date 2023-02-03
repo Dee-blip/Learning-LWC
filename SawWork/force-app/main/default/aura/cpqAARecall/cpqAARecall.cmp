@@ -1,0 +1,55 @@
+<!--=====================================================================================================+
+    Component name      :   cpqAARecall.cmp 
+    Author              :   kimishra
+    Created             :   04-JUN-20
+    Purpose             :   For recalling quote approval.
+                           
+    Last Modified Developer           		Purpose            
+    ============= ========================  ======= 
+    04-JUN-20     kimishra  				Initial Development(Jira Ticket# CPQ-256)
++=====================================================================================================-->
+
+<aura:component controller="QuoteExtController" implements="force:lightningQuickActionWithoutHeader,force:hasRecordId">
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="confirmed" type="Boolean" default="false" />
+
+    <!-- header -->
+    <div class="modal-header slds-modal__header slds-size_1-of-1">
+        <h4 class="title slds-text-heading--medium">Recall Approval</h4>
+    </div>
+    <!-- body -->
+    <div
+        class="slds-modal__content slds-p-around--x-small slds-align_absolute-center slds-size_1-of-1 slds-is-relative">
+        <form class="slds-form--stacked">
+            <aura:if isTrue="{!!v.confirmed}">
+                <div class="slds-align_absolute-center slds-text-heading_medium">
+                    Are you sure you want to recall the approval for this quote?
+                </div>
+                <br /><br /><br /><br /><br /><br />
+                <div class="slds-align_absolute-center">
+                    Click on Confirm to continue or Cancel to go back to the quote.
+                </div>
+                <aura:set attribute="else">
+                    <div class="slds-align_absolute-center slds-text-heading_medium">
+                        Hang tight while we recall the approval for you!
+                    </div>
+                    <div class="slds-align_absolute-center">
+                        Please do not close the window.
+                    </div>
+                    <br />
+                    <div class="slds-align_absolute-center holder">
+                        <img src="{!$Resource.loadstein + '/loadstein.gif'}" alt="Placeholder" />
+                    </div>
+                </aura:set>
+            </aura:if>
+        </form>
+    </div>
+    <br /><br /><br /><br />
+    <!-- footer -->
+    <aura:if isTrue="{!!v.confirmed}">
+        <div class="modal-footer slds-modal__footer slds-size_1-of-1">
+            <lightning:button variant="Brand" class="slds-button" label="Confirm" onclick="{!c.handleConfirm}" />
+            <lightning:button variant="Neutral" class="slds-button" label="Cancel" onclick="{!c.handleClose}" />
+        </div>
+    </aura:if>
+</aura:component>

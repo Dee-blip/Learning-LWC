@@ -1,0 +1,10 @@
+<apex:page standardController="SFDC_MDF_Claim__c" extensions="L2Q_MDF_DefaultValues">
+    <apex:includeLightning />
+    <div id="lightning" />
+	<script>
+    	$Lightning.use("c:GSM_GenericFormApplication", function () {
+	        $Lightning.createComponent("c:GSM_GenericFormComponent", {sObjectName: "SFDC_MDF_Claim__c",objectLabel: "Create Fund Claim", defaultValues: '{!JSENCODE(defaultValuesForFundClaim)}', customMetaDataObjName: "SFDC_MDF_Claim__c", returnValPrefix: '{!JSENCODE(returnValPrefix)}'}, "lightning", function (cmp) {
+	        });
+	    });
+    </script>
+</apex:page>

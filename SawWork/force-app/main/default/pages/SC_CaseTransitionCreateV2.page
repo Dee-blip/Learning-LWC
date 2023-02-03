@@ -1,0 +1,259 @@
+<!--
+<apex:page standardController="Case" extensions="SC_CaseTransitionControllerV2" >
+    <apex:includeScript value="/support/console/32.0/integration.js"/> 
+    <apex:includeScript value="{!$Resource.JQuery_New}"/>
+    <style>
+        .newRecordSection {
+            width: 43%;
+            float: left;
+            height:700px;
+            overflow:auto;
+        }
+        
+        .HistorySection {
+            width: 55%;
+            float: left;
+            height:800px;
+            overflow:auto;
+        }
+        
+        div.HistorySection table{
+            table-layout:fixed;
+        }
+        .emptyDiv{
+             width: 02%;
+            float: left;
+        }
+        .fullPage {
+            width:100%;
+        }
+        .warning {
+            font-style: normal;
+            font-size:14px;
+            font-color:red;
+        }
+
+    </style>
+    <div class="fullPage" >
+        <a href="#" class="adjustLinkSection" title="This will show Transition Create Page in full page view" onclick="adjustView('newRecordSectionFull');return false;"> Transition View</a> &nbsp;&nbsp;
+        <a href="#" class="adjustLinkSection" title="This will show History Page in full page view. This view shows if case is in transition or CC Transition Queue or all approved transitions" 
+           onclick="adjustView('HistorySectionFull');return false;">History View </a>&nbsp;&nbsp;
+        <div  class="newRecordSection">
+            <apex:form id="actionSection" >
+             <apex:actionFunction name="loadTransitionAgain" action="{!initialise}" status="actStatusId" rerender="transitionHistoryForm" oncomplete="postRefreshUpdates();" />   
+                <apex:inputHidden value="{!historyAvailable}" id="historyAvailableId" /> 
+                <apex:inputHidden value="{!transitionAvailable}" id="hiddenActiveTransition" /> 
+                <apex:image rendered="{!activeTransition}"
+                            url="{!URLFOR($Resource.SCNewHomePage, 'SCNewHomeScreenicons/transitionIcon.png')}" /> 
+                <apex:outputText styleClass="warning" rendered="{!activeTransition}" value="Case has Active Transition"/>   
+                <center>
+                    <apex:actionStatus id="actStatusId" >
+                        <apex:facet name="start" >
+                            <img src="/img/loading.gif" />                    
+                        </apex:facet>
+                    </apex:actionStatus> 
+                 </center>
+                <apex:pageBlock >
+                    <a id="refreshTransitionPage" style="float:right;"
+                       onclick="loadTransitionAgain();return false;"> Refresh Transition Data</a>
+                    <apex:pageBlockSection columns="1" collapsible="true">
+                        <apex:pagemessages />
+                        <apex:inputField value="{!caseTransitionObject.Issue_Summary__c}"/>
+                        <apex:inputField value="{!caseTransitionObject.Troubleshooting_to_Date__c}"/>
+                        <apex:inputField value="{!caseTransitionObject.Data_Collected__c}"/> 
+                        <apex:inputField value="{!caseTransitionObject.Customer_Expectations__c}"/> 
+                        <apex:inputField value="{!caseTransitionObject.Next_Action_Recommendation__c}" /> 
+                        <apex:commandButton action="{!createTransition}"
+                                            value="Save Living Summary"
+                                             status="actStatusId"
+                                            reRender="actionSection"
+                                            rendered="{!displaySaveButton}"
+                                            oncomplete="postRefreshUpdates();"/> &nbsp;
+                        <apex:outputPanel rendered="{!PendingApproval}">
+                            Pending Approval from Shift Lead or Manager
+                            <a target="_new" href="https://agora.akamai.com/wiki/Ccare_transition_SF">(Need Help?)</a><br/><br/>  
+                        </apex:outputPanel>
+
+                        <apex:outputPanel rendered="{!displayTransitionButton}">
+                            
+                            Current Shift <B>{!currentShift} </B> &nbsp;
+                            Target Shift &nbsp; <apex:inputField value="{!caseTransitionObject.Target_Shift__c}" /> &nbsp;
+                            Warm Transition Required &nbsp; <apex:inputField value="{!caseTransitionObject.Warm_Transition_Needed__c}" /><br/>
+                            
+                            <br/><apex:commandButton action="{!approveTransition}"
+                                                      status="actStatusId"
+                                                     reRender="actionSection,historyPage"
+                                                     value="Approve & Create Transition from Summary"
+                                                     title="Transitions must be approved by a shift lead or peer reviewer who should ensure the Living Summary provides sufficient details for the case to be transitioned. The reviewer must also determine whether or not this case requires a warm transition"
+                                                     oncomplete="postRefreshUpdates();adjustView('HistorySectionFull');refreshTab();"/> &nbsp;
+                        </apex:outputPanel>
+                    </apex:pageBlockSection>        
+                </apex:pageBlock>    
+            </apex:form>
+        </div>
+        <div class="emptyDiv">&nbsp;</div> 
+        
+        <div class="HistorySection">
+             <apex:include id="historyPage" pageName="SC_CaseTransitionHistory"/> 
+        </div>
+    </div>
+    
+    <script>
+        enlargeTextArea();
+        var activeTransitionAvailable = $("input[id$=hiddenActiveTransition]").val();
+        //if there is active transiiton , show history page by default
+        if (activeTransitionAvailable == 'true'){
+            adjustView('HistorySectionFull');
+        }    
+        else {
+            adjustView('newRecordSectionFull');
+        }    
+        function refreshTab() {
+            //First find the ID of the current tab to refresh it
+            sforce.console.getEnclosingTabId(refreshSubtab);
+        }
+        var refreshSubtab = function refreshSubtab(result){
+            var subTabId = result.id;
+            console.log(result);
+            sforce.console.refreshSubtabById(subTabId, true, refreshSuccess );          
+        }
+    
+        var refreshSuccess = function refreshSuccess(result) {
+            console.log(result);
+            //Report whether refreshing the subtab was successful
+            if (result.success == true) {
+                console.log('Subtab refreshed successfully');
+            } else {
+                console.log('Subtab did not refresh');
+            }
+        };
+    
+        function initWidth(){
+             var historyAvailable = $("input[id$=historyAvailableId]").val();
+                if (historyAvailable == 'false'){
+                    $('.adjustLinkSection').hide();
+                    $('.newRecordSection').attr('style','width:98%');
+                    $('.HistorySection').attr('style','width:0%');
+                }
+                else {
+                    $('.adjustLinkSection').show();
+                    $('.newRecordSection').attr('style','width:43%');
+                    $('.HistorySection').attr('style','width:55%');
+                    
+                }    
+    
+        } 
+    
+        function adjustView(viewName){
+            if (viewName == 'newRecordSectionFull'){
+                $('.newRecordSection').show();
+                $('.newRecordSection').attr('style','width:98%');
+                $('.HistorySection').hide();
+            }
+            if (viewName == 'HistorySectionFull'){
+                 $('.newRecordSection').hide();
+                $('.HistorySection').show();
+                $('.HistorySection').attr('style','width:98%');
+            }
+            if (viewName == 'defaultView'){
+                 $('.newRecordSection').show();
+                $('.HistorySection').show();
+                initWidth();
+            }
+            
+        }    
+    
+        function postRefreshUpdates(){
+            enlargeTextArea();
+            refreshHistory();
+            
+        }    
+        function enlargeTextArea(){
+            $('textarea').attr('cols','50'); 
+            $('textarea').attr('rows','5');
+        }    
+    </script>
+</apex:page>
+Commneted by Vamsee-->
+
+<apex:page standardController="Case" extensions="SC_CaseTransitionControllerV2" lightningStylesheets="true">
+    <apex:includeScript value="/support/console/43.0/integration.js"/> 
+    <apex:includeScript value="{!$Resource.JQuery_New}"/>
+    <style>
+        .newRecordSection {
+            width: 90%;
+            float: left;
+            height:700px;
+            overflow:auto;
+        }
+        .fullPage {
+            width:100%;
+        }
+        .warning {
+            font-style: normal;
+            font-size:14px;
+            font-color:red;
+        }
+
+    </style>
+    
+    <div class="fullPage" >
+        <div  class="newRecordSection">
+            <apex:image rendered="{!activeTransition}"
+                            url="{!URLFOR($Resource.SCNewHomePage, 'SCNewHomeScreenicons/transitionIcon.png')}" /> 
+             <apex:outputText styleClass="warning" rendered="{!activeTransition}" value="Case has Active Transition"/>   
+                <apex:pageBlock >
+                <apex:form id="actionSection" > 
+                    <center>
+                        <apex:actionstatus id="actStatusId">
+                            <apex:facet name="start">
+                                <div class="waitingSearchDiv"
+                                    style="background-color: #fbfbfb; height: 100%; opacity: 0.65; width: 100%;position:fixed;z-index:1000;">
+                                    <div class="waitingHolder" style="top: 50%; width: 91px; position: fixed;z-index: 1001; left: 50%;">
+                                    <img class="waitingImage" src="/img/loading.gif"
+                                    title="Please Wait.." /> <span class="waitingDescription">Loading..</span>
+                                    </div>
+                                </div>
+                            </apex:facet>
+                         </apex:actionstatus> 
+                    </center>      
+                  <apex:pageBlockSection columns="1" collapsible="true">
+                        <apex:pagemessages />
+                       
+                        <apex:outputPanel >
+                            Pending Approval from Shift Lead or Manager
+                            <a target="_new" href="https://agora.akamai.com/wiki/Ccare_transition_SF">(Need Help?)</a><br/><br/>  
+                        </apex:outputPanel>
+
+                       <apex:outputPanel rendered="{!displayTransitionButton}">
+                            Transition Approver <B>{!$User.firstname} {!$User.lastname}</B><br/>
+                            Current Shift <B>{!currentShift} </B> &nbsp;<br/>
+                            
+                            Target Shift &nbsp; <apex:inputField value="{!caseTransitionObject.Target_Shift__c}" > 
+                                <apex:actionSupport event="onchange" action="{!updateTargetDate}" reRender="actionSection" />
+                            </apex:inputField>
+                            <br/>
+                            Warm Transition Needed &nbsp; <apex:inputField value="{!caseTransitionObject.Warm_Transition_Needed__c}" /><br/>
+                            Wakeup Time &nbsp;<B>{!wakeupTime} </B> &nbsp;<br/>
+                            
+                            <br/><apex:commandButton action="{!approveTransition}"
+                                                     disabled="{!flag}"
+                                                     status="actStatusId"
+                                                     reRender="actionSection,historyPage"
+                                                     value="Approve & Create Transition from Summary"
+                                                     title="Transitions must be approved by a shift lead or peer reviewer who should ensure the Living Summary provides sufficient details for the case to be transitioned. The reviewer must also determine whether or not this case requires a warm transition"
+                                                     oncomplete="refreshTab();"/> &nbsp;
+                        </apex:outputPanel>
+                    </apex:pageBlockSection>  
+                     </apex:form>
+                </apex:pageBlock>    
+           
+        </div>
+     </div> 
+    <script>
+        function refreshTab() {
+            //First find the ID of the current tab to refresh it
+            sforce.console.getEnclosingTabId(refreshSubtab);
+        }
+    </script>
+</apex:page>

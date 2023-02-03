@@ -1,0 +1,162 @@
+<!-- 
+Author Name : Rajesh Kumar
+Description : Account Search Component based on partner type
+JIRA # : SFDC-5792 
+-->
+
+<aura:component  controller = "SF1_LocateAccountController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+	<!-- message library  -->
+	<lightning:notificationsLibrary aura:id="notifLib"/>
+	<!-- <meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/> -->
+	<!--Begin attributes decalaration -->
+	<aura:attribute name = "recordId" type = "String" default = " "/>
+	<aura:attribute name="columns" type="List"/>
+	<aura:attribute name = "clientWarError" type = "List" default="[]"/>
+	<aura:attribute name = "serverError" type = "List" default="[]"/>
+	<aura:attribute name = "pageUtil" type = "Map" 
+   default="{spinner:false,uiTheme: ' ',
+            messageTitle: ' ',
+            messageSeverity: ' ',
+            colasable:false,
+            isMessageVisible:false,
+            messgaeDetail: ' ',
+            searchDisabled:true,
+            isloadDisabled : false,
+            isClassic:false,
+            isfieldDisabled:false}"/>
+    <aura:attribute name = "opptyName" type = "String" default = " "/>        
+	<aura:attribute name="enableInfiniteLoading" type="Boolean" default="true"/>
+	<aura:attribute name="initialRows" type="Integer" default="10"/>
+	<aura:attribute name="rowsToLoad" type="Integer" default="10"/>
+	<aura:attribute name="totalNumberOfRows" type="Integer" default="0"/>
+	<aura:attribute name="loadMoreStatus" type="String" default=" "/>
+	<aura:attribute name="rowNumberOffset" type="Integer" default="0"/>
+	<aura:attribute name="loadMoreOffset" type="Integer" default="20"/>
+	<aura:attribute name="rowsToAdd" type="Integer" default="10"/>
+	<aura:attribute name="currentCount" type="Integer" default="0"/>
+	<aura:attribute name="data" type="Object" default = "{}"/>
+	<!-- End attributes decalaration -->
+	<!-- Begin Utility Decalarion -->
+	<aura:html tag="style">
+      .slds-modal__container{
+      max-width: 95rem !important;
+	  width:95% !important;
+      }
+   </aura:html>
+
+   
+  
+	<!-- End Utility Decalarion -->
+	<!-- Begin event decalaration  -->
+	<aura:registerEvent name="locateSubResellerVFevent" type="c:LocateSubResellerVFevent" />
+	<!-- End event decalaration  -->
+	<!-- Begin handlers decalaration-->
+	<aura:handler name="init" value="{!this }" action="{!c.doInit }"/>
+	<!-- End  handlers decalaration -->
+	<!-- Begin message header for classic  -->
+	<aura:if isTrue="{!and(v.pageUtil.isClassic,v.pageUtil.isMessageVisible)}">
+		<ui:message title="{!v.pageUtil.messageTitle}" severity="{!v.pageUtil.messageSeverity}"  closable="{!v.pageUtil.colasable}" >
+         {!v.pageUtil.messgaeDetail}
+   </ui:message>
+	</aura:if>
+	<!-- End message header for classic  -->
+	<!-- Begin Spinner Section -->
+	<aura:if isTrue="{!v.pageUtil.spinner}">
+		<lightning:spinner alternativeText="Loading" size="large" variant  = "brand"/>
+	</aura:if>
+	<!-- End Spinner Section -->
+	      
+		
+	<div class = "box" >
+        <!-- Begin Page Header   -->
+<div class = "header">
+								<lightning:layout>
+									<lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="12" largeDeviceSize="12" >
+											<div class="slds-media">
+													<div class="slds-media__figure">
+														<span class="slds-icon_container " title="account">
+															<lightning:icon iconName="standard:account" alternativeText="account" size = "large"/>
+														</span>
+													</div>
+													<div class="slds-media__body">
+														<div class="slds-page-header__name">
+															<div class="slds-page-header__name-title">
+																<h1>
+																	<span class="slds-page-header__title slds-truncate" title="Sub-Reseller Accounts" style="font-size: 22px;">Sub-Reseller Accounts</span>
+																</h1>
+															</div>
+														</div>
+														<p class="slds-page-header__name-meta" style="font-size: 14px;">Click on record link action to associate sub-reseller to opportunity based on search result.</p>
+													</div>
+													</div>
+										
+								</lightning:layoutItem>
+								
+								
+							</lightning:layout>
+								  </div>
+
+	
+		<!--End Page Header-->
+		<!-- Component  Content Start -->
+		
+			<lightning:layout  multipleRows="true" >
+            <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="4"  padding="around-small">
+					<div  onkeyup="{!c.onKeyup}">
+						<lightning:input  aura:id = "searchSrname" type = "text" name = "SubResellerName" label = "Sub-Reseller Name : " 
+                 placeholder="Enter minimum 3 characters to search" onchange="{!c.onChange}" />
+                </div>
+           </lightning:layoutItem>
+           <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="4"  padding="around-small">
+		</lightning:layoutItem>
+           
+           
+                
+				<lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="4"  padding="around-small">
+					<span class="slds-float_right" style = "padding-top:19px;">
+						<lightning:buttonGroup  >
+							<lightning:button onclick="{!c.onSearch}" label = "Search" iconName="utility:search" iconPosition="left" disabled = "{!v.pageUtil.searchDisabled}" />
+							<lightning:button onclick="{!c.onBack}" label = "Back to Opportunity" iconName="utility:back" iconPosition="left" />
+						</lightning:buttonGroup>
+					</span>
+                </lightning:layoutItem>
+                
+				<lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="12" largeDeviceSize="12"  padding="around-small">
+					<lightning:button iconName="utility:database" iconPosition="left" class="slds-align_absolute-center" variant="Neutral" label="Load More Data" title="Base action" onclick="{! c.handleMore }" disabled = "{!v.pageUtil.isloadDisabled}"/>
+				</lightning:layoutItem>
+			</lightning:layout>
+		
+		<div class="slds-m-top_medium" >
+			<lightning:layout>
+				
+				<lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="12" largeDeviceSize="12" >
+					
+				<div class="slds-float_left slds-badge ">
+						<strong> Total Matching Rows : {!v.totalNumberOfRows}</strong>
+                       
+                  
+					</div>
+					<div aura:Id = "statusCheckId" class="slds-float_right slds-badge " >
+						<strong>{!v.loadMoreStatus}</strong>
+					</div>
+				
+				</lightning:layoutItem>
+			
+			</lightning:layout>
+			<div class="slds-card  slds-m-top_medium"  style="height:335px" >
+				<lightning:datatable aura:Id = "datatableLsb"
+                       data="{!v.data}" 
+                       showRowNumberColumn="true"
+                       columns="{!v.columns}"
+                       keyField="id"
+                       hideCheckboxColumn="true"
+                       onrowaction="{!c.handleRowAction }"/>
+			</div>
+			<lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="12" largeDeviceSize="12"  padding="around-small">
+				<lightning:button disabled = "{!v.pageUtil.isloadDisabled}" iconName="utility:database" iconPosition="left" class="slds-align_absolute-center" variant="Neutral" label="Load More Data" title="Base action" onclick="{!c.handleMore}" />
+			</lightning:layoutItem>
+		</div>
+	</div>
+	<!--Component Content End-->
+</aura:component>

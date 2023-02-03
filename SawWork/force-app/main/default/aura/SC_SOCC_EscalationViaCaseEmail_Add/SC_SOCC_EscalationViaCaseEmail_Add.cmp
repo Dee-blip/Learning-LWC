@@ -1,0 +1,128 @@
+<aura:component>
+     <!-- attributes coming from the parent component -->
+    <!-- Policy Domain Id-->
+    <aura:attribute name="pdId" type="String"/>
+    <!-- To store existing + newly selected Authorized Contact Ids -->
+    <aura:attribute name="lAuthConIdForEmail" type="List"/>
+    <!-- List of all required Authrized Contact for table data --> 
+    <aura:attribute name="lAuthorizedContactTableDataForEmail" type="List"/>
+
+    <!-- List of Attributes -->
+    <!-- List of filtered Authrized Contact for table data --> 
+    <aura:attribute name="lFilteredAuthorizedContactTableDataForEmail" type="List"/>
+    <!-- Search term-->
+    <aura:attribute name="searchTerm" type="String"/>
+    <!-- to check/uncheck all checkboxes -->
+    <aura:attribute name="isSelectAll" type="boolean" default="false"/>
+
+    <!-- init method to trigger event and pass parameters -->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+
+    <!-- Registering event SC_SOCC_SendSelectedAuthConForEmail to send back List of selected Authorized Contacts to parent component -->
+    <aura:registerEvent name="sendSelectedAuthConForEmail" type="c:SC_SOCC_SendSelectedAuthConForEmail"/>
+
+
+    <!-- Main Modal -->
+    <div class="demo-only"  style="height: 100%;">
+          <section  class="slds-modal slds-fade-in-open">
+               <div class="slds-modal__container" style="width: 100%; max-width: 85rem;">
+                    <!-- Modal Header -->
+                    <div class="slds-modal__header slds-grid">
+                         <!-- Cross button to close the Modal -->
+                         <button class="slds-button slds-modal__close" title="Close" 
+                              onclick="{!c.closeMe}">
+                         <lightning:icon class="white slds-icon_small" iconName="utility:close"/> 
+                         <span class="slds-assistive-text">Close</span>
+                         </button>
+
+                         <div class="slds-col slds-float_left">
+                         <span><h2 class="sectionHeading">Add Notify via Case Email</h2></span>
+                         </div>
+                         <div class="slds-col">
+                         <span class="slds-float_right"><lightning:input type="search" value="{!v.searchTerm}" onchange="{!c.dofilter}" placeholder="Search Name or Email "/></span>
+                         </div>
+                    </div>
+
+                    <!--Modal Body -->
+                    <div class="slds-modal__content slds-p-around_medium" style="padding-top: 0rem;"> 
+                         <!-- Table to show data -->
+                         <table class="slds-table slds-table_cell-buffer slds-table_bordered" style="width:100%">
+                         <!--Table Header-->
+                         <thead>
+                              <tr class="slds-line-height_reset">
+                                   <th class="table-fixed-cell" style="width: 5%;">           
+                                        <label class="slds-checkbox">
+                                             <ui:inputCheckbox value="{!v.isSelectAll}" change="{!c.handleSelectAllAuthContact}" aura:id="selectAll"/>
+                                             <span class="slds-checkbox--faux" />
+                                             <span class="slds-form-element__label"></span>
+                                        </label>
+                                   </th>
+                                   <th class="slds-text-title_caps table-fixed-cell" scope="col" style="width: 20%;">
+                                        <div class="cell-content" >Contact Name</div>
+                                   </th>
+                                   <th class="slds-text-title_caps table-fixed-cell" scope="col" style="width: 19%;">
+                                        <div class="cell-content" >Email</div>
+                                   </th>
+                                   <th class="slds-text-title_caps table-fixed-cell" scope="col" style="width: 19%;">
+                                        <div class="cell-content" >SMS Notification</div>
+                                   </th>
+                                   <th class="slds-text-title_caps table-fixed-cell" scope="col" style="width: 19%;">
+                                        <div class="cell-content" >ACCOUNT</div>
+                                   </th>
+                                   <th class="slds-text-title_caps table-fixed-cell" scope="col">
+                                        <div class="cell-content" >SERVICE ACCOUNT</div>
+                                   </th>
+                              </tr>
+                         </thead>
+                         
+                         <tbody id="AuthConTable">
+                              <aura:iteration items="{!v.lFilteredAuthorizedContactTableDataForEmail}" var="authConRec">
+                                   <tr class="slds-hint-parent">
+                                        <td>
+                                             <label class="slds-checkbox">
+                                             <ui:inputCheckbox aura:id="checkContact" value="{!authConRec.isSelected}" text="{!authConRec.Id}" change="{!c.handleSelectAuthContact}"/>
+                                             <span class="slds-checkbox--faux" />
+                                             <span class="slds-form-element__label"></span>
+                                             </label>
+                                        </td>
+                                        <td>
+                                             <div class="cell-content">
+                                             {!authConRec.Contact_Name__r.Name}
+                                             </div>
+                                        </td>
+                                        <td>
+                                             <div class="cell-content">
+                                             {!authConRec.Contact_Name__r.Email}
+                                             </div>
+                                        </td>
+                                        <td>
+                                             <div class="cell-content">
+                                             {!authConRec.Contact_Name__r.SMS_Notifications__c}
+                                             </div>
+                                        </td>
+                                        <td>
+                                             <div class="cell-content">
+                                                  {!authConRec.Policy_Domain__r.Account_Name__r.Name}
+                                             </div>
+                                        </td>
+                                        <td>
+                                             <div class="cell-content">
+                                                  {!authConRec.Policy_Domain__r.Service_Account__r.Name}
+                                             </div>
+                                        </td>
+                                   </tr>
+                              </aura:iteration>
+                         </tbody>
+                         </table>
+                    </div>
+                    <!--Footer-->
+                    <footer class="slds-modal__footer"> 
+                         <button class="slds-button slds-button_neutral" onclick="{!c.closeMe}">Cancel</button>
+                         <button class="slds-button slds-button_brand" onclick="{!c.addAuthContacts}">Add</button>
+                    </footer>
+               </div>
+          </section>
+          <div class="slds-backdrop slds-backdrop_open"></div>
+      </div>
+
+</aura:component>

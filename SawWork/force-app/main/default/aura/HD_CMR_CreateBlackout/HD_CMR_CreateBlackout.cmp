@@ -1,0 +1,168 @@
+<aura:component controller="HD_CMR_BlackoutPeriod" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                access="global" >
+    
+    <ltng:require scripts="{!$Resource.HD_Error_Logger}" />
+    <aura:registerEvent name="outagematchingcmrs" type="c:HD_CMR_EventOutageMatchingCMRList"/>
+    <aura:registerEvent name="closeModalEvt" type="c:HD_CMR_ComponentEvent"/>
+    
+    <aura:attribute name="serviceoutage" type="BMCServiceDesk__Projected_Service_Outage__c" 
+                    default="{'sobjectType':'BMCServiceDesk__Projected_Service_Outage__c',
+                             'Name': '',
+                             'BMCServiceDesk__Blackout__c': '',
+                             'BMCServiceDesk__Description__c': '', 
+                             'BMCServiceDesk__Display_in_Self_Service__c': '',
+                             'BMCServiceDesk__Inactive__c':'',
+                             'BMCServiceDesk__End_Date__c':'',
+                             'BMCServiceDesk__Start_Date__c':'',
+                             'Service_Outage_Type__c': '',
+                             'Services_Affected__c':'',
+                             'Sub_Services_Affected__c':'',
+                             'Affected_Services_Picklist__c':''
+                             }"/>
+    
+    <aura:attribute name="newServiceOutage" type="BMCServiceDesk__Projected_Service_Outage__c"/>
+    <aura:attribute name="simpleNewServiceOutage" type="Object"/>
+    <aura:attribute name="newServiceOutageError" type="String"/>
+    <aura:attribute name="objectParams" type="String"/>  
+    
+    
+    
+                    <aura:attribute name="serviceoptions" type="selectOption[]" />
+  <aura:attribute name="selectedItems" type="String[]" />
+  <aura:attribute name="width" type="String" default="240px;" />
+  <aura:attribute name="dropdownLength" type="Integer" default="5" />
+  <aura:attribute name="dropdownOver" type="Boolean" default="false" />
+     
+  <aura:attribute name="isSpinnerEnabled" type="Boolean" default="false"/>
+  <aura:attribute name="options_" type="String[]" />
+  <aura:attribute name="infoText" type="String" default="Select an option..." />
+    
+    <force:recordData aura:id="serviceoutageRecordCreator"
+                      layoutType="COMPACT"
+                      targetRecord="{!v.newServiceOutage}"
+                      targetFields ="{!v.simpleNewServiceOutage}"
+                      targetError="{!v.newServiceOutageError}"
+                      />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <aura:if isTrue="{!v.isSpinnerEnabled}">
+                        <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                            <span class="slds-assistive-text">Loading</span>
+                            <div class="slds-spinner__dot-a"></div>
+                            <div class="slds-spinner__dot-b"></div>
+                        </div>
+                    </aura:if>
+    
+    <div class="Create ServiceOutage">
+        <article class="slds-card">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            
+                            <span class="slds-text-heading_small">New ServiceOutage</span>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            <div class="slds-card__body slds-card__body_inner" >
+                <div class="slds-form-element slds-box">
+                    <div class="slds-form-element__control">
+                        <div class="slds-grid slds-grid--pull-padded-large ">
+                            <div class="slds-col slds-p-horizontal--medium" >
+                                <div></div>
+                                <lightning:input aura:id="soname" label="Name" required="true" value="{!v.simpleNewServiceOutage.Name}"/>
+                                
+                            </div>
+                            <div class="slds-col slds-p-horizontal--medium">
+                                <lightning:input type='datetime' name='sdatetime' aura:id="startdatetime" label="Start DateTime" onchange="{!c.onchange}" required="true"/>
+                                
+                            </div>
+                        </div> 
+                        
+                        <div class="slds-grid slds-grid--pull-padded-large ">
+                            <div class="slds-col slds-p-horizontal--medium" >
+                                <div></div>
+                                <lightning:input aura:id="description" label="Description" required="true" value="{!v.simpleNewServiceOutage.BMCServiceDesk__Description__c}"/>
+                                
+                            </div>
+                            <div class="slds-col slds-p-horizontal--medium" >
+                                
+                                <lightning:input type='datetime' name='endatetime' aura:id="enddatetime" label="End DateTime"  onchange="{!c.onchange}" required="true"/>
+                            </div>
+                        </div>
+                        <hr class="seperator"/>
+                        <div class="slds-grid slds-grid--pull-padded-medium ">
+                            <div class="slds-col slds-p-horizontal--medium" >
+                                <lightning:select name="serviceoutagetype" label="Service Outage Type"  aura:id="serviceoutagetype" class="form-input" onchange="{!c.onchange}">
+                                    <option value="">--None--</option>
+                                    <option value="Enhanced Review Period">Enhanced Review Period</option>
+                                    <option value="Conditional Blackout Period">Conditional Blackout Period</option>
+                                </lightning:select>
+                                
+                                       
+                            </div>
+                            <div class="slds-col slds-p-horizontal--medium">
+                                
+                                <div class="slds-form-element">
+                                  <label class="slds-form-element__label" for="select-01">Select Services</label>
+                                    <div class="slds-hide" aura:id="unselct_icon" style="float:right;cursor: pointer;" onclick="{!c.selclear}" title="Clear all selection"><lightning:icon  aura:id="undoArrow" iconName="utility:undo" size="xx-small" alternativeText="Indicates dash" onclick="{!c.selclear}"/></div>
+                                    
+                               
+                                    <div class="slds-form-element__control" onfocusout="{!c.onchange}">
+                                    <select id="service_multiselect" onchange='{!c.showunselct}' class="slds-select" aura:id="affectedservices" multiple="true">
+                                      <aura:iteration items="{!v.serviceoptions}" var="opt" indexVar="idx">  
+                                      <option value="{!opt.value}">{!opt.option}</option>
+                                        </aura:iteration>
+                                    </select>
+                                  </div>
+                                    
+                                    <br/>
+                                    <br/>
+                                  <span onfocusout="{!c.onchange}"><lightning:input  aura:id="subservices" label="Sub Services" value="{!v.simpleNewServiceOutage.Sub_Services_Affected__c  }"/></span> 
+                         
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="slds-grid slds-grid--pull-padded-medium">
+                            
+                            <div class="slds-col slds-p-horizontal--medium">
+                               
+                            </div>
+                        </div> 
+                        <hr class="seperator"/>
+                        <div class="slds-grid slds-grid--pull-padded-medium">
+                            <div class="slds-col slds-p-horizontal--medium"><lightning:input aura:id="displayinselfservice"  name="display_in_selfservice" type="checkbox" label="Display In Self Service" value="{!v.simpleNewServiceOutage.BMCServiceDesk__Display_in_Self_Service__c}" onchange="{!c.onchange}"/>
+                            </div>
+                            
+                            <div class="slds-col slds-p-horizontal--medium">
+                                <lightning:input class='testclass' aura:id="soinactive" name="inactive" type="checkbox" label="Inactive" value="{!v.simpleNewServiceOutage.BMCServiceDesk__Inactive__c}" onchange="{!c.onchange}"/>
+                                
+                            </div>
+                        </div> 
+                        
+                        <div class="slds-grid slds-grid--pull-padded-medium">
+                            <div class="slds-col slds-p-horizontal--medium">
+                                <lightning:input aura:id="blackoutperiod" name  = "blackoutperiod" type="checkbox" label="Blackout Period (Only Emergency CMRs are allowed )" value="{!v.simpleNewServiceOutage.BMCServiceDesk__Blackout__c}" onchange="{!c.onchange}"/>
+                            </div>
+                        </div> 
+                    </div> 
+                </div>
+            </div>
+            <footer class="slds-card__footer">
+                <aura:if isTrue="{!not(empty(v.newServiceOutageError))}">
+                    <div class="recordError">
+                        {!v.newServiceOutageError}
+                        <br/><br/>
+                    </div>
+                </aura:if>
+                <lightning:button  aura:id="ar_savebutton" label="Save ServiceOutage" variant="brand" onclick="{!c.handleSaveServiceOutage}"/>
+            </footer>
+        </article>
+    </div>
+    <c:HD_CMR_CMRMatchingList/>
+</aura:component>

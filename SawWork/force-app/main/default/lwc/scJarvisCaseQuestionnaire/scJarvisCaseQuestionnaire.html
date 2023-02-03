@@ -1,0 +1,151 @@
+<template>
+
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class={modalClass}>
+        <div class="slds-modal__container">
+            <!-- Modal/Popup Box LWC header here -->
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                    <lightning-icon icon-name="utility:close"
+                        alternative-text="close"
+                        variant="inverse"
+                        size="small" ></lightning-icon>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Case Questionnaire</h2>
+            </header>
+            <div>
+                <template if:true={loadSpinner}>
+                    <div style="opacity: 0.7;" class="slds-spinner_container">
+                        <lightning-spinner alternative-text="Loading" variant="brand" size="medium">
+                        </lightning-spinner>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Modal/Popup Box LWC body starts here -->
+            <div class="slds-modal__content slds-p-around_medium applyJarvisQuestionnaire" id="modal-content-id-1">
+                <lightning-record-edit-form record-id={recordId} object-api-name="Case_Questionnaire__c" onsubmit={submitMethod} onsuccess={handleSucess} onerror={handleError}>
+                
+                    <lightning-layout class="slds-p-bottom_medium">
+                            
+                        <lightning-layout-item size="6" class="slds-p-right_medium">
+                            <abbr title="required" class="slds-required">*</abbr> 
+                            <label class="slds-form-element__label slds-no-flex labelStyle">Question</label>                                                    
+                            <lightning-input-field variant="label-hidden" data-field="Question__c" field-name="Question__c" class={nameClass} onchange={removeErrorClass}>
+                            </lightning-input-field>
+                                            
+                        </lightning-layout-item>
+
+                        <lightning-layout-item size="6" >
+                            <label class="slds-form-element__label slds-no-flex labelStyle">Help Text</label>                                                     
+                            <lightning-input-field variant="label-hidden" field-name="Help_Text__c" data-field="Help_Text__c" >
+                            </lightning-input-field>
+                                            
+                        </lightning-layout-item>
+    
+                    </lightning-layout>
+
+                    <lightning-layout class="slds-p-bottom_medium">
+                            
+                        <lightning-layout-item size="6" class="slds-p-right_medium"> 
+                            <div >
+                                <c-sc-community-dynamic-pick-list lookup-label="Case Product" search-query={query}
+                                onrecordselection={onProductSelection} recordslist={currentRecordsList}
+                                onsearchevent={handleSearch} message={currentMessage} error={currentError} selectedvalue={selectedProduct} 
+                                iconname="custom:custom20"  haserror={applyErrorToProduct} required="true" labelstyle="font-weight: bold !important;">
+                                </c-sc-community-dynamic-pick-list>
+                            </div>                                        
+                        </lightning-layout-item>
+
+
+                        <lightning-layout-item size="6" > 
+                            <div class={problemClass}>
+                                <template if:true={problemRequired}>
+                                    <abbr title="required" class="slds-required">*</abbr>
+                                </template>                                
+                                <label class="slds-form-element__label slds-no-flex labelStyle">Problem</label>
+                                <lightning-combobox
+                                variant="label-hidden"
+                                value={selectedProblem}
+                                placeholder="Problem"
+                                options={problems}
+                                onchange={onProblemChange} disabled={disableProblem}></lightning-combobox>                
+
+                            </div>
+                                                                
+                        </lightning-layout-item>
+    
+                    </lightning-layout>
+                    
+                    <lightning-layout class="slds-p-bottom_medium">
+                            
+                        <lightning-layout-item size="6" class="slds-p-right_medium"> 
+                            
+                            <abbr title="required" class="slds-required">*</abbr> 
+                            <label class="slds-form-element__label slds-no-flex labelStyle">Question Type</label>                                
+                            <lightning-input-field variant="label-hidden" field-name="Question_Type__c" data-field="Question_Type__c" class={typeClass} onchange={removeErrorClass}>
+                            </lightning-input-field>
+                                            
+                        </lightning-layout-item>
+
+
+                        <lightning-layout-item size="6" > 
+                            <template if:true={optionRequired}>
+                                <abbr title="required" class="slds-required">*</abbr>
+                            </template>                                
+                            <label class="slds-form-element__label slds-no-flex labelStyle">Answer Options</label> 
+                            <lightning-helptext content="The drop down options for picklist questions. Enter comma, semi-colon or new line separated."></lightning-helptext>                                                
+                            <lightning-input-field variant="label-hidden" field-name="Answer_Options__c" data-field="Answer_Options__c" class={optionClass} onchange={removeErrorClass} disabled={disableOptions}>                                
+                            </lightning-input-field>
+                        </lightning-layout-item>
+    
+                    </lightning-layout>
+
+                    <lightning-layout class="slds-p-bottom_medium">
+                            
+                        <lightning-layout-item size="6" class="slds-p-right_medium"> 
+                            <label class="slds-form-element__label slds-no-flex labelStyle">Is Active</label> 
+                            <lightning-helptext content="Only if the Question is active, it will show up in the create form."></lightning-helptext>                                                
+                            
+                            <lightning-input-field variant="label-hidden" field-name="Is_Active__c" data-field="Is_Active__c">
+                            </lightning-input-field>
+                                            
+                        </lightning-layout-item>
+
+
+                        <lightning-layout-item size="6" > 
+                            <label class="slds-form-element__label slds-no-flex labelStyle">Required</label> 
+                            <lightning-helptext content="Is this a mandatory question"></lightning-helptext>                                                
+
+                            
+                            <lightning-input-field variant="label-hidden" field-name="Required__c" data-field="Required__c">
+                            </lightning-input-field>
+                                            
+                        </lightning-layout-item>
+    
+                    </lightning-layout>
+                    
+                    <lightning-input-field variant="label-hidden" field-name="Case_Product__c" data-field="Case_Product__c" value={selectedProduct} class="productClass hidden" >
+                    </lightning-input-field>
+                    <lightning-input-field variant="label-hidden" field-name="Problem__c" data-field="Problem__c" value={selectedProblem} class="problemClass hidden">
+                    </lightning-input-field>
+
+
+                        <input type="submit" 
+                        class="hiddenButton hidden"
+                        ></button>                                            
+
+            </lightning-record-edit-form>  
+            </div>
+            <!-- Modal/Popup Box LWC footer starts here -->
+            <footer class="slds-modal__footer">
+                <button class="slds-button slds-button_neutral" onclick={closeModal} title="Cancel">Cancel</button>
+                <button class="slds-button slds-button_brand" onclick={validateForm} title="OK">Save</button>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+
+
+
+</template>

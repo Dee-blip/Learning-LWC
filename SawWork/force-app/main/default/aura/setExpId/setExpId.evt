@@ -1,0 +1,4 @@
+<!--/*Customer Community Component*/-->
+<aura:event type="APPLICATION">
+    <aura:attribute name="expid" type="String"/>  
+</aura:event>

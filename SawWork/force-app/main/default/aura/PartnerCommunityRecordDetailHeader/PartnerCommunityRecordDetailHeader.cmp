@@ -1,0 +1,74 @@
+<aura:component controller="PartnerCommunityOpptyHeaderController" extends="c:PartnerCommunityParentComponent" implements="flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="showSection" type="Boolean" default="false"/>
+    <aura:attribute name="oppty" type="Opportunity" />
+    <aura:attribute name="valuesMap" type="Map" />
+    <aura:attribute name="leadUrl" type="String" />
+    <aura:attribute name="sObjectName" type="String" />
+    <!--SFDC 9134-->
+    <aura:attribute name = "rebateDocURL" type = "String" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:registerEvent name="parentUpdateEvent" type="c:PartnerCommunityParentUpdateEvent"/>
+    
+    <aura:if isTrue="{!and((v.sObjectName)=='Opportunity',((v.oppty.Registration_Status__c)=='Draft' ))}" >
+        <article class="slds-card">
+            <div class="slds-card__header slds-grid">
+                <div class='slds-clearfix'>
+                    <div class="slds-float_left">
+                        <div aura:id="partnerAlert">
+                            <!--<div class="pageSpinner">
+                                <lightning:spinner aura:id="pageSpinner" alternativeText="Loading" size="medium" />
+                            </div> -->
+                            <aura:if isTrue="{!v.oppty.isRebateTCToShow__c}">
+                                <div class="slds-text-color_default slds-text-color_error">
+                                    {!$Label.c.PartnerRebate_TC_Notification_Text}
+                                    <lightning:button variant="base" label="{!$Label.c.Rebate_TC_Label}" onclick="{!c.toggleSection}" />
+                                </div>
+                                <aura:set attribute="else">
+                                    <div class="slds-text-color_default slds-text-color_error ">
+                                        Please Click on Submit for Approval button. 
+                                    </div>
+                                </aura:set>
+                            </aura:if>
+                        </div>
+                        
+                        <div id="rebateTCSection">
+                            <aura:if isTrue="{!v.showSection}">
+                                <div class="slds-p-top_medium">
+                                    {!v.valuesMap.rebateTCText}
+                                </div>
+                                <div class="slds-p-top_small">
+                                    {!v.valuesMap.rebateTCText1}                    	
+                                </div>
+                                <div class="slds-p-top_small">
+                                    <!-- SFDC-9134 -->
+                                    <aura:if isTrue="{!not(empty(v.rebateDocURL))}">
+                                        <lightning:formattedUrl value="{!v.rebateDocURL}" label="{!$Label.c.Rebate_TC_Label}" /> 
+                                        <aura:set attribute="else">
+                                            Error
+                                        </aura:set>
+                                    </aura:if>
+                                    <!-- <lightning:formattedUrl value="{!$Label.c.Partner_Reabte_TC_Doc_Link}" label="{!$Label.c.Rebate_TC_Label}" /> -->
+                                </div>
+                                <div class="slds-p-top_small">
+                                    {!v.valuesMap.notificationMessage}                    	
+                                </div>
+                                <div class="slds-p-top_medium slds-align_absolute-center">
+                                    <lightning:button variant="brand-outline" label="Accept" onclick="{!c.acceptJS}" />
+                                    <lightning:button variant="brand-outline" label="Reject" onclick="{!c.rejectJS}" />
+                                </div>
+                            </aura:if>
+                        </div>
+                        <div aura:id="partnerLeadLink">
+                            <aura:if isTrue="{!(v.oppty.Associated_Lead__c)!=null}">
+                                <lightning:formattedUrl value="{!v.LeadURL}" label="Navigate to associated Lead" />
+                            </aura:if>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </article>
+    </aura:if>
+</aura:component>

@@ -1,0 +1,18 @@
+<apex:page controller="BudgetController" showHeader="false" sidebar="false" standardStylesheets="true" >
+<style>
+.bPageBlock {
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+</style>
+    <apex:pageBlock >
+         <apex:pageBlockSection title="Available Funds" > 
+          <apex:panelGrid columns="2" id="theGrid">
+              <apex:outputLabel value="User Co-op Available" style="color:black;font-size:15px;" />
+              <apex:outputText value="$ {0, number, #,##0.00} " style="color:blue;font-size:15px;">
+                  <apex:param value="{!availableFunds}" />
+              </apex:outputText>
+          </apex:panelGrid>  
+       </apex:pageBlockSection>     
+   </apex:pageBlock>
+</apex:page>

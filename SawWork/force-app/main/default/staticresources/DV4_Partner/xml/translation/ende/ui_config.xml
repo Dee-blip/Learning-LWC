@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui>
+	<pltfm><![CDATA[Akamai-Plattform]]></pltfm>
+	<prmap><![CDATA[Karte drucken]]></prmap>
+	<svmap><![CDATA[Karte speichern]]></svmap>
+	<compare>
+		<wait><![CDATA[Bitte warten Sie. Dieser Prozess kann bis zu 2 Minuten dauern.]]></wait>
+		<abort><![CDATA[Abbrechen]]></abort>
+	</compare>
+	<formview>
+		<hlink><![CDATA[Methodologie und Datenerfassung]]></hlink>
+		<ddown1>
+			<item1><![CDATA[Echtzeit-Bericht]]></item1>
+			<item2><![CDATA[Wochenbericht]]></item2>
+			<item3><![CDATA[Vorheriger Wochenbericht]]></item3>
+		</ddown1>
+		<desc1><![CDATA[Vergleichs-URL]]></desc1>
+		<desc2><![CDATA[Geben Sie die Website-Adresse für den Echtzeit-Bericht ein.]]></desc2>
+		<submit><![CDATA[Vergleichen]]></submit>
+		<desc3><![CDATA[Vorherige Berichtsliste]]></desc3>
+		<desc4><![CDATA[Vorgang erfolgreich! Sie erhalten in rund einer Woche eine E-Mail mit einem Link zu dem Bericht.]]></desc4>
+		<desc5><![CDATA[Anwendungsperformancevergleich]]></desc5>
+		
+		<calc>
+			<label><![CDATA[Optional]]></label>
+			<mn_st_vst><![CDATA[Monatliche Website-Besuche]]></mn_st_vst>
+			<cr_conv_rate><![CDATA[Aktuelle Konversionsrate]]></cr_conv_rate>
+			<avg_ord_val><![CDATA[Durchschnittlicher Bestellwert]]></avg_ord_val>
+			<cr_rev><![CDATA[Aktueller Website-Umsatz pro Monat]]></cr_rev>
+			<ad_rev><![CDATA[Zusätzlicher Website-Umsatz pro Monat]]></ad_rev>
+		</calc>
+	</formview>
+	<brkdn>
+		<label><![CDATA[Aufschlüsselung]]></label>
+		<lbl_city><![CDATA[Leistung nach Stadt]]></lbl_city>
+		<lbl_city_smp><![CDATA[Leistung nach Stadt (Beispielstädte)]]></lbl_city_smp>
+		<lbl_region><![CDATA[Leistung nach Region]]></lbl_region>
+		<lbl_gbl><![CDATA[Durchschnittliche Leistung weltweit]]></lbl_gbl>
+		<lbl_wk_lng><![CDATA[Weeklong Performance Test]]></lbl_wk_lng>
+	</brkdn>
+	<drpdn>
+		<label><![CDATA[Region]]></label>
+		<global><![CDATA[Global]]></global>
+		<amrcs><![CDATA[Nord-, Mittel-, Südamerika]]></amrcs>
+		<emea><![CDATA[EMEA]]></emea>
+		<asia><![CDATA[Asien]]></asia>
+	</drpdn>
+	<map>
+		<prf_imp><![CDATA[Leistungsverbesserung]]></prf_imp>
+		<est_imp><![CDATA[Geschätzte Verbesserung]]></est_imp>
+		<graph>
+			<cnn><![CDATA[Verbindung]]></cnn>
+			<firstb><![CDATA[Erster Byte]]></firstb>
+			<dnld><![CDATA[Herunterladen]]></dnld>
+		</graph>
+		<pdf>
+			<org><![CDATA[Ausgangsserver]]></org>
+			<impr><![CDATA[Verbesserung]]></impr>
+			<citynm><![CDATA[Name der Stadt]]></citynm>
+			<citynm_imp><![CDATA[Name der Stadt (Verbesserung)]]></citynm_imp>
+			<orgsec><![CDATA[Ursprung (Sekunden)]]></orgsec>
+			<akmsec><![CDATA[Akamai (Sekunden)]]></akmsec>
+		</pdf>
+		<save>
+			<msg><![CDATA[Flash öffnet in Kürze den Dialog „Datei speichern“. Bitte klicken Sie auf OK, um fortzufahren.]]></msg>
+			<yes><![CDATA[OK]]></yes>
+			<no><![CDATA[ABBRECHEN]]></no>
+		</save>
+	</map>
+ </ui>

@@ -1,0 +1,28 @@
+<!-- *****************************************************************************************
+Component Name  : SC_OCQ_Link
+Controller      : SC_AkapediaController
+Test Class Name	: SC_KCS_TestClass
+Author          : Pinkesh
+Created Date    : 31-July-2019
+JIRA            : ESESP-2525
+
+|  HISTORY  |                                                                            
+
+|  DATE          DEVELOPER     JIRA       DESCRIPTION                                                       
+
+|  ===========   =========    =======     =========== 
+
+***************************************************************************************** -->
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" controller="SC_AkapediaController" access="global">
+    <!--Get the record ID of the case-->
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="OCQLink" type="string"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+	<lightning:card iconName="standard:account">
+    	<aura:set attribute="title">
+        	<a href="{!v.OCQLink}" target="_blank">Content Quality</a>
+    	</aura:set>
+    </lightning:card>
+</aura:component>

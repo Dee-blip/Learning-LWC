@@ -1,0 +1,60 @@
+<!--
+  @description       : This component is used to submit for product approval
+  @author            : apyati
+  @team              : GSM
+  @last modified on  : 01-19-2022
+  @last modified by  : apyati
+  Modifications Log
+  Ver   Date         Author   Modification
+ * 1.0   09-07-2021   apyati   Created for SFDC-8603
+-->
+<template>
+
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <template if:true={isLoading}>
+          <lightning-spinner variant="brand"
+                size="large">
+            </lightning-spinner>
+        </template> 
+
+        <div class="slds-modal__container modal-width">
+   
+
+            <div class="slds-modal__header">
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={handleCancel}
+                    alternative-text="close" variant="bare-inverse" class="slds-modal__close"></lightning-button-icon>
+
+                <header class="slds-card__header slds-text-heading_medium header-font-weight"> {requesttype} </header>
+            </div>
+
+
+            <div class="slds-modal__content slds-p-horizontal_medium slds-p-bottom_medium" id="modal-content-id-1">
+
+                <template if:true={showErrorMessage}>
+                    <div class="slds-col align-center error-message">
+                        {showErrorMessage}
+                    </div>
+                </template>
+
+                <template if:true={showEditForm}>
+                    <div class="slds-card">
+                        <lightning-record-edit-form object-api-name="Deal_Support_Request__c" onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                            <lightning-messages></lightning-messages>
+                            <div class="slds-m-around_medium">
+                                <lightning-input-field field-name="Notes__c" required="true"></lightning-input-field>
+                                <div class="slds-var-m-top_medium  slds-align_absolute-center">
+                                    <lightning-button variant="brand" type="submit" name="save" label="Submit">
+                                    </lightning-button>
+                                </div>
+                            </div>
+                        </lightning-record-edit-form>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </section>
+
+    <div class="slds-backdrop slds-backdrop_open"></div>
+
+
+</template>

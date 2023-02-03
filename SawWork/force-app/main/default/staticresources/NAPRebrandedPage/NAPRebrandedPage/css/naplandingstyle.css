@@ -1,0 +1,303 @@
+@font-face {
+    font-family: 'OpenSans-Light'; 
+    src: url('../fonts/OpenSans-Light.ttf');
+}
+@font-face {
+    font-family: 'Ubuntu-Light'; 
+    src: url('../fonts/Ubuntu-Light.ttf');
+}
+
+@font-face {
+    font-family: 'OpenSans-LightItalic'; 
+    src: url('../fonts/OpenSans-LightItalic.ttf');
+}
+
+@font-face {
+    font-family: 'OpenSans-Regular'; 
+    src: url('../fonts/OpenSans-Regular.ttf');
+}
+@font-face {
+    font-family: 'Ubuntu'; 
+    src: url('../fonts/Ubuntu-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Akamai-Logo'; 
+    src: url('../fonts/Akamai-logo.ttf');
+}
+
+/*
+Custom Akamai Logo font built using fontcustom
+*/
+
+@font-face {
+  font-family: "akamailogofont";
+  src: url("../fonts/akamailogofont.eot");
+  src: url("../fonts/akamailogofont.eot?#iefix") format("embedded-opentype"),
+       url("../fonts/akamailogofont.woff") format("woff"),
+       url("../fonts/akamailogofont.ttf") format("truetype"),
+       url("../fonts/akamailogofont.svg#fontcustom") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: "akamailogofont";
+    src: url("../fonts/akamailogofont.svg#fontcustom") format("svg");
+  }
+}
+
+[data-icon]:before { content: attr(data-icon); }
+
+[data-icon]:before,
+.icon-akamai-logo:before {
+  display: inline-block;
+  font-family: "akamailogofont";
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  line-height: 1;
+  text-decoration: inherit;
+  text-rendering: optimizeLegibility;
+  text-transform: none;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+}
+
+.icon-akamai-logo:before { content: "\f100"; }
+
+.container-non-responsive {
+    /* Margin/padding copied from Bootstrap */
+    margin-left: auto;
+    margin-right: auto;
+
+    /* Set width to your desired site width */
+    width: 1370px;
+}
+
+.top-menu-bar{
+    height: 71px;
+    background: #2B2928;
+    box-shadow: 0px 4px 0px 0px rgba(0,0,0,0.10), inset 0px -4px 0px 0px rgba(0,0,0,0.45);
+}
+
+.partner-portal-top {
+    font-family: 'Ubuntu';
+    font-size: 18px; 
+    color: #FFFFFF; 
+    line-height: 21px;
+    padding-top: 25px;
+    padding-bottom: 25px;
+}
+
+
+.dropdown-toggle{
+    
+    font-family: 'Ubuntu-Light'; 
+    font-size: 15px;
+    color: #FFFFFF; 
+    background-color: #2B2928;
+    border-color: #2B2928;
+    line-height: 17px;
+    padding-top: 27px;
+    padding-bottom: 21px;
+    text-align: center;      
+}
+
+.dropdown-menu,.dropdown-menu>li>a {
+    font-family: 'Ubuntu-Light'; 
+    font-size: 15px;
+    color: #FFFFFF;
+    background-color: #2B2928;
+    min-width: 122px;
+
+}
+
+.top-hello{
+   position: relative; z-index: 597; float: right;
+
+}
+.glyphicon.glyphicon-menu-down{
+    color :#0099CC;
+    font-size: 12px;
+}
+.glyphicon.glyphicon-search{
+    background: #FF9933; 
+    box-shadow: inset 0px -4px 0px 0px rgba(0,0,0,0.10); 
+    color:  #FFFFFF;
+    width: 74px;
+   height: 71px;
+    font-size: 24px;
+   text-align: center;
+    padding-top: 20px;
+
+}
+body {
+    background:#FFFFFF !important;
+   
+}
+
+#myCarousel,.carousel-inner{
+    height: 330px;
+}
+
+.menu-contents-row
+{
+    padding-left: 100px;
+    padding-top: 31px;
+    padding-right : 100px;
+    height: 500px;
+    padding-bottom : 40px;
+    
+}
+.akamai-top-menu-logo{
+    padding-top: 11px;
+    padding-bottom: 11px;
+}
+
+.slider-text{
+    /*z-index: 100;
+    position: absolute;*/
+     background-color: #0099CC;
+    opacity: 0.5;
+    height: 330px;
+    width: 100%
+ 
+}
+
+.carousel-caption
+{
+    text-align: left;
+    top : 0
+}
+
+
+.btn.btn-default{
+    background: transparent;
+    font-family: 'OpenSans-Regular';
+    font-size: 18px;
+    color: #FFFFFF;
+    line-height: 28px;
+    padding-right: 30px;
+    padding-left: 30px;
+    margin-top: 30px;
+    margin-left: left;
+
+}
+
+.hr-style{
+   color: #FFFFFF;
+   display: block;
+   margin-top: -0.05em;
+   margin-bottom: 0.25em;
+   width:25%;
+   padding-left: 219px;
+
+}
+#blue-img{
+    position: absolute;
+    opacity:1;
+}
+
+.slider-description-row2{
+    font-family: 'OpenSans-Regular'; 
+    font-size: 49px;
+    color: #FFFFFF;
+    line-height: 66px;
+    
+   
+}
+.slider-description-row3{
+    font-family: 'OpenSans-LightItalic';
+    font-size: 21px;
+    color: #FFFFFF;
+    line-height: 28px; 
+    width : 500px;     
+}
+
+.carousel-indicators{       
+            
+    text-align : left;      
+}
+
+.carousel-indicators li{
+    border-radius: 3px;
+}
+
+
+.banner-image-description{
+    font-family: 'OpenSans-LightItalic';
+    color: #707070;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;    
+}
+
+.col-xs-3{
+  text-align : center;
+  height : 200px;
+
+}
+
+.banner-image-div-true:hover > div,.banner-image-div-true:hover > i {
+    color: #FFFFFF;
+}
+
+.banner-image-div-true:hover{
+    background: #0099CC;
+    border-radius: 8px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+
+.banner-image-div-false>i{
+    color: #707070;
+
+}
+
+.banner-image-div-false{
+    color: #707070;
+    pointer-events: none;
+}
+
+.banner-image{
+    color: #0099CC;
+   font-size: 80px;
+   text-align: center;
+}
+
+.banner-image-heading{
+    text-align: center;
+    font-family: 'OpenSans-Light';
+    font-size: 21px;
+    line-height: 50px;
+    color: #707070;
+}
+
+.footer-class{
+    height: 70px;
+    background: #EBEBEB;  
+    position: relative;
+
+}
+
+.footer-quick-links{
+    padding-left: 319px;
+    position: absolute;
+    top: 11px;
+}
+
+.footer-text{
+
+    font-family: Ubuntu; 
+    font-size: 14px;
+    color: #686868; 
+    line-height: 46px;
+    padding-right: 70px;
+    text-align: center;
+}

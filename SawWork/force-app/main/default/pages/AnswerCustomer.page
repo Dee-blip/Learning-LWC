@@ -1,0 +1,76 @@
+<!-- Modified by Vandhana for CR 3596981 - set the Email Subject to [AKAM-CASE #F-CS-XXXX] Case Subject
+Pinkesh     18-May-2017     ESESP-392      Display warning when auto-suggestions being offered by SF are from different accounts 
+CR 3157091 - In "Send an Email", Warn user when selecting contact that isn't associated with the account
+Created On: 22 June 2016
+Created By: ssawhney
+Description: This page will override the email publisher action for technical record type cases                              
+-->
+<apex:page standardController="Case" extensions="AnswerCustomerController" showHeader="false">
+    <apex:includeScript value="{!$Resource.JQuery_New}"/>
+  <div style="width:100%;  height:700px; overflow:auto;" >
+  <apex:form >
+
+    <apex:pageMessages id="msg" escape="false"/>
+            <apex:actionFunction id="validateEmail" name="validateEmail" action="{!ValidateEmails}" reRender="msg">
+      <apex:param id="emailAddress" name="emailAddress" value="" assignTo="{!emailAddress}"/>
+    </apex:actionFunction>
+    <apex:emailPublisher id="emailPublish" entityId="{!Case.id}"
+              toAddresses="{!IF(!case.IsMicrosoftAzureAccount__c,IF(contains(case.AuthorizedContacts__c,Case.Contact.Email), case.AuthorizedContacts__c, Case.Contact.Email+ ',' +case.AuthorizedContacts__c),toAddresses)}"
+        fromAddresses="{!$Setup.SCAnswerCustomerEmailAddress__c.FromEmailAddresses__c}"
+        fromVisibility="selectable"
+        autoCollapseBody="true"
+        bccVisibility="editableWithLookup"
+        ccVisibility="editableWithLookup"
+        expandableHeader="true"
+        enableQuickText="true"
+        emailBodyFormat="textAndHTML"
+        showAdditionalFields="false"
+        showAttachments="true"
+        showTemplates="true"
+        toVisibility="editableWithLookup"
+        verticalResize="false"
+        emailBodyHeight="400em"
+              subject="[AKAM-CASE #{!Case.Akam_Case_id__c}] {!Case.Subject}"
+        width="530px">
+    </apex:emailPublisher>
+    </apex:form>
+    </div>
+  <script type="text/javascript">
+        //Get the 15 digit case id and create the div element ids for to, cc and bcc
+    var caseId = '';
+        $(document).ready(function() {
+          //Get the 15 digit case id and create the div element ids for to, cc and bcc
+        caseId = "{!Case.id}";
+        if(caseId.length == 18)
+          caseId = caseId.substring(0,15);
+        var toField = "#to_" + caseId +"_div";
+        var ccField = "#cc_" + caseId +"_div";
+        var bccField = "#bcc_" + caseId +"_div";
+          //register the dom added and removed events for to, cc and bcc fields
+            $(document).on('DOMNodeInserted', toField, emailValidation);
+            $(document).on('DOMNodeRemoved', toField, emailValidation);
+            $(document).on('DOMNodeInserted', ccField, emailValidation);
+            $(document).on('DOMNodeRemoved', ccField, emailValidation);
+          $(document).on('DOMNodeInserted', bccField, emailValidation);
+            $(document).on('DOMNodeRemoved', bccField, emailValidation);
+        }); 
+
+        //This method is used to validate the email ids entered in each of the fields (to, cc, bcc)
+         var emailValidation = function (e) {
+          var email = '';
+             if(e.target.id != '' || (e.target.id == '' && e.target.outerHTML.indexOf("oneRecipientIcon recipientIcon")<0)){
+             var currentNode = e.target.innerHTML;
+             var currentNodeId = currentNode.substring(currentNode.lastIndexOf(' id="')+5,currentNode.lastIndexOf(' id="')+14);
+             $('.innerRecipient').each(function(){
+                 if(e.type == 'DOMNodeInserted' ||  this.id != currentNodeId)
+              email += $(this).attr("data-email") + ';';
+             });
+             email = email.slice(0, -1);
+
+             if((email != '' || (email == '' && e.type == 'DOMNodeRemoved')) ){
+                 validateEmail(email);
+             }
+       }
+  }
+    </script>
+</apex:page>

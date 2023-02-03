@@ -1,0 +1,51 @@
+<template>
+        <div>
+            <div class="slds-grid" style="justify-content: center;">
+                <div class="slds-col slds-grid slds-grid_vertical">
+                    <div>
+                        <div class="slds-col numberCircle darkGreyBubble">{teamsPrimary}</div>
+                        <div class="tooltip slds-popover slds-popover_tooltip slds-nubbin_top-left" role="tooltip" style="position:absolute;margin-top:10px;margin-left:-11px">
+                            <div class="slds-popover__body"># Teams Primary</div>
+                        </div>
+                    </div>
+                    <div class="slds-col"><span class="bubbleLabel">TP</span></div>
+                </div>
+                <div class="slds-col slds-grid slds-grid_vertical">
+                    <div>
+                        <div class="slds-col numberCircle burlyBubble">{teamsSecondary}</div>
+                        <div class="tooltip slds-popover slds-popover_tooltip slds-nubbin_top" role="tooltip" style="position:absolute;margin-top:10px;margin-left:-53px">
+                            <div class="slds-popover__body"># Teams Secondary</div>
+                        </div>
+                    </div>
+                        <div class="slds-col"><span class="bubbleLabel">TS</span></div>
+                </div>
+                <div class="slds-col slds-grid slds-grid_vertical">
+                    <div>
+                        <div class="slds-col numberCircle bisqueBubble">{teamsOthers}</div>
+                        <div class="tooltip slds-popover slds-popover_tooltip slds-nubbin_top" role="tooltip" style="position:absolute;margin-top:10px;margin-left:-43px">
+                            <div class="slds-popover__body"># Teams Others</div>
+                        </div>
+                    </div>
+                        <div class="slds-col"><span class="bubbleLabel">TO</span></div>
+                </div>
+                <div class="slds-col slds-grid slds-grid_vertical">
+                    <div>
+                        <div class="slds-col numberCircle lightGreyBubble">{accountsPrimary}</div>
+                        <div class="tooltip slds-popover slds-popover_tooltip slds-nubbin_top" role="tooltip" style="position:absolute;margin-top:10px;margin-left:-53px">
+                            <div class="slds-popover__body"># Accounts Primary</div>
+                        </div>
+                    </div>
+                        <div class="slds-col"><span class="bubbleLabel">AP</span></div>
+                </div>
+                <div class="slds-col slds-grid slds-grid_vertical">
+                    <div>
+                        <div class="slds-col numberCircle">{accountsSecondary}</div>
+                        <div class="tooltip slds-popover slds-popover_tooltip slds-nubbin_top-right" role="tooltip" style="position:absolute;margin-top:10px;margin-left:-111px">
+                            <div class="slds-popover__body"># Accounts Secondary</div>
+                        </div>
+                    </div>
+                        <div class="slds-col"><span class="bubbleLabel">AS</span></div>
+                </div>
+            </div>
+        </div>
+    </template>

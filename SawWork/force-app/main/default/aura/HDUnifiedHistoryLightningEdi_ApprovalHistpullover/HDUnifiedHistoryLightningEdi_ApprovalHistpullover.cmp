@@ -1,0 +1,102 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="HDUnifiedHistoryLightningEdition">
+    <aura:handler name="init" value="{!this}" action="{!c.initAction}" />
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="rowCount" type="String" default="100" />
+    <aura:attribute name="unifiedApprovalHistory" type="List"/>
+    <aura:attribute name="showApprovalsflag" type="boolean" default="false"/><!-- added for showing and hiding the content -->
+    <aura:if isTrue="{!v.unifiedApprovalHistory.length != 0}">
+        <article class="slds-card">
+            <aura:if isTrue="{!v.showApprovalsflag}">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__figure">
+                            <lightning:icon iconName="standard:task" size="x-small" alternativeText="Refresh" />
+                        </div>
+                        <div class="slds-media__body">
+                            <h2 class="slds-card__header-title">
+                                <a href="javascript:void(0);" class="slds-card__header-link slds-truncate" title="Approval Activity">
+                                    <span>Approval Activity</span>
+                                </a>
+                            </h2>
+                        </div>
+                        <!-- adding icon for closing -->
+                        <div class="slds-media__figure handcursor" onclick="{!c.showApprovals}">
+                            <lightning:icon iconName="action:close" size="xx-small" alternativeText="close" />
+                        </div>
+                    </header>
+                </div>
+                
+                
+                <div aura:id="div1" class="slds-card__body slds-card__body_inner">
+                    <aura:iteration items="{!v.unifiedApprovalHistory}" var="unifieddata" indexVar="key">
+                        <br></br>
+                        <!-- Approval steps table -->
+                        <table
+                               class="slds-table slds-table_bordered slds-table_resizable-cols slds-table_fixed-layout" role="grid">
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <!-- removing date -->
+                                    <th class="slds-is-sortable slds-is-resizable slds-text-title_caps" scope="col">
+                                        <div class="slds-truncate" title="Date">Date</div>
+                                    </th>
+                                    <!--  -->
+                                    <th class="slds-is-sortable slds-is-resizable slds-text-title_caps" scope="col">
+                                        <div class="slds-truncate" title="Status">Status</div>
+                                    </th>
+                                    <th class="slds-is-sortable slds-is-resizable slds-text-title_caps" scope="col">
+                                        <div class="slds-truncate" title="Assigned To">Assigned To</div>
+                                    </th>
+                                    <th class="slds-is-sortable slds-is-resizable slds-text-title_caps" scope="col">
+                                        <div class="slds-truncate" title="Actual Approver">Actual Approver
+                                        </div>
+                                    </th>
+                                    <th class="slds-is-sortable slds-is-resizable slds-text-title_caps" scope="col">
+                                        <div class="slds-truncate" title="Comment">Comment</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <aura:iteration items="{!unifieddata.stepandworkitemunifiedlist}" var="workitem" indexVar="key">
+                                    <tr>
+                                        <!-- removing date -->
+                                        <td data-label="Date">
+                                            <div class="slds-truncate" title="{!workitem.stepcreatedDate}">
+                                                <ui:outputDateTime format="MMM dd, yyyy hh:mm a" value="{!workitem.stepcreatedDate}" />
+                                            </div>
+                                        </td>
+                                        <!--       -->
+                                        <td data-label="Status">
+                                            <div class="slds-truncate" title="{!unifieddata.stepstatus}">{!workitem.stepstatus}
+                                            </div>
+                                        </td>
+                                        <td data-label="Assigned To">
+                                            <div class="slds-truncate" title="{!unifieddata.assigned_To}">{!workitem.assigned_To}
+                                            </div>
+                                        </td>
+                                        <td data-label="Actual Approver">
+                                            <div class="slds-truncate" title="{!unifieddata.actual_Approver}">{!workitem.actual_Approver}
+                                            </div>
+                                        </td>
+                                        <td data-label="Comment">
+                                            <div class="wordwrap" title="{!unifieddata.approval_Comment}">{!workitem.approval_Comment}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </aura:iteration>
+                            </tbody>
+                        </table>
+                    </aura:iteration>
+                    <!-- END Approval steps table -->
+                </div>
+            </aura:if> 
+            <aura:if isTrue="{!not(v.showApprovalsflag)}">
+                <footer class="slds-card__footer">
+                    <a class="slds-card__footer-action slds-text-align_center" href="javascript:void(0);" onclick="{!c.showApprovals}">View Approval Activity
+                        <span class="slds-assistive-text">Show all Approval history activity</span>
+                    </a>
+                </footer>
+            </aura:if>     
+        </article>
+    </aura:if>
+    
+</aura:component>

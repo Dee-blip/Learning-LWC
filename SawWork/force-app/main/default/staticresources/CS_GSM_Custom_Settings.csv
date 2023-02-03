@@ -1,0 +1,334 @@
+Name,Value__c
+IR_ManualList_GraceMonths,-2
+PartnerAccess#PricingLibrary,00GG0000002hHFPMA2
+OpportunityTrg#RebateTCError,Please Accept/Reject Rebate Terms And Conditions.
+IRCase_CutOffDayOfMonth,24
+IRCase_DefaultInvoiceNumber,N/A
+CaseInvoiceTrigger#AccMismatchError,Case Account and Related Invoice account should match.
+OpportunityNew#Profiles,"Akamai Partner User,Akamai Partner Administrator,Partner Community User,Partner Community Admin"
+SCCriticalLicenseMailBody1,"Thanks,<br/>CRM Ops Team"
+SCCriticalLicenseMailSubject,Service Cloud Critical License Alert
+KULicenseCountCritical,10
+KUCriticalLicenseSendMailTo,"pfernand@akamai.com,eae-ops@akamai.com"
+SCLicenseCountCritical,10
+SCCriticalLicenseMailBody,"Hi #userName#,<br></br><br></br>As per our records you are the application owner of CRM. There are only #licenseLeft# Service Cloud license(s) remaining. This is a reminder that we need to make more licenses available.<br></br><br></br>"
+KUCriticalAlertAddressTo,Paul
+KUCriticalSubject,Knowledge User Critical License Alert Mail
+SCLicenseCountTotal,2760
+KULicenseCountTotal,550
+SCCriticalLicenseSendMailTo,"pfernand@akamai.com,eae-ops@akamai.com"
+SCCriticalLicenseAlertTo,Paul
+KUCriticalLicenseMailBody,"Hi #userName#,<br></br><br></br>As per our records you are the application owner of CRM. There are only #licenseLeft# Knowledge User license(s) remaining. This is a reminder that we need to make more licenses available.<br></br><br></br>"
+KUCriticalLicenseMailBody1,"Thanks,<br/>CRM Ops Team"
+OpptyTriggerClass#SubCategoryError,"Opportunity Category, Sub-Category, Cancellation/Loss Reason is required"
+Opportunity_SalesOverlay_TeamRole,Sales - Secondary
+Opportunity_SalesOverlay_OTMAccess,Edit
+OpportunityTriggerClass#minOCRMsg,At least two __Cancelled Customer Survey_ܝ Contact Roles must be populated before you move the stage beyond 4-Prove
+OppSchCls#DaysPastforOwner,14
+OpportunityTriggerClass#minContacts,3
+AddressDoctor#EmailLicenseKey,7CC5248C0AF21C5D96B8
+AddressDoctor#PhoneLicenseKey,BE0627B3DC8CA40DEB41
+AddressDoctor#PhoneRemainingLicenses,1000
+AddressDoctor#EmailTimeout,90
+AddressDoctor#EmailRemainingLicenses,1000
+OppSchCls#DaysPastforManager,21
+ESignature#CustomExpireSettings,TRUE
+OpportunityTriggerClass#contactRole,Cancelled Customer Survey
+ProductApprovals#TSPReminderFreq,-4
+ProductApprovals#TSPReminderTemplate,00XG0000001OD7r
+Contract_Extension#BED#errEffectDt,Billing Effective Date cannot be deferred: Effective End Date is empty.
+Contract_Extension#BED#pageTitle,Billing Effective Date Deferment
+Contract_Extension#BED#errInactive,Billing Effective Date cannot be deferred: Contract is not Active.
+Contract_Extension#BED#errIndirect,Billing Effective Date cannot be deferred for this contract: Associated Opportunity is missing Partner Involved value.
+Contract_Extension#BED#errUnlocked,Billing Effective Date cannot be deferred: Contract is not Locked
+Contract_Extension#pageTitle,Contract Extension
+Contract_Extension#BED#PopUPMsg,Warning: BED Deferment request has already been made for this contract in the last 24 hours.
+Contract_Extension#BED#BtnErMsg,"0:You do not have sufficient access to request a BED Deferment for this contract, you need to be part of Account Team to proceed with this request."
+Contract_Extension#PopUPMsg,Warning: Contract extension request has already been made for this contract in the last 24 hours.
+LeadButtonsClass#CanViewButtons,"00eA0000000R5M5IAK,00eA0000000e5IbIAI,00eA0000000QpQpIAK,00eA0000000VTG1IAO,00eG0000000eFOXIA2"
+AccountTriggerClass#CheckCheckButton,"00eA0000000QkKm,00eA0000000VTG1"
+CSP_SalesProfileIds,"00eA0000000QkKxIAK,00eA0000000QpNBIA0,00eA0000000VTG1IAO,00eA0000000dmONIAY,00e18000000DothAAC,00e18000000DotmAAC,00e18000000DotSAAS,00e18000000DotNAAS,00e18000000DosjAAC,00e18000000DosoAAC,00e18000000DostAAC,00e18000000DosyAAC"
+CSP_SalesReportURL,https://akamai.my.salesforce.com/00OG0000004BpH5
+OpptyTrigCls#SalesPAEProfileId,00eA0000000QkKxIAK
+CSP_TabId,01rG0000000VIep
+ESignature#ExpireEnvelopeGraceDays,1
+OpptyTrigger#Error-MissingFCM,Channel Manager is mandatory when Partner Involved? is populated
+OpptyTrigger#Exception-ProfileUsrTyp,PowerPartner
+AccountTrigger#ChinaAccOwnerId,005A0000000MvlZIAS
+PRMAddPartnerToSalesTeam#template,00XG0000001OAXN
+LeadConversionController#RecTypeId,012A0000000Cy1y
+Common#ONAUserId,005A0000000OLetIAG
+CFA_SendEmailController#InvalidUser,You do not have the ability to accept a POA. Please contact your administrator.
+PartnerProfile#InvalidConToError,"Contact in ""To:"" field does not have the ability to accept a POA. Notify the administrator at the Partner to grant this permission or choose another partner contact."
+Contract_Extension#ExpiryGraceDays,1
+OppSchCls#RenewalOppty_emailTempl,00XG0000001OaA2
+SFDCLicenseCountCritical,10
+CronBatchJob#EmailDestro,"eae-ops@akamai.com,partnersupport@akamai.com"
+DocumentJSON#WorkspaceId,058G0000000Toh3
+SFDCCriticalLicenseMailAddressTo,Paul
+OppSchCls#RenewalOppty_recEmailMsg,##o.AccName## has a renewal opportunity: ##o.OpptyName##. Please be aware that contract ##o.RenewalContractID## is ending on ##o.EffContractEndDate##. Please make sure the opportunity information is updated.
+OppSchCls#RenewalOpp_NoActivityDays,10
+OppSchCls#RenewalOpp_finalCheck,0
+NetAlliancePortalTotalLicense#,1450
+OppSchCls#RenewalOpp_checkMonths,"7,5,2"
+OpptyLineItemTrigger#MobileProduct,Mobile Products
+OppSchCls#RenewalOpp_finalEmailMsg,##o.AccName## has a Renewal Opportunity: ##o.OpptyName##. Please be aware that contract ##o.RenewalContractID## EXPIRES on ##o.EffContractEndDate##. Please make sure the opportunity information is updated and if needed create a short-term extension.
+NAPCriticalLicenseSendMailTo,"pfernand@akamai.com,eae-ops@akamai.com"
+NAPCriticalLicenseMailBody,"Hi #userName#,<br></br><br></br>As per our records you are the application owner of NetAlliance Partner Portal. There are only #licenseLeft# license(s) remaining. This is a reminder that we need to make more licenses available.<br></br><br></br>"
+SFDCCriticalLicenseMailBody,"Hi #userName#,<br></br><br></br>As per our records you are the application owner of CRM. There are only #licenseLeft# license(s) remaining. This is a reminder that we need to make more licenses available.<br></br><br></br>"
+SFDCCriticalLicenseSendMailTo,"pfernand@akamai.com,eae-ops@akamai.com"
+NetAlliancePortalCriticalLicense#,10
+NAPCriticalLicenseMailBody1,"To see Partners who have not logged in for the last 160 days please see this report: <a href=""https://akamai.my.salesforce.com/00OG0000004BBzL"">Click here</a><br></br><br></br>Thanks,<br/>Operations Team"
+OppSchCls#RenewalOppty_finalEmail,00XG0000001OaA3
+AddOpptyLineItems#CanResError,"""Cancellation Reason"" is mandatory. Please update __Cancellation Reason_ܝ field and then click __Add Selected Products_ܝ button."
+NAPCriticalLicenseMailAddressTo,Paul
+NAPCriticalLicenseMailSubject,Netalliance Partner Portal Critical License Alert
+LeadTrigger#LeadSourceInbound,"Inbound Call,Live Chat,Sales Web Form,Akamai ADS Contact Us Form,Inbound Other"
+Contract_Extension#MomentumLink,https://momentum.akamai.com/addendum_orders/auto_create_and_upload
+Contract_Extension#Error-ContractId,Unable to find a Contract with the specified Id.
+Contract_Extension#Error-Unlocked,Contract cannot be extended: Contract is not Locked
+Contract_Extension#Error-Expired,This contract has already expired.
+Contract_Extension#SuccessMessage,Your request for a contract extension is being processed. You will be notified by an email within 15 minutes.
+Contract_Extension#DateFormat,YYYY-MM-DD
+Contract_Extension#WaitingMinutes,10
+Contract_Extension#Error-Inactive,Contract cannot be extended: Contract is not Active
+EmailTracking#delimiter,#ref
+Contract_Extension#Error-BadDate,Extend Contract Upto: Please select a date that is later than the current Effective End Date.
+CampaignTriggerClass#WebFormUserId,005A0000000MvEqIAK
+IR_EscalStatus_Default,Pending Review
+IR_EscalOwner_TeamMemberRole,Services - Secondary
+IR_RecordTypeName_Default,Invoice_Review_Case
+IR_FIN_Intl_QueueDevName,FIN_IR_International
+IR_RecordTypeName_Readonly,Invoice_Review_Read_Only
+IR_FIN_US_QueueDevName,FIN_IR_US
+IR_Unassigned_QueueDevName,IR_Unassigned
+IR_Owner_TeamMemberRole,CMG - Analyst
+IR_Status_Default,Pending Review
+IR_System_ProfileIDs,"00eA0000000QpNLIA0,00eA0000000VTG1IAO"
+IR_NewMissingProcess_BatchSize,5
+IR_CaseRecordTypeIds,"012G0000000ygAxIAI,012G0000000ygB2IAI"
+IR_CaseAccessProfileIDs,"00eA0000000QpNLIA0,00eA0000000VTG1IAO,00eA0000000QpQUIA0"
+IR_CaseDefaultRecordTypeId,012G0000000ygAxIAI
+IRCasesEAlert_RecipientList,"eae-ops@akamai.com,mohkhan@akamai.com,sgautam@akamai.com"
+SalesCoachUtil#ExceptionStages,4-Prove Best Case
+ContactTrigger_b#ERMWebUserId,005A0000000MvEq
+SchOpptyClose#CloseDateNDaysOld,365
+E2Chatter:ecommerce@akamai.com,0F9G00000004MXM:#e-commerce
+OpptyLineItemTrigger#Error_bd,"You cannot delete this product as the ""Invoiced Monthly Commitment/Usage"" is filled."
+SchOpptyClose#NoOfMonthsOld,2
+EmailTracking#ContextAlias,CRMOPS
+PLUViewController#APLUPageSize,5
+Release#ReminderOffSet_day:hh:mm,-3:13:30
+SchOpptyClose#BatchSize,100
+ESignature#DefaultEnvelopeExpireDays,30
+Contract_Extension#ContractType,Indirect Customer
+SFDCCriticalLicenseMailSubject,CRM Critical License Alert
+SFDCLicenseCountTotal,3262
+SFDCCriticalLicenseMailBody1,"To see standard users who have not logged in for the last 160 days please see this report: <a href=""https://akamai.my.salesforce.com/00OG0000004BzVn"">Click here</a><br></br><br></br>Thanks,<br/>CRM Ops Team"
+OppSchCls#NumberOfDays,7
+ESignature#DSSenderReminderToggle,TRUE
+OLITrigger_bd#exceptionProfileIds,"00eA0000000QpNL,00eA0000000QpRD,00eA0000000VTG1"
+FundClaimApproval#TaskSubject,Request for Fund Claim Entry
+SchOpptyClose#SalesStagesToIgnore,"Closed Won,Closed Lost,Closed Admin,6-Signed"
+SchOpptyClose#lastBatchProcessId,707G000000W0dAQ
+OppSchCls#IndexFilterDays,365
+CFA_SendEmailController#EmailHeader,"<table border=""0"" width=""600""><tr><td><img src=""http://wwwns.akamai.com/images/net_alliance_logo_white.jpg"" alt=""Company Logo"" border=""0""/><br/>"
+Contract_Extension#SAProfileNames,"SA - Analyst, SA - Manager, CMG SA - Hybrid, System Administrator"
+ESignature#RecipientEmail__c,eae-ops@akamai.com
+CFA_SendEmailController#EmailToPae,CAF_Email_to_PAE
+Contract_Extension#BED#ErBadDate,"BED Defer to Date: Cannot be empty, please select a date."
+Contract_Extension#BtnErrorMsg,"0:You do not have sufficient access to extend this Contract, you need to be part of Account Team to proceed with this request."
+CFA_SendEmailController#SfUrl,https://akamai.my.salesforce.com/secur/login_portal.jsp?orgId=00DA0000000Hu5a&portalId=060A0000000HX9f&startURL=
+ESignature#DSEnvlopStatusInvalid,"Completed,Voided,Declined"
+UserTriggerClass#TemplateId,00XG0000001OBrBMAW
+Contract_Extension#ExistsDaysOld,1
+ESignature#EmailTemplateIdSender,00XG0000001OBzD
+CFA_SendEmailController#EmailLinkTop,<br/><br/>Please click on the link(s) below and submit your acceptance.<br/>
+CFA_SendEmailController#EmailPartner,CAF_Email_to_partner
+CFA_SendEmailController#Emailfooter,"<br/><img src=""http://wwwns.akamai.com/images/akamai_footer.jpg"" alt=""Company Footer"" width=""100%"" border=""0""/></td></tr></table>"
+Contract_Extension#popUPOKMsg,Click on OK to continue or Cancel to return to Contract page
+ESignature#SFOrgURL,https://akamai.my.salesforce.com
+Contract_Extension#Error-Indirect,Contract cannot be extended: Associated Opportunity is missing Partner Involved value.
+Contract_Extension#Error-EffectiveDt,Contract cannot be extended: Effective End Date is empty.
+OppSchCls#OppPastDue21,00XG0000001Pd4R
+AccReassign#MissingAccIdError,"Oops! Cannot find the Account record, please return to previous page and try again."
+OppSchCls#OppPastDue14,00XG0000001Pd4g
+CastIronClass#AlertHourSetting,1
+PLUViewController#BackLinkName,<<Back To List: Activation Home Page
+PLULaunchItemsPageSize,15
+PLUViewController#PLUTabId,01rA0000000UnRt
+OpportunityTriggerClass#surveyExclude,"Sales Operations, System Administrator, CMG, Business Operations, Akamai Partner Administrator, Akamai Partner User"
+OpportunityTriggerClass#minCheck,TRUE
+CastIronClass#ReplyToAddress,eaeblrops@akamai.com
+OpptyTrigger#ExceptionProfileNames,"System Administrator,Business Operations,CRM Integration"
+CastIronClass#OrgWideAddressId,0D2G00000004D7S
+PartnerProfile#Latin America,"Mexico,Argentina,Brazil,Chile,Colombia,Peru"
+PartnerProfile#North America,"United States,Canada,USA"
+PartnerProfile#EMEA,"Germany,Switzerland,Austria,Netherlands,Belgium,Luxembourg,Czech Republic,Hungary,Slovenia,Poland,Romania,Turkey,France,Italy,Israel,Portugal,Spain,UK,Ireland,Sweden,Denmark,Finland,Norway"
+PartnerProfile#AP-J,"Australia,China,New Zealand,Singapore,Malaysia,Hong Kong,Taiwan,India,Japan,Korea"
+PartnerProfile#PageCountryId,00NG0000008Nvot
+PartnerProfile#PagePrtnrTypeId,00NG0000008Nvp6
+PartnerProfile#PageZipId,00NG0000008Nvow
+PartnerProfile#PageStreetId,00NG0000008Nvov
+PartnerProfile#PagePrtnerAcc_lkid,CF00NG0000008Nvop_lkid
+PartnerProfile#PageCityId,00NG0000008Nvos
+PartnerProfile#PageStateId,00NG0000008Nvou
+PartnerProfile#PagePrtnrAccId,CF00NG0000008Nvop
+CastIronClass#AlertToAddress,ajanikar@akamai.com
+ForecastingMigration#OldNewProdMap6,Dynamic Site Accelerator - Non-MPV:Dynamic Site Accelerator;Dynamic Site Accelerator - MPV:Dynamic Site Accelerator;
+ForecastingMigration#SendEmail,TRUE
+ForecastingMigration#DateRange,2000-01-01:2007-01-01
+ForecastingMigration#EmailRecipients,mohkhan@akamai.com
+ForecastingMigration#OldNewProdMap5,Web Application Accelerator:Web App/IP App/Session Accelerator;IP Application Accelerator:Web App/IP App/Session Accelerator;Other-Media:Other Products;Other-Origin:Other Products;
+ForecastingMigration#OldNewProdMap4,Application Performance Solutions:Web App/IP App/Session Accelerator;Other:Other Products;Advertising Decision Solutions:Other Products;DataPower/Hybrid Cloud:Other Products;
+ForecastingMigration#OldNewProdMap2,Security:Kona Site Defender/DDoS Defender/Web Application Firewall;Analytics:Media Analytics (QoS Monitor/Stream Analyzer);Mobile Optimization:Aqua Mobile Accelerator;Storage:NetStorage;Streaming:Other Streaming Product;
+ForecastingMigration#OldNewProdMap3,Premium Support Package:Premium Support;Priority Support Package:Priority Support;Professional Service/Other:Professional Service/Other;Rich Media Accelerator:Rich Media Accelerator;
+ForecastingMigration#OldNewProdMap7,Other-Site:Other Products;Riverbed Steelhead Cloud Accelerator:Riverbed Steelhead Cloud Accelerator;Terra Alta:Terra Alta;
+ForecastingMigration#OldNewProdMap1,"Electronic Software Delivery:Downloads Delivery (HTTP, HTTP for Gaming, FTP);Dynamic Site Accelerator:Dynamic Site Accelerator;Dynamic Site Delivery:Dynamic Site Delivery;HD Network:HD Streaming (On-Demand or Live);"
+ForecastingMigration#StagesToFix,"1-Create,2-Qualify,3-Develop,4-Prove,5-Negotiate,6-Commit,6-Signed,Closed Won,Closed Lost,Closed Admin,4-Prove Best Case"
+Forecast#RSMReportURL,/00OG0000004Azvf
+ForecastingMigration#Recurring,MRR
+Forecast#RSMProfileID,"00eA0000000ERErIAO,00eA0000000VTG1IAO,00e18000000DotSAAS,00e18000000DotNAAS"
+Forecast#MAEProfileID,"00eA0000000dmONIAY,00eA0000000VTG1IAO,00eA0000000QkKxIAK,00e18000000DosjAAC,00e18000000DosoAAC,00e18000000DostAAC,00e18000000DosyAAC"
+Forecast#AkamaiForecastTabId,01rG0000000VGuv
+Forecast#MAEReportURL,/00OG0000004Azug
+Forecasting#OLIFixUpperLimitMonths,2
+Forecasting#ExemptedSalesStage,None
+Forecasting#OLIFixLowerLimitDays,2
+Forecasting#OpptyCancelReasonError,"Cancellation Reason"" is mandatory. Please update Cancellation Reason field and then click Save button."
+PartnerUserController#ErrorMessage,"Deployment is in progress, Please try after some time."
+ProductApprovals#TSPReminderCutoff,2011-11-07T00:00:00Z
+DataFixButtonContactOwner#ProfileIDs,00eA0000000VTG1IAO
+OpptyLineItemTrigger#PAEProfileName,Sales - Partner Account Executive
+AccountDelete#EnabledProfileId,"00eA0000000QpNLIA0,00eA0000000VTG1IAO"
+ContactTriggerClass#ErrorException,005A0000000MvEqIAK
+BatchableUpdateContactOwner#EmailId,eae-ops@akamai.com
+PLUViewController#ProfileIds,"00eA0000000dendIAA,00eA0000000VTG1IAO"
+AccountMerge#EnabledProfileId,00eA0000000QpRDIA0
+OpptyLineItems#ManageProductsError,You are not authorized to Manage Products. Please contact your Akamai Sales Rep for more information.
+ESignature#CheckIfCustEnvToggle,TRUE
+PLUViewController#PLUPageSize,12
+EBCInvitee#EBCAccountName,CF00NG0000008PHr9
+EBCInvitee#EBCId,CF00NG0000008PHr7
+GSMUtilClass#ADSRecordTypeId,012A0000000CvQK
+PartnerProfile#PrtnrPhoneId,00NG0000008P2qe
+ApprovalPage#RebateRejectionMsg,This Partner has rejected the Rebate Program Terms & Conditions and has thus declined participation. The rebate percent has been set to zero.
+RebateTCController#RebateText,Akamai requires annual acceptance of the NetAlliance Rebate Program Terms & Conditions in order for Partners to participate in the program.
+ApprovalPage#RebateLastYearDefaultMsg,Rebate pecent has been defaulted as per Partner's last year Rebate TC acceptance/Rejection.
+RebateTCController#NotificationMessage,"Please be aware that you are accepting or denying these terms and conditions and, thus, participation on behalf of '#account#' for the #year# calendar year."
+AccountReassignment#ErrorToShow,"The Channel Manager is inactive, to make changes to the opportunity please change the Channel Manager."
+AccountReassignment#ErrorToCompare,Value does not exist or does not match filter criteria.
+RebateTCController#RebateText1,Please review the Rebate Program Document at the link below and either accept or reject these terms and conditions to respectively acknowledge or decline participation in the Rebate Program.
+PartnerProfile#PrtnrAccNameId,00NG0000008P2qd
+AccountTrigger#ChinaProfileId,00eG0000000eFOXIA2
+AccTrgrCls#PartnerAdminProfile,Partner Community Admin
+PartnerProfile#PrtnrWebsiteId,00NG0000008P2qf
+OFExpiredAlert#2CCEmailIds,
+OrgWideId#CRMADMINS,0D2G00000004D7SKAU
+OFExpiredAlert#EmailTemplateId2,00XG0000001OravMAC
+OFExpiredAlert#EmailTemplateId,00XG0000001OrawMAC
+Opportunity Record Type Ids,"012A0000000xpQIIAY,012A0000000xpQJIAY,012G0000000yB4cIAE"
+Start date of close deals,2013-07-15 00:00:00
+OpptyTriggerCls#PartnerOverSharingMail,"eae-ops@akamai.com,clohani@akamai.com"
+Opportunity Record Types,"Akamai Opportunity,ADS Record Type,Deal Reg Submitted,Deal Reg Unsubmitted,Deal Reg Rejected"
+CmpgnMmbrTrgr#RemoveErrMsg,You are not authorize to remove campaign member
+CMapTrigger_StageNames,"Closed Won,Closed Lost,Closed Admin,Closed Duplicate,Closed Contract Ended"
+OpptyTriggerClass#SendEmailClosedWon,TRUE
+OpptyTrigger#SS6TaskSubject,Request for Contract Entry
+CmpgnMmbrTrgr#ExcptnProfiles,00eA0000000QpQpIAK
+OpptyTrigger#MarkettingOpsProfileId,00eA0000000QpQp
+ApprovalHistory#SysAdminId,00eA0000000VTG1
+OpptyTrigger#AkamaiOpptyRecType,012A0000000CvQL
+OpptyTriggerClass#AkamaiIdentifier,@akamai
+Contract_Extension#Error-EmptyCurncy,"Error: Contract cannot be extended, Contract Currency is empty."
+Contract_Extension#BED#EmptyCurncy,"Error: Billing Effective Date cannot be deferred, Contract Currency is empty."
+OpptyTriggerClass#DelegatedApprover,Channel - Delegated Approver
+IRCA_DraftInvThresPercent,25
+EmailRecipient,spadashe@akamai.com
+IRCA_FinalInvThresPercent,50
+OFExpiredAlertForAgmt#EmailTemplateId,00XG00000027Gb7
+DealRegAutoClose#emailTemplate,NOTE : value will be the Id of email template Deal Registration closed Date passed by 14 days placed in the  Deal Reg Folder of email Template
+DealRegAutoClose#NoofDaysSubmitted,30
+DealRegAutoClose#NoofDaysEmail,14
+DealRegAutoClose#NoofDaysRejected,30
+DealRegAutoClose#NoofDaysUnsubmitted,90
+OppSchCls#NetOpsId,005A0000000MvgZ
+OppSchCls#RecordType,Akamai Opportunity
+CastIronClass#EmailTemplateName,Castiron_Polling_Email_Template
+Aura_hardware_value,Network Operator - Hardware
+Aura_software_value,Network Operator - Software/Services
+AddOpptyLineItem#removalErrorMsg,"Opportunity Category, Sub-Category and Cancellation/Lost Reason cannot be removed for this Opportunity as there is a negative MRR product associated with it."
+AddOpptyLineItem#OppCatError,"Please add Category, Sub-Category and Closed/Lost Reason"
+AddOpptyLineItem#profileName,Sales -
+AddOpptyLineItem#missProdError,Missing Product Feature is mandatory when Closed/Loss Reason = Competition Price Driven or Competitive Product Feature Driven
+AddOpptyLineItem#competitorError,Competitor is mandatory when Closed/Loss Reason = Competition Price Driven or Competitive Product Feature Driven
+CaseTrigger#updateContact,"Collections, International Business Development, Invoice Review Case, Invoice Review Read Only, Momentum Case Record, Partner Portal Case, Product Management, SF Feedback"
+updateDollarMRR#DataFix,TRUE
+OppLineItemTrigCls#delExcptProfId,"00eA0000000QpNBIA0,00eA0000000QpRDIA0"
+OpptyLineItemTrigCls#delErrMsg,You cannot delete a product on Closed Opportunities.
+OpptyTriggerClass#CompetitorMandatory,Competitor is mandatory
+ReciteContract#BatchSize,200
+LeadSharesTrigger#AccountId,001A0000004ugxBIAQ
+OpptyTrigCls#profileName,Sales -
+CronCurrToUsdBatch#ErrorMailId,"karam@akamai.com,vverma@akamai.com"
+UserTriggerClass#ChannelUsersGroupId,00GA00000017C5p
+UserTriggerClass#ChannelUsersProfiles,"00eG0000000eAyJIAU,00eG0000000eAyOIAU,00eA0000000QkKxIAK,00eG0000000g65cIAA"
+OpptyVfPageController#ClosedOppty,You cannot perform the operations when opportunity is closed lost
+Level3PartnerAccountAKAMId,B-3-172TBGV
+CMGReviewerQueue,005G0000001vtoG
+CMGProfileId,00eA0000000QpQU
+OpptyTrigCls#exceptionprofileName,CRM Integration
+CRM_Integration,005A0000000NHQc
+PartnerUserController#PermissionError,You are not authorized to update your own user permissions. Please contact partnersupport@akamai.com for assistance.
+OppLineItem#SecurityGroup,Security
+OppLineItem#ExcludedForecastGroup,Media
+OppLineItem#specificInclusionList,Media & Delivery - Dynamic Site Delivery
+Rebate#NewAccount,5
+Rebate#CustomerOrExistAcc,5
+Rebate#ExistingOppty,-5
+Rebate#NewOppty,0
+AccountReassignment#EMEA,"SEB,CER,UKI,SER"
+AccountReassignment#Geographies,"AccountReassignment#Americas,AccountReassignment#EMEA,AccountReassignment#APJ"
+AccountReassignment#APJ,"India,Japan,North Asia,South Asia,Carrier APJ"
+AccountReassignment#Americas,"Channel Direct,Growth Verticals,Core Verticals,Foundation,Media,Contains ECG,Inside Sales,Contains Carrier"
+DealRegSubmit#ProfileException,"00eA0000000VTG1IAO,00eA0000000QpRDIA0"
+ContactTrigger#ProfileCheck,"00eA0000000QpNLIA0,00eG0000000g4vPIAQ"
+OpptyVFpage#error3,Loss Reason can't  be left empty for marking it as Churn
+AccountReassignment#Prefix,AR
+ContactTrigger#ProfileRestrictAccount,00eA0000000e5HsIAI
+AccountReassignment#TimeToSchedule,120
+ContactTrigger#RestrictAccErr,You do not have permission to create a contact on the chosen Account. Please contact partner support@akamai.com for further help.
+OpptyLineItemTrigger#CarrierFamily,Carrier
+OppSchCls#TimeToScheduleBatch,60
+OppSchCls#YearToScheduleBatch,2010
+UpdateGDRATBatch#ErrorMail,"karam@akamai.com,vverma@akamai.com"
+AccTriggerCls#ExclusionAccountList,"WWW Lead Gen (DO NOT DELETE!),WWW Pending Lead Gen (Do Not Delete!),WWW Bad Data (Do Not Delete)"
+Lead#NotAssignedQueueName,Assignment Not Found
+Lead#ReassignReason,"The fields on this lead record looks incorrect, I have corrected the values. Please reassign as per the new values"
+CronAccEngagementLevel#emailList,"standon@akamai.com,ashivash@akamai.com"
+CronAccEngagementLevel#MarketoId,005G00000055clu
+CronAccEngagementLevel#batchSize,1000
+AddressDoctor#SpecialCharactersPhone,"!@ #$%^&*()-_=+"";:{}<>,.?/"
+AddressDoctor#OriginalPhoneLicenses,2500
+AddressDoctor#MigratorQueryDays,1
+AddressDoctor#OriginalEmailLicenses,2500
+AddressDoctor#MigratorLimitApplicable,FALSE
+AddressDoctor#MigratorLimit,1000
+AddressDoctor#LicenseMonitorEmailIds,"shiverma@akamai.com,ashivash@akamai.com"
+AddressDoctor#lastBatchProcessId,707J000000RYurs
+AddressDoctor#EnableUIVerification,TRUE
+AddressDoctor#Enable,FALSE
+AddressDoctor#DisableLimitPercentage,98
+AddressDoctor#DaysToQueryContacts,1
+AddressDoctor#CronChainIntervalInMin,10
+AddressDoctor#BatchSize,10
+Contract_HierarchyEndDateDays,90
+OEMExclusionStageList#ForecastCategory,"5-Closed/Booked,6-Closed/Rev Shipped"
+OEMInclusionStageList#ForecastCategory,"1-Target Account,2-Qualified,3-Develop,4-Negotiation,Closed Lost"
+MaskCSEmails#BatchSize,50
+PostRefresh#MaskCSEmail#maskParamSize,2
+ApprovalHistory#Step3,Akamai Partner Account Executive Assignment
+ApprovalHistory#partnerSupportID,00eG0000000eAyO
+ApprovalHistory#Step2,Akamai Partner Executive Review
+TaskTriggerCls#ActivityToStampOnLead,"Call,Follow up - Contact in Future,%Email%"
+OpportunityTrg#DealRegRecType,Changes are there to avoid the  Test class failiure

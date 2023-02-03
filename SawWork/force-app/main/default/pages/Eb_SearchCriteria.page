@@ -1,0 +1,49 @@
+<!-- Page to display the search criteria. CR 1816825 -->
+
+<apex:page controller="EB_CtrlMailerWizard" showHeader="true" sidebar="false" standardStylesheets="true">
+  <apex:form >
+  <style type ="text/css">
+table.gridtable {
+        font-family: verdana,arial,sans-serif;
+        font-size:11px;
+        color:#333333;
+        border-width: 1px;
+        border-color: #666666;
+        border-collapse: collapse;
+}
+table.gridtable th {
+        font: bold 11px "Trebuchet MS", Verdana, Arial, Helvetica,
+    sans-serif;
+    color: #4f6b72;
+    border: 1px solid #C1DAD7;
+    border-bottom: 1px solid #C1DAD7;
+    border-top: 1px solid #C1DAD7;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 6px 6px 6px 12px;
+    background: #CAE8EA url(images/bg_header.jpg) no-repeat;
+}
+table.gridtable td {
+    border-bottom: 1px solid #C1DAD7;   
+    background: #fff;
+    padding: 6px 6px 6px 12px;
+    color: #6D929B;
+}
+</style>
+   
+    <h1> <b> The search criteria specified is</b> </h1> 
+    <br/> <br/> <br/> 
+    <apex:outputText value="{!readXml}" escape="false"></apex:outputText> 
+    <br/> <br/> 
+   <apex:commandButton Value="Back" action="{!backfromSearchCriteria}" rendered="{!(!extractxmldone)}" style="font-size:125%;font-weight:bold;"/> 
+      &nbsp;&nbsp;&nbsp;&nbsp; 
+   <apex:commandButton value="Create Mailer" action="{!choosemailer}" disabled="{!disableMailerButton}" id="Buttons" style="font-size:125%; font-weight:bold;"/> 
+     &nbsp;&nbsp;&nbsp;&nbsp; 
+  <br></br>
+  
+
+  
+  <!-- End Default Content REMOVE THIS -->
+  </apex:form>
+</apex:page>

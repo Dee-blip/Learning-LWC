@@ -1,0 +1,56 @@
+<aura:component controller="SF1_CustomSortController" implements="force:lightningQuickAction,force:hasRecordId,force:appHostable">
+    
+    <aura:attribute name="sObjectName" type="String" />
+    <aura:attribute name="sObject" type="sObject" />
+    <aura:attribute name="mapOfFieldNamesvsApiName" type="Map" default="{}" />
+    <aura:attribute name="listOfFieldNames" type="List" default="[]" />
+    <aura:attribute name="sortBy" type="Map" default="{}" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="c:SF1_showSortDetailsEvent" action="{!c.showSortDetails}"/>
+    
+    <!--handle this event in parent component to get orderBy String based upon user selection -->
+    <aura:registerEvent name="SF1_orderByQueryComponentEvent" type="c:SF1_orderByQueryComponentEvent" />
+    
+    <c:SF1_SortFooter />
+    
+    <div id="visibleAfterClickingOnSort" style="display:none;z-index:10;">
+        <div aria-labelledby="" tabindex="-1" role="dialog" class="uiPanel--default uiPanel forceMobileOverlay open active" style="z-index:1; visibility:visible;">
+            <div class="IOS container">
+                <span class="assistiveText">Start</span>
+                
+                <div class="panel-content scrollable">
+                    <div class="uiListSorter">
+                        <div class="listSorterContainer open PHONE" style="width: 414px; height: 736px">
+                            <div class="headerBar">
+                                <a id="cancel" onclick="{!c.hideVisibleAfterClickingOnSort}" class="cancel button" href="javascript:void(0);">Cancel</a>
+                                <span class="title">Sort</span>
+                                <a id="apply" onclick="{!c.applyTheSortingSelected}" class="apply button" href="javascript:void(0);">Apply</a>
+                            </div>
+                            
+                            <div class="body" >
+                                <div class="sorterMenu uiMenu" >
+                                    <div class="sorterMenuList scrollable popupTargetContainer uiPopupTarget uiMenuList uiMenuList--default visible positioned" style="height: 694px;">
+                                        <div class="sorterMenuList scrollable" role="presentation" >
+                                            <ul class="scrollable" role="presentation" >
+                                                <div aura:id="sectionContainer" id="sectionContainer" class="sectionContainer" style="height:71vh;overflow-y: scroll;">
+                                                    <aura:iteration var="fieldName" items="{!v.listOfFieldNames}" indexVar="index">
+                                                        <span>
+                                                            <c:SF1_FieldsAvailableInSorting fieldName="{!fieldName.value}" indexVar="{!index}" />
+                                                        </span>
+                                                    </aura:iteration>
+                                                </div>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+            </div>
+        </div>
+    </div>
+</aura:component>

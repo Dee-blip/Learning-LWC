@@ -1,0 +1,113 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+ <aura:attribute name="forPrint" type="boolean" default="false"/>   
+ <aura:attribute name="actionHistoryData" type="List" />
+ <aura:attribute name="actionData" type="List" default="[]"/>
+ <aura:handler name="init" value="{!this}" action="{!c.InitAction}" />
+ <aura:dependency resource="markup://c:HD_TextToHtml" type="COMPONENT"/><!-- Added the dependency Tag for better rendering -->
+
+    
+    <!-- Actual Data itration start here -->
+    <aura:iteration items="{!v.actionData}"  var="data">
+        
+        <aura:if isTrue="{!data.actionId == ( 'Email Sent' || 'Email Received') ? false : true}">
+            <aura:if isTrue="{!data.note.length > 0 ? true : false}">
+            <p class="slds-hyphenate" style="white-space: pre-wrap;">
+               <!--{!data.note}&nbsp;--><c:HD_TextToHtml content="{!data.note}"/><!-- added the new cmp for parsing plaintxt-->
+            </p>
+            </aura:if>
+        </aura:if>
+        
+        <!-- For Incident opnede from Self Service -->
+        <aura:if isTrue="{!data.actionId == 'Incident Opened From Self Service' ? true : false}">
+            <p class="slds-hyphenate" style="white-space: pre-wrap;">
+                {!data.action_History_Description}&nbsp;
+            </p>
+        </aura:if>
+        <!-- END For Incident opnede from Self Service -->
+     
+        <aura:If isTrue="{!data.richNote.length > 0 ? true : false}">
+            
+            <aura:If isTrue="{!data.actionId == 'Email Received' ? true : false}">
+                <aura:If isTrue="{!v.forPrint==true}">
+                    <p class="slds-text-color--weak slds-text-body--regular" style="white-space: pre-wrap;">
+                        <c:HD_Email_Viewer emailContent="{!data.richNote}"/>
+                    </p>
+                    
+                    <aura:set attribute="else">
+                        <p class="slds-text-color--weak slds-text-body--regular slds-border--top slds-border--bottom  slds-border--right EmailChainHeight" style="white-space: pre-wrap;">
+                            <c:HD_Email_Viewer emailContent="{!data.richNote}"/>
+                        </p>
+                    </aura:set>
+                </aura:If>
+                
+                <br></br>
+            </aura:If>
+            
+            <div>
+                <aura:If isTrue="{!data.actionId == 'Email Sent' ? true : false}">
+                    <aura:If isTrue="{!v.forPrint==true}">
+                        <p class="slds-text-color--weak slds-text-body--regular " style="white-space: pre-wrap;">
+                            <c:HD_Email_Viewer emailContent="{!data.richNote}"/>
+                        </p>
+                        <aura:set attribute="else">
+                            <p class="slds-text-color--weak slds-text-body--regular slds-border--top slds-border--bottom  slds-border--right EmailChainHeight" style="white-space: pre-wrap;">
+                                <c:HD_Email_Viewer emailContent="{!data.richNote}"/>
+                            </p>
+                        </aura:set>
+                    </aura:If>
+                    
+                    <br></br>
+                </aura:If>
+                <!-- Adding reply button -->
+                <aura:renderIf isTrue="{!v.forPrint == false}">
+                    <aura:if isTrue="{!((data.actionId == 'Email Sent') || (data.actionId == 'Email Received')) ? true : false}">
+                        <c:HD_History_reply_Button ActionHistoryId="{!data.incident_History_ID}"/>
+                    </aura:if>    
+                </aura:renderIf>
+                <!-- END Adding reply button -->   
+            </div>
+            
+            <!-- setting if richtextnote is null -->
+            <aura:set attribute="else">
+                <!-- setting not her instead of richtextNote -->
+                <aura:If isTrue="{!data.actionId == 'Email Received' ? true : false}">
+                    <aura:If isTrue="{!v.forPrint==true}">
+                        <p class="slds-text-color--weak slds-text-body--regular " style="white-space: pre-wrap;">
+                            <c:HD_Email_Viewer emailContent="{!data.note}"/>
+                        </p>
+                        <aura:set attribute="else">
+                            <p class="slds-text-color--weak slds-text-body--regular slds-border--top slds-border--bottom  slds-border--right EmailChainHeight" style="white-space: pre-wrap;">
+                                <c:HD_Email_Viewer emailContent="{!data.note}"/>
+                            </p>
+                        </aura:set>
+                    </aura:If>
+                    
+                    <br></br>
+                </aura:If> 
+                
+                <aura:If isTrue="{!data.actionId == 'Email Sent' ? true : false}">
+                    <aura:If isTrue="{!v.forPrint==true}">
+                        <p class="slds-text-color--weak slds-text-body--regular" style="white-space: pre-wrap;">
+                            <c:HD_Email_Viewer emailContent="{!data.note}"/>
+                        </p>
+                        <aura:set attribute="else">
+                            <p class="slds-text-color--weak slds-text-body--regular slds-border--top slds-border--bottom  slds-border--right EmailChainHeight" style="white-space: pre-wrap;">
+                                <c:HD_Email_Viewer emailContent="{!data.note}"/>
+                            </p>
+                        </aura:set>
+                    </aura:If>
+                    
+                    <br></br>
+                </aura:If>
+                <!--END setting not her instead of richtextNote -->
+            </aura:set>
+            
+            <!--END setting is richtextnote is null -->
+        </aura:If>   
+        
+
+    </aura:iteration>
+    <!-- END Actual Data itration start here -->
+    
+    
+</aura:component>

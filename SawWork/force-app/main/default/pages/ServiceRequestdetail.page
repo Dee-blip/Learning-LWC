@@ -1,0 +1,324 @@
+<apex:page standardController="BMCServiceDesk__Incident__c" showHeader="false" ID="srmdetail" extensions="HD_SRM_ServiceRequestDetails_Extension" docType="html-5.0" >
+ <!-- Applying Stylesheets -->
+<!-- Latest compiled and minified CSS -->
+<apex:stylesheet value="{!URLFOR($Resource.HDscriptcss,'/bootstrapV3_3_0/css/bootstrap.min.css')}"/>
+<!-- Define Tab panel .css styles -->
+    <style>
+    .activeTab {background-color: #236FBD; color:white; background-image:none}
+    .inactiveTab { background-color: lightgrey; color:black; background-image:none}
+    </style>
+   
+    <!---Navabar -->
+<nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">
+        <apex:image url="{!URLFOR($Resource.HDscriptcss,'akamlogo.png')}" width="70" />
+      </a>
+      <p class="navbar-text navbar-right">Record Status : &nbsp;<apex:outputLink onclick="return false;" rendered="{!Record_Lock_flag}" styleClass="glyphicon glyphicon-lock" id="recordlock" title="Record is locked Due to active approval process"></apex:outputLink><apex:outputLink onclick="return false;" rendered="{!IF(NOT(Record_Lock_flag),true,false)}" styleClass="glyphicon glyphicon-pencil" id="recordedit"></apex:outputLink></p>
+    </div>
+  </div>
+</nav>  
+
+   <!-- Create Tab panel -->
+    <apex:tabPanel switchType="client" selectedTab="name1" id="AccountTabPanel" tabClass="activeTab" inactiveTabClass="inactiveTab" rendered="true">
+ <apex:tab label="Service Request Detail for #{!BMCServiceDesk__Incident__c.Name}" name="name1" id="tabOne">
+<apex:pageBlock id="messages"> <apex:messages styleClass="alert alert-warning"/></apex:pageBlock>     
+ <apex:form id="Srmdetailform">
+   <apex:actionFunction action="{!ajaxsave}"  name="updateaction" reRender="errorflag, messages, srmdetailpageblock2, srmdetailpageblock3, srmdetailpageblock4, srmdetailpageblock5, srmdetailpageblock6" status="statusaction"/>
+  
+ <apex:pageBlock title="Service Request Detail for #{!BMCServiceDesk__Incident__c.Name}" id="srmdetailpageblock">
+    <apex:pageBlockButtons location="both">
+   <apex:commandLink styleClass="glyphicon glyphicon-refresh" title="Refresh Record" action="{!refreshRecord}"></apex:commandLink>&nbsp;
+   <apex:commandButton value="Save"  disabled="{!IF(Record_Lock_flag,true,false)}" onclick="updateaction();return false;"></apex:commandButton>
+   <apex:commandButton value="Knowledge Search" onclick="popitup('/apex/BMCServiceDEsk__KnowledgeSearch?enableSelfClosing=true&calledFromForm=true&standardLayout=true&isCalledFromConsole=true&objectName=Incidents&search=&KMincidentID={!BMCServiceDesk__Incident__c.Id}&isServiceCloudConsole=&isRFConsoleDetailForm=');return false;"/>
+   <apex:commandButton value="Reopen" onclick="reOpen();return false;"/>
+   <apex:commandButton value="Send Email" onclick="openSendEmail();return false;"/>
+   <!-- apex:commandButton value="Close" onclick="popitup('/apex/BMCServiceDesk__CloseIncidentPage?incidentId={!BMCServiceDesk__Incident__c.Id}&IncidentCat={!BMCServiceDesk__Incident__c.BMCServiceDesk__FKCategory__c}&isIncidentConsole=false');return false;" disabled="{!IF(Record_Lock_flag,true,false)}"/ -->
+   <apex:commandButton value="Close" onclick="variable_popitup('/apex/HDSRMClose?id={!BMCServiceDesk__Incident__c.Id}',600,500);return false;"/>
+   <apex:commandButton value="Print" onclick="variable_popitup('/{!BMCServiceDesk__Incident__c.Id}/p',800,600);return false;"/>
+  <apex:actionStatus id="statusaction" startText="Busy...."><apex:facet name="start"><img src="{!URLFOR($Resource.HDscriptcss,'ajax-loader.gif')}" width="25"></img></apex:facet></apex:actionStatus>
+ </apex:pageBlockButtons>
+
+   
+ <apex:pageBlockSection columns="1" collapsible="true" id="srmdetailpageblock1" showHeader="false" title="Broadcast and Stage" rendered="true"  >
+ <apex:iframe src="/apex/BMCServiceDesk__StdLayoutTickerPage" height="40" width="100%"/>
+ <apex:iframe src="/apex/BMCServiceDesk__StdLayoutBtnToolbarPage?id={!$CurrentPage.parameters.id}" height="40" width="100%"/>
+ </apex:pageBlockSection>
+ 
+ <apex:pageBlockSection columns="2" collapsible="false" id="srmdetailpageblock2" showHeader="true" title="Client Details">
+ <apex:pageBlockSectionItem helpText="{!$ObjectType.BMCServiceDesk__Incident__c.fields.BMCServiceDesk__FKClient__c.label}" id="clientidsectionitem"><apex:outputLabel >{!IF($UserRole.Name ='HR Staff Users',SUBSTITUTE($ObjectType.BMCServiceDesk__Incident__c.fields.BMCServiceDesk__FKClient__c.label,'Client','Employee'),$ObjectType.BMCServiceDesk__Incident__c.fields.BMCServiceDesk__FKClient__c.label)}</apex:outputLabel> <apex:inputField value="{!BMCServiceDesk__Incident__c.BMCServiceDesk__FKClient__c}"  required="true" id="userIdVal"/></apex:pageBlockSectionItem>
+ 
+ <apex:repeat value="{!$ObjectType.BMCServiceDesk__Incident__c.FieldSets.HD_SRM_Client_Details}" var="clientdetails">
+ <!--for normal field -->
+ <apex:pageBlockSectionItem helpText="{!BMCServiceDesk__Incident__c[clientdetails]}" rendered="{!IF(clientdetails = ('Last_Updated_Date_Time__c'),false,true)}">
+ <apex:outputLabel >{!IF($UserRole.Name ='HR Staff Users',SUBSTITUTE(clientdetails.Label,'Client','Employee'),clientdetails.Label)}</apex:outputLabel> 
+ <apex:inputField value="{!BMCServiceDesk__Incident__c[clientdetails]}"  required="{!clientdetails.Required}"/>
+ </apex:pageBlockSectionItem>
+ 
+  <!--for readonly field -->
+  <apex:pageBlockSectionItem helpText="{!BMCServiceDesk__Incident__c[clientdetails]}" rendered="{!IF(clientdetails = ('Last_Updated_Date_Time__c'),true,false)}">
+  <apex:outputLabel >{!IF($UserRole.Name ='HR Staff Users',SUBSTITUTE(clientdetails.Label,'Client','Employee'),clientdetails.Label)}</apex:outputLabel> 
+  <!-- apex:inputText value="{!BMCServiceDesk__Incident__c[clientdetails]}"  required="{!clientdetails.Required}" html-readonly="true"/-->
+  <apex:outputField value="{!BMCServiceDesk__Incident__c[clientdetails]}"  />
+  </apex:pageBlockSectionItem>
+  
+  
+ 
+ </apex:repeat>
+ </apex:pageBlockSection>
+ 
+  <apex:pageBlockSection columns="2" collapsible="false" id="srmdetailpageblock3" showHeader="true" title="Service Details">
+   <apex:repeat value="{!$ObjectType.BMCServiceDesk__Incident__c.FieldSets.HD_SRM_Service_Details}" var="servicedetails">
+  <apex:pageBlockSectionItem rendered="{!IF(servicedetails = '',false,true)}">
+  <apex:outputLabel >{!IF(servicedetails.Label == 'Incident #','Service Request #',servicedetails.Label)}</apex:outputLabel>
+  <apex:inputField value="{!BMCServiceDesk__Incident__c[servicedetails]}"  required="{!servicedetails.Required}"/>
+  </apex:pageBlockSectionItem>
+  
+    <!--for readonly field -->
+  <apex:pageBlockSectionItem rendered="{!IF(servicedetails = '',true,false)}">
+  <apex:outputLabel >{!IF(servicedetails.Label == 'Incident #','Service Request #',servicedetails.Label)}</apex:outputLabel>
+  <apex:inputText value="{!BMCServiceDesk__Incident__c[servicedetails]}"  required="{!servicedetails.Required}" html-readonly="true"/>
+  </apex:pageBlockSectionItem>
+  
+ </apex:repeat>
+ </apex:pageBlockSection>
+ 
+ <apex:pageBlockSection columns="2" collapsible="true" id="srmdetailpageblock4" showHeader="true" title="Status and Priority Details">
+
+ <apex:repeat value="{!$ObjectType.BMCServiceDesk__Incident__c.FieldSets.HD_SRM_Status_and_details}" var="details">
+ <apex:pageBlockSectionItem ><apex:outputLabel >{!details.Label}</apex:outputLabel> <apex:inputField value="{!BMCServiceDesk__Incident__c[details]}"  required="{!details.Required}" /></apex:pageBlockSectionItem>
+ </apex:repeat>
+ </apex:pageBlockSection>
+ 
+ <apex:pageBlockSection columns="2" collapsible="true" id="srmdetailpageblock5" showHeader="true" title="Date and Time Details">
+  <apex:repeat value="{!$ObjectType.BMCServiceDesk__Incident__c.FieldSets.HD_SRM_Date_Time}" var="datetime">
+ <apex:pageBlockSectionItem ><apex:outputLabel >{!datetime.Label}</apex:outputLabel>
+  <apex:outputText value="{!BMCServiceDesk__Incident__c[datetime]}"/>
+  </apex:pageBlockSectionItem>
+ </apex:repeat>
+ </apex:pageBlockSection>
+ 
+ <apex:pageBlockSection columns="2" collapsible="false" id="srmdetailpageblock6" showHeader="true" title="Assignment Details">
+  <apex:repeat value="{!$ObjectType.BMCServiceDesk__Incident__c.FieldSets.HD_SRM_Assignment_detail}" var="assignmentdet">
+ <apex:pageBlockSectionItem ><apex:outputLabel >{!assignmentdet.Label}</apex:outputLabel> <apex:inputField value="{!BMCServiceDesk__Incident__c[assignmentdet]}"  required="{!assignmentdet.Required}"/></apex:pageBlockSectionItem>
+ </apex:repeat>
+ </apex:pageBlockSection>
+ 
+ <apex:pageBlockSection columns="1" collapsible="true" id="srmdetailpageblock7" showHeader="true" title="Request Details">
+ <!-- apex:iframe height="400"  scrolling="true" src="/apex/BMCServiceDesk__ServiceRequestDetail?incidentId={!BMCServiceDesk__Incident__c.Id}&isLookup=true&reqDefId={!BMCServiceDesk__Incident__c.BMCServiceDesk__FKRequestDefinition__c}&reqDtlsId={!BMCServiceDesk__Incident__c.BMCServiceDesk__FKRequestDetail__r.Id}&clientId={!BMCServiceDesk__Incident__c.BMCServiceDesk__FKClient__r.Id}&standardLayout=true&isConsole=true&RequestDetailCloneId={!BMCServiceDesk__Incident__c.BMCServiceDesk__RequestDetailCloneId__c}"/ -->
+ <apex:iframe height="400"  scrolling="true" src="/apex/ServiceRequestinputdetailsecure?id={!BMCServiceDesk__Incident__c.Id}"/>
+ </apex:pageBlockSection>
+ 
+  </apex:pageBlock>
+ </apex:form>
+       
+  </apex:tab>
+ 
+  <apex:tab label="Related List" name="name2" id="tabTwo" styleClass="background-color:#000">
+   
+   <c:HD_Approval_History servicerequestOrincidentRecordId="{!$CurrentPage.parameters.id}"/>
+   <c:HD_service_req_Incident_link_relatedList title="Service Request : Linked Incidents" recordLimit1="10" servicerequestrecordid="{!$CurrentPage.parameters.id}" />
+   <!-- apex:relatedList list="BMCServiceDesk__Incident_Histories__r" rendered="true"/ -->
+   <c:HD_Action_History servicerequestOrincidentRecordId="{!$CurrentPage.parameters.id}" incidentObj="{!BMCServiceDesk__Incident__c}"/>
+
+   <!-- apex:relatedList subject="{!BMCServiceDesk__Incident__c}" list="CombinedAttachments"  /-->
+   <c:Notes_Attachemnt_HD servicerequestOrincidentRecordId="{!$CurrentPage.parameters.id}"/>
+   <c:HD_Generic_History_relatedList recordLimit1="50" myObject1="{!BMCServiceDesk__Incident__c}" pageblocktitle="Service Request History" />
+
+   <!-- apex:iframe src="/apex/BMCServiceDesk__consoleIncidentRelatedList?id={!$CurrentPage.parameters.id}&isdtp=vw" frameborder="false" height="1024px" scrolling="true" id="theIframe"/ -->
+    
+   
+  </apex:tab>
+  </apex:tabPanel>
+<!--- JAVASCRIPT Section -->
+<apex:includeScript value="{!URLFOR($Resource.HDscriptcss,'/jquery-2.1.1.min.js')}" loadOnReady="false"/>
+<apex:includeScript value="{!URLFOR($Resource.HDscriptcss,'/bootstrapV3_3_0/js/bootstrap.min.js')}" loadOnReady="false"/>
+<apex:includeScript value="{!URLFOR($Resource.HDscriptcss,'/jquery.tablesorter.js')}" loadOnReady="false"/>
+<apex:includeScript value="/soap/ajax/15.0/connection.js"/>
+<apex:includeScript value="/soap/ajax/15.0/apex.js"/>
+
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+//onload event ontime
+$j(document).ready(function(){
+$j('[id$=userIdVal_lkwgt]').click(function(){
+var current_lookupusr = $j(this).parent('.lookupInput').find('[id$=userIdVal]').val();
+openLookup('/apex/hduserlookup?lksrch='+current_lookupusr+'&frm=Srmdetailform&txt=userIdVal', 800, 1, '');
+});
+
+});//ready
+
+//popup function
+function popitup(url) {
+    newwindow=window.open(url,'name','height=550,width=700');
+    if (window.focus) {newwindow.focus()}
+    return false;
+}//
+
+//popup function
+function variable_popitup(url,height,width) {
+    newwindow=window.open(url,'name','height='+height+','+'width='+width+'\'');
+    if (window.focus) {newwindow.focus()}
+    return false;
+}//
+
+
+//popup function for custom popup
+  function openLookup( baseURL, width, modified, searchParam ){
+    console.log('Calling OpenLookup()');
+    var originalbaseURL = baseURL;
+    var originalwidth = width;
+    var originalmodified = modified;
+    var originalsearchParam = searchParam;
+   
+    var lookupType = baseURL.substr(baseURL.length-3, 3);
+    if (modified == '1') baseURL = baseURL + searchParam;
+   
+    var isCustomLookup = false;
+   
+    // Following "001" is the lookup type for Account object so change this as per your standard or custom object
+    if(lookupType == "001"){
+ 
+      var urlArr = baseURL.split("&");
+      var txtId = '';
+      if(urlArr.length > 2) {
+        urlArr = urlArr[1].split('=');
+        txtId = urlArr[1];
+      }
+     
+      // Following is the url of Custom Lookup page. You need to change that accordingly
+      baseURL = "/apex/hduserlookup?txt=" + txtId;
+     
+      // Following is the id of apex:form control "Srmdetailform". You need to change that accordingly
+      baseURL = baseURL + "&frm=" + escapeUTF("{!$Component.Srmdetailform}");
+      if (modified == '1') {
+        baseURL = baseURL + "&lksearch=" + searchParam;
+      }
+     
+      // Following is the ID of inputField that is the lookup to be customized as custom lookup
+      if(txtId.indexOf('userIdVal') > -1 ){
+        isCustomLookup = true;
+      }
+    }
+   
+   
+    if(isCustomLookup == true){
+      openPopup(baseURL, "lookup", 350, 480, "width="+width+",height=480,toolbar=no,status=no,directories=no,menubar=no,resizable=yes,scrollable=no", true);
+    }
+    else {
+      if (modified == '1') originalbaseURL = originalbaseURL + originalsearchParam;
+      openPopup(originalbaseURL, "lookup", 350, 480, "width="+originalwidth+",height=480,toolbar=no,status=no,directories=no,menubar=no,resizable=yes,scrollable=no", true);
+    }    
+   
+  }//
+  
+//Send Email functioning
+var isCalledFromConsole = false;
+if(typeof consoleDetailElements !='undefined'){
+isCalledFromConsole = true;
+}
+var stdLayoutScreenWidth = 690;
+var stdLayoutScreenHeight = 656;
+function stdScreenLeft(){
+return parseInt((screen.availWidth/2) - (stdLayoutScreenWidth/2));
+}
+
+function stdScreenTop(){
+return parseInt((screen.availHeight/2) - (stdLayoutScreenHeight/2));
+}
+var sendEmailBtnHandlerWindow;
+
+
+function openSendEmail()
+{
+if({!BMCServiceDesk__Incident__c.BMCServiceDesk__state__c}){
+
+if (!sendEmailBtnHandlerWindow || sendEmailBtnHandlerWindow.closed){
+sendEmailBtnHandlerWindow = window.open('/apex/BMCServiceDesk__ComposeEmailPage?enableSelfClosing=false&recordId={!CASESAFEID(BMCServiceDesk__Incident__c.Id)}&isNew=true&objectName=Incident__c&standardLayout=true&isCalledFromConsole='+isCalledFromConsole+'&popupHeader={!BMCServiceDesk__Incident__c.Name}',null,"status = 1, height ="+stdLayoutScreenHeight+", width ="+ stdLayoutScreenWidth +",left="+stdScreenLeft()+",top="+stdScreenTop()+",resizable = 1, status=no,scrollbars=yes");
+}
+
+if (sendEmailBtnHandlerWindow.focus) {sendEmailBtnHandlerWindow.focus() ;}
+}
+else
+{
+var label='{!JSENCODE($Label.bmcservicedesk__incident_is_closed)}';
+alert(label);
+}
+}//openSendEmail()
+
+//Reopen logic
+function reOpen()
+{
+if({!BMCServiceDesk__Incident__c.BMCServiceDesk__state__c}){
+var label='{!JSENCODE($Label.bmcservicedesk__incident_is_already_open)}';
+alert(label);
+}
+else
+{
+sforce.connection.sessionId = '{!$Api.Session_ID}';
+var isUpdateable = sforce.apex.execute("BMCServiceDesk.WebServiceMethodsUtility","checkForUpdatePermission", {objName:"Incident__c"});
+  isUpdateable = 'true';
+if (isUpdateable != 'true') 
+{
+var label='{!JSENCODE($Label.bmcservicedesk__insufficentprivilegetoaccess)}';
+alert(label);
+}
+else {
+//code for status
+var statusresult = sforce.connection.query("SELECT ID, Name FROM BMCServiceDesk__Status__c Where Name='ASSIGNED' limit 1");
+var statusrecords = statusresult.getArray("records");
+//updating the current record to reopened status
+var incident = new sforce.SObject("BMCServiceDesk__Incident__c");
+incident.id = "{!BMCServiceDesk__Incident__c.Id}";
+
+for(var i=0;i<statusrecords.length;i++)
+{
+var record = statusrecords[i];
+incident.BMCServiceDesk__FKStatus__c = record.Id;
+console.log('--->'+record);
+}//for
+//lets update the record 
+result = sforce.connection.update([incident]);
+if (result[0].getBoolean("success")) {
+console.log("account with id " + result[0].id + " updated");
+} else 
+{
+console.log("failed to update account " + result[0]);
+}
+//END of code for status
+
+
+if('{!BMCServiceDesk__Incident__c.BMCServiceDesk__FKBroadcast__c}'!= ''){
+var errormessage='{!JSENCODE($Label.bmcservicedesk__stdincidentrelatedbroadcastschanges)}';
+var r=confirm(errormessage);
+if(r==true){
+window.location.href="/apex/ServiceRequestdetail?id={!BMCServiceDesk__Incident__c.Id}";
+}
+else{
+window.location.href="/apex/ServiceRequestdetail?id={!BMCServiceDesk__Incident__c.Id}";
+}
+}//if('{!BMCServiceDesk__Incident__c.BMCServiceDesk__FKBroadcast__c}'!= '')
+else{
+window.location.href="/apex/ServiceRequestdetail?id={!BMCServiceDesk__Incident__c.Id}";
+}//else
+}//else
+}
+
+}//End reOpen
+//END Reopen logic
+
+//function to save the record and redirect
+function saveAndRedirect()
+{
+//
+var pagevalidation = document.getElementById('{!$Component.messages}').innerHTML.indexOf('ERROR') > -1;
+alert(document.getElementById('{!$Component.messages}').innerHTML+'--->'+pagevalidation);
+//
+ location.href="/apex/ServiceRequestdetail?id={!$CurrentPage.parameters.id}";
+ location.reload();
+}
+//END 
+</script>
+</apex:page>

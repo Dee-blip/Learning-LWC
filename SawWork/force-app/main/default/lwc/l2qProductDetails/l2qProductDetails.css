@@ -1,0 +1,39 @@
+.delete-icn{
+    --sds-c-icon-color-foreground-default: red; 
+    --sds-c-icon-color-foreground: red; 
+    --sds-c-icon-color-background: white;
+ }
+ .icondelete{
+    color: red;
+}
+caption, th{
+    text-align :center;
+    height:35px;
+}
+
+.slds-hint-parent .slds-cell-edit:hover .slds-button__icon_edit, .slds-hint-parent .slds-cell-edit:hover .slds-button__icon--edit, .slds-hint-parent .slds-cell-edit:focus .slds-button__icon_edit, .slds-hint-parent .slds-cell-edit:focus .slds-button__icon--edit {
+    opacity: 0.5;
+}
+td{
+    height:35px;
+    
+}
+.slds-button_icon-bare .slds-button--icon-bare{
+    fill: var(--lwc-colorTextError,rgb(234, 0, 30)) !important;
+    color: var(--lwc-colorTextError,rgb(234, 0, 30)) !important;
+}
+table{
+   /* border-collapse:collapse;*/
+}
+.slds-table thead th{
+    background-color:rgb(250, 250, 249)
+}
+.slds-button_icon-brand {
+    background-color: white;
+    border-color: white;
+    color: red;
+    fill:red;
+}
+.slds-m-left_x-large, .slds-m-left--x-large{
+    margin-left:1px;
+}

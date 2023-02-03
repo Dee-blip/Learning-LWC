@@ -1,0 +1,107 @@
+/*Making checkbox values appear in a single row*/
+.THIS .slds-checkbox {
+    display: inline !important;
+}
+.THIS tbody {
+    display: block;
+    max-height: 200px;
+    overflow-y: scroll;
+   
+}
+
+.THIS .slds-accordion__summary
+{
+     background-image: linear-gradient(to right, #035b79,#2ebfea);
+    color:white;
+}
+
+.THIS .slds-button:hover, .THIS .slds-button:focus
+{
+    color:white;
+}
+.THIS .slds-icon-text-default
+{
+    fill:white;
+}
+
+.THIS tbody::-webkit-resizer {
+background-color: #1e50f4;
+}
+
+.THIS .pointer
+{
+    cursor: pointer; 
+}
+
+.THIS .notallowed
+{
+    cursor: not-allowed;
+}
+.THIS thead,
+.THIS tbody tr {
+    
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    
+}
+
+.THIS .FilterClass
+{
+    font-size:13px !important;
+    color:#005fb2 !important;
+    font-weight:500 !important; 
+}
+
+.THIS td
+{	
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size:12px; 
+    
+}
+.THIS th{ 
+    /*resize: horizontal;*/
+    font-size:13px !important;
+    color:#005fb2 !important;
+    font-weight:500 !important;    
+}
+
+.THIS .sidenav {
+    height: 78%;
+    width: 0;
+    position: fixed;
+    top:120px;
+    z-index: 1;
+    right: 0;
+    background-color: white;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 10px;
+    border : 1px solid #005fb2;
+}
+
+.THIS .sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+
+.THIS .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+.THIS .slds-card
+{
+    border : 1px solid #1589ee;
+}

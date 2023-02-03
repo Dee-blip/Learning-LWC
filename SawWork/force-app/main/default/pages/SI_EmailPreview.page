@@ -1,0 +1,3 @@
+<apex:page id="tstpopup" StandardController="BMCServiceDesk__Incident__c" extensions="SI_ServiceIncidentDetails" sidebar="false" >     
+       <apex:outputText id="notesValue" value="{!SI_EmailPreview}" escape="false"/>
+</apex:page>

@@ -1,0 +1,57 @@
+.THIS .fl_title{
+    color:#54698d;
+    font-size:13px;
+}
+
+.THIS .attention_bar{
+    
+    width : 400px;
+    height: 15px;
+    border-radius: 20px;
+    overflow: hidden;
+    color: white;
+    text-align: center;
+    line-height: 75px;
+    font-size: 35px;
+    font-family: "Segoe UI";
+    animation-direction: reverse;
+    background-color: #CCC9C9;
+    
+    
+    
+    
+}
+
+.THIS.row {
+    padding: 5px 0;
+    margin-bottom: 15px;
+}
+
+.THIS.row .header {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.THIS pre{
+   font-family: 'Slabo 27px', sans-serif;
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+.THIS .redfill{
+    width: 40%;
+    height: 100%;
+    padding: 1px;
+    vertical-align: middle;
+    background-color: #A92626;
+    background: -moz-linear-gradient(left, #F9E5CA,  #A92626);
+    
+    background: -webkit-linear-gradient(left, #F9E5CA, #A92626);
+    
+    background: linear-gradient(to right, #F9E5CA, #A92626);
+    
+}

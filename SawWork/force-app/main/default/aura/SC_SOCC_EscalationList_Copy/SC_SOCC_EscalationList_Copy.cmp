@@ -1,0 +1,205 @@
+<!--
+     @Modification Log   : 
+  Ver       Date            Author      		              Modification
+  1.0                  ChangeMeIn@UserSettingsUnder.SFDoc     Initial Version
+            29/03/21       Tejaswini                          Changes for ESESP-4955 
+-->
+<aura:component controller="SC_SOCC_EscalationListCtrl">
+     <!--override Toast CSS with external [.CSS] file.--> 
+    <ltng:require styles="{!$Resource.SC_MultilineToastCSS}" />
+    <!-- attributes coming from the parent component -->
+    <!-- 1. Main Escalation List Record-->
+    <aura:attribute name="escalationListRec" type="Object"/>
+    <!-- 2. List of PD Records available to be copied to -->
+    <aura:attribute name="lPDForCopy" type="Object"/>
+    <!-- 3. List of invalid Escalation Contacts of the selected record -->
+    <aura:attribute name="lInvalidEscalationCon" type="Object"/> 
+    <!-- 4. List of Escalation Lists to be copied -->
+    <aura:attribute name="lCopiedEscalationList" type="Object"/>
+    <!-- 5. current selected row -->
+    <aura:attribute name="currentRow" type="integer" default="0"/>
+    <!-- 6. if any row added, to add remove class for colour -->
+    <aura:attribute name="isRowAdded" type="boolean" default="false"/>
+    <!-- 7. Spinner show/hide attribute -->
+    <aura:attribute name="mainSpinner" type="boolean" default="false"/> 
+    <!-- 8. List of invalid Escalations via Case Email of the selected record -->
+    <aura:attribute name="lInvalidEscalationViaCaseEmail" type="Object"/>
+    
+    <!-- init method to trigger event and pass parameters -->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+	<aura:html tag="style">
+        .slds-modal__container{
+        	width: 70% !important;
+			max-width: 70% !important;
+        }
+    </aura:html>
+    <!--loading spinner start... style=Brand Medium (blue dots)-->
+    <aura:if isTrue="{!v.mainSpinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container" style="z-index:9999; top:-15rem;">
+                <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+        </div>
+    </aura:if>
+    <!-- Loading spinner end-->
+
+    <!-- Main Modal -->
+    <div  style="height: 100%;">
+          <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+              <div class="slds-modal__container">
+                  <header class="slds-modal__header">
+                      <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onclick="{!c.closeModal}" title="Close">
+                          <lightning:icon class="white slds-icon_small" iconName="utility:close"/>
+                          <span class="slds-assistive-text">Close</span>
+                      </button>
+                      <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate sectionHeading">Copy Escalation List</h2>
+                  </header>
+                  <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                         <table class="slds-table slds-table_bordered slds-table_cell-buffer"> 
+                              <thead>
+                                   <tr class="slds-text-title_caps">
+                                        <th scope="col" style="width: 15%; padding-left: 0.5rem;">
+                                             <div class="slds-truncate" title="Action">&nbsp;</div>
+                                        </th>
+                                        <th scope="col" style="width: 42.5%">
+                                             <div class="slds-truncate" title="Escalation List Name">Escalation List Name</div>
+                                        </th>
+                                        <th scope="col">
+                                             <div class="slds-truncate" title="Policy Domain">Policy Domain</div>
+                                        </th>
+                                   </tr>
+                              </thead>   
+                              <tbody>        
+                                   <aura:iteration items="{!v.lCopiedEscalationList}" var="eachRec" indexVar="index">
+                                        <tr aura:id="eachrow" class="selectedRow">
+                                            
+                                             <td style="padding-left: 0.5rem;">
+                                                
+                                                <lightning:layout>
+                                                 <lightning:layoutItem flexibility="auto" padding="horizontal-small">
+                                                 <aura:if isTrue="{!eachRec.isNotCopiable}">
+                                                     <span name="warning" data-id="warning" onclick="{!c.viewWarning}">
+                                                         <lightning:buttonicon aura:id="warningicon" iconName="utility:warning" class="selectedWarningIcon" variant="bare" size="large" title="{!message}" alternativeText="Warning" />
+                                                     </span>
+                                                 </aura:if>
+                                                 </lightning:layoutItem>
+                                                    
+                                                 <lightning:layoutItem flexibility="auto" padding="horizontal-small">
+                                                  <span name="{!'view-' + index}" data-id="view" onclick="{!c.viewRow}">
+                                                       <lightning:buttonicon aura:id="viewicon" iconName="utility:preview" class="selectedPreviewIcon" variant="bare" size="large" title="Preview" alternativeText="Preview" />
+                                                  </span>
+                                                 </lightning:layoutItem>
+                                                    
+                                                 <lightning:layoutItem flexibility="auto" padding="horizontal-small">
+                                                 <aura:if isTrue="{!index == 0}">
+                                                       <span name="add" onclick="{!c.addRow}">
+                                                            <lightning:buttonicon iconName="utility:new" class="newIcon" variant="bare" size="large" title="Add" alternativeText="Add" />
+                                                       </span>
+                                                       <aura:set attribute="else">
+                                                            <span name="{!'delete-' + index}" onclick="{!c.deleteRow}">
+                                                                 <lightning:buttonicon iconName="utility:delete" class="delIcon" variant="bare" size="large" title="Delete" alternativeText="Delete" />
+                                                            </span>
+                                                       </aura:set>
+                                                  </aura:if>
+                                                </lightning:layoutItem>
+                                               	  
+                                             </lightning:layout> 
+                                                 
+                                             
+                                                </td>
+                                            
+                                            
+                                            
+                                            <td>
+                                                
+                                                    
+                                                 <lightning:input value="{!eachRec.Name}" required="true" maxlength="80" messageWhenTooLong="You have exceeded the limit of 80 characters!" variant="label-hidden"></lightning:input>
+                                                    
+                                                    
+                                             </td>
+                                             
+                                             <td>
+                                                 
+                                                     
+                                                 <lightning:select name="{!'copiedPd-' + index}" value="{!eachRec.Policy_Domain__c}" onchange="{!c.changeRow}" variant="label-hidden" class="copy-pd-picklist">
+                                                       <aura:iteration items="{!v.lPDForCopy}" var="eachPD">
+                                                            <option value="{!eachPD.Id}">{!eachPD.Name}</option>
+                                                       </aura:iteration>
+                                                  </lightning:select>
+                                                    
+                                                   
+                                             </td>
+                                                
+                                        </tr>
+                                   </aura:iteration>
+                              </tbody>
+                         </table>
+                  </div>
+                  <!-- Show uncopied Escalation Contact List -->
+                  <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                         <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                              <thead>
+                                   <tr class="slds-text-title_caps">
+                                        <th scope="col" style="width: 40%;">
+                                             <div class="slds-truncate" title="Action">&nbsp;</div>
+                                        </th>
+                                        <th scope="col">
+                                             <div class="slds-truncate" title="Invalid Escalation Contact Name">Invalid Escalations via Phone</div>
+                                        </th>
+                                   </tr>
+                              </thead>
+                              <tbody>        
+                                   <aura:iteration items="{!v.lInvalidEscalationCon}" var="eachRec">
+                                        <tr>
+                                             <td>
+                                                  &nbsp;
+                                             </td>
+                                             <td>
+                                                  {!eachRec.Authorized_Contact__r.Contact_Name__r.Name}
+                                             </td>
+                                        </tr>
+                                   </aura:iteration>
+                              </tbody>
+                         </table>
+                    </div>
+
+                    <!-- Show uncopied Escalations via Case Email List -->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                         <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                              <thead>
+                                   <tr class="slds-text-title_caps">
+                                        <th scope="col" style="width: 40%;">
+                                             <div class="slds-truncate" title="Action">&nbsp;</div>
+                                        </th>
+                                        <th scope="col">
+                                             <div class="slds-truncate" title="Invalid Escalations via Case Email">Invalid Notify Via Case Email</div>
+                                        </th>
+                                   </tr>
+                              </thead>
+                              <tbody>        
+                                   <aura:iteration items="{!v.lInvalidEscalationViaCaseEmail}" var="eachRec">
+                                        <tr>
+                                             <td>
+                                                  &nbsp;
+                                             </td>
+                                             <td>
+                                                  {!eachRec.Authorized_Contact__r.Contact_Name__r.Name}
+                                             </td>
+                                        </tr>
+                                   </aura:iteration>
+                              </tbody>
+                         </table>
+                    </div>
+                  
+                    <footer class="slds-modal__footer">
+                         <button class="slds-button slds-button_neutral" onclick="{!c.closeModal}">Cancel</button>
+                         <button class="slds-button slds-button_brand" onclick="{!c.save}">Save</button>
+                    </footer>
+              </div>
+          </section>
+          <div class="slds-backdrop slds-backdrop_open"></div>
+      </div>
+
+</aura:component>

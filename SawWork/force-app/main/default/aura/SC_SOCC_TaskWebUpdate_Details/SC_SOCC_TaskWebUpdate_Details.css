@@ -1,0 +1,10 @@
+.THIS lightning-primitive-header-actions {
+    display: none;
+}
+.THIS .DescWrap {
+    max-width: 15rem;
+    word-wrap: break-word;
+    overflow: hidden;
+    height: 50px;
+    overflow-y: scroll;
+}

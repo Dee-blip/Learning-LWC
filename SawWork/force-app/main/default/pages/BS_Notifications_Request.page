@@ -1,0 +1,76 @@
+<apex:page sidebar="true" showHeader="false" standardStylesheets="false" applyHtmlTag="false" applyBodyTag="false" >
+<html>
+    <head>
+        <meta charset='utf-8'></meta>
+        <title>b+s Notifications</title>
+        <apex:stylesheet value="{!URLFOR($Resource.cnx__CnxSfdcResources, 'gadget/css/connects.min.css')}"/>
+        <style>body { overflow-y:auto }</style>
+    </head>
+    <body id='notificationPopUp'>
+        <div class='message'></div>
+        <div class='bsLogo'></div>
+        <p><strong>&nbsp; Table of Contents</strong></p>
+        
+        
+        <p>&nbsp; I.  Enable Salesforce ACD Notifications on Google Chrome Browser</p>
+        <p>&nbsp; II. For Windows Users: Turn Google Chrome Notifications On</p>
+        <p>&nbsp; III.    For Mac Users: Allow Notifications for Google Chrome</p>     
+        
+        <p style="padding-left: 40px;">&nbsp;</p>
+
+
+        <p><strong>&nbsp; I.  Enable Salesforce ACD Notifications on Google Chrome Browser</strong></p>
+        <p style="padding-left: 40px;">1.&nbsp; On this page, click the <strong>lock </strong>icon to the immediate left of the URL.</p>
+        <apex:image url="{!URLFOR($Resource.bs_Notifications, 'bs_Notification_help1.png')}" width="374" height="34"/> 
+        <p style="padding-left: 40px;">2.&nbsp; Click on <strong>Site settings.</strong></p>
+        <apex:image url="{!URLFOR($Resource.bs_Notifications, 'bs_Notification_help2.png')}" width="368" height="211"/> 
+        <p style="padding-left: 40px;">3.&nbsp; Under <strong>Permissions</strong>, set Notifications to <strong>Allow</strong></p>
+        <apex:image url="{!URLFOR($Resource.bs_Notifications, 'bs_Notification_help3.png')}" width="658" height="289"/> 
+        <p style="padding-left: 40px;">4.&nbsp; Return to previous page and click <strong>Reload</strong></p>
+        <apex:image url="{!URLFOR($Resource.bs_Notifications, 'bs_Notification_help4.png')}" width="530" height="93"/> 
+        <p style="padding-left: 40px;">Note: To disable notifications, repeat Steps 1 – 4 but in Step 3, set Notifications to Block</p>
+        <apex:image url="{!URLFOR($Resource.bs_Notifications, 'bs_Notification_help11.png')}" width="658" height="289"/>
+        
+        <p style="padding-left: 40px;">&nbsp;</p>
+        <p><strong>&nbsp; II.  If you use Windows, ensure your Google Chrome browser notifications are allowed</strong></p>
+        <p style="padding-left: 40px;">1.&nbsp; Click on the <strong>Start Menu</strong> and then click on the <strong>Settings </strong></p>
+        <apex:image url="{!URLFOR($Resource.bs_Notifications, 'bs_Notification_help5.png')}" width="241" height="143"/>
+        <p style="padding-left: 40px;">2.&nbsp; Search for <strong>notifications</strong> and click on <strong>Notifications &amp; actions settings</strong></p>
+        <apex:image url="{!URLFOR($Resource.bs_Notifications, 'bs_Notification_help6.png')}" width="340" height="83"/>
+        <p style="padding-left: 40px;">3.&nbsp; Ensure <strong>Notifications </strong>are set to <strong>On</strong></p>
+        <apex:image url="{!URLFOR($Resource.bs_Notifications, 'bs_Notification_help7.png')}" width="315" height="111"/>
+        <p style="padding-left: 40px;">4.&nbsp; Scroll down to the <strong>Get notifications from these senders </strong>section</p>
+        <p>&nbsp;</p>
+        <apex:image url="{!URLFOR($Resource.bs_Notifications, 'bs_Notification_help8.png')}" width="461" height="389"/>
+     
+        <p style="padding-left: 40px;">&nbsp;</p>     
+        <p><strong>&nbsp; III.  For Mac Users: Allow Notifications for Google Chrome</strong></p>
+
+        <p style="padding-left: 40px;">1.&nbsp; Open <strong>System Preferences</strong></p>
+        <apex:image url="{!URLFOR($Resource.bs_Notifications, 'bs_Notification_help13.png')}" width="549" height="388"/>
+        <p style="padding-left: 40px;">2.&nbsp; Click <strong>Notifications Focus</strong></p>
+        <apex:image url="{!URLFOR($Resource.bs_Notifications, 'bs_Notification_help14.png')}" width="811" height="669"/>
+        <p style="padding-left: 40px;">3.&nbsp; Enable <strong>Allow Notifications </strong>for Google Chrome</p>
+        <apex:image url="{!URLFOR($Resource.bs_Notifications, 'bs_Notification_help15.png')}" width="668" height="527"/>
+        
+        <script>
+            var htmlElement = document.querySelector('.message');
+            Notification.requestPermission().then(updateContent);
+
+            function updateContent(response) {
+                htmlElement.classList.add(response);
+                switch (response) {
+                    case 'granted':
+                        htmlElement.textContent = window.opener.cnx.crminteraction.getLabels().NotificationPopUpAllowed;
+                        break;
+                    case 'denied':
+                    case 'default':
+                    default:
+                        htmlElement.textContent = window.opener.cnx.crminteraction.getLabels().NotificationPopUpBlocked;
+                        break;
+                }
+            }
+        </script>
+    </body>
+</html>
+</apex:page>

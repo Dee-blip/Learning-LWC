@@ -1,0 +1,29 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="HD_IncidentDetailController">
+    
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="warnings" type="String[]"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:dependency resource="markup://force:editRecord" type="EVENT" />
+    <div>
+    	<div aura:id="Accspinner" class="slds-spinner_container slds-hide">
+		<div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+			<span class="slds-assistive-text">Processing</span>
+			<div class="slds-spinner__dot-a"></div>
+			<div class="slds-spinner__dot-b"></div>
+		</div>
+	</div>
+        <div class="demo-only slds-size_1-of-2">
+  			<div class="slds-form-element" aura:id="toggle-div">
+    			<label class="slds-checkbox_toggle slds-grid">
+      				<span class="slds-form-element__label slds-m-bottom_none">Toggle to resume</span>
+                    <ui:inputcheckbox aura:id="toggle-checkbox" change="{!c.onChange}"/>
+      				<span aura:id="toggle-span" id="toggle-desc" class="slds-checkbox_faux_container" aria-live="assertive">
+        				<span class="slds-checkbox_faux"></span>
+        				<span class="slds-checkbox_on">Suspended</span>
+        				<span class="slds-checkbox_off">Resume</span>
+      				</span>
+                </label>
+            </div>
+        </div>
+    </div>
+</aura:component>

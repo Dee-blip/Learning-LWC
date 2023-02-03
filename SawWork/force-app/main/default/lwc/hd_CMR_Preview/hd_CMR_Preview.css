@@ -1,0 +1,77 @@
+:host {
+  --sds-c-accordion-summary-color-background: lightgray;
+  --sds-c-accordion-section-color-border: darkgray;
+}
+
+.OPENED {
+  background-color: #0000b3;
+  font-weight: bold;
+  color: #efefef;
+  font-size: 12px;
+}
+
+.PENDINGAPPROVAL {
+  background-color: #40367c;
+  font-weight: bold;
+  color: #efefef;
+  font-size: 12px;
+}
+
+.AUTHORIZED {
+  background-color: #2db92d;
+  font-weight: bold;
+  color: #efefef;
+  font-size: 12px;
+}
+
+.REJECTED {
+  background-color: #811818;
+  font-weight: bold;
+  color: #efefef;
+  font-size: 12px;
+}
+
+.INPROGRESS {
+  background-color: #006dcc;
+  font-weight: bold;
+  color: #efefef;
+  font-size: 12px;
+}
+
+.COMPLETED {
+  background-color: #4bca81;
+  font-weight: bold;
+  color: #efefef;
+  font-size: 12px;
+}
+
+.CHANGEFAILED {
+  background-color: #c23934;
+  font-weight: bold;
+  color: #efefef;
+  font-size: 12px;
+}
+
+.CLOSED {
+  background-color: #2f4f4f;
+  font-weight: bold;
+  color: #efefef;
+  font-size: 12px;
+}
+
+.CANCELLED {
+  background-color: #2f4f4f;
+  font-weight: bold;
+  color: #efefef;
+  font-size: 12px;
+}
+
+.slideUp {
+  transition: 1s;
+  height: 500px !important;
+}
+
+.slideDown {
+  transition: 1s;
+  height: 50px !important;
+}

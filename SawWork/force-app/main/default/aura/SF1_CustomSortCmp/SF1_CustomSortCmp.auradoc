@@ -1,0 +1,42 @@
+<!--
+To include in your component , implement following in your parent cmp : 
+(1)<aura:attribute name="orderBy" type="String" default="Name Asc"/>
+(2)<aura:handler event="c:SF1_orderByQueryComponentEvent" action="{!c.getOrderByString}"/>
+(3)<c:SF1_CustomSortCmp sObjectName="Opportunity"/>
+(4) getOrderByString : function(component, event, helper) 
+     {
+        var eventValue_orderByString= event.getParam("orderByString");
+        component.set("v.orderBy", eventValue_orderByString); 
+        component.set("v.offset", parseInt("0")); //pagination components
+        component.set("v.listOfOpptys", []);      //pagination components
+        //update the query at backend and fire it again
+        helper.getOpportunityList(component);
+    }
+
+Cmp Explained : 
+(1) <c:SF1_CustomSortCmp sObjectName="Opportunity"/> 
+					Including this calls init method of SF1_CustomSortCmp - it reads from SF1_CustomSortSettings__mdt , fields available for this object to be shown in sorting options
+
+(2) - > User clicks on Sort in SF1_SortFooter 
+    - > SF1_showSortDetailsEvent is fired 
+    - > caught by SF1_CustomSortCmp
+    - > Makes the hiding block of visibleAfterClickingOnSort visible to user with apply & cancel
+    - > List of fields are internally displayed using sub-cmp inside aura:iteration :  <c:SF1_FieldsAvailableInSorting fieldName="{!fieldName.value}" indexVar="{!index}" />
+    - > Each such cmp contains List field name , Asc , Desc options. 
+    - > When user clicks on one row , the fieldname and Asc/Desc information is passed back to SF1_CustomSortCmp(event caught in c.showSortDetails) using SF1_showSortDetailsEvent.
+    - > The above info is saved in sortBy (map) attribute of SF1_CustomSortCmp. //It can be extended to contain multilevel sorting,currently it holds only one field and its asc/desc value.(change required only in showSortDetails method)
+    - > Finally when user clicks on Apply , SF1_orderByQueryComponentEvent is fired and the order by sub-query String is passed for example Name Asc <API name of field>,<Asc/Desc> . 
+    - > SF1_orderByQueryComponentEvent is to be caught in the parent component where SF1_CustomSortCmp is to be integrated . 
+    - > The param passed is orderByString.
+    
+(3) - > To give default sorting , use <aura:attribute name="orderBy" type="String" default="Name Asc"/>
+    - > utilize default tag in your parent cmp.
+    
+-->
+
+<aura:documentation>
+    <aura:description>Documentation</aura:description>
+    <aura:example name="ExampleName" ref="exampleComponentName" label="Label">
+        Example Description
+    </aura:example>
+</aura:documentation>

@@ -1,0 +1,22 @@
+<apex:page controller="Eb_CtrlPreviewTemplateFirstPage">
+  <apex:form >
+    <!-- start of changes for adding an error if template is deleted CR 856235 -->
+    <apex:pageMessages id="errorMessage">
+    </apex:pageMessages>
+      
+        <br/>
+     <apex:image url="{!HeaderImageUrl}" rendered="{!renderHTML}">
+     </apex:image>
+        <br/>
+        <b>SUBJECT:</b>
+        <b><apex:outputText value="{!subject}" id="subject"/></b>
+        <br/>
+        <br/>
+        <apex:outputtext value="{!HTMLValue}" id="HTMLBody" escape="false" rendered="{!renderHTML}"/>
+        <apex:image url="{!FooterImageUrl}" rendered="{!renderHTML}"></apex:image>
+        <apex:repeat value="{!bodyWithLineBreaks}" var="string" id="theRepeat">
+            <apex:outputText value="{!string}" id="theValue" escape="false" rendered="{!renderText}"/><br/>
+        </apex:repeat>
+        
+   </apex:form>
+</apex:page>

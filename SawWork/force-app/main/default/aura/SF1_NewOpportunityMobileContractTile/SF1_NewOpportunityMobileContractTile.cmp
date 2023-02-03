@@ -1,0 +1,188 @@
+<aura:component >
+
+  <!-- show modal content accordingly -->
+  <aura:attribute name="openModalOnClick" type="Boolean" default="false"/>
+  <!-- attribute to select this contract Tile -->
+  <aura:attribute name="selectThisContract" type="Boolean" default="false"/>
+  <!-- distinguishes between type of contract Tile -->
+  <aura:attribute name="contractType" type="String" default="primaryContractTile"/>
+  <!-- contract attribute contains data for primaryContractTile -->
+  <aura:attribute name="contract" type="SObject"/>
+  <!-- renewalContract attribute contains data for secondaryContractTile -->
+  <aura:attribute name="renewalContract" type="SObject"/>
+  <!-- Ids of selected Contracts -->
+  <aura:attribute name="selectedContractIDs" type="String[]"/>
+  <!-- show the particular contracts -->
+  <aura:attribute name="productsToShow" type="List"/>
+
+  <aura:registerEvent name="Select Contracts" type="c:SF1_NewOpportunityMobileContractEvent"/>
+  <aura:registerEvent name="Modal Values" type="c:SF1_NewOpportunityMobileModalEvent"/>
+
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+  <aura:if isTrue="{!v.contractType == 'primaryContractTile'}">
+    <article class="slds-tile slds-tile_board">
+      <lightning:tile >
+        <aura:set attribute="media">
+          <lightning:icon iconName="standard:contract" size="medium" alternativeText="Opportunity..."/>
+          <!-- <lightning:input type="checkbox-button" label=" " name="input2" checked="{! v.selectContract }"/> -->
+        </aura:set>
+        <ul >
+          <li class="slds-item slds-has-flexi-truncate">
+            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+              <div class="slds-p-horizontal_small slds-size_6-of-8 slds-has-flexi-truncate">
+                <strong><ui:outputText value="{! v.contract.Name }"/></strong>
+              </div>
+              <div class="slds-p-horizontal_small slds-size_2-of-8">
+                <div class="slds-col_bump-left slds-text-align_right">
+                  <lightning:input type="checkbox-button" label=" " name="selectThisContract" checked="{!v.selectThisContract}" onchange="{!c.returnValuesToParent}"/>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </lightning:tile>
+      <lightning:tile >
+        <ul >
+          <li class="slds-item slds-truncate">
+            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+              <div class="slds-p-horizontal_small slds-size_3-of-6">Currency</div>
+              <div class="slds-p-horizontal_small slds-size_3-of-6">
+                <aura:if isTrue="{!v.contract.Currency__c != null }">
+                  <div class="slds-truncate">
+                    <ui:outputText value="{! v.contract.Currency__c }"/>
+                  </div>
+                  <aura:set attribute="else">
+                    --
+                  </aura:set>
+                </aura:if>
+
+              </div>
+            </div>
+          </li>
+
+          <li class="slds-item slds-truncate">
+            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+              <div class="slds-p-horizontal_small slds-size_3-of-6">Type</div>
+              <div class="slds-p-horizontal_small slds-size_3-of-6">
+                <aura:if isTrue="{!v.contract.Contract_Type__c != null }">
+                  <div class="slds-truncate">
+                    <ui:outputText value="{!v.contract.Contract_Type__c}"/>
+                  </div>
+                  <aura:set attribute="else">
+                    --
+                  </aura:set>
+                </aura:if>
+
+                <!-- <aura:if isTrue="{!v.contract.Contract_Type__c == 'Indirect Customer'}">
+                    Indirect
+                  </aura:if>
+                  <aura:if isTrue="{!v.contract.Contract_Type__c == 'Direct Customer'}">
+                    Direct
+                  </aura:if> -->
+              </div>
+            </div>
+          </li>
+
+          <li class="slds-item slds-truncate">
+            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+              <div class="slds-p-horizontal_small slds-size_3-of-6">
+                <div class="slds-truncate_container_75">
+                  Eff. End Date
+                </div>
+              </div>
+              <div class="slds-p-horizontal_small slds-size_3-of-6">
+                <aura:if isTrue="{!v.contract.Effective_End_Date__c != null }">
+                  <ui:outputDate value="{!v.contract.Effective_End_Date__c}"/>
+                  <aura:set attribute="else">
+                    --
+                  </aura:set>
+                </aura:if>
+
+                <!-- <aura:if isTrue="{!v.contract.Contract_Type__c == 'Indirect Customer'}">
+                    Indirect
+                  </aura:if>
+                  <aura:if isTrue="{!v.contract.Contract_Type__c == 'Direct Customer'}">
+                    Direct
+                  </aura:if> -->
+              </div>
+            </div>
+          </li>
+
+          <li class="slds-item slds-has-flexi-truncate">
+            <div class="slds-grid slds-border_top">
+              <a>
+                <div name="{! v.contract.Contract_Products__r }" onclick="{!c.fireModalEvent}">View Products ({! v.contract.Contract_Product_Count__c })</div>
+              </a>
+            </div>
+          </li>
+
+        </ul>
+      </lightning:tile>
+    </article>
+  </aura:if>
+
+  <aura:if isTrue="{!v.contractType == 'secondaryContractTile'}">
+    <article class="slds-tile slds-tile_board">
+      <lightning:tile >
+        <aura:set attribute="media">
+          <lightning:icon iconName="standard:contract" size="medium" alternativeText="Opportunity..."/>
+          <!-- <lightning:input type="checkbox-button" label=" " name="input2" checked="{! v.selectContract }"/> -->
+        </aura:set>
+        <ul >
+          <li class="slds-item slds-has-flexi-truncate">
+            <strong>
+              <aura:if isTrue="{! v.renewalContract.Contract_Id_Text__c != null }">
+                <ui:outputText value="{! v.renewalContract.Contract_Id_Text__c }"/>
+                <aura:set attribute="else">
+                  --
+                </aura:set>
+              </aura:if>
+            </strong>
+          </li>
+        </ul>
+      </lightning:tile>
+      <lightning:tile >
+        <ul >
+
+          <li class="slds-item slds-has-flexi-truncate">
+            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+              <div class="slds-p-horizontal_small slds-size_3-of-6">Type</div>
+              <div class="slds-p-horizontal_small slds-size_3-of-6">
+
+                <aura:if isTrue="{! v.renewalContract.Contract_Type__c != null }">
+                  <ui:outputText value="{! v.renewalContract.Contract_Type__c }"/>
+                  <aura:set attribute="else">
+                    --
+                  </aura:set>
+                </aura:if>
+                <!-- <aura:if isTrue="{!v.contract.Contract_Type__c == 'Indirect Customer'}">
+                    Indirect
+                  </aura:if>
+                  <aura:if isTrue="{!v.contract.Contract_Type__c == 'Direct Customer'}">
+                    Direct
+                  </aura:if> -->
+              </div>
+            </div>
+          </li>
+
+          <li class="slds-item slds-has-flexi-truncate">
+            <div class="slds-grid slds-wrap slds-grid_pull-padded">
+              <div class="slds-p-horizontal_small slds-size_3-of-6">Eff. End Date</div>
+              <div class="slds-p-horizontal_small slds-size_3-of-6">
+                <aura:if isTrue="{! v.renewalContract.Contract_Effective_End_Date__c != null }">
+                  <ui:outputDate value="{! v.renewalContract.Contract_Effective_End_Date__c }"/>
+                  <aura:set attribute="else">
+                    --
+                  </aura:set>
+                </aura:if>
+              </div>
+            </div>
+          </li>
+
+        </ul>
+      </lightning:tile>
+    </article>
+  </aura:if>
+
+</aura:component>

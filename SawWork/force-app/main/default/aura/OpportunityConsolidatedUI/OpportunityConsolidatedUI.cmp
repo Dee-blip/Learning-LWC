@@ -1,0 +1,253 @@
+<aura:component controller="OpportunityConsolidatedUIController" implements="flexipage:availableForAllPageTypes,force:appHostable,force:hasRecordId" access="global" >
+  <!--<ltng:require styles="{!$Resource.SLDS +
+               '/assets/styles/salesforce-lightning-design-system-ltng.css'}" />-->
+    <!--Attribute for contact-->
+      <aura:attribute name="theContact" type="Contact" default="{ sobjectType: 'Contact' }"/>
+      <aura:attribute name="contactId" type="Id" />
+      <aura:attribute name="task" type="Task[]"/>
+    <aura:attribute name="theOppty" type="Opportunity"/>
+      <aura:attribute name="camp" type="Campaign" />
+      <aura:attribute name="tskEWrapper" type="OpportunityConsolidatedUIController.taskEventWrapper" />
+          <!-- <aura:attribute name="dummmyContact" type="Task" default="{sobjectType: 'Task'}"/> -->
+      <aura:attribute name="values" type="Object[]"/>
+      <aura:attribute name="convalues" type="Object[]"/>
+      <aura:attribute name="camvalues" type="Object[]"/>
+      <aura:attribute name="form" type="Aura.Component[]"/>
+        <aura:attribute name="fields" type="FieldSetMember[]" />
+
+     <aura:handler event="c:PageChange" action="{!c.pageChange}"/>
+     <aura:attribute name="page" type="integer"/>
+         <aura:attribute name="eventOffset" type="integer"/>
+         <aura:attribute name="eventLimit" type="integer"/>
+      <aura:attribute name="pages" type="integer"/>
+      <aura:attribute name="total" type="integer"/>
+          <aura:attribute name="pageSize" type="String" default="3" />
+
+       <!--Initialization event handler-->
+     <!-- <force:recordView recordId="{!v.contactId}" type="MINI"/>
+      <force:recordView recordId="{!v.taskId}" type="MINI"/>-->
+      <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+      <!-- <aura:handler event="aura:waiting" action="{!c.showSpinner}"/> -->
+      <aura:handler event="aura:doneWaiting" action="{!c.toggleSpinner}"/>     
+      <center>
+          <div>
+            <ui:spinner aura:id="spinner"/>
+                  <!-- <img src="/resource/SLDS0121/assets/images/spinners/slds_spinner_brand.gif" alt="Loading..." /> -->
+    </div>
+      </center>
+
+    <div class="slds">
+              <!-- <force:inputField value="{!v.dummmyContact.Name}" class="slds-hide"/> -->
+          <div class="slds-grid">
+          
+             <div class="slds-p-horizontal--small slds-size--1-of-2">
+                <aura:renderIf isTrue="{!v.convalues.length==0}">
+                  <center><div class="slds-m-top--x-large slds-m-horizontal--xx-large">No Contact is associated with this opportunity</div></center>
+                </aura:renderIf>
+                <aura:renderIf isTrue="{!v.convalues.length > 0}">
+                   <center><span class="slds-truncate thick-title">Contact Details</span></center>
+                  <table class="slds-table slds-table--bordered container slds-table--fixed-layout">
+                    <thead>
+                      <!-- <tr>
+                        <th scope="col">
+                          <div class="slds-truncate thick-title" title="Contact Details">Contact Details</div>
+                        </th>
+                      </tr> -->
+                      </thead>
+                      <tbody>
+                      <aura:iteration items="{!v.convalues}" var="item">
+
+                        <tr>
+                          
+                            <td data-label="Contact Details" class="labelCol slds-p-top--none slds-p-bottom--none">
+                              <div class=" slds-text-align--right slds-truncate thick " title="{!item.name}">{!item.name}</div>
+                            </td>
+                            <aura:renderIf isTrue="{!item.name != 'Last Name'}">
+                            <td data-label="Contact Details" class="slds-p-top--none slds-p-bottom--none">
+                              <div class="slds-text-align--left slds-truncate" title="{!item.name}"><!-- <ui:outputText value="{!item.value}"/> --><span>{!item.value}</span></div>
+                            </td>
+                            </aura:renderIf>
+                            <aura:renderIf isTrue="{!item.name == 'Last Name'}">
+                              <td data-label="Campaign Details" class="slds-p-top--none slds-p-bottom--none">
+                                  <div class="slds-text-align--left" title="{!item.name}"> 
+                                  
+                                  <a href="{!'/'+v.theContact.Id}" target="_blank" >{!item.value}</a>
+                                  </div>
+                              </td> 
+                            </aura:renderIf>
+                          
+                        </tr>
+                      </aura:iteration>
+                      
+                      </tbody>
+                      </table>
+
+
+        </aura:renderIf>            
+              </div>
+        
+        <!-- 2nd Column of Grid -->
+        
+        
+        <div class="slds-p-horizontal--small slds-size--1-of-2">
+        <aura:renderIf isTrue="{!v.camvalues.length==0}">
+            <center><div class="slds-m-top--x-large slds-m-horizontal--xx-large">No Campaign is associated with this opportunity</div></center>
+          </aura:renderIf>
+          <aura:renderIf isTrue="{!v.camvalues.length > 0}">
+                <center><span class="slds-truncate thick-title">Campaign Details</span></center>
+                  <table class="slds-table slds-table--bordered slds-table--fixed-layout">
+                    <thead>
+                      <!-- <tr>
+                        <th scope="col">
+                          <div class="slds-truncate thick" title="Campaign Details">Campaign Details</div>
+                        </th>
+                      </tr> -->
+                      </thead>
+                      <tbody>
+                       <aura:iteration items="{!v.camvalues}" var="item">
+                       <!-- <div class="slds-has-flexi-truncate"> -->
+                        <tr>
+                            <td data-label="Campaign Details" class="labelCol slds-p-top--none slds-p-bottom--none">
+                              <div class=" slds-text-align--right slds-truncate thick" title="{!item.name}">{!item.name}</div>
+                            </td>
+                            <aura:renderIf isTrue="{!item.name != 'Campaign Description' &amp;&amp; item.name != 'URL/Microsite'}">
+                              <td data-label="Campaign Details" class="slds-p-top--none slds-p-bottom--none">
+                                <div class="slds-text-align--left slds-truncate" title="{!item.name}"> <ui:outputText value="{!item.value}"/> <!-- <span>{!item.value}</span> --></div>
+                              </td> 
+                            </aura:renderIf>
+                            <aura:renderIf isTrue="{!item.name == 'URL/Microsite'}">
+                              <td data-label="Campaign Details" class="slds-p-top--none slds-p-bottom--none">
+
+                                  <div class="slds-text-align--left" title="{!item.name}"> <!-- <ui:outputText value="{!item.value}"/> --> <!-- <ui:outputURL value="#" label="{!item.value}" target="_blank" click="{!c.redirectToMicrosite}" class="{!item.value}"/> -->
+                                    <a href="{!'https://'+item.value}" target="_blank" >{!item.value}</a>
+                                  </div>
+                              </td> 
+                            </aura:renderIf>
+                            <aura:renderIf isTrue="{!item.name == 'Campaign Description'}">
+                              <td data-label="Campaign Details" >
+                                <div class="slds-text-align--left slds-scrollable" title="{!item.name}"> <!-- <ui:outputText value="{!item.value}"/> --> <ui:scrollerWrapper class="scrollerSize">{!item.value}</ui:scrollerWrapper></div>
+                              </td> 
+                            </aura:renderIf>
+                            
+                        </tr>
+                        <!-- </div> -->
+                      </aura:iteration>
+                      
+                      </tbody>
+                      </table>
+
+
+              </aura:renderIf>      
+              </div>
+              
+                </div>
+  <div class="line-break"></div>
+
+  <!-- <hr size="2px" border-color="#ddb929"/> -->
+  <aura:renderIf isTrue="{!v.tskEWrapper.length == 0}">
+            <div class="slds-m-top--x-small">No task is associated with this opportunity</div>
+  </aura:renderIf>
+  <aura:renderIf isTrue="{!v.tskEWrapper.length > 0}">
+  <div  class="slds-truncate thick-title slds-p-bottom--xx-small" >Recent Activities</div>
+  <br/>
+    <div class="slds-table--edit_container slds-is-relative">
+      <table class="slds-table slds-table--edit slds-table--bordered slds-table--fixed-layout slds-table--resizable-cols slds-no-cell-focus" role="grid" style="width:100%;" title="Activities">
+
+        <div style="height:150px;width:auto;" class="slds-scrollable--y">
+        <thead>
+         <tr>
+         
+            
+            <th class="slds-is-sortable slds-is-resizable slds-text-title--caps col-width-subDue slds-p-top--none slds-p-bottom--none" scope="col">
+              <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset" tabindex="-1">
+                <span class="slds-truncate" title="Subject">Subject</span>
+                <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true"></span>
+              </a>
+            </th>
+            
+            <th class="slds-is-sortable slds-is-resizable slds-text-title--caps col-width-subDue slds-p-top--none slds-p-bottom--none" scope="col">
+              <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset" tabindex="-1">
+                <span class="slds-truncate" title="Due Date">Due Date</span>
+                <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true"></span>
+              </a>
+            </th>
+            
+            <th class="slds-is-sortable slds-is-resizable slds-text-title--caps col-width-desc slds-p-top--none slds-p-bottom--none" scope="col">
+              <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset" tabindex="-1">
+                <span class="slds-truncate" title="Description">Description</span>
+                <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true"></span>
+              </a>
+            </th>
+            <th class="slds-is-sortable slds-is-resizable slds-text-title--caps col-width-owner slds-p-top--none slds-p-bottom--none" scope="col">
+              <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset" tabindex="-1">
+                <span class="slds-truncate" title="Assigned To">Assigned To</span>
+                <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true"></span>
+              </a>
+            </th>
+            <th class="slds-is-sortable slds-is-resizable slds-text-title--caps col-width-owner slds-p-top--none slds-p-bottom--none" scope="col">
+              <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset" tabindex="-1">
+                <span class="slds-truncate" title="Assigned To">Created By</span>
+                <span class="slds-assistive-text" aria-live="assertive" aria-atomic="true"></span>
+              </a>
+            </th>
+          </tr>
+        </thead>
+        <!-- <ui:scrollerWrapper class="tskScrollerSize" > -->
+        
+        <tbody>
+        <!-- style="height:240px;padding:1rem;" -->
+        
+        <aura:iteration items="{!v.tskEWrapper}" var="tske">
+          <tr class="slds-hint-parent slds-wrap">
+            <td role="gridcell" class="slds-cell-edit col-width-subDue slds-wrap">
+              <span class="slds-grid slds-text-longform slds-cell-wrap">
+              <span title="{!tske.subject}"><a href="{!'/'+tske.Id + '?retURL=/' + v.theOppty.Id }" target="_blank" >{!tske.subject}</a></span>
+              </span>
+            </td>
+            
+            <td role="gridcell" class="slds-cell-edit col-width-subDue" aria-readonly="true">
+              <span class="slds-grid slds-grid--align-spread">
+                <span title="{!tske.ActivityDate}">{!tske.ActivityDate}</span>
+              </span>
+            </td>
+            
+            <td role="gridcell" class="slds-cell-edit col-width-desc">
+            
+              <span class="slds-grid slds-grid--align-spread">
+              <ui:scrollerWrapper class="{!tske.Description ? 'scrollerTskDesSize' : ''}">{!tske.Description}</ui:scrollerWrapper>
+              </span>
+            </td>
+            <td role="gridcell" class="slds-cell-edit col-width-owner">
+              <span class="slds-grid slds-grid--align-spread">
+                <span title="{!tske.Owner}">{!tske.Owner}</span>
+              </span>
+            </td>
+             <td role="gridcell" class="slds-cell-edit col-width-owner">
+              <span class="slds-grid slds-grid--align-spread">
+                <span title="{!tske.Creator}">{!tske.Creator}</span>
+              </span>
+            </td>
+          </tr>
+          
+          </aura:iteration>
+        
+        </tbody>
+        </div>   
+         <!-- </ui:scrollerWrapper> -->
+      </table>
+      
+    </div>
+  </aura:renderIf>
+       <!--  <center>
+  <div class="slds-form-element">
+         <button class="slds-button slds-button#brand" onclick="{!c.previousPage}" disabled="{!v.page &lt;= 1}">
+             Previous
+          </button>
+          &nbsp;{!v.total} records • page {!v.page} / {!v.pages} &nbsp;
+         <button class="slds-button slds-button#brand" onclick="{!c.nextPage}" disabled="{!v.page >= v.pages}"> Next</button>
+       </div>
+            </center>  -->
+          <!--<force:recordView recordId="{!v.contact.Id}" type="MINI"/>-->
+      <!-- <ui:button label="Save" press="{!c.saveObj}"/> -->
+      </div>
+  </aura:component>

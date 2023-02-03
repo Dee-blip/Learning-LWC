@@ -1,0 +1,7 @@
+<apex:page standardController="Account_Plan__c" extensions="L2Q_CreateMultipleAccountTasksController" recordSetVar="listOfAccountPlans" action="{!createTaskForSelectedAccounts}" lightningStylesheets="true">
+    <apex:pageMessages />
+    <br/>
+    <button onclick ="window.history.back()">
+        Back
+    </button>
+</apex:page>

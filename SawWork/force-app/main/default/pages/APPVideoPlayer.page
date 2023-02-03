@@ -1,0 +1,168 @@
+<apex:page sidebar="false" showHeader="false" controller="NAPVideoPlayerController" applyBodyTag="false" applyHtmlTag="false"
+    standardStylesheets="false">
+    <html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <title>{!videoTitle}</title>
+
+        <apex:stylesheet value="https://netalliance.akamaized.net/player/2.91.10/resources/styles/styles.css" />
+
+        <apex:includeScript value="https://netalliance.akamaized.net/player/2.91.10/amp.premier/amp.premier.min.js" />
+        <!--
+            
+            <apex:stylesheet value="{!URLFOR($Resource.amp_standard, 'amp_standard/resources/styles/styles.css')}"/>
+            <apex:includeScript value="{!URLFOR($Resource.amp_standard, 'amp_standard/amp/amp.js')}"/>
+            -->
+        <script src="/soap/ajax/39.0/connection.js" type="text/javascript"></script>
+        <script src="/soap/ajax/39.0/apex.js" type="text/javascript"></script>
+        <!--
+            -->
+        <script type="text/javascript">
+            var amp;
+            var videoTypeForAMP = "{!videoTypeForAMP}";
+
+            function loadHandler(event) {
+                var config = {
+                    autoplay: false,
+                    captioning: { enabled: false },
+                    paths: {
+                        //SFDC-7653 - @nadesai
+                        // player: "{! $Label.NapRebrand_Label3 + '/player/2.91.10/amp.premier/' }"
+                        // resources: "{! $Label.NapRebrand_Label3 + '/player/2.91.10/resources/' }"
+                        // plugins: "{! $Label.NapRebrand_Label3 + '/player/2.91.10/akamai/amp/' }"
+                        player: "https://netalliance.akamaized.net/player/2.91.10/amp.premier/",
+                        resources: "https://netalliance.akamaized.net/player/2.91.10/resources/",
+                        plugins: "https://netalliance.akamaized.net/player/2.91.10/akamai/amp/"
+                    },
+
+                    /*
+                    paths: {
+                        player: "/resource/1517311916000/amp_standard/amp_standard/amp/",
+                        resources: "/resource/1517311916000/amp_standard/amp_standard/resources/",
+                        plugins: "/resource/1517311916000/amp_standard/amp_standard/akamai/amp/"
+            
+                    },
+                     */
+                    media: {
+                        title: "{!videoTitle}",
+                        source: [{
+                            src: "{!videoDownloadURL}",
+                            type: videoTypeForAMP
+                        }],
+                        status: {
+                            // this tells the player the media needs to be authorized
+                            state: (videoTypeForAMP == "application/x-mpegURL") ? "blocked" : ""
+                        }
+                    },
+
+                    hls: {
+                        resources: [
+                            { type: "text/javascript", src: "#{paths.resources}js/hls.min.js", debug: "#{paths.resources}js/hls.js" },
+                            { type: "text/javascript", src: "https://media-acceleration.akamai.com/sdk/js/1.2.2/hlsjs.min.js" }
+                        ],
+                        mae: {},
+                        withCredentials: (navigator.userAgent.indexOf("Firefox") != -1) ? true : false
+
+                    }
+
+                };
+
+
+
+                var urlWithoutToken = "{!videoURLWithoutHost}";
+
+                sforce.connection.sessionId = "{!$Api.Session_ID}";
+                var tokenString = '';
+
+                amp = akamai.amp.AMP.create("akamai-media-player", config, function () {
+                    amp.addEventListener("authorize", function () {
+                        // do token generation / retrieval
+                        console.log(urlWithoutToken);
+
+                        tokenString = sforce.apex.execute("AkamaiEdgeAuthTokenGenerator", "generateToken", { urlPath: urlWithoutToken, windowInSeconds: 7200 });
+                        var tStamp = Date.now() + (7200 * 1000);
+                        amp.authorize({
+                            token: tokenString,
+                            expiration: tStamp
+                        });
+
+                    })
+
+
+                });
+            }
+        </script>
+        <style type="text/css">
+            body,
+            html {
+                margin: 0;
+                color: #000;
+                background-color: #333333;
+                text-align: center;
+                width: 100%;
+                height: 100%;
+            }
+
+            .sample-player {
+                margin: 0;
+                padding: 0;
+                border: 0;
+
+                width: 100%;
+                height: 100%;
+
+            }
+
+            #akamai-media-player .akamai-control-bar {
+                background: rgba(0, 0, 0, 0.45);
+                border: 0;
+            }
+
+            .page {
+                background-color: inherit;
+                width: 100%;
+                height: 100%;
+            }
+
+            .content {
+                background-color: inherit;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+                text-align: center;
+            }
+
+            .errorPanel {
+                width: 100%;
+                position: relative;
+                color: white;
+                font-weight: bold;
+                float: left;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            button.amp-share {
+                display: none;
+            }
+        </style>
+    </head>
+    <!-- HACK: ontouchstart="" is a workaround that enables the use of the CSS :active psuedo class on iOS -->
+
+    <body onload="loadHandler(event)" ontouchstart="">
+        <apex:outputPanel layout="block" styleClass="page">
+            <apex:outputPanel styleClass="content" layout="block">
+                <apex:outputPanel styleClass="sample-player" layout="block" rendered="{!ISNULL(errorMessage)}">
+                    <div id="akamai-media-player"></div>
+                </apex:outputPanel>
+                <apex:outputPanel layout="block" rendered="{!NOT(ISNULL(errorMessage))}" styleClass="errorPanel">
+                    {!errorMessage}
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </apex:outputPanel>
+    </body>
+
+    </html>
+</apex:page>

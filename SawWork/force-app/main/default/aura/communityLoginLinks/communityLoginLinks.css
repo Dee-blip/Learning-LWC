@@ -1,0 +1,88 @@
+.THIS {
+    background-color: rgb(16, 59, 79);
+    color: #ffffff;
+    top: 1px;
+    right: 0%;
+    font-size: 14px !important;
+    
+}
+.THIS .topRightLinks:hover {
+    color:#ffffff;
+    text-decoration: underline !important;
+    cursor:pointer;
+}
+
+.THIS.toggle {
+    display: none;
+}
+.THIS.slds-dropdown--left{
+    display: none;
+}
+
+.THIS.slds-button_icon-container .slds-button--icon-container .slds-button_icon-border
+.slds-button--icon-border .slds-button_icon-border-filled .slds-button--icon-border-filled
+.slds-button_icon-border-inverse .slds-button--icon-border-inverse .slds-button_icon-brand .slds-button_icon-more
+.slds-button--icon-more .slds-button_icon-container-more .slds-button--icon-container-more {
+    width: 10px !important;
+    height: 10px !important;
+    border:none;
+}
+
+.THIS .headerLink {
+    padding-right: 10px;
+    vertical-align: bottom;
+    display: inline-block;
+    margin-right: 16px;
+}
+
+.THIS .logo-text-part{
+/*font-size: 20px; */
+    /* font-style: italic; */
+    color: #ffa431;
+    /* padding: 0 2px 0 0; */
+    /* border-right: 1px solid white; Commented out as part of Akamai Branding.ESESP-1541*/
+    margin-right: 10px;
+    padding-right: 10px;
+    font: italic 26.0px/22.0px Helvetica, Arial, serif;
+    
+}
+.THIS .logo-text-part2{
+    /* font-size: 16px; */
+    color: white;
+    padding: 0 4px 0 0;
+    margin-right: 4px;
+    font: 18.0px/22.0px Helvetica, Arial, serif;
+    /* margin-top: 41px; */
+    
+}
+
+.THIS .topRightLinks{
+width: 53%;
+    display: inline-block;
+    text-align: right;
+    min-width: 480px;
+    height: 45px!important;
+    margin-top: 5px;
+}
+
+.THIS .topLeftBrandTextLogo{
+    margin-top: -26px;
+    padding-left: 165px;
+    font-weight: 900;
+    font-size: medium;
+    font-size: 17px;
+    min-width: 717px;
+    width: auto;
+    height: 54.0px;
+}
+
+.THIS .topLeftBrandImgLogo{
+	width: 41%;
+    display: inline-block;
+    text-align: left;
+    min-width: 410px;
+}
+
+.THIS .cHeaderLine {
+    padding: 8rem 1rem 4rem 1rem;
+}

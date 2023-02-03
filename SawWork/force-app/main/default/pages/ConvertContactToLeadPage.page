@@ -1,0 +1,19 @@
+<apex:page >
+<apex:sectionHeader title="Create Lead" />
+
+<apex:includeLightning />
+    <div id="lightning"/>
+<script type="text/javascript">
+	//get account Id from URL
+    var contactId = "{!$CurrentPage.parameters.id}";
+  
+
+    $Lightning.use("c:GSM_Lite_ContactToLeadCreate", function () {
+      $Lightning.createComponent("c:GSM_CallToAction_Create_Lead", {"recordId" : contactId}, "lightning", function (cmp) {
+      	console.log('Lead create Component created');
+      });
+    });
+</script>
+    
+
+</apex:page>

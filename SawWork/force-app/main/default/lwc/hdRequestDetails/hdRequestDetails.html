@@ -1,0 +1,158 @@
+<template>
+    <div class="slds-card">
+        <lightning-spinner if:true={isLoading} variant="brand" size="medium" data-id="spinner"></lightning-spinner>
+        <div class="slds-card__body slds-card__body_inner slds-m-top_x-small slds-m-bottom_x-small slds-p-horizontal_medium">       
+
+            <div class="slds-page-header__row slds-theme_shade slds-m-top_x-small slds-m-bottom_x-small" style="border-radius: 10px;">
+                <div class="slds-page-header__col-details">
+                    <div class="slds-media slds-media_center">
+                        <lightning-button-stateful
+                            icon-name-when-off="utility:chevronright"
+                            icon-name-when-on="utility:chevrondown"
+                            variant="text"
+                            selected={showDetails}
+                            onclick={handleDetailsChevron}>
+                        </lightning-button-stateful>
+                        <div class="slds-media__figure slds-p-around_xx-small">
+                            <lightning-icon icon-name="action:record" size="x-small" alternative-text="Info" title="Information">
+                            </lightning-icon>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <h2>
+                                    <span class="slds-truncate wrapText accordionTitle">
+                                        Service Request Details ~ {srTitle}
+                                    </span>
+                                </h2>
+                            </div>
+                        </div>
+                        <template if:true={wiredIsEnabled.data}>
+                            <div style="float: right;">
+                                <lightning-button variant="base" label="Edit SR" title="Edit Details" onclick={handleEditSR} class="slds-m-left_x-small"></lightning-button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <template if:true={showDetails} >
+                <lightning-layout multiple-rows class="page-section slds-m-top_xx-small slds-m-bottom_x-small slds-size_12-of-12">
+                    
+                    <template if:false={displayInSecondColumn}>
+                        <template for:each={srDetail} for:item="field">
+                            <lightning-layout-item class="slds-p-left_x-small slds-m-bottom_x-small" size ="12" key={field.key} >
+                                <template if:true={field.isHeader}>
+                                    <template if:false={field.isNote}>
+                                        <div class="headings wrapText slds-m-top_small slds-text-title_bold slds-truncate slds-m-bottom_xx-small">
+                                            <lightning-formatted-text value={field.prompt}></lightning-formatted-text>
+                                        </div>
+                                        <hr class="slds-m-top_xxx-small slds-m-bottom_small slds-m-right_x-small"/>
+                                    </template>
+                                    <template if:true={field.isNote}>
+                                        <div class="custom-note wrapText slds-text-title slds-truncate slds-m-top_xx-small slds-m-bottom_xx-small">
+                                            <lightning-formatted-text value={field.prompt}></lightning-formatted-text>
+                                        </div>
+                                    </template>
+                                </template>
+                                <template if:false={field.isHeader}>
+                                    <template if:true={field.isEncrypted}>
+                                        <div class="slds-text-title wrapText slds-truncate ">
+                                            <lightning-formatted-text value={field.prompt}></lightning-formatted-text>
+                                        </div>
+                                        <div class="input-response wrapText slds-m-bottom_xx-small" style="color: red;">
+                                            {field.response}
+                                        </div>
+                                    </template>
+                                    <template if:false={field.isEncrypted}>
+                                        <div class="slds-text-title wrapText slds-truncate ">
+                                            <lightning-formatted-text value={field.prompt}></lightning-formatted-text>
+                                            <template if:true={field.addTooltip}>
+                                                <lightning-helptext class="slds-m-left_x-small slds-p-bottom_xx-small" content={field.tooltip}></lightning-helptext>
+                                            </template>
+                                        </div>
+                                        <div class="input-response wrapText slds-m-bottom_xx-small">
+                                            <lightning-formatted-text value={field.response}></lightning-formatted-text>
+                                        </div>
+                                    </template>
+                                </template>
+                            </lightning-layout-item>
+                        </template>
+                    </template>
+                    
+                    <template if:true={displayInSecondColumn}>
+                        <template for:each={srDetail} for:item="field">
+                            <template if:false={field.isHeader}>
+                                
+                                <lightning-layout-item class="slds-p-left_x-small slds-m-bottom_x-small" size ="6" key={field.key} >
+                                    <template if:true={field.key}>
+                                        <template if:true={field.isEncrypted}>
+                                            <div class="slds-text-title wrapText slds-truncate ">
+                                                <lightning-formatted-text value={field.prompt}></lightning-formatted-text>
+                                            </div>
+                                            <div class="input-response wrapText slds-m-bottom_xx-small" style="color: red;">
+                                                {field.response}
+                                            </div>
+                                        </template>
+                                        <template if:false={field.isEncrypted}>
+                                            <div class="slds-text-title wrapText slds-truncate ">
+                                                <lightning-formatted-text value={field.prompt}></lightning-formatted-text>
+                                                <template if:true={field.addTooltip}>
+                                                    <lightning-helptext class="slds-m-left_x-small slds-p-bottom_xx-small" content={field.tooltip}></lightning-helptext>
+                                                </template>
+                                            </div>
+                                            <div class="input-response wrapText slds-m-bottom_xx-small">
+                                                <lightning-formatted-text value={field.response}></lightning-formatted-text>
+                                            </div>
+                                        </template>
+                                    </template>
+                                </lightning-layout-item>
+                                
+                                <lightning-layout-item class="slds-p-left_x-small slds-m-bottom_x-small" size ="6" key={field.key2} >
+                                    <template if:true={field.key2}>
+                                        <template if:true={field.isEncrypted2}>
+                                            <div class="slds-text-title wrapText slds-truncate ">
+                                                <lightning-formatted-text value={field.prompt2}></lightning-formatted-text>
+                                            </div>
+                                            <div class="input-response wrapText slds-m-bottom_xx-small" style="color: red;">
+                                                {field.response2}
+                                            </div>
+                                        </template>
+                                        <template if:false={field.isEncrypted2}>
+                                            <div class="slds-text-title wrapText slds-truncate ">
+                                                <lightning-formatted-text value={field.prompt2}></lightning-formatted-text>
+                                                <template if:true={field.addTooltip2}>
+                                                    <lightning-helptext class="slds-m-left_x-small slds-p-bottom_xx-small" content={field.tooltip2}></lightning-helptext>
+                                                </template>
+                                            </div>
+                                            <div class="input-response wrapText slds-m-bottom_xx-small">
+                                                <lightning-formatted-text value={field.response2}></lightning-formatted-text>
+                                            </div>
+                                        </template>
+                                    </template>
+                                </lightning-layout-item>
+                            </template>
+    
+                            <lightning-layout-item class="slds-p-left_x-small slds-m-bottom_x-small" size ="12" key={field.key} if:true={field.key}>
+                                <template if:true={field.isHeader}>
+                                    <template if:false={field.isNote}>
+                                        <!-- <hr class="slds-m-top_small slds-m-bottom_xxx-small slds-m-right_x-small"/> -->
+                                        <div class="headings wrapText slds-m-top_small slds-text-title_bold slds-truncate slds-m-bottom_xx-small">
+                                            <lightning-formatted-text value={field.prompt}></lightning-formatted-text>
+                                        </div>
+                                        <hr class="slds-m-top_xxx-small slds-m-bottom_small slds-m-right_x-small"/>
+                                    </template>
+                                    <template if:true={field.isNote}>
+                                        <div class="custom-note wrapText slds-text-title slds-truncate slds-m-top_xx-small slds-m-bottom_xx-small">
+                                            <lightning-formatted-text value={field.prompt}></lightning-formatted-text>
+                                        </div>
+                                    </template>
+                                </template>
+                            </lightning-layout-item> 
+                        </template>
+                    </template>
+                    
+                </lightning-layout>
+            </template>
+        </div>    
+    </div>
+</template>

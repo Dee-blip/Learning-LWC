@@ -1,0 +1,34 @@
+<apex:page controller="RSSCloneController">
+ 
+<apex:pageMessages ></apex:pageMessages> 
+<apex:form >
+<apex:PageBlock mode="edit" title="New RSS Form" >
+<apex:pageBlockButtons >
+<apex:commandButton value="Clone" action="{!CloneRSSForm}" />
+</apex:pageBlockButtons>
+<apex:PageBlockSection columns="1">
+<apex:inputField value="{!RSSForm.Name}" required="true"/>
+<apex:inputField value="{!RSSForm.Account__c}" required="true"/>
+<apex:inputField value="{!RSSForm.AEName__c}" />
+<apex:inputField value="{!RSSForm.DigitalProperty__c}" />
+<apex:pageBlockSectionItem >
+Products
+<apex:outputPanel >
+<apex:outputPanel rendered="false">
+<c:MultiSelectComponent AvailableList="{!availableList}" ChosenList="{!chosenList}"/>
+</apex:outputPanel>
+<apex:selectList disabled="true"  rendered="true">
+<apex:selectOptions value="{!chosenList}"></apex:selectOptions>
+</apex:selectList>
+</apex:outputPanel>
+</apex:pageBlockSectionItem>
+
+
+<!--apex:inputField value="{!RSSForm.Services__c}" /-->
+</apex:PageBlockSection>
+
+</apex:PageBlock>
+
+</apex:form>
+
+</apex:page>

@@ -1,0 +1,627 @@
+<!--
+*****************************************************************************
+ * Name             : AgentHomePage
+ * Created By       : Pitamber Sharma
+ * Created Date     : 06-June-2013
+ * Purpose          : Agent Home Page
+ 
+ DATE             DEVELOPER     CR              DESCRIPTION                               
+ ===========      =========     =======         =========== 
+ 17-Feb-2014        Vijetha                     Added limits to the Collection.
+ 12-May-2014      Himanshu Kar      2578737(3.42)   Added Condition to exclude Close Case in Case Query
+ 22-May-2015		Jay				2950085(4.8)	when users have single quotes in view, links were not clickable
+ 04-Nov-2016		Aditya			3394061    		AMG Home Screen Redesign
+ 07-Nov-2016        Vandhana        3568251      	AMG Homescreen for My LOE
+ 21-June-2018		Vandhana		ESESP-734		Setting up a backup while going Unavailable
+ ***************************************************************************** -->
+
+<apex:page controller="AgentHomePageController" standardStylesheets="false" showHeader="false" sidebar="false" readOnly="false">
+    <!-- Include css and js files for Bootstrap-->
+    <script src="{!$Resource.JQuery_New}"></script>
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrap, '/css/bootstrap.min.css')}"/>
+    <script src="{!URLFOR($Resource.bootstrap, '/js/bootstrap.min.js')}"></script>
+    <script src="{!URLFOR($Resource.SCloud_HomePage, '/js/jquery.dataTables.min.js')}"></script>
+    
+    <!-- Include css and js files for Tablesorter 
+    <apex:stylesheet value="{!URLFOR($Resource.JQuery_Tablesorter, '/css/theme.default.css')}"/>
+    <script src="{!$Resource.JQuery}"></script>
+    <script src="{!URLFOR($Resource.JQuery_Tablesorter, '/js/jquery.tablesorter.js')}"></script>-->
+    
+    <!-- Include js file for sevice cloud -->
+        <apex:includeScript value="/support/console/32.0/integration.js"/>
+        
+        <style>
+        
+        
+        .btn-custom {
+        background-color: hsl(206, 71%, 53%) !important;
+                              background-repeat: repeat-x;
+                              filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#3292dc", endColorstr="#3292dc");
+    background-image: -khtml-gradient(linear, left top, left bottom, from(#3292dc), to(#3292dc));
+                                      background-image: -moz-linear-gradient(top, #3292dc, #3292dc);
+                                      background-image: -ms-linear-gradient(top, #3292dc, #3292dc);
+                                      background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #3292dc), color-stop(100%, #3292dc));
+                                      background-image: -webkit-linear-gradient(top, #3292dc, #3292dc);
+                                      background-image: -o-linear-gradient(top, #3292dc, #3292dc);
+                                      background-image: linear-gradient(#3292dc, #3292dc);
+                                      border-color: #3292dc #3292dc hsl(206, 71%, 53%);
+                                      color: #fff !important;
+                                      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.00);
+    -webkit-font-smoothing: antialiased;
+    border-radius: 6px;
+    
+    }
+    
+    .bPageBlock{ 
+        background-color:#FFFFFF !important;
+        border-top: 0px !important; 
+        border-bottom: 0px !important; 
+        border-left: 0px !important; 
+        border-radius: 0px 0px 0px 0px;
+        border-right: 0px !important; 
+    }
+    
+    .pane-header {
+        background: url("{!URLFOR($Resource.PaneHeaderImage)}") repeat-x scroll left 1px #FFFFFF;
+        border-radius: 10px 10px 0 0;
+    }
+    
+    .sorting_asc div {
+        background: url("{!URLFOR($Resource.SCloud_HomePage, '/i/icon-sort-asc.png')}") right center no-repeat;
+        padding-right: 15px;
+    }
+    
+    .sorting_desc div {
+        background: url("{!URLFOR($Resource.SCloud_HomePage, '/i/icon-sort-desc.png')}") right center no-repeat;
+        padding-right: 15px;
+    }
+    
+    .alert-updated {
+        background: url("{!URLFOR($Resource.RedIcon)}") center center no-repeat;
+        display: block;
+        overflow: hidden;
+        text-indent: -9999px;
+    }
+    
+    //Styling for Lookup
+    
+    .assistiveText 
+    { 
+        //position: absolute !important; 
+        //height: 1px; 
+        //width: 1px; 
+        //overflow: hidden; 
+        //clip: rect(1px,1px,1px,1px); 
+        display: none !important;
+    }
+    
+    .lookupInput
+    {
+        display: inline;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+    .lookupInput img
+    {
+        background-repeat: no-repeat;
+        margin-right: .25em;
+        vertical-align: middle;
+    }
+    .lookupInput .disabled
+    {
+        background-color: #ccc;
+    }
+    .lookupInput .emptyDependentLookup
+    {
+        font-style: italic;
+    }
+    .lookupInput input[readonly]
+    {
+        background-color: #e6e6e6;
+        border: 2px solid #e6e6e6;
+        color: #333;
+        cursor: default;
+    }
+        .lookupInput a.readOnly
+        {
+        float: right;
+    }
+    .lookupInput span.readOnly
+    {
+        display: block;
+        white-space: normal;
+    }
+    .lookupInput span.totalSummary
+    {
+        font-weight: bold;
+    }
+    .inlineEditRequiredDiv .lookupInput img,.inlineEditDiv .lookupInput img
+    {
+        vertical-align: middle;
+    }
+    .quickCreateModule .lookupInput input {
+        max-width: 155px
+    }
+    .lookupIcon {
+        background-image: url(/img/func_icons/util/lookup20.gif);
+        background-position: 0 0;
+        width: 20px;
+        height: 20px;
+        background-position: top left
+    }
+    .lookupIconOn {
+        background-image: url(/img/func_icons/util/lookup20.gif);
+        background-position: 0 0;
+        width: 20px;
+        height: 20px;
+        background-position: top right
+    }
+    .greenDot {
+    height: 25px;
+    width: 25px;
+    background-color: #78f68d;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow:0px 1px 2px 1px grey;
+	}
+    .yellowDot {
+    height: 25px;
+    width: 25px;
+    background-color: #eeee00;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow:0px 1px 2px 1px grey;
+	}
+    .redDot {
+    height: 25px;
+    width: 25px;
+    background-color: #f04848;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow:0px 1px 2px 1px grey;
+	}
+    .orangeDot {
+    height: 25px;
+    width: 25px;
+    background-color: #ff8e2e;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow:0px 1px 2px 1px grey;
+	}
+    .redAndGreenDot {
+    height: 25px;
+    width: 25px;
+    background-color: #6161ff;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow:0px 1px 2px 1px grey;
+    background: linear-gradient( 90deg, #f14643, #f14643 32%, #f14643 52%, #f14643 58%, #f14643 0% );
+	}
+	
+	.pbBody{
+		font-size:13px !important;
+	}
+    
+    </style>
+    <script type="text/javascript">
+        
+        function openConsole(url)
+    {
+        sforce.console.generateConsoleUrl([url], openConsoleUrl);        
+    }   
+    
+    var openConsoleUrl = function(result){
+        sforce.console.openConsoleUrl(null, result.consoleUrl,true,null,null,openSuccess);        
+    }
+    
+    var openSuccess = function(result) {
+        //Report whether opening the new tab was successful
+        if (result.success == false)
+            alert('The corresponding tab is already opened');
+    };
+    
+    function openQueueListView(objectName, qName) {
+        var listViewMap;
+        var rec;
+        var prefix;
+        if(objectName == 'Case') {
+            listViewMap = '{!caseListViewMap}';
+            listViewMap = listViewMap.replace("{", ", ");
+            if(listViewMap.indexOf(", "+qName) == -1) {
+                qName = 'All cases';
+            }
+            preFix = '/500/l?fcf='; 
+        } else if(objectName == 'ER'){
+            listViewMap = '{!erListViewMap}';
+            //alert(listViewMap);
+            listViewMap = listViewMap.replace("{", ", ");
+            if(listViewMap.indexOf(", "+qName) == -1) {
+                qName = 'All';
+            }
+            preFix = '/{!$Setup.sobject_prefixes__c.Engagement_Request__c}/l?fcf=';
+        } else if('Incident') {
+            listViewMap = '{!incidentsListViewMap}';
+            listViewMap = listViewMap.replace("{", ", ");
+            if(listViewMap.indexOf(", "+qName) == -1) {
+                qName = 'All';
+            }
+            preFix = '/{!$Setup.sobject_prefixes__c.Incident__c}/l?fcf=';            
+            
+        }
+        rec = listViewMap.substring(listViewMap.indexOf(", "+qName));
+        rec = rec.substring(1);
+        rec = rec+', END';
+        rec = rec.substring(0, rec.indexOf(","));
+        rec = rec.substring(rec.indexOf("=")+1);
+        rec = rec.substring(0, 15);
+        openConsole(preFix+rec+'&isdtp=4');
+    }
+    
+    
+    function enableToolTip(){
+        var ageingCaseElement = $(".ageingCaseClass");
+        $(".ageingCaseClass").tooltip(
+            {          
+                show: {  duration: 0 },
+            });
+        var slaAlertElement = $(".slaAlertClass");
+        $(".slaAlertClass").tooltip(
+            {          
+                show: {  duration: 0 },
+            });
+        var taskLOEElement = $(".taskLOEClass");
+        $(".taskLOEClass").tooltip(
+            {          
+                show: {  duration: 0 },
+            });
+    }  
+    
+    </script>
+
+    <apex:form >
+        <apex:pageMessages id="msgs" />
+        
+        <apex:outputpanel >
+            <apex:actionstatus id="goStatus">
+                <apex:facet name="start">
+                    <div class="waitingSearchDiv"
+                         style="background-color: #fbfbfb; height: 100%; opacity: 0.65; width: 100%;position:fixed;z-index:1000;">
+                        <div class="waitingHolder" style="top: 50%; width: 91px; position: fixed;z-index: 1001; left: 50%;">
+                            <img class="waitingImage" src="/img/loading.gif"
+                                 title="Please Wait.." /> <span class="waitingDescription">Loading..</span>
+                        </div>
+                    </div>
+                </apex:facet>
+            </apex:actionstatus>
+        </apex:outputpanel>
+        
+        <apex:outputpanel >
+            <apex:actionstatus id="saveUserStatus">
+                <apex:facet name="start">
+                    <div class="waitingSearchDiv"
+                         style="background-color: #fbfbfb; height: 100%; opacity: 0.65; width: 100%;position:fixed;z-index:1000;">
+                        <div class="waitingHolder" style="top: 50%; width: 91px; position: fixed;z-index: 1001; left: 50%;">
+                            <img class="waitingImage" src="/img/loading.gif"
+                                 title="Saving..." /> <span class="waitingDescription">Saving...</span>
+                        </div>
+                    </div>
+                </apex:facet>
+            </apex:actionstatus>
+        </apex:outputpanel>
+        
+        <apex:actionFunction name="applyCaseFilter" action="{!populateCases}" reRender="caseSection,ageingCaseId,slaAlertId,taskLOEId" status="goStatus" oncomplete="addSortingCaseTable('SortableCaseTable'); applyFormating()"/>
+        <apex:actionFunction name="applyTaskFilter" action="{!populateTasks}" reRender="taskSection" status="goStatus" oncomplete="addSorting('taskSortableTable'); applyFormating()"/>
+        <apex:actionFunction name="applyIncidentFilter" action="{!populateIncidents}" reRender="incidentSection" status="goStatus" oncomplete="addSorting('incidentSortableTable'); applyFormating()"/>
+        <apex:actionFunction name="queuePanelReRender" action="{!populateQueues}" reRender="queuePanel" status="goStatus" />
+        
+        <apex:pageBlock id="topBlock">
+            <br/> <br/>   
+            <apex:commandButton value="{!IF(isAvailable, 'Available', 'Unavailable')}" action="{!toggleUserAvailability}"
+                                style="{!IF(isAvailable, 'background:green !important;', 'background:#FD9193 !important;')}float:right;margin-right:13px;"
+                                styleClass="btn btn-primary btn-custom"/>
+            
+            <apex:commandButton value="Service Incidents" onClick="openConsole('/apex/AgentHomeServiceIncident');return false"
+                                style="float:right;margin-right:300px;width:150px;font-weight:bold;"  styleClass="btn btn-primary btn-custom"/>
+            
+            <apex:commandButton value="My LOE" onmouseover="enableToolTip();" title="{!totalLOE}" id="taskLOEId" onClick="openConsole('/apex/AgentHomeLOEPage');return false"
+                                style="float:right;margin-right:50px;width:150px;font-weight:bold;"  styleClass="btn btn-primary btn-custom taskLOEClass"/>
+            
+            <apex:commandButton value="Ageing Cases" disabled="{!if((caseFilter =='My Open Cases'),false,true)}" onmouseover="enableToolTip();" id="ageingCaseId" onClick="openConsole('/apex/AgentHomeAgeingCase');return false"
+                                title="{!TotalAgeingCase}" style="{!IF(((caseFilter =='My Open Cases') && ageingCaseButtonColors = 'Red'),'background:#E23A3A !important;',IF((caseFilter !='My Open Cases'),'background:#85858d !important;','background:#73B80F !important;'))}float:right;margin-right:50px;width:150px;font-weight:bold;"  styleClass="btn btn-primary btn-custom ageingCaseClass"/>
+            
+            <apex:commandButton value="SLA Alert" title="{!totalExternalCases}" id="slaAlertId" onmouseover="enableToolTip();" onClick="openConsole('/apex/AgentHomePageSlaAlerts?view={!caseFilter}');return false"
+                                style="{!IF((slaAlertButtonColors = 'Red'),'background:#E23A3A !important;',IF((slaAlertButtonColors = 'Yellow'),'background:#FFC300 !important;',IF((slaAlertButtonColors = 'Orange'),'background:#ff8e17 !important;',IF((caseFilter =='My Open Cases2'),'background:#85858d !important;','background:#73B80F !important;'))))}float:right;margin-right:50px;display:inline; width:150px;font-weight:bold;" styleClass="btn btn-primary btn-custom slaAlertClass" />
+            
+            <apex:pageBlockSection id="backupUsrPBSection" rendered="{!if(showAvailability && !isAvailable, true, false)}">
+                <apex:pageBlockSectionItem id="backupUsrSecItem">
+                    <apex:outputLabel style="font-weight:bold" for="backupUsr">Backup User : </apex:outputLabel>
+                    <apex:inputField id="backupUsr" value="{!currentUser.Backup_User__c}" rendered="{!if(showAvailability && !isAvailable, true, false)}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:commandButton value="Save" status="saveUserStatus" rendered="{!if(showAvailability && !isAvailable, true, false)}" styleClass="btn btn-xs btn-primary btn-success"
+                                        immediate="false" reRender="msgs" action="{!updateBackupUser}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>            
+            
+            <table class="table">
+                <tbody>
+                    <tr style="height:20px;"><td></td><td></td></tr>
+                    <td style="width:58%;border:0px;height:100%;">
+                        <apex:panelGroup id="caseSection">
+                            <div style="height:1100px;border: 1px solid #DDDDDD;border-radius: 10px;">
+                                <apex:outputPanel layout="block" style="height:40px; padding-top:10px;font-weight:bold;" styleClass="pane-header">
+                                    <div style="float:left; margin-left:10px; font-size:16px;"> Cases </div>
+                                    <div class="formLine" style="float:right;">
+                                        <apex:commandButton value="CREATE NEW CASE" onClick="sforce.console.openPrimaryTab(null, '/setup/ui/recordtypeselect.jsp?ent=Case&retURL=%2F500%2Fl&save_new_url=%2F500%2Fe%3FretURL%3D%252F500%252Fl', true);return false" 
+                                                            styleClass="btn btn-primary btn-custom" style="margin-bottom:10px;"/>
+                                        
+                                        <apex:selectList id="caseFilter" value="{!caseFilter}" size="1" style="margin-left: 10px;margin-right: 10px;" 
+                                                         onchange="applyCaseFilter();">
+                                            <apex:selectOptions value="{!caseFilterOptions}"></apex:selectOptions>
+                                        </apex:selectList>
+                                        <input type="button" value="" title="Refresh" onClick="applyCaseFilter();" 
+                                               class="btn btn-primary btn-custom" style="margin-right: 10px;margin-bottom:10px;background: url('/img/alohaSkin/sync.png') no-repeat scroll 4px 5px  !important;"/>
+                                    </div>
+                                </apex:outputPanel>
+                                <div style="height:1010px; overflow:auto;">
+                                    
+                                    <apex:dataTable value="{!lstCases}" var="caseRec" cellpadding="5" cellspacing="5" id="SortableCaseTable" 
+                                                    styleClass="table table-striped" style="margin-bottom:0px;">
+                                        <apex:column style="white-space: nowrap;">
+                                            <apex:facet name="header">Case#</apex:facet>
+                                            <a onClick="openConsole('/{!caseRec.Id}')" style="cursor: pointer; text-decoration: underline; color:#3597dc;">{!caseRec.AKAM_Case_ID__c}</a>
+                                            &nbsp;<apex:image url="{!URLFOR($Resource.Green_Arrow)}" rendered="{!caseRec.AutoClose__c}" style="height:13px;width:9px;"/>
+                                        </apex:column>
+                                        <apex:column >
+                                            <apex:facet name="header">Account</apex:facet>
+                                            <apex:outputText value="{!caseRec.Account.Name}"/>
+                                        </apex:column>
+                                        <apex:column >
+                                            <apex:facet name="header">Title</apex:facet>
+                                            <apex:outputText value="{!caseRec.Subject}"/>
+                                        </apex:column>
+                                        <apex:column >
+                                            <apex:facet name="header">Status</apex:facet>
+                                            <apex:outputText value="{!caseRec.Status}"/>
+                                        </apex:column>
+                                        <apex:column rendered="{!isAMGOrBilling}">
+                                            <apex:facet name="header">Case Origin</apex:facet>
+                                            <apex:outputText value="{!caseRec.origin}"/>
+                                        </apex:column>
+                                        <apex:column rendered="{!!isAMGOrBilling}" style="text-align:center;">
+                                            <apex:facet name="header">Severity</apex:facet>
+                                            <apex:outputText value="{!caseRec.Severity__c}"/>
+                                        </apex:column>
+                                        <apex:column width="98px;">
+                                            <apex:facet name="header">Support Level</apex:facet>
+                                            <apex:outputText value="{!caseRec.Account.Support_Level__c}"/>
+                                        </apex:column>
+                                        <apex:column >
+                                            <apex:facet name="header">Age</apex:facet>
+                                            <apex:outputText value="{!caseRec.Age_days__c}"/>
+                                            <!-- <apex:outputText value="{!((NOW() - caseRec.AKAM_Created_Date__c) * 24)}" rendered="{!!caseRec.Isclosed}" styleClass="numbers"/>
+<apex:outputText rendered="{!caseRec.Isclosed}">N/A</apex:outputText>  -->
+                                        </apex:column>
+                                        <apex:column >
+                                            <apex:facet name="header">SLA</apex:facet>
+                                            <apex:outputText value="{!IF(caseIdButtonFlagMap[caseRec] == 'Red','3',IF(caseIdButtonFlagMap[caseRec] == 'RedAndGreen','2',IF(caseIdButtonFlagMap[caseRec] == 'Yellow','4',IF(caseIdButtonFlagMap[caseRec] == 'Green','1','0'))))}" rendered="true" style="color:white;font-size: 1px;"/>
+                                            <apex:outputText rendered="{!IF(caseIdButtonFlagMap[caseRec] == 'Yellow','true','false')}" styleClass="yellowDot" label="SLA Running" title="Case with SLA running."/>
+                                            <apex:outputText rendered="{!IF(caseIdButtonFlagMap[caseRec] == 'Red','true','false')}" styleClass="redDot" label="SLA Voilated" title="Case with SLA violation."/>
+                                            <apex:outputText rendered="{!IF(caseIdButtonFlagMap[caseRec] == 'Green','true','false')}" styleClass="greenDot" label="External" title="Case with SLA met."/>
+                                            <apex:outputText rendered="{!IF(caseIdButtonFlagMap[caseRec] == 'RedAndGreen','true','false')}" styleClass="redAndGreenDot" label="External" title="Case with milestone violation."/>
+                                            <apex:outputText rendered="{!IF(caseIdButtonFlagMap[caseRec] == 'Blue','true','false')}" styleClass="" label="Internal" title="Internal Cases" value="N/A"/>
+                                            <!--<apex:image value="{!IF(caseIdButtonFlagMap[caseRec] == 'Red',$Resource.SC_AMGHOME_RedFlag_2,$Resource.SC_AMGHOME_YellowFlag_1)}"
+                                                        rendered="{!IF(
+                                                                  AND(
+                                                                  !caseRec.Isclosed,
+                                                                  caseRec.CaseMilestones.size > 0,
+                                                                  OR(caseRec.Do_Not_Show_in_Portal__c,!caseRec.Do_Not_Show_in_Portal__c),
+                                                                  OR(caseRec.Request_Type__c == 'Customer Onboarding',caseRec.Request_Type__c == 'Quarterly Business Review', AND(!caseRec.Do_Not_Show_in_Portal__c,caseRec.Request_Type__c != 'Quarterly Business Review',caseRec.Request_Type__c != 'Customer Onboarding'))
+                                                                  ),true,false)}"
+                                                        styleClass="numbers" width="25" height="25"/>
+                                            
+                                            <apex:outputText value="N/A" rendered="{!IF(AND(!caseRec.Isclosed,caseRec.Do_Not_Show_in_Portal__c,caseRec.Request_Type__c != 'Customer Onboarding',caseRec.Request_Type__c != 'Quarterly Business Review'),true,false)}" styleClass="numbers"/>-->
+                                        </apex:column>
+										<apex:column >
+                                            <apex:facet name="header">Owner</apex:facet>
+                                            <apex:outputText value="{!caseRec.Owner.Name}"/>
+                                        </apex:column>
+                                        
+                                    </apex:dataTable>
+                                    
+                                </div>
+                                
+                                <apex:outputPanel style="float:right;margin-right:5px;margin-top:2px;" >
+                                    <span style="float:right;margin-right:5px;margin-top:0px;">
+                                        <apex:commandButton value="VIEW ALL" onClick="openQueueListView('Case', '{!caseFilter}');return false" styleClass="btn btn-primary btn-custom pull-left"/>
+                                    </span>
+                                </apex:outputPanel>
+                            </div>
+                        </apex:panelGroup>
+                    </td>
+                    
+                    
+                    <td style="width:40%;border:0px;height:50%;padding-left:2px;">
+                        <apex:panelGroup id="taskSection">
+                            <div style="height:480px;border: 1px solid #DDDDDD;border-radius: 10px;">
+                                <apex:outputPanel layout="block" style="height:40px; padding-top:10px;font-weight:bold;" styleClass="pane-header">
+                                    <div style="float:left; margin-left:10px; font-size:16px;">Tasks </div>
+                                    <div style="float:right;">
+                                        
+                                        <apex:selectList value="{!taskFilter}" size="1" style="margin-right: 10px;" onchange="applyTaskFilter();">
+                                            <apex:selectOptions value="{!taskFilterOptions}"></apex:selectOptions>
+                                        </apex:selectList>
+                                        <input type="button" value="" title="Refresh" onClick="applyTaskFilter();" 
+                                               class="btn btn-primary btn-custom" style="margin-bottom:10px;margin-right: 10px;background: url('/img/alohaSkin/sync.png') no-repeat scroll 4px 5px  !important;"/>
+                                    </div>
+                                </apex:outputPanel>
+                                <div style="height:390px; overflow:auto;">
+                                    <apex:dataTable value="{!lstTasks}" var="taskRec" cellpadding="4" cellspacing="4" 
+                                                    styleClass="table table-striped" style="margin-bottom:0px;" id="taskSortableTable">
+                                        <!--<apex:column >
+                                            <apex:facet name="header">Account</apex:facet>
+                                            <apex:outputText value="{!taskRec.Account.Name}"/>
+                                        </apex:column>-->
+                                        <apex:column >
+                                            <apex:facet name="header">Title</apex:facet>
+                                            <a onClick="openConsole('/{!taskRec.Id}')" style="cursor: pointer; text-decoration: underline; color:#3597dc;">{!IF(taskRec.Subject == '','Title Not available',taskRec.Subject)}</a>
+                                        </apex:column>
+                                        <apex:column >
+                                            <apex:facet name="header">Related To</apex:facet>
+                                            <apex:outputText value="{!taskRec.What.Name }"/>
+                                        </apex:column>
+                                        <apex:column >
+                                            <apex:facet name="header">Status</apex:facet>
+                                            <apex:outputText value="{!taskRec.Status}"/>
+                                        </apex:column>
+                                        <apex:column >
+                                            <apex:facet name="header">Due Date</apex:facet>
+                                            <apex:outputText value="{0,date,MM'/'dd'/'yyyy}" >
+                                                <apex:param value="{!taskRec.ActivityDate}" />
+                                            </apex:outputText>
+                                        </apex:column>
+                                    </apex:dataTable>
+                                </div>
+                                <apex:outputPanel >
+                                    <span style="float:right;margin-right:5px;margin-top:5px;">
+                                        <apex:commandButton value="VIEW ALL" onClick="openConsole('/00T/l');return false" 
+                                                            styleClass="btn btn-primary btn-custom pull-left"/>
+                                    </span>
+                                </apex:outputPanel>
+                            </div>
+                        </apex:panelGroup>
+                        
+                        <table>  
+                            <tr style="width:40%;border:0px;height:50%;">
+                                <td id="queueSection" style="width:40%;border:0px;padding-top:6px;padding-left:0px;padding-right:0px">
+                                    <apex:panelGroup id="queuePanel">
+                                        <div style="height:610px;border: 1px solid #DDDDDD;border-radius: 10px;">
+                                            <apex:outputPanel layout="block" style="height:40px; padding-top:10px;font-weight:bold;" styleClass="pane-header">
+                                                <div style="float:left; margin-left:10px; font-size:16px;"> Queue Health </div>
+                                                <div class="formLine" style="float:right;">
+                                                    <input type="button" value="" title="Refresh" onClick="queuePanelReRender();" 
+                                                           class="btn btn-primary btn-custom" style="margin-right: 10px;margin-bottom:10px;background: url('/img/alohaSkin/sync.png') no-repeat scroll 4px 5px  !important;"/>
+                                                </div>        
+                                            </apex:outputPanel>
+                                            <div style="height:430px; overflow:auto;">
+                                                <apex:dataTable value="{!queuesMap}" var="queueRec" cellpadding="5" cellspacing="5" styleClass="table"
+                                                                style="margin-bottom:0px;" id="queueSortableTable">
+                                                    <apex:column style="background:{!queuesMap[queueRec][3]}">
+                                                        <apex:facet name="header">Title</apex:facet>
+                                                        <a onClick="openQueueListView('{!queuesMap[queueRec][4]}', '{!queueRec}')" style="cursor: pointer; text-decoration: underline; color:black;">{!queueRec}</a>
+                                                    </apex:column>
+                                                    <apex:column style="background:{!queuesMap[queueRec][3]}">
+                                                        <apex:facet name="header">Severity 1</apex:facet>
+                                                        <apex:outputText >{!queuesMap[queueRec][0]}</apex:outputText>
+                                                    </apex:column>
+                                                    <apex:column style="background:{!queuesMap[queueRec][3]}">
+                                                        <apex:facet name="header">Severity 2</apex:facet>
+                                                        <apex:outputText >{!queuesMap[queueRec][1]}</apex:outputText>
+                                                    </apex:column>
+                                                    <apex:column style="background:{!queuesMap[queueRec][3]}">
+                                                        <apex:facet name="header">Severity 3</apex:facet>
+                                                        <apex:outputText >{!queuesMap[queueRec][2]}</apex:outputText>
+                                                    </apex:column>
+                                                </apex:dataTable>
+                                            </div>
+                                            <apex:outputPanel ></apex:outputPanel>
+                                        </div>
+                                    </apex:panelGroup>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tbody>
+            </table>
+        </apex:pageBlock>
+    </apex:form>
+   <script>
+    var ageingCaseCount = '{!TotalAgeingCase}';
+    var slaAlertCount =  '{!totalExternalCases}';
+    var taskLOECount =  '{!totalLOE}';
+    
+   function addSorting(ids) { 
+    $("[id$='"+ids+"']").dataTable({
+        sDom:'t',
+        iDisplayLength:-1
+        ,"aaSorting": []
+        ,fnDrawCallback:function() {
+            //no sort empty row
+            var tr = $(this).find('tr.no-sort');
+            if(tr.length>0) {
+                tr.detach();
+                $(this).find('tbody').append(tr);
+                $(this).find('tbody tr:odd').addClass('odd').removeClass('even');
+                $(this).find('tbody tr:even').addClass('even').removeClass('odd');
+            }
+        }
+     });
+    }
+    
+    function addSortingCaseTable(ids) {  
+    $("[id$='"+ids+"']").dataTable({
+        sDom:'t',
+        iDisplayLength:-1
+        ,"aaSorting": [[6,'asc'],[9,'asc']]
+        ,"aoColumns": [ null, null, null, null,null, null,null,null,null]
+        ,fnDrawCallback:function() {
+            //no sort empty row
+            var tr = $(this).find('tr.no-sort');
+            if(tr.length>0) {
+                tr.detach();
+                $(this).find('tbody').append(tr);
+                $(this).find('tbody tr:odd').addClass('odd').removeClass('even');
+                $(this).find('tbody tr:even').addClass('even').removeClass('odd');
+            }
+        }
+     });   
+    }
+    
+    function addSortingSLA(ids) {  
+    $("[id$='"+ids+"']").dataTable({
+        sDom:'t',
+        iDisplayLength:-1
+        ,"aaSorting": [[7,'asc']]
+        ,"aoColumns": [ null, null, null, null, null, null, null,null,{"bSortable": false}]
+        ,fnDrawCallback:function() {
+            //no sort empty row
+            var tr = $(this).find('tr.no-sort');
+            if(tr.length>0) {
+                tr.detach();
+                $(this).find('tbody').append(tr);
+                $(this).find('tbody tr:odd').addClass('odd').removeClass('even');
+                $(this).find('tbody tr:even').addClass('even').removeClass('odd');
+            }
+        }
+     });   
+    }
+    
+    function applyFormating() {
+       $(".numbers").each(function() {
+       //alert($(this).text().indexOf(".") > 0);
+           if($(this).text().indexOf(".") > 0) {
+            var num = parseFloat($(this).text());
+            var new_num = $(this).text(num.toFixed(0));
+            }
+       });
+    }
+    
+    
+    $(document).ready(function() 
+                     {
+                         $(".assistiveText").css("display","none");
+                         $(".detailList").css("float","right");
+                         $(".detailList").css("margin-top","10px");
+                         $(".detailList").css("margin-bottom","10px");
+                         $("[id*=backupUsr]").css('margin-bottom','0px');
+       addSorting('SortableTable');
+       addSortingCaseTable('SortableCaseTable');
+                         //addSortingSLA('SortableCaseTable');
+       applyFormating();
+       
+       $("[id$= ageingCaseId]").attr('title',ageingCaseCount);
+       $("[id$= slaAlertId]").attr('title',slaAlertCount);
+       $("[id$= taskLOEId]").attr('title',taskLOECount);
+    });   
+    </script>
+</apex:page>

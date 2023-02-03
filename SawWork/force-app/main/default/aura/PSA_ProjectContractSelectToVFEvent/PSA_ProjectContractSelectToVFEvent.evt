@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION">
+    <aura:attribute name="currentRecId" type="String"/>
+    <aura:attribute name="productName" type="String" />
+    <aura:attribute name="cliName" type="String" />
+</aura:event>

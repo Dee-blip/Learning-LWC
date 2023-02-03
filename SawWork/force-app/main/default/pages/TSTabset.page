@@ -1,0 +1,69 @@
+<apex:page sidebar="false">
+  <head>
+<meta charset="UTF-8"/>
+<title>Example of Bootstrap 3 Dynamic Tabs</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<style type="text/css">
+    .bs-example{
+        margin: 10px;
+    }
+    .container-fluid {
+       margin-left: -10px;
+    }
+    /* tab color */
+    .nav-tabs>li>a {
+     border-color: #777777;
+     border: 1px solid #ccc;
+     margin-right: -14px;
+     background: #feffff; /* Old browsers */
+     background: -moz-linear-gradient(top,  #feffff 0%, #ddf1f9 35%, #a0d8ef 100%); /* FF3.6+ */    
+     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#feffff), color-stop(35%,#ddf1f9), color-stop(100%,#a0d8ef)); /* Chrome,Safari4+ */
+     background: -webkit-linear-gradient(top,  #feffff 0%,#ddf1f9 35%,#a0d8ef 100%); /* Chrome10+,Safari5.1+ */
+     background: -o-linear-gradient(top,  #feffff 0%,#ddf1f9 35%,#a0d8ef 100%); /* Opera 11.10+ */
+     background: -ms-linear-gradient(top,  #feffff 0%,#ddf1f9 35%,#a0d8ef 100%); /* IE10+ */
+     background: linear-gradient(to bottom,  #feffff 0%,#ddf1f9 35%,#a0d8ef 100%); /* W3C */
+     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', endColorstr='#a0d8ef',GradientType=0 ); /* IE6-9 */
+                   }
+     /* tabcolor active */
+         .nav-tabs>li.active>a 
+         {  
+              border: 1px solid #6495ED;
+         }
+</style>
+<style>
+   .textsize {font-size: 6pt;}
+</style> 
+</head>
+<body class="textsize">
+<div class="bs-example">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#sectionA">Support Teams</a></li>
+        <li><a data-toggle="tab" href="#sectionB">Support Teams By Employee</a></li>
+        <li><a data-toggle="tab" href="#sectionC">Employees by ACD Skill</a></li>
+        <li><a data-toggle="tab" href="#sectionD">ACD Employees</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="sectionA" class="tab-pane fade in active">
+        
+            <apex:iframe src="/apex/TSSupportTeamsList" scrolling="true" id="theIframe"/>
+        </div>
+        <div id="sectionB" class="tab-pane fade" style="width:100%;margin-left:0px;margin-right:0px;">
+        
+         <apex:iframe src="/apex/SupportTeamByEmployees" scrolling="true" id="theI2frame"/>
+            
+        </div>
+        <div id="sectionC" class="tab-pane fade" style="width:100%;margin-left:0px;margin-right:0px;">
+        
+         <apex:iframe src="/apex/TSProductSkillList" scrolling="true" id="theI3frame"/>
+            
+        </div>
+        <div id="sectionD" class="tab-pane fade">
+            <apex:iframe src="/apex/ACDEmployees" scrolling="true" id="theI4frame"/>
+        </div>
+    </div>
+</div>
+</body>
+</apex:page>

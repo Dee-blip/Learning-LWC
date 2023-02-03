@@ -1,0 +1,117 @@
+<apex:page controller="L2Q_WaiverEmailGenerator" contentType="application/msword#Revenue Alignment E-Mail Template.doc" cache="true">
+  <html xmlns:w="urn:schemas-microsoft-com:office:word">
+    <head>
+      <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+      <style>
+        br {
+          display: block;
+          margin: 10px 0;
+        }
+
+      </style>
+    </head>
+      <apex:pageBlock >
+        <p>
+          <b>TO:</b><br/>
+          <b>FROM:</b><br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EMAIL:<br/>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PHONE:<br/>
+          <b>DATE:</b><br/>
+
+        </p>
+
+        <p style="text-align : center;">
+          <b>GENERAL INFORMATION</b>
+        </p>
+
+        <table border="1">
+          <apex:Repeat Value="{!FormValues}" var="item">
+            <tr>
+
+              <td style="width:40%;"><apex:outputText value="{!item}"/></td>
+              <td><apex:outputText value="{!FormValues[item]}"/></td>
+
+            </tr>
+          </apex:Repeat>
+        </table>
+        <p style="font-size:12px;">
+          <i>*You will need to submit a Help Desk Ticket for EAE-Ops provide traffic data. Typical ticket response time is 24-hours. The Short Description of the ticket should read: **Short Description: URGENT – Revenue Alignment Traffic Split Request. Please
+            make sure EAE-Ops is the recipient. The category should be reflected as, Category = 'Traffic Breakdown'. You will need to convert traffic into annual revenue dollars.
+          </i>
+        </p>
+
+        <p style="text-align : center;">
+          <b>ADDITIONAL INFORMATION</b>
+        </p>
+
+        <ol type="1">
+          <li>Have you reviewed the Revenue Alignment FAQ with the customer? Indicate Yes or No.
+            <br/>&nbsp;
+          </li>
+
+          <li>Has Akamai Tax or Legal communicated directly with the customer? Indicate Yes or No.
+            <br/>&nbsp;&nbsp;&nbsp;Tax/Legal Name:
+            <br/>&nbsp;&nbsp;&nbsp;Date of Communication:
+            <br/>&nbsp;
+          </li>
+
+          <li>Has your Regional Sales Manager been engaged in discussions with your customer?
+            <br/>&nbsp;&nbsp;&nbsp;RSM Name:
+            <br/>&nbsp;&nbsp;&nbsp;Date of Communication:
+            <br/>&nbsp;&nbsp;&nbsp;Detail Steps Taken to Revenue Align the Customer:
+            <br/>&nbsp;&nbsp;&nbsp;__________________________________________________________________
+            <br/>&nbsp;&nbsp;&nbsp;__________________________________________________________________
+            <br/>&nbsp;&nbsp;&nbsp;__________________________________________________________________
+            <br/>&nbsp;&nbsp;&nbsp;__________________________________________________________________
+            <br/>&nbsp;
+          </li>
+
+          <p style="page-break-after: always;">&nbsp;</p>
+
+          <li>When is the next opportunity to engage with this customer? Please provide Opportunity ID, Expected Close Date and Annual Revenue for that opportunity.
+            <br/>&nbsp;&nbsp;&nbsp;__________________________________________________________________
+            <br/>&nbsp;&nbsp;&nbsp;__________________________________________________________________
+            <br/>&nbsp;
+          </li>
+
+          <li>Please provide a detailed justification for this Revenue Alignment Waiver Request. If this section is not completed with specific details, the request will be automatically rejected.
+            <br/>&nbsp;&nbsp;&nbsp;__________________________________________________________________
+            <br/>&nbsp;&nbsp;&nbsp;__________________________________________________________________
+            <br/>&nbsp;&nbsp;&nbsp;__________________________________________________________________
+            <br/>&nbsp;&nbsp;&nbsp;__________________________________________________________________
+            <br/>&nbsp;&nbsp;&nbsp;__________________________________________________________________
+            <br/>&nbsp;&nbsp;&nbsp;__________________________________________________________________
+            <br/>&nbsp;&nbsp;&nbsp;__________________________________________________________________
+            <br/>&nbsp;
+          </li>
+
+          <li>Has your Regional Sales Manager provided approval for this request?
+            <br/>&nbsp;&nbsp;&nbsp;RSM Name:
+            <br/>&nbsp;&nbsp;&nbsp;Date of Approval:
+            <br/>&nbsp;
+          </li>
+
+        </ol>
+
+        <p style="text-align : center;">
+          <b>SALES LEADERSHIP REVIEW
+          </b>
+        </p>
+        <br/>VP Name:
+        <br/>Indicate Approved/Rejected:
+        <br/>Date Approved/Rejected:
+        <br/>Comments:
+        <br/>&nbsp;&nbsp;&nbsp;__________________________________________________________________
+        <br/>&nbsp;&nbsp;&nbsp;__________________________________________________________________
+        <br/>&nbsp;&nbsp;&nbsp;__________________________________________________________________
+        <br/>&nbsp;&nbsp;&nbsp;__________________________________________________________________
+
+        <p style="text-align : center;">
+          <b>WORKFLOW</b>
+          <br/>&nbsp;<br/>&nbsp;
+          <!--<apex:dynamicComponent componentValue="{!ImageDetails}"/>-->
+          <div id="imageSection"></div>
+        </p>
+      </apex:pageBlock>
+  </html>
+</apex:page>

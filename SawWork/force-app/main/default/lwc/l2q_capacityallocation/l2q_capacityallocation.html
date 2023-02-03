@@ -1,0 +1,92 @@
+<!--
+  Author : Rajesh Kumar - GSM Sales Team 
+  JIRA : # SFDC-7368
+  Desceription : Specific functionality (Non-Generic) to handle CPR country wise split 
+  Considerations : Static Value at mos of the places for now , If required while NOCC integration it may changes 
+-->
+
+<template>
+  <template if:true={isloading}>
+    <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+  </template>
+  <div style="max-height: 350px;z-index:50">
+    <table style="border: 2px solid rgb(221, 219, 218); border-radius: 0.25rem"
+      class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_fixed-layout slds-table_col-bordered">
+      <thead>
+        <tr class="slds-text-title_caps">
+          <th style="color: #0070d2; width: 40px">#</th>
+          <th style="color: #0070d2">COUNTRY</th>
+          <th style="color: #0070d2">REQUESTED CAPACITY </th>
+          <template if:true={forapproval}>
+            <th style="color: #0070d2">APPROVED CAPACITY</th>
+          </template>
+
+          <th style="width: 50px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <template for:each={datalist} for:item="data" for:index="index">
+          <tr key={data.rowunqid}>
+            <td>
+              <div style="padding-top:15px">{data.index}</div>
+            </td>
+
+            <!-- Begin Requested Capacity Data  -->
+            <td>
+              <c-l2q_searchabledropdown pre-select={data.country} onselected={handleCountrychange} values={countryMap}
+                disabled={forapproval} uniquekey={data.rowunqid} placeholder="--Select Country--">
+              </c-l2q_searchabledropdown>
+            </td>
+            <td>
+              <lightning-input type="number" step="0.001" variant="label-hideen" value={data.allocatedcapacity}
+                data-target-id={data.rowunqid} onchange={handleallocationChange} name='request' disabled={forapproval}>
+              </lightning-input>
+            </td>
+            <!-- End Requested Capacity Data  -->
+
+            <!-- Begin Approved Capacity Data  -->
+            <template if:true={forapproval}>
+              <td>
+                <lightning-input type="number" step="0.001" variant="label-hideen" value={data.approvedcapacity}
+                  data-target-id={data.rowunqid} onchange={handleapprovalChange} name='approval'></lightning-input>
+              </td>
+            </template>
+            <!-- End Approved Capacity Data  -->
+
+            <!--Begin Delete Row Functionality  -->
+            <td style="width: 20px">
+              <template if:false={data.recordid}>
+                <div style="padding-top: 15px">
+                  <lightning-button-icon icon-name="utility:delete" data-target-id={data.rowunqid}
+                    onclick={handleDelete}>
+                  </lightning-button-icon>
+                </div>
+              </template>
+            </td>
+            <!--End Delete Row Functionality  -->
+          </tr>
+        </template>
+
+        <!-- Begin Sum Calculations  -->
+        <template if:true={showsum}>
+          <tr>
+            <td></td>
+            <td></td>
+            <td>
+              <lightning-badge label={reqsum} style="color: #0070d2">
+              </lightning-badge>
+            </td>
+            <template if:true={forapproval}>
+              <td>
+                <lightning-badge label={apprsum} style="color: #0070d2">
+                </lightning-badge>
+              </td>
+            </template>
+            <td></td>
+          </tr>
+        </template>
+        <!-- End  Sum Calculations  -->
+      </tbody>
+    </table>
+  </div>
+</template>

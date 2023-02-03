@@ -1,0 +1,169 @@
+<apex:page standardController="RSS_Form__c" extensions="RSS_FormController" showHeader="false" renderAs="pdf"  sidebar="false" contentType="application/pdf#abcd.pdf">
+<head>
+
+<style> 
+body
+{
+font-family: Arial, Helvetica, sans-serif;
+/*{!if(RSSForm.Published__c,'',' background-image:url(/resource/jquery119/jquery-ui-1.10.2.custom/Draft.jpg);
+            //background-repeat: no-repeat;
+            background-position: center;
+            width: 100%;')} */
+}
+@page {
+  size: A4;
+  margin: 10%;
+  //align: left;
+  text-align: justify;
+  
+  @top-center {
+        //background-image: url(/resource/jquery119/jquery-ui-1.10.2.custom/akamai_logo_color.jpg) ;
+        //background-repeat: no-repeat;
+        //background-position:right top;
+        //width: 100%;
+        //height: 50%;
+        white-space: pre;
+        content: "\00000a {!Day(DateValue(Now()))}-{!CASE( MONTH(DateValue(Now())) , 1, "January", 2, "February", 3, "March", 4, "April", 5, "May", 6, "June", 7, "July", 8, "August", 9, "September", 10, "October", 11, "November", 12, "December", "None")}-{!Year(DateValue(Now()))}";
+        font-family: Arial, Helvetica, sans-serif;
+        Font-Size:11px;
+     } 
+ 
+
+ 
+
+  @bottom-left {
+     white-space: pre;
+     content: "{!RSSform.Name} - {!RSSForm.Owner.Name}"   " \00000a Akamai Technologies, Inc.";
+     font-family: Arial, Helvetica, sans-serif;
+     Font-Size:11px;
+  }
+ 
+  @bottom-right {
+    white-space: pre;
+    content: "Page " counter(page)  "\00000a Proprietary and Confidential";
+    font-family: Arial, Helvetica, sans-serif;
+    Font-Size:11px;
+  }
+}
+.ProductFormTOC
+{
+Font-Size:13px;
+}
+a
+{
+text-decoration:none;
+color:black;
+}
+.SectionsTOC
+{
+list-style-type: none;
+}
+.ProductFormName
+{
+color:#38608F;
+Font-Size:18px;
+Font-weight:bold;
+padding-bottom:8px;
+}
+.SectionName
+{
+color:#38608F;
+Font-Size:16px;
+}
+.Question
+{
+Font-Weight:bold;
+Font-Size:12px;
+}
+.Response
+{
+Font-Size:12px;
+//white-space: pre-line;
+//text-align: justify;
+//text-justify:inter-word;
+}
+.contents
+{
+Font-Size:12px;
+page-break-after:always;
+}
+</style>
+</head>  
+
+<body>
+
+<div style="font-size:13px">
+<center><label style="font-size:20px;font-weight:bold;">{!RSSform.Name}</label>
+<br />
+Publish Version : {!RSSform.Version__c}
+</center>
+
+<br/>
+<br/>
+<br/>
+<div>
+<label style="color:#38608F;Font-Size:18px;Font-weight:bold;"> Contents</label>
+</div>
+<br/>
+<div class="contents">
+<apex:repeat value="{!RSSFormWrappers}" var="rfw">   
+
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#Form{!rfw.UniqueNumber}" class="ProductFormTOC"><apex:outputLabel value="{!rfw.ProductForm.Survey__r.Name}"></apex:outputLabel></a>
+<ul class="SectionsTOC">
+<apex:repeat var="g" value="{!rfw.responseGroupWrappers}">
+<li>
+<a href="#Group{!g.UniqueNumber}"><apex:outputLabel value="{!g.questionGroup.Name}" ></apex:outputLabel></a>
+</li>
+</apex:repeat>
+</ul>
+
+
+</apex:repeat>
+</div>
+<apex:repeat value="{!RSSFormWrappers}" var="rfw">   
+<div id="Form{!rfw.UniqueNumber}" style="page-break-after:always;"  >
+<div  class="ProductFormName"><apex:outputLabel value="{!rfw.ProductForm.Survey__r.Name}" ></apex:outputLabel>
+</div>
+<br/>
+<apex:repeat var="g" value="{!rfw.responseGroupWrappers}">
+
+<div id="Group{!g.UniqueNumber}">
+<div style="padding-bottom: 5px;"><apex:outputLabel value="{!g.questionGroup.Name}" styleClass="SectionName" ></apex:outputLabel></div>
+<apex:repeat var="r" value="{!g.surveyResponses}">
+
+                    
+                    <div>                    
+                        <apex:outputLabel value="{!r.response.Survey_Question__r.Question__c}" styleClass="Question"></apex:outputLabel> 
+                    </div>
+                    
+                   <div style="wordSpacing: normal;text-align: justify; white-space: pre-line;">
+                        <apex:outputText escape="false" value=" {!if(r.response.Response__c='','--No Answer--',r.response.Response__c)}" styleClass="Response" rendered="{! OR(IF(r.response.Survey_Question__r.Type__c = 'Multi-Select--Vertical',false,true),
+                        if(r.response.Response__c='',true,false))}"></apex:outputText>
+                   </div><br/>
+                   
+                   <div Id='checkBox' rendered="{! AND(IF(r.response.Survey_Question__r.Type__c = 'Multi-Select--Vertical',true,false), IF(r.response.Response__c='',False,True))}">
+                       <apex:repeat var="selectedItem" value="{! r.CheckBoxValues}">
+                           <apex:outputLabel value="{! selectedItem}" styleClass="Response" rendered="{! AND(IF(r.response.Survey_Question__r.Type__c = 'Multi-Select--Vertical',true,false), IF(r.response.Response__c='',False,True))}"></apex:outputLabel> <br/>
+                       </apex:repeat>    
+                   </div>
+                   
+                   <!--div  rendered="{! IF(r.response.Survey_Question__r.Type__c = 'Free Text',true,false)}">
+                       <apex:outputLabel value="{! IF(r.response.Response__c='','--No Answer--','hh')}" rendered="IF(r.response.Response__c='',true,false"></apex:outputLabel>
+                       <apex:outputLabel value="{! r.answer}"></apex:outputLabel>
+                   </div> -->
+                   
+                   <!--
+                   <apex:repeat var="response" value="{! pdftempMap[r.response.Survey_Question__r.Id]}"></apex:repeat>
+                   <apex:outputLabel value="response"></apex:outputLabel>
+                   --> 
+                    
+</apex:repeat>
+</div>
+</apex:repeat>
+</div>
+</apex:repeat>
+
+</div>
+
+</body>
+</apex:page>

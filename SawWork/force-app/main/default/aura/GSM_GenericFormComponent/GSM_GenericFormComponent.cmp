@@ -1,0 +1,400 @@
+<aura:component
+  implements="forceCommunity:availableForAllPageTypes,flexipage:availableForAllPageTypes,lightning:actionOverride,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction,lightning:isUrlAddressable"
+  controller="GSM_GenericFormController" access="global">
+
+  <aura:attribute name="customMetaDataObjName" type="String" />
+  <aura:attribute name="sObjectName" type="String" />
+  <aura:attribute name="objectLabel" type="String" />
+  <aura:attribute name="objectIconName" type="String" default="custom:custom15" />
+  <aura:attribute name="returnURL" type="String" />
+  <aura:attribute name="showFields" type="Boolean" default="false" />
+  <aura:attribute name="isCreatable" type="Boolean" />
+  <aura:attribute name="errorMessage" type="String" />
+  <aura:attribute name="hasError" type="Boolean" default="false" />
+  <aura:attribute name="listOfSectionDescribe" type="List" />
+  <aura:attribute name="defaultValues" type="String" default="" />
+  <aura:attribute name="currentRecordTypeId" type="String" default="" />
+  <aura:attribute name="redirectionRequired" type="Boolean" default="true" />
+  <aura:attribute name="requiresSobjectId" type="Boolean" default="true" />
+  <aura:attribute name="returnValPrefix" type="String" default="" />
+  <aura:attribute name="returnValSuffix" type="String" default="" />
+
+  <aura:attribute name="recordTypeModalRequired" type="Boolean" default="false" />
+  <aura:attribute name="mapOfRecordTypeVsIdsString" type="String" />
+  <aura:attribute name="mapOfRecordTypeVsIds" type="List" />
+
+  <aura:attribute name="caseAssignmentCheckboxValue" type="Boolean" default="false" />
+  <aura:attribute name="emailNotificationCheckboxValue" type="Boolean" default="false" />
+
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+  <aura:if isTrue="{! v.recordTypeModalRequired == false }">
+
+    <lightning:card iconName="{! v.objectIconName }">
+      <aura:set attribute="title">
+        <strong>
+          {!v.objectLabel}
+        </strong>
+      </aura:set>
+    </lightning:card>
+
+    <aura:if isTrue="{!v.hasError}">
+      <ui:message title="Error" severity="error" closable="false">
+        <b>
+          {! v.errorMessage }
+        </b>
+      </ui:message>
+    </aura:if>
+
+    <c:SF1_CustomLoader />
+
+    <div style="padding-top:10px; background-color: white;">
+      <aura:iteration items="{!v.listOfSectionDescribe}" indexVar="SectionIndex" var="eachSectionDescribe">
+        <aura:if isTrue="{!eachSectionDescribe.isEmptySection != true}">
+          <div id="{! 'Section' + SectionIndex }" class="slds-section slds-is-open">
+
+            <div data-type="{! 'Section' + SectionIndex }" class="slds-section__title" onclick="{! c.handleClick }">
+              <button aria-controls="expando-unique-id" aria-expanded="true"
+                class="slds-button slds-section__title-action">
+                <lightning:icon iconName="utility:chevronright" alternativeText="Approved" size="x-small" />
+                <span class="slds-truncate" title="Section Title">{! eachSectionDescribe.sectionName }</span>
+              </button>
+            </div>
+
+            <div aria-hidden="false" class="slds-section__content" id="expando-unique-id">
+              <div class="slds-col slds-col--padded">
+                <div class="slds-grid slds-wrap">
+
+                  <aura:iteration items="{!eachSectionDescribe.listOfSectionFields}" indexVar="ListIndex" var="eachFD">
+
+                    <aura:if
+                      isTrue="{!eachFD.value != '' ? eachFD.value != null ? eachFD.isUpdatable == false : false : false }">
+                      <aura:if isTrue="{!eachFD.isReadOnly != false}">
+                        <div class="slds-col slds-size_1-of-2">
+                          <div style="width:85%">
+                            <div style="padding:10px; overflow: hidden !important">
+                              <div class="slds-form-element__label">
+                                <aura:text value="{!eachFD.label}" />
+                              </div>
+                              <div class="slds-form-element__control" style="text-align: justify !important">
+                                <aura:if isTrue="{!eachFD.fieldType == 'TEXTAREA' ? 'true' : 'false'}">
+                                  <ui:outputTextarea value="{!eachFD.value}" />
+                                </aura:if>
+                                <aura:if isTrue="{!eachFD.fieldType != 'TEXTAREA' ? 'true' : 'false'}">
+                                  <ui:outputText value="{!eachFD.value}" />
+                                </aura:if>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </aura:if>
+                      <aura:set attribute="else">
+
+                        <aura:if isTrue="{!eachFD.isUpdatable}">
+
+                          <div class="slds-col slds-size_1-of-2">
+                            <div style="width:85%">
+                              <div style="padding:10px">
+
+                                <div class="slds-form-element__label">
+                                  <aura:if isTrue="{!eachFD.isRequired}">
+                                    <span style="color: red">*</span>
+                                  </aura:if>
+                                  <aura:text value="{!eachFD.label}" />
+                                  &nbsp;
+                                  <aura:if isTrue="{!eachFD.helpText != null ? 'true' : 'false'}">
+                                    <div class="slds-form-element__icon slds-align-middle">
+                                      <lightning:icon iconName="utility:info" alternativeText="Info" size="xx-small"
+                                        title="{!eachFD.helpText}" />
+                                    </div>
+                                  </aura:if>
+                                  &nbsp;
+                                  <aura:if isTrue="{!eachFD.isDependentField != null ? true : 'false'}">
+                                    <div class="slds-form-element__icon slds-align-middle">
+                                      <lightning:icon iconName="utility:info" alternativeText="Info" size="xx-small"
+                                        title="Depenedent Field" />
+                                    </div>
+                                  </aura:if>
+
+                                </div>
+
+                                <aura:if
+                                  isTrue="{!and(eachFD.fieldType == 'REFERENCE', eachFD.isDynamicLookup) ? 'true' : 'false'}">
+                                  <div data-type="{!eachFD.dynamicLookupDependencyOn}"
+                                    data-current="{!eachFD.fieldAPIName}" onclick="{! c.populateWhereClause }">
+                                    <c:SF1_LookupComponent type="{!eachFD.referenceFieldType}" value="{!eachFD.value}"
+                                      fieldsToShowInSuggestion="createddate"
+                                      whereClause="{!eachFD.lookupFilterQuery}" />
+                                  </div>
+                                  <aura:set attribute="else">
+                                    <aura:if isTrue="{!eachFD.fieldType == 'REFERENCE' ? 'true' : 'false'}">
+                                      <c:SF1_LookupComponent type="{!eachFD.referenceFieldType}" value="{!eachFD.value}"
+                                        fieldsToShowInSuggestion="createddate"
+                                        whereClause="{!eachFD.lookupFilterQuery}" />
+                                      <aura:set attribute="else">
+                                        <aura:if isTrue="{!eachFD.fieldType == 'PICKLIST' ? 'true' : 'false'}">
+
+                                          <lightning:select value="{!eachFD.value}"
+                                            disabled="{!eachFD.isDependentField != null ? eachFD.isDependentField : false }">
+                                            <aura:iteration items="{!eachFD.pickListVals}" var="val">
+                                              <option text="{!val}" label="{!val}" />
+                                            </aura:iteration>
+                                          </lightning:select>
+                                          <aura:set attribute="else">
+                                            <aura:if isTrue="{!eachFD.fieldType == 'MULTIPICKLIST' ? 'true' : 'false'}">
+                                              <div style="padding-top:10px">
+                                                <lightning:dualListbox aura:id="DummyVal"
+                                                  name="{!v.multiPickListDescriptor.label}" sourceLabel="Available"
+                                                  selectedLabel="Selected" options="{!eachFD.pickListVals}"
+                                                  value="{!eachFD.selectedPickListValues}" />
+                                              </div>
+                                              <aura:set attribute="else">
+                                                <aura:if isTrue="{!eachFD.fieldType == 'DATE' ? 'true' : 'false'}">
+                                                  <lightning:input type="date" value="{!eachFD.value}" />
+                                                  <aura:set attribute="else">
+                                                    <aura:if
+                                                      isTrue="{!eachFD.fieldType == 'STRING' ? 'true' : 'false'}">
+                                                      <lightning:input value="{!eachFD.value}"
+                                                        type="{!eachFD.fieldType}" />
+                                                      <aura:set attribute="else">
+                                                        <aura:if
+                                                          isTrue="{!eachFD.fieldType == 'TEXTAREA' ? 'true' : 'false'}">
+                                                          <ui:inputTextArea value="{!eachFD.value}" rows="3"
+                                                            cols="80" />
+                                                          <aura:set attribute="else">
+                                                            <aura:if
+                                                              isTrue="{!eachFD.fieldType == 'RICHTEXT' ? 'true' : 'false'}">
+                                                              <lightning:inputRichText value="{!eachFD.value}" />
+                                                              <aura:set attribute="else">
+                                                                <aura:if
+                                                                  isTrue="{!eachFD.fieldType == 'RICHTEXT_LIMITED' ? 'true' : 'false'}">
+                                                                  <lightning:inputRichText value="{!eachFD.value}"
+                                                                    disabledCategories="FORMAT_FONT,INSERT_CONTENT,ALIGN_TEXT" />
+                                                                  <aura:set attribute="else">
+                                                                    <aura:if
+                                                                      isTrue="{!eachFD.fieldType == 'CURRENCY' ? 'true' : 'false'}">
+                                                                      <lightning:input type="number"
+                                                                        value="{!eachFD.value}" step="any" />
+                                                                      <aura:set attribute="else">
+                                                                        <aura:if
+                                                                          isTrue="{!eachFD.fieldType == 'DOUBLE' ? 'true' : 'false'}">
+                                                                          <lightning:input type="number"
+                                                                            value="{!eachFD.value}" step="any" />
+                                                                          <aura:set attribute="else">
+                                                                            <aura:if
+                                                                              isTrue="{!eachFD.fieldType == 'BOOLEAN' ? 'true' : 'false'}">
+                                                                              <lightning:input type="checkbox"
+                                                                                checked="{!eachFD.value}" />
+                                                                              <aura:set attribute="else">
+                                                                                <aura:if
+                                                                                  isTrue="{!eachFD.fieldType == 'INTEGER' ? 'true' : 'false'}">
+                                                                                  <lightning:input type="number"
+                                                                                    step="1" value="{!eachFD.value}" />
+                                                                                  <aura:set attribute="else">
+                                                                                    <aura:if
+                                                                                      isTrue="{!eachFD.fieldType == 'DATETIME' ? 'true' : 'false'}">
+                                                                                      <lightning:input type="datetime"
+                                                                                        value="{!eachFD.value}" />
+                                                                                      <aura:set attribute="else">
+                                                                                        <aura:if
+                                                                                          isTrue="{!eachFD.fieldType == 'DEPENDENTPICKLIST' ? 'true' : 'false'}">
+                                                                                          <div
+                                                                                            id="{! 'dependencySelect-' + SectionIndex + ':' + ListIndex }"
+                                                                                            data-type="{!eachFD.listOfDependentFields}"
+                                                                                            data-map="{!eachFD.dependedntPicklistsMap}">
+                                                                                            <lightning:select
+                                                                                              name="{! 'dependencySelect-' + SectionIndex + ':' + ListIndex }"
+                                                                                              value="{!eachFD.value}"
+                                                                                              onchange="{!c.enableDependencies}">
+                                                                                              <aura:iteration
+                                                                                                items="{!eachFD.pickListVals}"
+                                                                                                var="val">
+                                                                                                <option text="{!val}"
+                                                                                                  label="{!val}" />
+                                                                                              </aura:iteration>
+                                                                                            </lightning:select>
+                                                                                          </div>
+                                                                                          <aura:set attribute="else">
+                                                                                            <aura:if
+                                                                                              isTrue="{!eachFD.fieldType == 'URL' ? 'true' : 'false'}">
+                                                                                              <lightning:input
+                                                                                                type="url"
+                                                                                                value="{!eachFD.value}" />
+                                                                                              <aura:set
+                                                                                                attribute="else">
+                                                                                                <aura:if
+                                                                                                  isTrue="{!eachFD.fieldType == 'EMAIL' ? 'true' : 'false'}">
+                                                                                                  <lightning:input
+                                                                                                    type="email"
+                                                                                                    value="{!eachFD.value}" />
+                                                                                                  <aura:set
+                                                                                                    attribute="else">
+                                                                                                    <aura:if
+                                                                                                      isTrue="{!eachFD.fieldType == 'PHONE' ? 'true' : 'false'}">
+                                                                                                      <lightning:input
+                                                                                                        type="tel"
+                                                                                                        value="{!eachFD.value}" />
+                                                                                                    </aura:if>
+                                                                                                  </aura:set>
+                                                                                                </aura:if>
+                                                                                              </aura:set>
+                                                                                            </aura:if>
+                                                                                          </aura:set>
+                                                                                        </aura:if>
+                                                                                      </aura:set>
+                                                                                    </aura:if>
+                                                                                  </aura:set>
+                                                                                </aura:if>
+                                                                              </aura:set>
+                                                                            </aura:if>
+                                                                          </aura:set>
+                                                                        </aura:if>
+                                                                      </aura:set>
+                                                                    </aura:if>
+                                                                  </aura:set>
+                                                                </aura:if>
+                                                              </aura:set>
+                                                            </aura:if>
+                                                          </aura:set>
+                                                        </aura:if>
+                                                      </aura:set>
+                                                    </aura:if>
+                                                  </aura:set>
+                                                </aura:if>
+                                              </aura:set>
+                                            </aura:if>
+                                          </aura:set>
+                                        </aura:if>
+                                      </aura:set>
+                                    </aura:if>
+                                  </aura:set>
+                                </aura:if>
+
+                              </div>
+                            </div>
+                          </div>
+                        </aura:if>
+                      </aura:set>
+                    </aura:if>
+
+                  </aura:iteration>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <aura:set attribute="else">
+            <aura:if
+              isTrue="{! and(eachSectionDescribe.editLayoutProperties == true, eachSectionDescribe.layoutPropertiesDetails != null)}">
+              <div id="{! 'Section' + SectionIndex }" class="slds-section slds-is-open">
+
+                <div data-type="{! 'Section' + SectionIndex }" class="slds-section__title" onclick="{! c.handleClick }">
+                  <button aria-controls="expando-unique-id" aria-expanded="true"
+                    class="slds-button slds-section__title-action">
+                    <lightning:icon iconName="utility:chevronright" alternativeText="Approved" size="x-small" />
+                    <span class="slds-truncate" title="Section Title">{! eachSectionDescribe.sectionName }</span>
+                  </button>
+                </div>
+
+                <div aria-hidden="false" class="slds-section__content" id="expando-unique-id">
+
+                  <div style="padding-top:10px">
+                    <div class="slds-col slds-col--padded">
+                      <div class="slds-grid slds-wrap">
+
+                        <div class="slds-col slds-size_1-of-2">
+                          <div style="padding:5px">
+                            <aura:if
+                              isTrue="{! and(eachSectionDescribe.layoutPropertiesDetails.caseAssignmentCheckboxRequired != null, eachSectionDescribe.layoutPropertiesDetails.caseAssignmentCheckboxRequired == true)}">
+                              <div class="slds-form-element__label">
+                                <aura:text value="Assign using active assignment rules" />
+                              </div>
+                              <lightning:input type="checkbox" checked="{! v.caseAssignmentCheckboxValue }" />
+                            </aura:if>
+                          </div>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-2">
+                          <div style="padding:5px">
+                            <aura:if
+                              isTrue="{! and(eachSectionDescribe.layoutPropertiesDetails.emailNotificationCheckboxRequired != null, eachSectionDescribe.layoutPropertiesDetails.emailNotificationCheckboxRequired == true)}">
+                              <div class="slds-form-element__label">
+                                <aura:text value="Send notification email to contact" />
+                              </div>
+                              <lightning:input type="checkbox" checked="{! v.emailNotificationCheckboxValue }" />
+                            </aura:if>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </aura:if>
+          </aura:set>
+
+        </aura:if>
+
+      </aura:iteration>
+
+    </div>
+
+    <div style="height: 180px;">
+      <div class="slds-docked-form-footer">
+        <button type="button" class="slds-button slds-button_neutral" onclick="{! c.cancelAction }">Cancel</button>
+        <button type="button" class="slds-button slds-button_brand" onclick="{! c.updatedVals }">Save</button>
+      </div>
+    </div>
+
+    <aura:set attribute="else">
+
+      <div>
+        <div role="dialog" tabindex="-1" aura:id="SortModalbox" aria-labelledby="header43"
+          class="slds-modal  slds-modal_small slds-fade-in-open">
+          <div class="slds-modal__container">
+            <div class="slds-modal__header">
+              <h6 id="modal-heading-01" class="slds-text-heading--small">Select Record Type</h6>
+            </div>
+            <div class="slds-modal__content slds-p-around--medium">
+              <div>
+                <ul class="slds-has-dividers_around-space ">
+                  <aura:iteration items="{! v.mapOfRecordTypeVsIds }" var="eachName">
+
+                    <li class="slds-item slds-color__background_gray-2">
+                      <div class="slds-grid">
+                        <div class="slds-col slds-size_5-of-6">
+                          {!eachName.label}
+                        </div>
+                        <div class="slds-col slds-size_1-of-6">
+                          <lightning:input type="radio" variant="label-hidden" value="{!eachName.value}" name="options"
+                            checked="" onchange="{!c.assignSelectedValue}" />
+                        </div>
+                      </div>
+                    </li>
+
+                  </aura:iteration>
+
+                </ul>
+              </div>
+            </div>
+            <div class="slds-modal__footer">
+              <div style="align:">
+                <button class="slds-button slds-button_brand"
+                  disabled="{! v.currentRecordTypeId == null || v.currentRecordTypeId == '' ? 'true' : 'false'}"
+                  onclick="{!c.moveToComponent}">Next</button>
+                <!-- <button class="slds-button slds-button-neutral" onclick="{!c.moveBack}">Back</button> -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open" aura:id="SortModalClose"></div>
+      </div>
+
+    </aura:set>
+  </aura:if>
+
+</aura:component>

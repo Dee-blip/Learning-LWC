@@ -1,0 +1,143 @@
+<!--
+ * CR: 3147531
+ * Release: 16.5
+ * Developer: Sharath Prasanna
+ * Summary: Acceptance Form for ERSS forms
+ */
+-->
+<apex:page id="page" standardController="ERSS_Acceptance_Form__c" extensions="RSS_Acceptance_Form_Controller" sidebar="false">
+
+<script type="text/javascript" src="/resource/jquery119/jquery-ui-1.10.2.custom/js/jquery-1.9.1.js" ></script>
+<script type="text/javascript" src="/resource/jquery119/jquery-ui-1.10.2.custom/js/jquery-ui-1.10.2.custom.js" ></script>
+<link rel="stylesheet" type="text/css" href="/resource/jquery119/jquery-ui-1.10.2.custom/css/ui-lightness/jquery-ui-1.10.2.custom.css"></link>
+
+    <head>
+        <style>
+        .red
+        {
+        	color:#ff0000;
+        }
+        </style>
+    </head>
+
+    <script>
+        jeRSS$ = jQuery.noConflict();
+
+        //function called to disable the page
+        function greyOut () {
+            jeRSS$('#complete').css( 'pointer-events', 'none' );
+            jeRSS$('#complete').css({opacity: 0.1});
+        }
+        //function called to enable the page
+        function removeGreyOut () {
+            jeRSS$('#complete').css( 'pointer-events', 'auto' );
+            jeRSS$('#complete').css({opacity: 1});
+        }
+      
+
+        
+    </script>
+    
+    <style>
+         .Custbtn
+         {
+          height:22px;   
+         }
+    </style> 
+       
+        
+    <apex:outputPanel >
+        <apex:actionStatus id="SubmitPublish">
+            <apex:facet name="start">
+                <c:P2RenhancedActionStatus BackColor="#ffffff" borderColor="#ffffff" borderSize="2" height="50px" width="150px" ImageUrl="/changemgmt/img/spinner24.gif" Message="Please wait..." messageStyle="color:darkred;font-size:11pt;font-weight:bold;"/>
+            </apex:facet>   
+        </apex:actionStatus>
+    </apex:outputPanel>
+        
+    <div id="complete">    
+    
+        <apex:form id="form" >
+
+            <div id="pagemessagediv"> 
+                <apex:outputPanel id="PageMessages"> 
+                    <apex:PageMessages escape="false"/>
+                </apex:outputPanel>            
+            </div>
+            <!-- <apex:commandLink value="Return to RSS Form" action="{! ReturnToForm}" target="_blank"/>         -->
+            <apex:PageBlock id="pageblock" mode="edit" >
+                <apex:commandLink value="Return to RSS Form" action="{! ReturnToForm}"/>        
+        
+                <apex:pageBlockButtons id="pageblockbuttons" location="Bottom">
+                    <apex:outputPanel id="validpanel">  
+
+                        <apex:commandButton id="Update" value="Save" action="{!UpdateForm}"  rendered="{! !AcceptanceForm.Submitted__c}" styleClass="Custbtn" reRender="PageMessages" status="SubmitPublish"/>
+
+                        <apex:commandButton id="Submit" value="Submit" action="{!SubmitForm}"  rendered="{! !AcceptanceForm.Submitted__c}" styleClass="Custbtn" status="SubmitPublish" reRender="PageMessages"/>
+
+                    </apex:outputPanel>
+
+                </apex:pageBlockButtons>
+
+                <b><p><center style="text-align:center;color:green;size:14"> 
+                <apex:outputText rendered="{!AcceptanceForm.Submitted__c}">Submitted Acceptance Form</apex:outputText></center></p></b>
+            
+                <apex:PageBlockSection id="pageblocksection" columns="1" title="Basic Integration Achieved">
+
+    	            <div >
+    	                <h1 >
+    	                        {!AcceptanceForm.Question1__c}<span class="red"> *</span>
+    	                </h1>
+                        <apex:selectRadio value="{!answer}" disabled="{! AcceptanceForm.Submitted__c}" layout="pageDirection" onchange="greyOut();CheckForNo();"> 
+                            <apex:selectOptions value="{!Choices1}"/>
+                        </apex:selectRadio>	                
+                     <apex:actionFunction name="CheckForNo" action="{! CheckForNo}" reRender="q2,q3" oncomplete="removeGreyOut();"></apex:actionFunction>   
+
+    	            </div>    
+
+                     <apex:pageBlockSectionItem >                    
+                        <apex:outputPanel id="commentPanel">
+                            <apex:outputLabel style="font-weight:bold" for="commentBlock">Comments</apex:outputLabel>
+                            <div>
+                            <apex:inputTextarea id="commentBlock" readonly="{! AcceptanceForm.Submitted__c}" style="width:25%;" value="{!AcceptanceForm.Comments__c}" rows="4" />
+                            </div>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection id="pageblocksection2" columns="1" title="Completeness of Information">
+           
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel id="q2" >
+                        <h1 >
+                                {!AcceptanceForm.Question2__c}<span class="red"> *</span>
+                         </h1>
+
+                      <apex:selectCheckboxes value="{!CheckBoxValues2}"  layout="pageDirection" disabled="{! Satisfactory || AcceptanceForm.Submitted__c}">
+                        <apex:selectOptions value="{!Choices2}"/>
+                    </apex:selectCheckboxes> 
+                        
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+            </apex:pageBlockSection>
+            <apex:pageBlockSection id="pageblocksection3" columns="1" title="Quality of Information">
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel id="q3" >
+                        <h1 >
+                                {!AcceptanceForm.Question3__c}<span class="red"> *</span>
+                         </h1>
+                    <apex:selectCheckboxes value="{!CheckBoxValues3}" layout="pageDirection" disabled="{! Satisfactory || AcceptanceForm.Submitted__c}">
+                        <apex:selectOptions value="{!Choices3}"/>
+                    </apex:selectCheckboxes> 
+                        
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+            </apex:pageBlockSection>
+
+                   
+        </apex:PageBlock>          
+
+     
+    </apex:form>
+    </div>
+</apex:page>

@@ -1,0 +1,65 @@
+<!--@Author: Nikhil Karn @Akamai Technology -->
+<!--@CreatedDate: 13 Aug,2018-->
+<!--@Details: This components is responsible to show list of the actions which a user can perform -->
+<!--@Controller: HD_CMRActions_Controller -->
+<!--@Events:                         -->
+<!--@LastModifiedDate:               -->
+<!--@LastModifyDetails:              -->
+<!--@LastModifiedBy:                 -->
+
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickAction"
+                access="global" controller="HD_CMRActions_Controller">
+    
+    <aura:registerEvent name="refreshPreview" type="c:HD_CMR_PreviewRefreshEvent" />
+    <aura:registerEvent name="CreateCMR" type="c:HD_CMRCreate" />
+
+    <aura:registerEvent name="getChangeListEvent" type="c:getIncidentList"/>
+
+    
+    <aura:attribute name="change" type="BMCServiceDesk__Change_Request__c" />
+    <aura:attribute name="listOfActions" type="List"/>
+    <aura:attribute name="isSpinnerEnabled" type="Boolean" default="false"/>
+    <aura:attribute name="action" type="String" default=""/>
+    <aura:attribute name="isOpen" type="Boolean" default="false"/>
+    <aura:attribute name="listOfActionsDisplay" type="List"/>
+    <aura:attribute name="listOfActionsMenuDisplay" type="List"/>
+    <aura:attribute name="isDropDownMenuAvailable" type="Boolean" default="false"/>
+    <aura:attribute name="renderCreateForm" type="Boolean" default="false"/>
+    <aura:attribute name="floatClass" type="String" default="slds-align_absolute-center"/>
+    <aura:attribute name="PIRStatus" type="String" default="CLOSED"/>
+    
+    <aura:handler event="c:hd_renderCreateFormEvent" action="{!c.hideCreatePIRForm}" />
+    
+    
+    <div class="slds-grid slds-theme_shade" style="padding:2px;">
+        <div class="slds-col slds-float_right">
+            <div class="{!v.floatClass}" style="height: 3rem;">
+                <lightning:buttonGroup>
+                    
+                    <aura:iteration items="{!v.listOfActionsDisplay}" var="action" indexVar="counter">
+                        <div onclick="{!c.performAction}"  id="{!action}">
+                            <lightning:button label="{!action}"/>
+                        </div>
+                    </aura:iteration>
+                    
+                    <aura:if isTrue="{!v.isDropDownMenuAvailable}">
+                        <lightning:buttonMenu alternativeText="Show menu" class="slds-button_last" onselect="{!c.performAction}">
+                            <aura:iteration items="{!v.listOfActionsMenuDisplay}" var="action" indexVar="counter">
+                                <lightning:menuItem label="{!action}" value="{!action}"/>
+                            </aura:iteration>
+                        </lightning:buttonMenu>
+                    </aura:if>
+                </lightning:buttonGroup>
+            </div>
+        </div>
+    </div>
+    <aura:if isTrue="{!v.renderCreateForm==true}">
+        <div id = "createformid" aura:id = "auracreateformid">  
+            <c:HD_Change_PIRForm currentChangeRequest = "{!v.change}" changeStatus="{!v.PIRStatus}"/>
+        </div>
+    </aura:if>
+    <aura:if isTrue="{!v.isOpen}">
+        <c:HD_CMR_ApproveReject_Modal change="{!v.change}" action="{!v.action}" isOpen="{!v.isOpen}" processWorkItemId=""/>
+    </aura:if>
+    
+</aura:component>

@@ -1,0 +1,154 @@
+<template>
+    <!--MODAL FOR CONFIRMATION-->
+    <template if:true={showConfirmModal}>
+        <div style="height: 640px;">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeConfirmModal}>
+                            <lightning-icon icon-name="utility:close" size="medium">
+                            </lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Copy To Case</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <!--SPINNER-->
+                        <template if:true={loadSpinner}>
+                            <div style="opacity: 0.7;height:95%" class="slds-spinner_container">
+                                <lightning-spinner alternative-text="Loading" variant="brand" size="medium">
+                                </lightning-spinner>
+                            </div>
+                        </template>
+                        <!--SPINNER-->
+                        <center>
+                            <h2><b>Copying will append the "Final Approval Notes" on case. Are you sure?</b></h2>
+                            <br/>
+                        </center>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Cancel" variant="neutral" onclick={closeConfirmModal}></lightning-button>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <lightning-button label="Copy" variant="brand" onclick={copyToCase}></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </template>
+    <!--MODAL FOR CONFIRMATION-->
+
+    <!--HEADER-->
+    <div class="slds-card__header slds-grid slds-border_left slds-border_right slds-table--bordered" data-aura-rendered-by="2381:0" style="height: 55px;padding: 0 1rem 0;">
+        <header class="slds-media slds-media--center slds-has-flexi-truncate" data-aura-rendered-by="2382:0">
+            <!--AD ICON-->
+            <div class="slds-media__figure" data-aura-rendered-by="2383:0">
+                <div class="extraSmall forceEntityIcon" style="background-color: #6b9ee2;" data-aura-rendered-by="2687:0" data-aura-class="forceEntityIcon">
+                    <span data-aura-rendered-by="2690:0" class="uiImage" data-aura-class="uiImage">
+                        <lightning-icon icon-name="custom:custom33" title="Approval Details" size="small"></lightning-icon>
+                    </span>
+                </div>
+            </div>
+            <!--AD ICON-->
+            <div class="slds-media__body" data-aura-rendered-by="2384:0">
+                <h2 id="header_2374:0" data-aura-rendered-by="2385:0">
+                    <b>  
+                        <span style="display:inline-block;overflow:inherit;" class="slds-card__header-title slds-truncate slds-m-right--xx-small" title="Approval Details" data-aura-rendered-by="2387:0">Approval Details ({ADSize})
+                            <span class="assistiveText" data-aura-rendered-by="3801:0">Approval Details</span>
+                        </span>
+                    </b> 
+                    <template if:true={showADList}>
+                        <span style="padding-left: 2rem;"> <a onclick={expandAll}>Expand All </a>| <a onclick={collapseAll}>Collapse All</a></span>
+                    </template>  
+                </h2>
+            </div>
+        </header>
+        
+        <!--COPY TO CASE BUTTON-->
+        <div class="slds-grid slds-grid--align-end" style="line-height: 1.5;"> 
+            <lightning-button-icon icon-name="utility:refresh"  alternative-text="Refresh" title="Refresh" onclick={refreshADs} style="padding-top: 0.75rem;"></lightning-button-icon>
+            <template if:true={showADList}>
+                <lightning-button disabled={disableCopy} label="Copy to Case" title="Copy to Case" onclick={showCopyToCase} class="slds-m-left_x-small" style="padding-top: 0.75rem;"></lightning-button>
+            </template>
+        </div>
+
+    </div>
+    <!--HEADER-->
+
+    <!--LIGHTNING CARD - APPROVAL DETAIL LIST-->
+    <lightning-card variant="Narrow">
+        <template if:true={showADList}>
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-border--left slds-border--right" style="margin-top: -17px;table-layout: fixed;width: 100%;">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th class="" scope="col" style="width:8%;">
+                        <div class="slds-truncate">
+                            <lightning-input onchange={allSelected} type="checkbox"></lightning-input>
+                        </div>
+                    </th>
+                    <th class="" scope="col" style="padding-left: 1.5rem;height: 3.25rem;">
+                        <div class="slds-truncate" title=Name>Select/Deselect Approval Details</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <template for:each={allADs} for:item="eachAD">
+                    <tr key={eachAD.ADRec.Id}>
+                        <td style="width:8%;">
+                            <div>
+                                <lightning-input type="checkbox" value={eachAD.ADRec.Id} data-id={eachAD.ADRec.Id} onchange={rowSelChangeEvent}></lightning-input>
+                            </div>
+                        </td>
+                        <td class="slds-cell-wrap">
+                            <!--ACCORDIAN-->
+                            <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}>
+                                <lightning-accordion-section key={eachAD.ADRec.Id} name={eachAD.ADRec.Name}  label={eachAD.ADname}>
+                                        
+                                    <lightning-record-view-form record-id={eachAD.ADRec.Id} object-api-name="Approval_Details__c">
+                                        <div class="slds-box slds-theme_default">
+                                            <div style="float: left;padding-bottom: 1rem;-webkit-text-fill-color: rgb(0, 109, 204);">
+                                                <a onclick={navigateToDetail}>
+                                                    <lightning-output-field variant="label-hidden" field-name="Name" id={eachAD.ADRec.Id}></lightning-output-field>
+                                                </a>
+                                            </div>
+                                            <div style="padding-bottom: 1rem;padding-left: 33%;font-size: 15px;">
+                                                <a id={eachAD.ADRec.Id} onclick={navigateToEdit}>Edit</a>
+                                            </div>
+                                            
+                                            <lightning-output-field field-name="Approval_Request__c">
+                                            </lightning-output-field>
+                                            <lightning-output-field field-name="Approval_Status__c">
+                                            </lightning-output-field>
+                                            <lightning-output-field field-name="Approval_Details_Description__c">
+                                            </lightning-output-field>
+                                            <template if:true={isDD}>
+                                                <lightning-output-field field-name="Business_Justification__c">
+                                                </lightning-output-field>
+                                            </template>
+                                            <lightning-output-field field-name="Approver_Notes__c">
+                                            </lightning-output-field>
+                                            <!--<template if:true={isDD}>
+                                                <lightning-output-field field-name="Pricing_Reason_Code__c"></lightning-output-field>
+                                                <lightning-output-field field-name="Deal_Structure_Reason_Code__c"></lightning-output-field>
+                                                <lightning-output-field field-name="T_C_Reason_Code__c"></lightning-output-field>
+                                                <lightning-output-field field-name="Retro_Date__c"></lightning-output-field>
+                                                <lightning-output-field field-name="Retro_Adjustment_invoices__c"></lightning-output-field>
+                                                <lightning-output-field field-name="Retro_Revenue_Impact_RevRec__c"></lightning-output-field>
+                                                <lightning-output-field field-name="Retro_Reason_Code__c"></lightning-output-field>
+                                                <lightning-output-field field-name="BED_Deferral_Date__c"></lightning-output-field>
+                                                <lightning-output-field field-name="BED_Reason_Code__c"></lightning-output-field>
+                                                <lightning-output-field field-name="Products_Services_Integration_Packages__c"></lightning-output-field>
+                                            </template>-->
+                                        </div>
+                                    </lightning-record-view-form>
+                                </lightning-accordion-section>
+                            </lightning-accordion>
+                            <!--ACCORDIAN-->
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+        </template>
+    </lightning-card>
+    <!--LIGHTNING CARD - APPROVAL DETAIL LIST-->
+</template>

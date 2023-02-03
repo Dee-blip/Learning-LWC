@@ -1,0 +1,9 @@
+<aura:documentation>
+	<aura:description>
+		<code>c:cpqAASubmit</code> component is used to validate and submit the quote advanced approval process. It
+		refreshes the detail page after record is submitted successfully.
+	</aura:description>
+	<!-- <aura:example name="ExampleName" ref="exampleComponentName" label="Label">
+		Example Description
+	</aura:example> -->
+</aura:documentation>

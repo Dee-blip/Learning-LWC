@@ -1,0 +1,34 @@
+<apex:page showHeader="false" sidebar="false">
+
+    <apex:includeLightning />
+
+<script>
+    // Load the App for Mobile else go to the Record
+    if("{! $User.UIThemeDisplayed }" == "Theme4t")
+    {
+        var paramMap = {
+            taskId:"{!$CurrentPage.parameters.taskId}",
+            showTaskPage: true
+        }
+        $Lightning.use("c:SF1_App_TaskNotificationView", function() 
+        {
+            $Lightning.createComponent(
+                "c:SF1_TaskCmpParent",
+                {paramMapTaskInterface:paramMap},
+                "taskPageDiv",
+                function(cmp) 
+                {
+                    
+
+                });
+        });
+    }
+    else
+    {
+        window.parent.location = "/{!$CurrentPage.parameters.taskId}";      
+    }     
+    
+    </script>
+    
+    <div id="taskPageDiv"></div>
+</apex:page>

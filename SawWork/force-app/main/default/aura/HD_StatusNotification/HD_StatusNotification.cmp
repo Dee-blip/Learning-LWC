@@ -1,0 +1,52 @@
+<aura:component controller="HD_IncidentHeaderController"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId"
+                access="global">
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:registerEvent name="HDLogger" type="c:HDLogger"/>
+    <ltng:require scripts="{!$Resource.HD_Error_Logger}" />
+
+    <div aura:id="Accspinner" class="slds-spinner_container slds-hide">
+        <div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+            <span class="slds-assistive-text">Processing</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+        </div>
+    </div>
+    
+    
+<div class="slds-is-relative" style="height: 4.5rem;">
+        <div aura:id="notificationContainer" class="slds-notification-container" style = "right:50%;">
+            <div aria-live="assertive" aria-atomic="true" class="slds-assistive-text">Customer Responded Notification</div>
+            <section class="slds-notification" style="width: 30rem;" role="dialog" aria-labelledby="noti52" aria-describedby="dialog-body-id-30">
+                <div class="slds-notification__body" id="dialog-body-id-30">
+                    <a class="slds-notification__target slds-media" href="javascript:void(0);">
+                        <span class="slds-icon_container slds-icon-standard-event slds-media__figure" title="event">
+                            <lightning:icon iconName="utility:notification"  alternativeText="event"/>   
+                        </span>
+                        <div class="slds-media__body">
+                            <h2 class="slds-text-heading--small slds-m-bottom--xx-small" id="noti52">
+                                <span class="slds-assistive-text">event notification:</span>Notification</h2>
+                            <p>The Customer has responded to the ticket.</p>
+                            <p>Do you want to move the ticket to <span style="color:green">IN PROGRESS</span>?</p>
+                            <lightning:button class="slds-button_neutral slds-float--right" label="Yes" onclick="{! c.changeToInProgress }" />
+                        </div>
+                    </a>
+                    <button class="slds-button slds-button_icon slds-button--icon-container slds-notification__close" title="Dismiss" onclick="{!c.onClose}">
+                        <lightning:icon iconName="utility:close" alternativeText="close"/>   
+                        
+                        <span class="slds-assistive-text">Customer Responded Notification</span>
+                    </button>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</aura:component>

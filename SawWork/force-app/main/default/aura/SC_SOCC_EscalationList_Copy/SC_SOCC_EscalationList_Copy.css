@@ -1,0 +1,31 @@
+.THIS .copy-pd-picklist label{
+     display: none;
+}
+
+.THIS .previewIcon svg{
+     fill: #1d5873 !important;
+}
+
+.THIS .newIcon svg{
+     fill: #0bbbae !important;
+ }
+ 
+ .THIS .delIcon svg{
+     fill: #ec6874 !important;
+ }
+
+.THIS .toastMessage{
+     white-space : pre-line !important;
+}
+
+.THIS .selectedPreviewIcon svg{
+     fill: white !important;
+}
+
+.THIS .selectedRow{
+     background: #1d5873 !important;
+}
+
+.THIS .selectedWarningIcon{
+    color: #ffae42 !important;
+}

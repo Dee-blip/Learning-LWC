@@ -1,0 +1,277 @@
+<!--Customer Community Component-->
+<apex:page standardController="Case" extensions="SC_CommunityReplyController" showHeader="false" >
+    <apex:includeScript value="/support/console/24.0/integration.js"/>
+    <apex:pageMessages id="messageId"/>
+    <style>
+    
+        .bluerund{
+        border-radius: 100% !important;
+        box-shadow: none !important;
+        border:1px solid #dbdbde !important;
+        background-image: none,-webkit-linear-gradient(top,rgba(255,255,255,.45) 0,rgba(255,255,255,0) 100%) !important;
+        background-image: none,-moz-linear-gradient(top,rgba(255,255,255,.45) 0,rgba(255,255,255,0) 100%)  !important;
+        background-image: none,-o-linear-gradient(top,rgba(255,255,255,.45) 0,rgba(255,255,255,0) 100%)  !important;
+        background-color: #f3f3f4;
+        color: #515967 !important;
+        background-image: none,linear-gradient(to bottom,rgba(255,255,255,.45) 0,rgba(255,255,255,0) 100%)  !important;   
+        width:22px;
+        height:22px;
+        margin-top:5px !important;
+        }
+        body .btnDisabled{
+        opacity:0.5;
+        }
+        
+        .customPopup{
+        background-color: white;
+        border-style: solid;
+        border-width: 2px;
+        left: 63%;
+        padding:10px;
+        position: absolute;
+        z-index: 9999;
+        /* These are the 3 css properties you will need to tweak so the pop 
+        up displays in the center of the screen. First set the width. Then set 
+        margin-left to negative half of what the width is. You can also add 
+        the height property for a fixed size pop up.*/
+        width: 500px;
+        margin-left: -250px;
+        top:-1px;
+        }
+        /*Action Status style processing */    
+        .loadingClass{
+        display: none;
+        position: absolute;
+        top: 45%;
+        left: 45%;
+        width: 200px;
+        height: 50px;
+        padding:10px 15px 0px;
+        border: 3px solid #ababab;
+        box-shadow:1px 1px 10px #ababab;
+        border-radius:20px;
+        background-color: white;
+        z-index: 1002;
+        text-align:center;
+        overflow: auto;
+        }
+        
+        /*Action Status style processing*/    
+        #fade{
+        display: none;
+        position:absolute;
+        top: 0%;
+        left: 0%;
+        width: 100%;
+        height: 100%;
+        background-color: #ababab;
+        z-index: 1001;
+        -moz-opacity: 0.8;
+        opacity: .70;
+        filter: alpha(opacity=80);
+        }
+        
+        
+    </style>
+    <apex:form >
+        
+        <!--Action status to show processing-->
+        <apex:actionStatus id="statusId">
+            <apex:facet name="start">
+                <div class="fadeModal"/>     
+                <div class="loadingClass" style="display:block;">
+                    <img id="creatingMailerModalId" src="{!$Resource.CMCLoadingImage}" width="25" height="25" style="display:inline;"/>&nbsp;&nbsp;<b id="textModalId">{!$Label.JV_Updating_Record}</b>
+                </div>
+            </apex:facet>
+            <apex:facet name="stop"> </apex:facet>
+        </apex:actionStatus>
+        
+        <div id="fade"></div>
+        
+        <apex:pageBlock id="page">
+            
+            <apex:actionFunction action="{!showPopup}" name="showPopup" reRender="commentId,popup">
+                <apex:param id="commentId" name="commentId" value="" assignTo="{!commentId}"/>
+            </apex:actionFunction>
+            
+            <apex:actionFunction action="{!markCorrect}" name="markBestCommentAF" reRender="bestCommentId,messageId" status="statusId" oncomplete="closeModal(); return false;">
+                <apex:param id="bestCommentId" name="bestCommentId" value="" assignTo="{!bestCommentId}"/>
+            </apex:actionFunction>
+            
+            <apex:actionFunction action="{!refreshCommentSection}" name="refreshCommentSection" reRender="page,bestCommentId,messageId" status="statusId" oncomplete="closeModal(); return false;"/>
+            
+            <div style = "{!If(noCommentMsg != '','display:block','display:none')}">
+                <center><b>{!noCommentMsg}</b></center>
+            </div>
+            <div>
+                <center>
+                    <apex:commandButton value="Reply" onclick="replyBox(); return false;"/>&nbsp;&nbsp;
+                    <apex:commandButton value="Refresh" reRender="myTable" onclick="refreshPage(); return false;"/>
+                </center>
+            </div>
+            
+            <div style = "{!If(noCommentMsg == '','display:block','display:none')}">
+                
+                <apex:PageBlockTable value="{!feedCommentWithoutHTML}" var="res" id="myTable">
+                    
+                    <apex:column rendered="false">
+                        <apex:facet name="header">
+                            <apex:commandLink value="Id" reRender="myTable"> 
+                            </apex:commandLink>
+                        </apex:facet>
+                        <apex:outputField value="{!res.Id}" />
+                    </apex:column>
+                    
+                    <apex:column rendered="true">
+                        <apex:facet name="header">
+                            <apex:commandLink value="Action" reRender="myTable"> 
+                            </apex:commandLink>
+                        </apex:facet>
+                        <apex:commandButton value="View" onclick="showCommentBody('{!res.Id}'); return false;"/> 
+                        <!--<apex:commandButton value="Preview" onclick="passCommentIdToSeeReply('{!res.Id}'); return false;"/> -->
+                        <apex:commandButton onclick="markBestComment('{!res.Id}'); return false;" style="{!IF(bestCommentId == res.Id,'background:#33ff33;color:#000000','')}" disabled="{!bestCommentId == res.Id}" value="{!IF(bestCommentId == res.Id,'{!$Label.JV_Correct_Answer}','{!$Label.JV_Mark_Correct}')}"/>
+                    </apex:column>
+                    
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:commandLink value="{!$Label.JV_Comment}" reRender="myTable"> 
+                            </apex:commandLink>
+                        </apex:facet>
+                        <apex:outputField value="{!res.CommentBody}" />
+                    </apex:column>
+                    
+                    
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:commandLink value="{!$Label.JV_Author}" reRender="myTable">
+                            </apex:commandLink>
+                        </apex:facet>
+                        <apex:outputField value="{!res.CreatedBy.Name}" />
+                    </apex:column>
+                    
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:commandLink value="{!$Label.JV_Created_Date}" reRender="myTable">
+                            </apex:commandLink>
+                        </apex:facet>
+                        <apex:outputField value="{!res.CreatedDate}" />
+                    </apex:column>
+                    
+                </apex:PageBlockTable>
+                
+                <div align="center" id='paginationBlockId1'>
+                    <apex:commandButton value="<<" disabled="{!DisablePreviousComment}" 
+                                        action="{!previousFirstComment}" 
+                                        Rerender="myTable,page" 
+                                        styleclass="bluerund">  
+                    </apex:commandButton>
+                    
+                    <apex:commandButton value="<" disabled="{!DisablePreviousComment}" 
+                                        action="{!previousComment}" 
+                                        Rerender="myTable,page"
+                                        styleclass="bluerund">  
+                    </apex:commandButton>
+                    <apex:outputText style="display:inline"> &nbsp; Page {!pageNumber} of {!totalPages} &nbsp;</apex:outputText>
+                    <apex:commandButton value=">" disabled="{!DisableNextComment}"
+                                        action="{!nextComment}" 
+                                        Rerender="myTable,page"
+                                        styleclass="bluerund">
+                    </apex:commandButton>
+                    
+                    <apex:commandButton value=">>" disabled="{!DisableNextComment}"
+                                        action="{!nextLastComment}"
+                                        Rerender="myTable,page"
+                                        styleclass="bluerund">  
+                    </apex:commandButton> 
+                </div>
+            </div>
+            
+        </apex:pageBlock> 
+    </apex:form>
+    <script>
+    
+    
+    var eachCommentId = "";
+    function showCommentBody(commentId){      
+        tabName = '{!$Label.JV_Reply}';
+        eachCommentId = '';
+        eachCommentId = commentId;
+        var replyViewUrlClassic = '/apex/SC_SFCommunityCommentView?id='+eachCommentId;
+        if (sforce.console.isInConsole()) {
+            sforce.console.getEnclosingPrimaryTabId(openSubtab);
+        }
+        else{
+            window.open(replyViewUrlClassic,'_blank');
+        }
+    }
+    
+    function replyBox(){
+        var replyURlClassic = '/apex/SC_CommunityReply_Comment?id='+'{!getFeedQuestionId}';
+        if (sforce.console.isInConsole()) {
+            sforce.console.getEnclosingPrimaryTabId(openReplySubtab);
+        }
+        else{
+            alert(replyURlClassic);
+            window.open(replyURlClassic,'_blank');
+        }
+        
+    }
+    
+    var openSubtab = function openSubtab(result) {
+        replyViewUrl = '/apex/SC_SFCommunityCommentView?id='+eachCommentId;
+        //Now that we have the primary tab ID, we can open a new subtab in it
+        var primaryTabId = result.id;
+        sforce.console.openSubtab(primaryTabId ,replyViewUrl, true, 
+                                  '{!$Label.JV_Reply}', null, openSuccess, 'salesforceSubtab');
+    };
+    
+    var openReplySubtab = function openReplySubtab(result) {
+        replyURl = 'apex/SC_CommunityReply_Comment?id='+'{!getFeedQuestionId}';
+        //Now that we have the primary tab ID, we can open a new subtab in it
+        var primaryTabId = result.id;
+        sforce.console.openSubtab(primaryTabId ,replyURl, true, 
+                                  '{!$Label.JV_Reply}', null, openSuccess, 'salesforceSubtab');
+    };
+    
+    var openSuccess = function openSuccess(result) {
+        //Report whether we succeeded in opening the subtab
+        if (result.success == true) {
+            //alert('subtab successfully opened');
+        } else {
+            //alert('subtab cannot be opened');
+        }
+    };
+    
+    
+    
+    function markBestComment(bestCommentId) {
+        openModal('bestComment');
+        markBestCommentAF(bestCommentId);
+    }
+    
+    function refreshPage(){
+        openModal('refresh');
+        refreshCommentSection();
+    }
+    
+    //function to fade screen while processing
+    function openModal(event) {
+        if(event === 'refresh'){
+            document.getElementById('textModalId').outerText ="{!$Label.JV_Fetching_Records}";
+        }
+        else{
+            document.getElementById('textModalId').outerText ="{!$Label.JV_Updating_Record}";
+        }
+        document.getElementById('fade').style.display = 'block';
+    }
+    
+    //function to remove fade screen after processing
+    function closeModal() {
+        document.getElementById('fade').style.display = 'none';
+    }
+    
+    
+    
+    
+    </script>
+</apex:page>

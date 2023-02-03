@@ -1,0 +1,62 @@
+<template>
+    <div class={itemClass}>
+        <div class="slds-media">
+            <div class="slds-media__figure">
+                <lightning-button-icon icon-name={stateIcon} size="small" variant="bare" onclick={toggleState}>
+                </lightning-button-icon>
+                <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon" title="task">
+                    <lightning-icon icon-name='standard:document' size="medium">
+                    </lightning-icon>
+                </div>
+            </div>
+            <div class="slds-media__body">
+                <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                    <div class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                        <h3 class="slds-truncate" title={itemTemplate.action_History_Description}>
+                            <a href={itemTemplate.whoId}>
+                                <strong>{itemTemplate.who} </strong>
+                            </a>{itemTemplate.title}
+                        </h3>
+                        <span class="slds-p-horizontal_x-small">
+                            <lightning-dynamic-icon if:true={itemTemplate.highlightActivity} type="eq">
+                            </lightning-dynamic-icon>
+                            <lightning-icon if:false={itemTemplate.highlightActivity} icon-name="utility:clock"
+                                size="x-small">
+                            </lightning-icon>
+                        </span> <b>{itemTemplate.daysAgo}</b>
+                    </div>
+                    <div class="slds-timeline__actions slds-timeline__actions_inline">
+                        <p class="slds-timeline__date">
+                            <lightning-formatted-date-time value={itemTemplate.when} year="numeric" month="short"
+                                day="2-digit" hour="numeric" minute="numeric">
+                            </lightning-formatted-date-time>
+                        </p>
+                    </div>
+                </div>
+                <article if:true={isExpanded} class="slds-box slds-timeline__item_details slds-theme_shade"
+                    aria-hidden="false">
+                    <div class="slds-file slds-file_card slds-has-title" style="width:15rem">
+                        <figure>
+                            <a href="javascript:void(0)" class="slds-file__crop" onclick={onPreviewClicked}
+                                data-id={itemTemplate.contentId}>
+                                <span class="slds-assistive-text">Preview:</span>
+                                <lightning-icon icon-name="utility:preview" size="large"></lightning-icon>
+                            </a>
+                            <figcaption class="slds-file__title slds-file__title_card">
+                                <div class="slds-media slds-media_small slds-media_center">
+                                    <div class="slds-media__figure slds-line-height_reset">
+                                        <lightning-icon icon-name="standard:document" size="medium"></lightning-icon>
+                                    </div>
+                                    <div class="slds-media__body">
+                                        <span class="slds-file__text slds-truncate"
+                                            title="Image Title">{itemTemplate.contentTitle}</span>
+                                    </div>
+                                </div>
+                            </figcaption>
+                        </figure>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,14 @@
+<template>
+    <div class="tooltipItem_dist">
+        <!-- <lightning-formatted-date-time value={value} hour="2-digit" minute="2-digit"></lightning-formatted-date-time> | <lightning-formatted-date-time value={value}>
+        </lightning-formatted-date-time> -->
+        <lightning-formatted-date-time value={value} year="numeric" month="numeric" day="numeric" hour="2-digit"
+        minute="2-digit" ></lightning-formatted-date-time>
+        <div class="tooltipItem">
+            <p>
+                {typeAttributes.hovertext}
+                <!-- <c-sc-relative-date-time value={value}></c-sc-relative-date-time> -->
+            </p>
+        </div>
+    </div>
+</template>

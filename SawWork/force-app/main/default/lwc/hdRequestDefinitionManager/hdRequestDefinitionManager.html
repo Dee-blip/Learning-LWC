@@ -1,0 +1,88 @@
+<template>
+    <c-hd-modal-popup name="Sample JSON" title="Sample JSON">
+        <lightning-layout-item padding="slds-p-around_small " size="6">
+            <div class="slds-p-around_xxx-small slds-float_right lgc-bg">
+                <lightning-button-icon icon-name={state.btnIconName}  onclick={copyToClipboard} variant="border-filled" alternative-text={state.hoverTextCopyButton} class="lgc-bg" ></lightning-button-icon>
+            </div>
+            <div class="slds-form-element__control abc">
+                <textarea data-id="txtJson" placeholder="Placeholder Text" readonly
+                    class="slds-textarea mytextarea">{state.sampleJSONContents}</textarea>
+            </div>
+        </lightning-layout-item>
+        <div slot="footer" style="display: inline;">
+            <lightning-button label="Close" variant="neutral" onclick={closeModal}>
+            </lightning-button>
+        </div>
+    </c-hd-modal-popup>
+    <lightning-card title="Service Request Manager" icon-name="utility:builder">
+        <template if:true={state.statusMessage}>
+            <c-hd-message-panel friendly-message={state.statusMessage} icon-name={state.iconName} errors={state.errors}>
+            </c-hd-message-panel>
+        </template>
+        <template if:true={state.showLoadingSpinner}>
+            <lightning-spinner alternative-text="Uploading......" size="large"></lightning-spinner>
+        </template>
+        <div class="slds-box slds-box_xx-small slds-m-horizontal_small">
+            <lightning-accordion active-section-name={state.activeSections} class="example-accordion" allow-multiple-sections-open>
+                <lightning-accordion-section name="Step1" label="Step 1 : Generate JSON">
+                    <lightning-layout vertical-align="center" multiple-rows="true">
+                        <lightning-layout-item padding="horizontal-small" size="7">
+                            <lightning-combobox name="Request Definitions" variant="label-hidden"
+                                placeholder="Select Request Definition..." options={state.requestDefns} onchange={onRequestDefinitionChanged}>
+                            </lightning-combobox>
+                        </lightning-layout-item>
+                        <lightning-layout-item padding="horizontal-small" size="2">
+                            <lightning-button onclick={handleGenerate} variant="bare" label="Generate"></lightning-button>
+                        </lightning-layout-item>
+                        <lightning-layout-item padding="horizontal-small" size="1">
+                                <p class="slds-text-heading_large slds-text-align_left">OR</p>
+                        </lightning-layout-item>
+                        <lightning-layout-item padding="horizontal-small" size="2">
+                            <lightning-button onclick={showModal} variant="bare" label="View Sample" icon-name="utility:preview"></lightning-button>  
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </lightning-accordion-section>
+                <lightning-accordion-section name="Step2" label="Step 2 : Preview JSON">
+                    <lightning-layout vertical-align="center">
+                        <lightning-layout-item padding="horizontal-small" size="6">
+                            <lightning-formatted-rich-text for="horizontal-input-id-02" value="&lt;b>Input JSON&lt;/b>">
+                            </lightning-formatted-rich-text>
+                            <div class="slds-form-element__control">
+                                <textarea id="horizontal-input-id-02" placeholder="Placeholder Text" readonly
+                                    class="slds-textarea mytextarea">{state.fileContents}</textarea>
+                            </div>
+                        </lightning-layout-item>
+                        <lightning-layout-item padding="horizontal-small" size="6">
+                            <lightning-formatted-rich-text for="horizontal-input-id-03"
+                                value="&lt;b>Processed Input&lt;/b>">
+                            </lightning-formatted-rich-text>
+                            <div class="slds-box slds-form-element__control mytextarea slds-scrollable">
+                                <lightning-tree items={state.items}></lightning-tree>
+                            </div>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </lightning-accordion-section>
+                <lightning-accordion-section name="Step3" label="Step 3: Upload JSON">
+                    <lightning-layout vertical-align="center" multiple-rows="true">
+                        <lightning-layout-item padding="around-small" size="12">
+                            <lightning-layout>
+                                <lightning-layout-item>
+                                    <div>
+                                        <lightning-input label="" name="file uploader" onchange={handleFilesChange}
+                                            type="file">
+                                        </lightning-input>
+                                    </div><br />
+                                    <div class="slds-text-body_small slds-text-color_error">{state.fileName}</div>
+                                </lightning-layout-item>
+                                <lightning-layout-item padding="around-large">
+                                    <lightning-button onclick={handleUpsert} variant="brand" label="Upsert"
+                                        disabled={isFileNotSelected}></lightning-button>
+                                </lightning-layout-item>
+                            </lightning-layout>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </lightning-accordion-section>
+            </lightning-accordion>
+        </div>
+    </lightning-card>
+</template>

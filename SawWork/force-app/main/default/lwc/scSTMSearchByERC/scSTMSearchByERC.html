@@ -1,0 +1,157 @@
+<template>
+    <template if:true={loadSpinner}>
+        <div class="forceModalSpinner testModal" style="z-index: 99 !important">
+            <div class="modal-glass" style="opacity: 0.2;">&nbsp;</div>
+            <div class="forceInlineSpinner indicatorContainer" aria-hidden="false" role="alert" data-aura-class="forceInlineSpinner">
+                <div class="forceDotsSpinner" data-aura-class="forceDotsSpinner">
+                    <div class="slds-spinner slds-spinner_brand slds-spinner_medium" role="status">
+                        <span class="slds-assistive-text">Loading...</span>
+                        <div class="slds-spinner__dot-a"></div>
+                        <div class="slds-spinner__dot-b"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <lightning-card>
+        <article class="slds-card">
+            <div class="slds-page-header" style="background-color: #e0e5ee;border-radius: 5px;margin-left: 5px; margin-right: 5px;">
+                <div class="slds-page-header__row">
+                    <div class="slds-page-header__col-title">
+                        <div class="slds-media">
+                            <div class="slds-media__figure">
+                                <lightning-icon icon-name="standard:search" alternative-text="Search By ERC" size="medium" class="slds-m-top_xxx-small" title="Search By ERC"></lightning-icon>
+                            </div>
+                            <div class="slds-media__body">
+                                <div class="slds-page-header__name">
+                                    <div class="slds-page-header__name-title">
+                                        <h1>
+                                            <span class="slds-page-header__title slds-truncate slds-align-middle clip-text slds-line-clamp slds-m-right--xx-small slds-m-top_x-small">Search By ERC</span>
+                                        </h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <lightning-layout multiple-rows="true" vertical-align="end">
+            <lightning-layout-item size="4" padding="around-small">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control" onkeypress={keycheck}>
+                        <lightning-input type="text" 
+                                        label="Enter ERC" 
+                                        onchange={handleERCChange}>
+                        </lightning-input>
+                    </div>
+                </div> 
+            </lightning-layout-item>
+            <lightning-layout-item size="1" padding="around-small">
+                <lightning-button label="Search" 
+                                variant="brand" 
+                                onclick={handleSearch}>
+                </lightning-button>
+            </lightning-layout-item>
+        </lightning-layout>
+        
+        <br/>
+
+        <lightning-layout>
+            <lightning-layout-item size="4" padding="around-small">
+                <div if:true={teamData}>
+                    <article class="slds-card">
+                        <div class="slds-page-header" style="background-color: #e0e5ee;border-radius: 5px;">
+                            <div class="slds-page-header__row">
+                                <div class="slds-page-header__col-title">
+                                    <div class="slds-media">
+                                        <div class="slds-media__figure">
+                                            <lightning-icon icon-name="standard:groups" alternative-text="Support Team" size="medium" class="slds-m-top_xxx-small" title="Support Team"></lightning-icon>
+                                        </div>
+                                        <div class="slds-media__body">
+                                            <div class="slds-page-header__name">
+                                                <div class="slds-page-header__name-title">
+                                                    <h2>
+                                                        <span class="slds-page-header__title slds-truncate slds-align-middle clip-text slds-line-clamp slds-m-right--xx-small slds-m-top_x-small">Support Team</span>
+                                                    </h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                    <lightning-datatable data={teamData} 
+                                    columns={teamColumns} 
+                                    key-field="id"
+                                    hide-checkbox-column="true">
+                    </lightning-datatable>  
+                </div>
+            </lightning-layout-item>
+            <lightning-layout-item size="4" padding="around-small">
+                <div if:true={accData} >
+                    <article class="slds-card">
+                        <div class="slds-page-header" style="background-color: #e0e5ee;border-radius: 5px;">
+                            <div class="slds-page-header__row">
+                                <div class="slds-page-header__col-title">
+                                    <div class="slds-media">
+                                        <div class="slds-media__figure">
+                                            <lightning-icon icon-name="standard:person_account" alternative-text="Support Team Account" size="medium" class="slds-m-top_xxx-small" title="Support Team Account"></lightning-icon>
+                                        </div>
+                                        <div class="slds-media__body">
+                                            <div class="slds-page-header__name">
+                                                <div class="slds-page-header__name-title">
+                                                    <h2>
+                                                        <span class="slds-page-header__title slds-truncate slds-align-middle clip-text slds-line-clamp slds-m-right--xx-small slds-m-top_x-small">Support Team Account</span>
+                                                    </h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                <lightning-datatable data={accData} 
+                                        columns={accColumns} 
+                                        key-field="id"
+                                        hide-checkbox-column="true">
+                </lightning-datatable>
+                </div>
+            </lightning-layout-item>
+            <lightning-layout-item size="4" padding="around-small">
+                <div if:true={memData}>
+                    <article class="slds-card">
+                        <div class="slds-page-header" style="background-color: #e0e5ee;border-radius: 5px;">
+                            <div class="slds-page-header__row">
+                                <div class="slds-page-header__col-title">
+                                    <div class="slds-media">
+                                        <div class="slds-media__figure">
+                                            <lightning-icon icon-name="standard:team_member" alternative-text="Support Team Member" size="medium" class="slds-m-top_xxx-small" title="Support Team Member"></lightning-icon>
+                                        </div>
+                                        <div class="slds-media__body">
+                                            <div class="slds-page-header__name">
+                                                <div class="slds-page-header__name-title">
+                                                    <h2>
+                                                        <span class="slds-page-header__title slds-truncate slds-align-middle clip-text slds-line-clamp slds-m-right--xx-small slds-m-top_x-small">Support Team Member</span>
+                                                    </h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                    <lightning-datatable data={memData} 
+                                        columns={memColumns} 
+                                        key-field="id"
+                                        hide-checkbox-column="true">
+                    </lightning-datatable>
+                </div>
+            </lightning-layout-item>
+        </lightning-layout>
+    </lightning-card>
+</template>

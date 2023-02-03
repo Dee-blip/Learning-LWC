@@ -1,0 +1,122 @@
+<template>
+     <template if:true={loadSpinner}>
+          <div style="opacity: 0.7;" class="slds-spinner_container">
+               <lightning-spinner alternative-text="Loading" variant="brand" size="medium"> </lightning-spinner>
+          </div>     
+      </template>
+      <!--<lightning-spinner if:true={loadSpinner}></lightning-spinner>-->
+     <!-- Filters and top level actions-->
+     <div class="slds-box" style="padding: 2px">
+          <div class="slds-grid button-zoom">
+               <div class="slds-col">
+                    <button class="slds-button slds-button_brand" style="float: right;" onclick={createTask}>New Task</button>                   
+               </div>
+               
+               <!--&nbsp; style="padding-left: 0.2rem;" style="padding-left: 3rem;"-->
+               <div class="slds-col" style="padding-left: 0.8rem;">
+                    <!--<button class="slds-button slds-button_brand" onclick={openTicketPushModal}>Ticket Push</button> prefix-icon-name="utility:task" -->
+                    <lightning-button-group>
+                         <lightning-button variant="brand" label="Ticket Push" value="TicketPush" ></lightning-button>
+                         <lightning-button-menu menu-alignment="right" alternative-text="Show menu" variant="border-filled">
+                             <lightning-menu-item label="Ticket Push 24h" prefix-icon-name="utility:task"
+                                 value="24" onclick={initiateTicketPush}>
+                             </lightning-menu-item>
+                             <lightning-menu-item label="Ticket Push 72h" prefix-icon-name="utility:task"
+                                 value="72" onclick={initiateTicketPush}>
+                             </lightning-menu-item>
+                         </lightning-button-menu>
+                     </lightning-button-group>
+               </div>
+               <div class="slds-col">
+                    <lightning-button-icon icon-name="action:refresh" tooltip="Refresh Table" onclick={manualRefreshTable}
+                         class="refreshbutton" variant="brand"></lightning-button-icon>
+               </div>
+          </div>
+          <lightning-combobox class="filter-zoom" label="Status Filter" value={statusFilter} options={statusFilterOptions}
+               onchange={handleStatusFilterChange}></lightning-combobox>
+          <lightning-combobox class="filter-zoom" label="Type Filter" value={typeFilter} options={typeFilterOptions}
+               onchange={handleTypeFilterChange}></lightning-combobox> 
+     </div>
+     <!--Lightning data table-->
+     <lightning-datatable class="table-zoom" columns={columns} data={lTask} key-field="id" hide-checkbox-column
+          onrowaction={handleRowActions}></lightning-datatable>
+
+     <!-- Modal for Defer-->
+     <template if:true={isShowDeferModal}>
+          <div style="height: 100%;">
+               <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small"
+                    aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2">
+                    <div class="slds-modal__container">
+                         <header class="slds-modal__header">
+                              <button
+                                   class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                   onclick={closeDeferModal} title="Close">
+                                   <lightning-icon icon-name="utility:close" alternative-text="close"
+                                        variant="inverse" size="small"></lightning-icon>
+                                   <span class="slds-assistive-text">Close</span>
+                              </button>
+                              <h2 id="modal-heading-02" class="slds-modal__title slds-hyphenate">Defer Task</h2>
+                         </header>
+                         <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                              <div class="slds-form-element slds-form-element_horizontal">
+                                   <label class="slds-form-element__label">Defer By(hours)</label>
+                                   <div class="slds-form-element__control">
+                                        <div class="slds-select_container">
+                                             <select class="slds-select" onchange={handleDeferValueChange}>
+                                                  <template for:each={deferOptions} for:item="option">
+                                                       <option key={option.label} class="uiInputSelectOption" value={option.value}>{option.value}</option>
+                                                  </template>
+                                             </select>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+                         <footer class="slds-modal__footer">
+                              <button class="slds-button slds-button_destructive" onclick={saveDeferredTask} disabled={isDeferButtonDisable}>Defer</button>
+                              <button class="slds-button slds-button_neutral" onclick={closeDeferModal} disabled={isDeferButtonDisable}>Cancel</button>
+                         </footer>
+                    </div>
+               </section>
+               <div class="slds-backdrop slds-backdrop_open"></div>
+          </div>
+     </template>
+     <!--Modal for Ticket Push
+     <template if:true={isTicketPushModal}>
+          <div style="height: 100%;">
+               <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small"
+               aria-labelledby="modal-heading-03" aria-modal="true" aria-describedby="modal-content-id-3">
+                    <div class="slds-modal__container">
+                         <header class="slds-modal__header">
+                              <button
+                                   class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                                   onclick={closeTicketPushModal} title="Close">
+                                   <lightning-icon icon-name="utility:close" alternative-text="close"
+                                        variant="inverse" size="small"></lightning-icon>
+                                   <span class="slds-assistive-text">Close</span>
+                              </button>
+                              <h2 id="modal-heading-03" class="slds-modal__title slds-hyphenate">Initiate Ticket Push</h2>
+                         </header>
+                         <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+                              <div class="slds-form-element slds-form-element_horizontal">
+                                   <label class="slds-form-element__label">Select an Option</label>
+                                   <div class="slds-form-element__control">
+                                        <div class="slds-select_container">
+                                             <select class="slds-select" onchange={handleTicketPushValueChange}>
+                                                  <template for:each={ticketPushOptions} for:item="option">
+                                                       <option key={option.label} class="uiInputSelectOption" value={option.value}>{option.value}</option>
+                                                  </template>
+                                             </select>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+                         <footer class="slds-modal__footer">
+                              <button class="slds-button slds-button_brand" onclick={initiateTicketPush}>Initiate</button>
+                              <button class="slds-button slds-button_neutral" onclick={closeTicketPushModal}>Cancel</button>
+                         </footer>
+                    </div>
+               </section>
+               <div class="slds-backdrop slds-backdrop_open"></div>
+          </div>
+     </template>-->
+</template>

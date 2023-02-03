@@ -1,0 +1,59 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" access="global" controller="GSM_CallToAction_CreateLeadController" >
+    <aura:attribute name="genericRecordID" type="Id" />
+    <!--<aura:attribute name="confirmSDRMessage" type="String"/>-->
+    <aura:attribute name="showPage" type="Boolean" default="false"/>
+    <aura:attribute name="showCreateLeadButton" type="Boolean" default="false"/>
+    <aura:attribute name="showSDRReassignMessage" type="Boolean" default="false"/>
+    <aura:attribute name="afterInit" type="Boolean" default="false"/>
+    <aura:attribute name="showCancelButton" type="Boolean" default="false"/>
+    
+    <aura:attribute name="c2aRecordId" type="String" />
+    
+    <aura:attribute name="successMessage" type="String"/>
+    
+    <aura:attribute name="ErrorMessage" type="String"/>
+    <aura:attribute name="hideSDRSection" type="Boolean" default="false"/>
+    <aura:attribute name="showContactComponent" type="Boolean" default="false"/>
+    <!--aura:attribute name="showTranscriptComponent" type="Boolean" default="false"/-->
+    
+    <aura:method name="parentCheckLead" action="{!c.checkLead}"></aura:method>
+    <aura:method name="SetActivityParameters" action="{!c.setActivityValues}">
+        <aura:attribute name="ProductLine" type="String"/>
+        <aura:attribute name="LeadType" type="String"/>
+        <aura:attribute name="Notes" type="String"/>
+    </aura:method>
+    
+    <aura:attribute name="productSelected" type="String" default=""/>
+    <aura:attribute name="leadTypeSelected" type="String" default=""/>
+    <aura:attribute name="Notes" type="String" default=""/>
+
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    
+    <div>
+        <div>
+            <center>
+                <lightning:spinner variant="brand" size="large" aura:id="ltngSpinner" class="slds-hide"/>
+            </center>
+        </div>
+        
+        <aura:if isTrue="{!v.showContactComponent}">
+            <c:GSM_Lite_ContactToLeadCreateComponent  aura:id="ContactToLeadCreateComponent" contactId = "{!v.recordId}" parent="{! this }"/>
+            <aura:set attribute="else">
+                
+                <div>
+                    <div class="slds-panel__section" 
+                         style="color:green;" aura:id="SuccessId2">
+                        <ui:message title="Message" severity="info" closable="true">
+                            A Call To Action already exists for this person record.
+                            Please click on the button to add an activity to capture the details.
+                        </ui:message>
+                        <lightning:button label="Link to Lead" variant="brand" class="slds-button" onclick="{!c.redirectLead}"/>
+                    </div>
+                </div>
+            </aura:set>
+        </aura:if>
+    </div>
+</aura:component>

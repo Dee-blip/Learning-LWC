@@ -1,0 +1,5 @@
+<apex:page standardController="SI_ServiceIncidentImpactedProducts__c" extensions="SI_NewImpactedProduct">
+<c:SI_PrdCatalogComponent pageController="{!this}" ></c:SI_PrdCatalogComponent>
+<apex:form >
+</apex:form>
+</apex:page>

@@ -1,0 +1,68 @@
+<aura:component controller="SF1_Controller_ListViewCustom" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+	
+    
+       <aura:attribute name="listName" type="String"/>
+       <aura:attribute name="sObjectName" type="String" default="Account" /> 
+       <aura:attribute name="listViewSelectOptions" type="String[]" /> 
+       <aura:attribute name="ObjItems" type="SObject[]" /> 
+       <aura:attribute name="listItemCount" type="String" /> 
+       
+       <aura:attribute name="currentOffset" type="String" /> 
+       <aura:attribute name="pageSize" type="String" /> 
+       <aura:attribute name="useFilter" type="Boolean" /> 
+       
+       <aura:attribute name="loadButtonLabel" type="String" /> 
+       <aura:attribute name="userSelection" type="String" /> 
+    
+    <aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
+    
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <aura:attribute name="loadDone" type="Boolean" default="false" />
+    <aura:attribute name="noRecordsPresent" type="Boolean" default="false" />
+    
+    <span id="oppSpinner" style="display:none; position: absolute; top: 50%; left: 50%;">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--medium slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading..</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+   </span>
+    
+    <ui:scrollerWrapper class="scrollerSize">
+    <aura:if isTrue="{!v.loadDone}">
+        <aura:if isTrue="{!!v.noRecordsPresent}">
+            <div class="slds">
+                <div class="sectionFive" >
+                    <div class="sectionContainer" >
+                        <aura:iteration var="obj" items="{!v.ObjItems}" indexVar="idx">
+                                <c:SF1_FinalRecord sObjectName="{!v.sObjectName}" record="{!obj}" recordId="{!obj.Id}" />
+                        </aura:iteration>
+                     </div>
+                </div>
+            </div>
+        </aura:if>
+            
+        <aura:if isTrue="{!v.noRecordsPresent}">
+            <div class="sectionSix slds-col slds-size--1-of-1" style="height:10vh;">
+                    <div id ="noRec" class="slds-align--absolute-center slds-container--fluid slds-align-bottom" style="display:block">
+                        <div id="message" style="display:block;height:16vh;">
+                            <c:SF1_uiMessage message="No Records are present under this list view. Go back to select another list view . " />
+                        </div><br></br>
+                    </div>
+            </div>
+        </aura:if>
+        
+        <aura:if isTrue="{!!v.noRecordsPresent}">
+            <div class="sectionSeven" style="margin-top:1vh;margin-bottom:1vh;">
+                  <lightning:button aura:id="loadMoreButton" class="loadingButton slds-p-horizontal--small slds-size--1-of-3" variant="brand" label="{!v.loadButtonLabel}"  type="submit" onclick="{! c.LoadMoreResults}" />
+            </div>
+       </aura:if>
+        
+      
+    </aura:if>
+
+    </ui:scrollerWrapper>
+</aura:component>

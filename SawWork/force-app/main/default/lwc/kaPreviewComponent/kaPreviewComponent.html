@@ -1,0 +1,17 @@
+<template>
+    <div style="position:relative;">
+        <lightning-spinner alternative-text="Loading" size="medium" if:true={isLoading}></lightning-spinner>
+        <c-hd-generic-search-component object-name="BMCServiceDesk__KM_KnowledgeArticle__c"
+            onitemremove={handleItemRemove} search-field="BMCServiceDesk__Title__c" iconname="standard:knowledge"
+            linked-items={linkedKnowledgeArticles} search-placeholder="Search Knowledge Articles by Title"
+            component-title="Knowledge Article Search" onitemlinked={handleItemLink} error-status={errorMessage}
+            favourites={favourites} size={flexipageRegionWidth}
+            metadata-fields="BMCServiceDesk__Article_Type__c,BMCServiceDesk__Category__c,BMCServiceDesk__Status__c">
+            <span slot="additionalSection">
+                <lightning-pill-container if:true={showPillContainer} items={linkedKnowledgeArticles}
+                    onitemremove={handleItemRemove}>
+                </lightning-pill-container>
+            </span>
+        </c-hd-generic-search-component>
+    </div>
+</template>

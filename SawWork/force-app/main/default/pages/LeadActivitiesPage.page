@@ -1,0 +1,12 @@
+<!-- SFDC-2407 Added by Mayank Bansal 13th March 2018 -->
+<apex:page standardController="Lead">
+    <apex:includeLightning />
+    <div id="lightning" />
+	<script>
+    	$Lightning.use("c:ActivityHistoryApp", function () {
+	        $Lightning.createComponent("c:ActivityHistoryComponent", {recordId: "{!Lead.AKAM_Lead_ID__c}"}, "lightning", function (cmp) {
+	          // do some stuff
+	        });
+	    });
+    </script>
+</apex:page>

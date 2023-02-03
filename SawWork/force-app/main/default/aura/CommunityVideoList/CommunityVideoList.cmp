@@ -1,0 +1,75 @@
+<aura:component controller="SC_CommunityVideoPlayer" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="contentList" type="ContentDocument[]"/>
+    <aura:attribute name="videoList" type="Community_Video__c[]"/>
+    <aura:attribute name="videoTitle" type="String"/>
+    <aura:attribute name="videoDownloadURL" type="String"/>
+    <aura:attribute name="videoURLWithoutHost" type="String"/>
+    <aura:attribute name="videoId" type="String"/>
+    <aura:attribute name="topicId" type="String" access="global"/>
+    <aura:attribute name="showNoRows" type="boolean" default="false"/>
+    <aura:attribute name="showTable" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:handler event="c:CommunityVideoEvt" action="{!c.playVideo}"/>
+
+    <div class="slds-page-header" role="banner">
+        <div>
+            <p class="slds-text-heading_label">{!$Label.c.Jarvis_CommunityVideoList_Heading}</p><!--Video List-->
+        </div>     
+    </div>
+    <aura:if isTrue="{!v.showNoRows}">
+        <p style="padding:14px;">{!$Label.c.Jarvis_CommunityVideoList_NoVideosText}</p><!--No videos are available for this topic.-->
+    </aura:if>
+    <aura:if isTrue="{!v.showTable}">
+        <table class="slds-table slds-table--bordered slds-table--striped slds-table--cell-buffer">
+            <thead>
+                <tr class="slds-text-heading--label">
+                    <th scope="col"><div class="slds-truncate" title="{!$Label.c.Jarvis_CommunityVideoList_TitleColumnHeading}">{!$Label.c.Jarvis_CommunityVideoList_TitleColumnHeading}</div></th> <!--Title - title-->
+                    <th scope="col"><div class="slds-truncate" title="{!$Label.c.Jarvis_CommunityVideoList_CreatedOnColumnHeading}">{!$Label.c.Jarvis_CommunityVideoList_CreatedOnColumnHeading}</div></th> <!--Created On - title-->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Use the Apex model and controller to fetch server side data -->
+                
+                <aura:iteration items="{!v.videoList}" var="content" indexVar="index">                                    
+                    <tr>
+                        <!--<th scope="row"><div class="slds-truncate" title="{!content.Title}"><a href="{!'/apex/SC_CommunityVideoPlayer?id='+content.Id}" target="_blank">{!content.Title}</a></div></th>-->
+                        <!--<th scope="row"><div class="slds-truncate" name="contentTitle" title="{!content.Title}"><a onclick="{!c.playVideo}">{!content.Title}</a></div></th>-->
+                        <th scope="row"><c:CommunityVideo videoTitle="{!content.Name}" videoId="{!content.Id}" /></th>
+                        <td><div class="slds-truncate" title="{!content.CreatedDate}"><lightning:formattedDateTime value="{!content.CreatedDate}"/></div></td>                    
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+    </aura:if>
+    <aura:if isTrue="{!v.isOpen}">
+        <!--###### MODAL BOX Start From Here ######--> 
+        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+            <div class="slds-modal__container">
+                <!-- ###### MODAL BOX HEADER Part Start From Here ######-->
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="{!$Label.c.Jarvis_CommunityVideoList_ModalCloseButtonTitle}" onclick="{!c.closeModel}"><!--Close - title-->
+                        X
+                        <span class="slds-assistive-text">{!$Label.c.Jarvis_CommunityVideoList_ModalCloseButtonTitle}</span><!--Close-->
+                    </button>
+                    <h2 id="header99" class="slds-text-heading--medium">{!v.videoTitle}</h2>
+                </div>
+                <!--###### MODAL BOX BODY Part Start From Here ######-->
+                <div class="slds-modal__content slds-p-around--medium">
+                    <div class="slds-form_stacked">
+                        <!--<iframe src="{! '/apex/SC_CommunityVideoPlayer?Id='+v.videoId}" width="100%" height="500px;" frameBorder="0"/>-->
+                        <!--<iframe src="http://videop-community.akamai.com/video/d5e9e8af810f6_10614339.mp4" width="100%" height="500px;" frameBorder="0"/>-->
+                    </div>
+                </div>
+                
+                <!--###### MODAL BOX FOOTER Part Start From Here ######-->
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >{!$Label.c.Jarvis_CommunityVideoList_ModalFooterCancelButton}</button><!--Cancel-->
+                    <!--<button class="slds-button slds-button-brand" onclick="{!c.createBlog}">Save Blog</button>-->
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+        <!--###### MODAL BOX Part END Here ######-->
+    </aura:if>
+</aura:component>

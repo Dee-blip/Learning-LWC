@@ -1,0 +1,88 @@
+<template>
+    <div style="height: 100%; border: 1px #08b97633; ">
+        <div class="title">
+            Revenue (<span style="color: #08b976;font-weight:400">{filteredRevenueMonths} months</span>)
+        </div>
+
+        <div class="slds-media slds-p-horizontal_medium slds-p-vertical_small trend-item">
+            <div class="slds-media__figure">
+                <lightning-icon icon-name="utility:money" variant="inverse" class="green" size="small"> </lightning-icon>
+            </div>
+            <div class="slds-media__body">
+                <div class="slds-grid slds-grid_align-spread item-with-subtext">
+                    <div class="slds-grid slds-grid_vertical-align-center">
+                        <p class="slds-truncate">
+                            Filtered revenue for EPS <br />
+                            <span> Revenue for {revenueMonths} Months is
+                                ${totalRevenueUnfiltered}</span>
+                        </p>
+                    </div>
+                    <div class="trend-item-value">
+                        <lightning-formatted-number value={totalRevenueFiltered} format-style="currency"
+                            currency-code="USD"></lightning-formatted-number>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slds-media slds-p-horizontal_medium slds-p-vertical_small trend-item">
+            <div class="slds-media__figure">
+                <lightning-icon icon-name="utility:graph" variant="inverse" class={currMarginClr} size="small">
+                </lightning-icon>
+            </div>
+            <div class="slds-media__body">
+                <div class="slds-grid slds-grid_align-spread">
+                    <div class="slds-grid slds-grid_vertical-align-center">
+                        <p class="slds-truncate">
+                            Current Profitability Score
+                        </p>
+                    </div>
+                    <div class="trend-item-value">
+                        {currentProfitabilityScore}%
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slds-media slds-p-horizontal_medium slds-p-vertical_small trend-item">
+            <div class="slds-media__figure">
+                <lightning-icon icon-name="utility:event" variant="inverse" class="green" size="small"> </lightning-icon>
+            </div>
+            <div class="slds-media__body">
+                <div class="slds-grid slds-grid_align-spread ">
+                    <div class="slds-grid slds-grid_vertical-align-center">
+                        <p class="slds-truncate">
+                            Average Revenue for EPS
+                        </p>
+                    </div>
+                    <div class="trend-item-value">
+                        <lightning-formatted-number value={averageMonthlyRevenue} format-style="currency"
+                            currency-code="USD"></lightning-formatted-number>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slds-media slds-p-horizontal_medium slds-p-vertical_small trend-item">
+            <div class="slds-media__figure">
+                <lightning-icon icon-name="utility:metrics" variant="inverse" class="green" size="small">
+                </lightning-icon>
+            </div>
+            <div class="slds-media__body">
+                <div class="slds-grid slds-grid_align-spread trend-item">
+                    <div class="slds-grid slds-grid_vertical-align-center">
+                        <p class="slds-truncate">
+                            Current Customer Role MRR
+                        </p>
+                    </div>
+                    <div class="trend-item-value">
+                        <p>
+                            <lightning-formatted-number value={currentCustomerRoleMrr} format-style="currency"
+                                currency-code="USD"></lightning-formatted-number>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,21 @@
+/* .header {
+    color:#6b6d70;
+} */
+
+.cell{
+    font-size: 13px;
+    font-weight: 400;
+    color: rgb(8, 7, 7);
+    /* fill: #16315a; */
+    text-align: center;
+}
+
+td {
+    padding-left: 1rem !important;
+}
+
+.slds-table_bordered tbody td {
+
+    border-top: 1px solid rgb(221, 219, 218);
+    border-left: 1px solid rgb(221, 219, 218);
+}

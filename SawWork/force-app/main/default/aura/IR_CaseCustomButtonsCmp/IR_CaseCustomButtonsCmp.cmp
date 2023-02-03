@@ -1,0 +1,36 @@
+<aura:component controller="IR_CaseCustomButtonsController" implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" >
+
+    <aura:attribute name="showSpinner" type="Boolean" default="false"/>
+
+    <span class="{!v.showSpinner ? 'slds-show' : 'slds-hide'}">
+      <lightning:spinner/>
+    </span>
+	<div >
+        <div style="display: inline-block; padding:3px;">
+            <lightning:button label="Manual Invoice Approval"
+                              aura:id="manualIRCaseApproval"
+                              variant="Neutral"
+                              onclick="{!c.handleSubmit}"
+                              >
+            </lightning:button> 
+        </div>
+        <div style="display: inline-block; padding:3px;">
+            <lightning:button class="btn"
+                              label="Assign to FIN IR US Queue"
+                              aura:id="FIN-US"
+                              variant="Neutral"
+                              onclick="{!c.handleSubmit}"
+                              >
+            </lightning:button>
+        </div>
+        <div style="display: inline-block; padding:3px;">
+            <lightning:button class="btn"
+                              label="Assign to FIN IR Intl. Queue"
+                              aura:id="FIN-Intl"
+                              variant="Neutral"
+                              onclick="{!c.handleSubmit}"
+                              >
+            </lightning:button>
+        </div>
+    </div>
+</aura:component>

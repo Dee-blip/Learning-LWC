@@ -1,0 +1,4 @@
+<aura:component >
+ <aura:attribute name="recordId" type="Id" />
+ <ui:button aura:id="Back" label="Back To Opportunity" press="{!c.Navigate}"/><br/>
+</aura:component>

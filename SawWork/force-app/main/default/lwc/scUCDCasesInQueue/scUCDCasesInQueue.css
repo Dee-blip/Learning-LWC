@@ -1,0 +1,42 @@
+.lgc-bg {
+    background-color: rgb(242, 242, 242);
+}
+
+.c-ltng-button-menu {
+    position: relative;
+    display: inline-block;
+    float: right;
+}
+
+.c-ltng-button-menu-content {
+    display: block;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 400px;
+    box-shadow: 0 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 5000;
+    margin-top: 32px;
+    width: 900px;
+}
+
+.show-right-to-left{
+    right: 0;
+    left: auto;
+}
+
+.backdrop {
+    position: fixed;
+    z-index: 500;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.brandColor{
+    fill: red !important;
+}
+.display-horizontal{
+    display: flex;
+    flex-direction: row;
+}

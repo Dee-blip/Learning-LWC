@@ -1,0 +1,5 @@
+<!-- SF1_OnCurrencySelectionChange -->
+<aura:event type="APPLICATION" description="Used for publishing currencySelection change.">
+    <aura:attribute name="currency" type="String" />
+    <!--aura:attribute name="currencyOptionType" type="String" /-->
+</aura:event>

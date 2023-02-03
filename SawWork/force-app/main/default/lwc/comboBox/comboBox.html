@@ -1,0 +1,89 @@
+<template>
+    <div class={formElCss}>
+        <template if:true={showLabel}>
+            <abbr if:true={required} title="required" class="slds-required">*</abbr>
+            <label class="slds-form-element__label" for="form-combo-box">{label}</label>
+        </template>
+        <div class="slds-form-element__control">
+            <div class={inpCss} id="form-combo-box">
+                <div class={comboCss} aria-expanded="false" aria-haspopup="listbox" role="combobox">
+
+                    <template if:true={selItem}>
+                        <div class={selItemCss}>
+                            <lightning-icon if:true={selItem.iconName} icon-name={selItem.iconName}
+                                alternative-text={selItem.iconText} size="small" variant={selItem.iconVariant}
+                                text={selItem.text} meta-text={selItem.metaText}
+                                class="slds-combobox__input-entity-icon"></lightning-icon>
+
+                            <input type="text" class="slds-input slds-combobox__input slds-combobox__input-value"
+                                aria-autocomplete="list" aria-controls="listbox-id-2" role="textbox"
+                                readonly disabled={disabled} value={selItem.text} />
+
+                            <button if:false={disabled} class="slds-button slds-button_icon slds-input__icon slds-input__icon_right"
+                                title="Remove selected option" onclick={handleRemoveAcc}>
+                                <lightning-icon icon-name="utility:close" alternative-text="Remove selected option"
+                                    size="x-small" variant="base"></lightning-icon>
+                            </button>
+                        </div>
+                        <div class="slds-p-bottom_x-small">
+
+                        </div>
+                    </template>
+                    <template if:false={selItem}>
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
+                            role="none">
+
+                            <input type="text" class="slds-input slds-combobox__input" id="combobox-id-1" data-id="input" 
+                                aria-autocomplete="list" aria-controls="listbox-id-1" autocomplete="off" role="textbox"
+                                placeholder={placeholder} onkeyup={handleInpChange} onfocus={handleInpFocus}
+                                onblur={handleOnBlur} />
+                            <span
+                                class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
+                                <lightning-icon icon-name="utility:search" alternative-text="Search" size="x-small">
+                                </lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-p-bottom_x-small">
+                            <div if:true={inpErrorMsg} class="slds-form-element__help invalid-inp">{inpErrorMsg}</div>
+                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right"
+                                role="none">
+
+                                <div id="listbox-id-1"
+                                    class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid"
+                                    role="listbox">
+
+                                    <template if:true={noresults}>
+                                        <div class="slds-p-horizontal_medium slds-text-font_monospace error-msg">
+                                            <lightning-icon icon-name="utility:info_alt" size="small"
+                                                class="slds-p-right_small" variant="inverse"></lightning-icon>
+                                            {noResultsMsg}
+                                        </div>
+                                    </template>
+
+
+                                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                        <template for:each={processedListData} for:item="datum">
+                                            <li key={datum.key} role="presentation" class="slds-listbox__item">
+                                                <div id={datum.key}
+                                                    class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta"
+                                                    role="option">
+                                                    <c-combo-box-item icon-name={datum.iconName}
+                                                        alternative-text={datum.iconText} icon-size={datum.iconSize}
+                                                        icon-variant={datum.iconVariant} text={datum.text}
+                                                        meta-text={datum.metaText} unique-id={datum.key}
+                                                        onselect={handleSelect}>
+                                                    </c-combo-box-item>
+                                                </div>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

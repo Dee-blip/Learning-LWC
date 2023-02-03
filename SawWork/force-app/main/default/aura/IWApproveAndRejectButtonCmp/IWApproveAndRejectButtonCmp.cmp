@@ -1,0 +1,82 @@
+<aura:component controller="IW_getRequestWatchers" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >    
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="showSubmit" type="boolean" default="false"/>
+    <aura:attribute name="showApprove" type="boolean" default="false"/>
+    <aura:attribute name="showReject" type="boolean" default="false"/>
+    <aura:attribute name="showEscalate" type="boolean" default="false"/>
+    <aura:attribute name="showCancel" type="boolean" default="false"/>
+    <aura:attribute name="isApproveDisabled" type="boolean" default="false"/>
+    <aura:attribute name="isRejectDisabled" type="boolean" default="false"/>
+    <aura:attribute name="isSubmitDisabled" type="boolean" default="false"/>
+    <aura:attribute name="isEscalateDisabled" type="boolean" default="false"/>
+    <aura:attribute name="isCancelDisabled" type="boolean" default="false"/>
+    <aura:attribute name="controllerError" type="string" default=""/>
+    <aura:attribute name="noActionRequiredMsg" type="boolean" default ="false"/> 
+    
+    <aura:attribute name="showCommentPopUp" type="boolean" default ="false"/>
+    <aura:attribute name="buttonClickedValue" type="string" default =""/>
+    <aura:attribute name="CommentBody" type="string" default =""/>
+    
+    <aura:attribute name="HideSpinner" type="Boolean" default="true"/>
+    <aura:renderIf isTrue="{!v.HideSpinner}">
+        <div class="slds-spinner_container" >
+            <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+                <span class="slds-assistive-text"></span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:renderIf>
+    
+    <lightning:card>
+    <div class="slds-align_absolute-center">
+    <aura:if isTrue="{!v.noActionRequiredMsg}">
+        You don't have permission to view the buttons.   
+    </aura:if>
+    <aura:if isTrue="{!v.showSubmit}">
+        <lightning:button iconName="action:approval" label="Submit" class="slds-button slds-button_neutral" onclick="{!c.onSubmit}" disabled="{!v.isSubmitDisabled}"/>&nbsp;
+    </aura:if>
+    <aura:if isTrue="{!v.showApprove}">   
+    	<lightning:button iconName="action:approval" label="Approve" class="slds-button slds-button_neutral" onclick="{!c.onApprove}" disabled="{!v.isApproveDisabled}"/>&nbsp;
+    </aura:if>
+    <aura:if isTrue="{!v.showReject}">   
+    	<lightning:button iconName="action:reject" label="Reject" class="slds-button slds-button_neutral" onclick="{!c.onReject}" disabled="{!v.isRejectDisabled}"/>&nbsp;
+    </aura:if>
+    <aura:if isTrue="{!v.showEscalate}">
+    	<lightning:button iconName="action:approval" label="Escalate" class="slds-button slds-button_neutral" onclick="{!c.onEscalate}" disabled="{!v.isEscalateDisabled}"/>&nbsp;
+    </aura:if>
+    <aura:if isTrue="{!v.showCancel}">
+        <lightning:button iconName="action:reject" label="Cancel" class="slds-button slds-button_neutral" onclick="{!c.onCancel}" disabled="{!v.isCancelDisabled}"/>&nbsp;
+    </aura:if>
+    </div>
+    </lightning:card>
+    
+    
+    <aura:if isTrue="{!v.showCommentPopUp}">
+        
+  <div class="commentDivCls" style="height:400px;">
+  <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+    <div class="slds-modal__container" aura:id="modalDiv">
+      <header class="slds-modal__header">
+      <button class="slds-button slds-button--icon-inverse slds-modal__close" onclick="{!c.closeModal}">
+      	<lightning:icon iconName="utility:close" size="medium" variant="bare"/>
+        <span class="slds-assistive-text">Close</span>
+      </button>
+        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Add Comments</h2>
+      </header>
+      <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+		<lightning:inputRichText value="{!v.CommentBody}" aura:id="iBody">
+		</lightning:inputRichText>
+      </div>
+      <footer class="slds-modal__footer">
+        <lightning:button iconName="" label="Cancel" class="slds-button slds-button_neutral" onclick="{!c.closeModal}"/>
+          <lightning:button iconName="" label="Save" class="slds-button slds-button_neutral" onclick="{!c.updateIW}"/>
+      </footer>
+    </div>
+  </section>
+  <div class="slds-backdrop slds-backdrop_open" aura:id="modalBackDropDiv"></div>
+</div>
+</aura:if>
+    
+</aura:component>

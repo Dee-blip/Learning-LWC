@@ -1,0 +1,18 @@
+<apex:page standardController="Deal_Support_Request__c" recordSetVar="dsrs" showHeader="true" sidebar="true">
+
+    <apex:includeLightning />
+
+    <div id="lightning"/>
+
+    <script>
+        $Lightning.use("c:GSM_App_DSRMoveAll", function() {
+          $Lightning.createComponent("c:GSM_Component_DSRMoveAll",
+          { existingOpportunityId:"{!$CurrentPage.parameters.Id}" },
+          "lightning",
+          function(cmp) {
+            // do some stuff
+          });
+        });
+    </script>
+
+</apex:page>

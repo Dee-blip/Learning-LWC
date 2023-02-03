@@ -1,0 +1,17 @@
+<design:component label="AMG Home Page Template">
+    <flexipage:template >
+        
+        <flexipage:region name="top" defaultWidth="MEDIUM" />
+        
+        <flexipage:region name="left" defaultWidth="MEDIUM" />
+        
+        <flexipage:region name="middle" defaultWidth="MEDIUM">               
+            <flexipage:formfactor type="MEDIUM" width="MEDIUM" />
+        </flexipage:region>
+        
+        <flexipage:region name="right" defaultWidth="MEDIUM" />
+        <flexipage:region name="bottomRight" defaultWidth="MEDIUM" />
+        <flexipage:region name="bottomLeft" defaultWidth="MEDIUM" />
+        
+    </flexipage:template>
+</design:component>

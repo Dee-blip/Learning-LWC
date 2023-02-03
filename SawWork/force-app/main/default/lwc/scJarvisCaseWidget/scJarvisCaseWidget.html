@@ -1,0 +1,33 @@
+<template>
+    <template if:true = {displayWidget}>
+        <lightning-card title={label.CASE_WIDGET_TITLE} class = "caseWidgetCard" >
+            <div slot="actions" >
+                <lightning-button  variant="brand"  icon-name="utility:new" label={label.NEW_CASE} class="newCaseButton"  onclick={goToNewCase}  if:true={displayNewCaseButton}> </lightning-button>
+            </div>
+            <div class="slds-grid ">
+                <div class="slds-size_1-of-3">
+                    <div class="slds-box slds-box_x-small slds-text-align_center slds-m-around_x-small" style="background-color: #ffffff">
+                        <div class="slds-text-body_small">{label.OPEN}</div>
+                        <div class="slds-text-body_small">{label.CASES}</div>
+                        <div class="slds-text-heading_large"> {myOpenCaseCount} </div>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-3">
+                    <div class="slds-box slds-box_x-small slds-text-align_center slds-m-around_x-small" style="background-color: #ffffff">
+                        <div class="slds-text-body_small">{label.UPDATED_CASES}</div>
+                        <div class="slds-text-heading_large"> {updatedCaseCount} </div>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-3">
+                    <div class="slds-box slds-box_x-small slds-text-align_center slds-m-around_x-small" style="background-color: #ffffff;">
+                        <div class="slds-text-body_small">{label.CLOSED_CASES}</div>
+                        
+                        <div class="slds-text-heading_large"> {closedCaseCount} </div>
+                    </div>
+                </div>
+            </div>  
+        
+            <div class = "slds-align_absolute-center slds-text-link viewDashboardLink" onclick={goToSupportHome}> <a>{label.MANAGE_CASES}</a></div>
+        </lightning-card>
+    </template>
+</template>

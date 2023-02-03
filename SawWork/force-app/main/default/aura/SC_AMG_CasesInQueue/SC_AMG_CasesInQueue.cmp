@@ -1,0 +1,348 @@
+<!--
+Developer          	: Vandhana Krishnamurthy
+Description     	: AMG Homescreen Dashboard for Lightning
+________________________________________________________________________________________________________
+
+Date                Developer             JIRA #                      		Description                                                       
+________________________________________________________________________________________________________
+25 Nov 2019     	Vandhana      		 ESESP-1900     		AMG Homescreen Lightning Development
+________________________________________________________________________________________________________
+-->
+
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" controller="SC_AMG_Home_Lightning" access="global" extends="c:AuraUtils" >
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:handler name="change" value="{!v.selectedQueue}" action="{!c.updateQueueTable}"/>
+    
+    <!--<aura:handler event="force:refreshView" action="{!c.init}"/>-->
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <aura:handler name="oSelectedRecordEvent" event="c:SC_CustomLookupEvent" action="{!c.handleComponentEvent}"/>
+    <aura:handler name="destroy" value="{!this}" action="{!c.handleDestroy}"/>
+    
+    <aura:attribute name="columns" type="List" default="[]"/>
+    <aura:attribute name="data" type="List" access= "global" default="[]"/>
+    
+    <aura:attribute name="dataFiltered" type="List" access= "global" default="[]"/>
+    <aura:attribute name="filteredDataCount" type="Integer" default="0"/>
+    
+    <aura:attribute name="casesCount" type="Integer" access= "global" default="-1"/>
+    
+    <aura:attribute name="teamColumns" type="List" default="[]"/>
+    <aura:attribute name="teamData" type="List" access="global" default="[]"/>
+    <aura:attribute name="teamDataCount" type="Integer" access="global" default="0"/>
+    
+    <aura:attribute name="userChosenColumns" type="List" default="[]"/>
+    <aura:attribute name="userChosenData" type="List" access="global" default="[]"/>
+    
+    <aura:attribute name="dataQueue" type="List" access= "global" default="[]"/>
+    
+    <aura:attribute name="keyField" type="String" default="id"/>
+    <!-- the container element determine the height of the datatable -->
+    <aura:attribute name="caseListToIterate" type="Case" access="global"/>
+    <aura:attribute name="fieldsList" type="List" default="[]"/>
+    
+    <aura:attribute name="selectedRowsCount" type="Integer" default="0"/>
+    
+    <aura:attribute name="amgQueue" type="String[]" default="Select Queue"/>
+    <aura:attribute name="selectedQueue" type="String" default="AMG APJ Hotseat Queue"/>
+    
+    <aura:attribute name="qCaseSearchText" type="String" default=""/>
+    
+    <!-- LOAD MORE DATA ATTRIBUTES -->
+    <aura:attribute name="enableInfiniteLoading" type="Boolean" default="true"/>
+    <aura:attribute name="initialRows" type="Integer" default="50"/>
+    <aura:attribute name="rowsToLoad" type="Integer" default="20"/>
+    <aura:attribute name="totalNumberOfRows" type="Integer" default="10"/>
+    <aura:attribute name="loadMoreStatus" type="String" default="Scroll down to load more!"/>
+    <aura:attribute name="showRowNumberColumn" type="Boolean" default="false"/>
+    <aura:attribute name="rowNumberOffset" type="Integer" default="0"/>
+    <aura:attribute name="rowsToAdd" type="Integer" default="20"/>
+    <aura:attribute name="currentCount" type="Integer" default="50"/>
+    
+    <aura:attribute name="sortedBy" type="String" default="agedays"/>
+    <aura:attribute name="sortedDirection" type="String" default="asc"/>
+
+    <aura:attribute name="activeSections" type="List" default="['Q']" />
+    <aura:attribute name="activeSectionsMessage" type="String" default="" />
+    <aura:attribute name="recId" type="Id" />
+    <aura:attribute name="loadSpinner" type="Boolean"/>
+    
+    <aura:attribute name="isUserManager" type="Boolean" default="false"/>
+    
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isTeamModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isAssignUserModalOpen" type="boolean" default="false"/>
+    
+    <aura:attribute name="assignCaseId" type="String"/>
+    
+    <aura:attribute name="assignUserId" type="String"/>
+    <aura:attribute name="assignUserName" type="String"/>
+    
+    <aura:attribute name="selectedUserRecord" type="sObject" default="{}" />
+    <aura:attribute name="selectedUserRecordId" type="String" default=""/>
+    <aura:attribute name="userSelected" type="sObject" default="{}"/>
+    <aura:attribute name="amgUserSelected" type="Boolean" default="false"/>
+    <aura:attribute name="userSelectedId" type="String" default=""/>
+
+    <aura:attribute name="setIntervalId" type="Integer"/>
+    
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid slds-gutters">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                
+                <div>
+                    <aura:if isTrue="{!v.loadSpinner}">
+                        <div style="opacity: 0.7;" aura:id="spinnerId" class="slds-spinner_container" >
+                            <lightning:spinner alternativeText="Loading" variant="brand" size="large" />
+                        </div>
+                    </aura:if>
+                </div>
+                
+                <div class="slds-media__figure slds-col slds-size_2-of-7">
+                    
+                    <ul class="slds-list_horizontal slds-media_center">
+                        <li>
+                            <lightning:icon iconName="standard:queue" class="slds-icon" />
+                        </li>
+                        <li class="">
+                            <span style="font-size:17px;padding-left: 10px;">Cases in Queues <b>({!v.totalNumberOfRows})</b></span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="slds-col" style="width: auto" >
+                    <lightning:select name="QueueSelect" value="{!v.selectedQueue}" class="label-hidden" variant="label-hidden">
+                        <aura:iteration items="{!v.amgQueue}" var="queue">
+                            <option text="{!queue}" selected="{!queue==v.selectedQueue}"></option>
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+                
+                <div class="slds-media slds-col">
+                    <lightning:button variant="brand" label="New Case" title="New Case" 
+                                      onclick="{!c.newCase }" />
+                </div>
+                
+                <div class="slds-col">
+                    <lightning:input value="{!v.qCaseSearchText}" placeholder="Search on Cases..." type="text" name="Case Search" class="label-hidden" onchange="{!c.filter}"/>
+                    <!--<p style="text-align:center">{!v.filteredDataCount} of {!v.casesCount}</p>-->
+                </div>	
+                
+                <div class="slds-col rightAlign">
+                    <button class="slds-button" label="Refresh"
+                            onclick="{!c.updateQueueTable}">
+                        <lightning:icon iconName="action:refresh" alternativeText="Refresh" size="x-small"/>
+                    </button>
+                </div>
+                
+                <!--<div class="slds-col slds-no-flex ">
+                    <lightning:button variant="base" label="Refresh" title="Refresh Cases" onclick="{!c.refreshView}">
+                        <lightning:icon iconName="standard:product_transfer" size="small" alternativeText="Refresh" />
+                    </lightning:button>
+                </div>-->
+                
+            </header>
+            
+        </div>
+        
+        <div class="slds-card__body slds-card__body_inner" style="height:290px;">
+            <aura:if isTrue="{!v.casesCount > 0}">
+                <div style="height:270px;">
+                    <!--
+                    <div class="slds-float_left">
+                        <strong>Total {!v.totalNumberOfRows} Cases</strong>
+                    </div>
+                    <div class="slds-float_right">
+                        <strong>{!v.loadMoreStatus}</strong>
+                    </div>
+                    <br/>
+                    -->
+                    <lightning:datatable 
+                                         data="{!v.dataFiltered}" 
+                                         columns="{!v.columns}" 
+                                         keyField="Id" 
+                                         aura:Id = "datatable"
+                                         onsort = "{!c.updateColumnSorting}"
+                                         sortedBy="{!v.sortedBy}"  
+                                         sortedDirection="{!v.sortedDirection}"
+                                         onrowaction="{!c.handleRowAction}"
+                                         hideCheckboxColumn = "true"
+                                         rowNumberOffset="0"
+                                         enableInfiniteLoading="{!v.enableInfiniteLoading}"
+                                         onloadmore="{!c.handleLoadMoreCases}"
+                                         />
+                </div>
+                <aura:set attribute ="else">
+                    <aura:if isTrue="{!v.casesCount == 0}">
+                        <div class="slds-text-heading_medium slds-align_absolute-center" style="padding: 30px;">
+                            That's a happy empty Queue!
+                        </div>
+                        
+                        <aura:set attribute="else">
+                            <div class="slds-text-heading_medium slds-align_absolute-center" style="padding: 30px;">
+                                Queueing up... Hang tight!
+                            </div>
+                        </aura:set>  
+                    </aura:if>
+                </aura:set>
+            </aura:if>
+        </div>
+        
+        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ASSIGN CASE TO MYSELF ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+        <aura:if isTrue="{!v.isModalOpen}">
+            <div class="slds-m-around_xx-large">
+                <!-- Modal/Popup Box starts here-->
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <!-- Modal/Popup Box Header Starts here-->
+                        <header class="slds-modal__header">
+                            <lightning:buttonIcon iconName="utility:close"
+                                                  onclick="{! c.closeModal }"
+                                                  alternativeText="close"
+                                                  variant="bare-inverse"
+                                                  class="slds-modal__close"/>
+                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Assign Case</h2>
+                        </header>
+                        <!--Modal/Popup Box Body Starts here-->
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            Assign this Case to yourself?
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning:button variant="neutral" 
+                                              label="No"
+                                              title="No"
+                                              onclick="{!c.closeModal}"/>
+                            <lightning:button variant="brand" 
+                                              label="Yes!"
+                                              title="Yes!"
+                                              onclick="{!c.assignCaseFunction}"/>
+                        </footer>
+                        
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </div>
+        </aura:if>
+        
+        
+        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ASSIGN CASE TO RESOURCE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+        <aura:if isTrue="{!v.isTeamModalOpen}">
+            <div class="slds-m-around_xx-large" >
+                <!-- Modal/Popup Box starts here-->
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_medium">
+                    <div class="slds-modal__container">
+                        <!-- Modal/Popup Box Header Starts here-->
+                        <header class="slds-modal__header">
+                            <lightning:buttonIcon iconName="utility:close"
+                                                  onclick="{! c.closeTeamModal }"
+                                                  alternativeText="close"
+                                                  variant="bare-inverse"
+                                                  class="slds-modal__close"/>
+                            
+                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Assign Case to Account Team Member</h2>
+                            <p class="slds-m-top_x-small">Click on the User to assign Case</p>
+                            
+                            <div>
+                                <c:SC_AMG_CustomLookup
+                                                       objectAPIName="User"
+                                                       IconName=""
+                                                       label="Search for any AMG User"
+                                                       selectedRecord="{!v.selectedUserRecord}"
+                                                       selectedRecordId="{!v.selectedUserRecordId}"
+                                                       />
+                            </div>
+                            
+                        </header>
+                        
+                        <div class="slds-modal__content slds-p-around_medium" id="teamModal">
+                            <aura:if isTrue="{!v.teamDataCount > 0}">
+                                <lightning:datatable 
+                                                     data="{!v.teamData}" 
+                                                     columns="{!v.teamColumns}" 
+                                                     keyField="userId" 
+                                                     aura:Id = "teamDatatable"
+                                                     onsort = "{!c.updateColumnSorting}"
+                                                     sortedBy="{!v.sortedBy}"  
+                                                     sortedDirection="{!v.sortedDirection}"
+                                                     onrowaction="{!c.handleTeamRowAction}"
+                                                     hideCheckboxColumn = "true"
+                                                     />
+                                <aura:set attribute ="else">
+                                    <div class="slds-align_absolute-center">
+                                        <h2>No Account Team Members to show!</h2>
+                                    </div>
+                                </aura:set>
+                            </aura:if>
+                            
+                            <div style="height:auto">
+                                <aura:if isTrue="{!v.amgUserSelected}">
+                                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Search Results</h2>
+                                    <lightning:datatable 
+                                                         data="{!v.userChosenData}" 
+                                                         columns="{!v.userChosenColumns}" 
+                                                         keyField="userId" 
+                                                         aura:Id = "userDatatable"
+                                                         onrowaction="{!c.handleUserRowAction}"
+                                                         hideCheckboxColumn = "true"
+                                                         />
+                                </aura:if>
+                            </div>
+                        </div>
+                        
+                        <footer class="slds-modal__footer">
+                            <lightning:button variant="brand" 
+                                              label="Assign Case to me!"
+                                              title="Assign Case to me!"
+                                              onclick="{!c.assignCaseFunction}"/>
+                            <lightning:button variant="neutral" 
+                                              label="Close"
+                                              title="Close"
+                                              onclick="{!c.closeTeamModal}"/>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </div>
+        </aura:if>
+        
+        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ CONFIRM ASSIGNING CASE TO RESOURCE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+        <aura:if isTrue="{!v.isAssignUserModalOpen}">
+            <div class="slds-m-around_xx-large">
+                <!-- Modal/Popup Box starts here-->
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <!-- Modal/Popup Box Header Starts here-->
+                        <header class="slds-modal__header">
+                            <lightning:buttonIcon iconName="utility:close"
+                                                  onclick="{!c.closeAssignUserModal}"
+                                                  alternativeText="close"
+                                                  variant="bare-inverse"
+                                                  class="slds-modal__close"/>
+                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Assign Case</h2>
+                        </header>
+                        <!--Modal/Popup Box Body Starts here-->
+                        <div class="slds-modal__content slds-p-around_medium" id="userAssignModal">
+                            Assign this Case to {!v.assignUserName}?
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning:button variant="neutral" 
+                                              label="Oops, no!"
+                                              title="Oops, no!"
+                                              onclick="{!c.closeAssignUserModal}"/>
+                            <lightning:button variant="brand" 
+                                              label="Yes"
+                                              title="Yes"
+                                              onclick="{!c.assignCaseToUserFunction}"/>
+                        </footer>
+                        
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </div>
+        </aura:if>
+    </article>
+
+        
+    <!--Markup ends-->
+    
+</aura:component>

@@ -1,0 +1,59 @@
+<template>
+    <div class="slds-is-relative">
+        <lightning-spinner if:true={isLoading}></lightning-spinner>
+        <lightning-record-edit-form object-api-name="BMCServiceDesk__Projected_Service_Outage__c" onload={onFormLoaded} record-id={currentRecordId}
+            onerror={onRecordSaveError} onsuccess={onRecordSaved} density="comfy">
+            <lightning-messages>
+            </lightning-messages>
+            <lightning-layout multiple-rows>
+                <lightning-layout-item size="6" class="slds-m-right_small">
+                    <lightning-input-field field-name="Name" value={soName} required>
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="5">
+                    <lightning-input-field field-name="BMCServiceDesk__Blackout__c" value={soBlackout}>
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" class="slds-m-right_small">
+                    <lightning-input-field field-name="BMCServiceDesk__Description__c" value={soDesc} required>
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="5">
+                    <lightning-input-field field-name="BMCServiceDesk__Inactive__c" value={soActive}>
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" class="slds-m-right_small">
+                    <lightning-input-field field-name="Service_Outage_Type__c" value={soType}>
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="5">
+                    <lightning-input-field field-name="BMCServiceDesk__Display_in_Self_Service__c" value={soDIS}>
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" class="slds-m-right_small">
+                    <lightning-input-field field-name="BMCServiceDesk__Start_Date__c" value={soStart} required>
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="5">
+                    <lightning-input-field field-name="BMCServiceDesk__End_Date__c" value={soEnd} required>
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="12">
+                    <lightning-input-field field-name="Affected_Services_Picklist__c" value={soService}>
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="6">
+                    <lightning-input-field field-name="Sub_Services_Affected__c" value={soSubServices}>
+                    </lightning-input-field>
+                </lightning-layout-item>
+            </lightning-layout>
+        </lightning-record-edit-form>
+        <div 
+            class="slds-modal__footer slds-border_top slds-p-top_small slds-text-align_center slds-m-top_small footerStyle">
+            <lightning-button class="slds-m-right_small" type="submit" name="Save" label="Save" onclick={handleSubmit}>
+            </lightning-button>
+            <lightning-button type="cancel" name="Cancel" label="Cancel" onclick={handleCancel}>
+            </lightning-button>
+        </div>
+    </div>
+</template>

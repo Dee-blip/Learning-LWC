@@ -1,0 +1,142 @@
+<aura:component controller="L2Q_MEDDICC_Controller" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="force:refreshView" action="{!c.refreshSectionData}"/>
+    <aura:attribute name="sectionList" type="list" />
+    <aura:attribute name="spinnerBool" type="boolean" default="false"/>
+    <aura:attribute name="progressValue" type="integer" default="0"/>
+    <aura:attribute name="opp" type="Opportunity"/>
+    <aura:attribute name="showEconomicBuyerSelections" type="boolean" default="false"/>
+    <aura:attribute name="showChampionSelections" type="boolean" default="false"/>
+    <aura:attribute name="competitorList" type="list" />
+    <aura:attribute name="needLoadingOfData" type="boolean" default="false"/>
+    <aura:attribute name="ebIdentified" type="string"/>
+    <aura:attribute name="championIdentified" type="string"/>
+    <aura:attribute name="competitorIdentified" type="string"/>
+    <aura:attribute name="ebRole" type="string" default="Economic Buyer"/>
+    <aura:attribute name="championRole" type="string" default="Champion"/>
+    <aura:attribute name="competition" type="string" default="Competition"/>
+    <aura:attribute name="showSalesCoachingReview" type="boolean" default="false"/>
+    <aura:if isTrue="{!v.spinnerBool}">
+        <lightning:spinner alternativeText="Loading" size="medium" />
+    </aura:if>
+    <div class="slds-grid slds-wrap" style="border: 1px solid #DDDBDA;margin-top:5px;background-color:#F3F2F2;padding:5px;padding-bottom:8px;border-radius:5px;">
+        <div class="slds-col slds-size_1-of-1" style="margin-top:4px;padding-left: 3px;margin-bottom: 4px;">
+            <div class="slds-grid">
+                <div class="slds-col slds-size_10-of-12">
+                    <div class="slds-text-title_caps">MEDDICC Completion: {!v.progressValue}%</div>
+                    <lightning:progressBar value="{!v.progressValue}" size="large" />
+                </div>
+                <div class="slds-col slds-size_2-of-12" style="text-align: right; padding-right: 4px;">
+                    <lightning:button disabled="{!v.opp.IsClosed}" onclick="{!c.saveMeddic}" label="Save" iconName="utility:save" iconPosition="left" variant="brand" type="submit" />
+                </div>
+            </div>
+        </div>
+        <aura:if isTrue="{!v.showSalesCoachingReview}">
+            <div class="slds-col slds-size_1-of-1" style="padding-left: 3px;">
+                <div class="slds-grid" style="margin-top:4px">
+                    <div class="slds-col slds-size_3-of-12 slds-text-heading_small" style="font-size:14px">
+                        Sales Coaching Deal Review
+                    </div>
+                    <div class="slds-col slds-size_9-of-12" style="margin-left: -30px; margin-top: -1px;">
+                        <lightning:input type="checkbox" checked="{!v.opp.Sales_Coaching_Deal_Review__c}"/>
+                    </div>
+                </div>
+            </div>
+        </aura:if>
+    </div>
+    <div class="slds-scrollable_y" style="height:510px;">
+        <div class="slds-grid slds-wrap">
+            <aura:iteration items="{!v.sectionList}" var="sec">
+                <div class="slds-col slds-size_1-of-1">
+                    <div class="header" onclick="{!c.onSectionSelect}" id="{!sec.sectionName + '#header'}">
+                        <section class="slds-clearfix" style="margin-top: -4px;height: 25px;">
+                            <div class="slds-float--right">
+                                <lightning:progressRing value="{!sec.sectionCompletion}" variant="base-autocomplete" size="small"/>
+                            </div>
+                            <div style="padding-top: 4px;">
+                                <div class="slds-text-heading_small" style="float:left;font-size: 15px;">{!sec.sectionName}</div>
+                                <div class="slds-text-title_caps" style="float:right">{!sec.sectionCompletion}%&nbsp;</div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="slds-show" id="{!sec.sectionName}" style="border:1px solid #DDDBDA;padding:10px;border-radius:8px;">
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-col slds-size_6-of-12">
+                                <aura:iteration items="{!sec.questionList}" var="qs" indexVar="index">
+                                    <lightning:input class="{!qs.question.AKAM_MEDDICC_Questionnaire_ID__c}" type="checkbox" disabled="{!v.opp.IsClosed}" label="{!qs.question.Question__c}" checked="{!qs.response}" onchange="{!c.onResponseChange}"/>
+                                </aura:iteration>
+                                <div class="slds-grid">
+                                    <div class="slds-col slds-size_1-of-1">
+                                        <aura:if isTrue="{!sec.sectionName == v.ebRole}">
+                                            <aura:if isTrue="{!v.showEconomicBuyerSelections}">
+                                                <br></br><u>Economic Buyers:</u><br></br>
+                                                <aura:iteration items="{!v.opp.OpportunityContactRoles}" var="cR">
+                                                    <aura:if isTrue="{!cR.Role==v.ebRole}">
+                                                        <a href="{!'/lightning/r/Contact/'+cR.ContactId+'/view'}" target="_blank" id="{!cR.ContactId}">{!cR.Contact.Name}</a><br></br>
+                                                    </aura:if>
+                                                </aura:iteration>
+                                            </aura:if>
+                                        </aura:if>
+                                        <aura:if isTrue="{!sec.sectionName == v.championRole}">
+                                            <aura:if isTrue="{!v.showChampionSelections}">
+                                                <br></br><u>Champions:</u><br></br>
+                                                <aura:iteration items="{!v.opp.OpportunityContactRoles}" var="cR">
+                                                    <aura:if isTrue="{!cR.Role==v.championRole}">
+                                                        <a href="{!'/lightning/r/Contact/'+cR.ContactId+'/view'}" target="_blank" id="{!cR.ContactId}">{!cR.Contact.Name}</a><br></br>
+                                                    </aura:if>
+                                                </aura:iteration>
+                                            </aura:if>
+                                        </aura:if>
+                                        <aura:if isTrue="{!sec.sectionName == v.competition}">
+                                            <br></br><u>Competitors:</u><br></br>
+                                            <div class="slds-grid" style="margin-top: -15px;padding-bottom:5px;padding-right:10px">
+                                                <div class="slds-col slds-size_4-of-12" style="padding-top:24px">
+                                                    Competitor-Primary
+                                                </div>
+                                                <div class="slds-col slds-size_8-of-12">
+                                                    <lightning:select name="Competitor-Primary" disabled="{!v.opp.IsClosed}" value="{!v.opp.Competitor__c}" onchange="{!c.onCompetitorChange}">
+                                                        <option value="null">--None--</option>
+                                                        <aura:iteration items="{!v.competitorList}" var="comp">
+                                                            <option value="{!comp}">{!comp}</option>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                </div>
+                                            </div>
+                                            <div class="slds-grid" style="margin-top: -15px;padding-bottom:5px;padding-right:10px">
+                                                <div class="slds-col slds-size_4-of-12" style="padding-top:24px">
+                                                    Competitor-Secondary
+                                                </div>
+                                                <div class="slds-col slds-size_8-of-12">
+                                                    <lightning:select name="Competitor-Secondary" disabled="{!v.opp.IsClosed}" value="{!v.opp.Competitor_Secondary__c}" onchange="{!c.onCompetitorChange}">
+                                                        <option value="null">--None--</option>
+                                                        <aura:iteration items="{!v.competitorList}" var="comp">
+                                                            <option value="{!comp}">{!comp}</option>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                </div>
+                                            </div>
+                                            <div class="slds-grid" style="margin-top: -15px;padding-bottom:5px;padding-right:10px">
+                                                <div class="slds-col slds-size_4-of-12" style="padding-top:24px">
+                                                    Other Competitor(s)
+                                                </div>
+                                                <div class="slds-col slds-size_8-of-12">
+                                                    <lightning:input disabled="{!v.opp.IsClosed}" value="{!v.opp.Other_Competitor_Name__c}" onchange="{!c.onCompetitorChange}"/>
+                                                </div>
+                                            </div>
+                                        </aura:if>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_3-of-12" style="margin-top:-7px;padding-right:5px">
+                                <lightning:textarea label="Details" value="{!sec.questionList[0].details}" disabled="{!v.opp.IsClosed}"/>
+                            </div>
+                            <div class="slds-col slds-size_3-of-12" style="margin-top:-7px">
+                                <lightning:textarea label="Next Steps" value="{!sec.questionList[0].nextSteps}" disabled="{!v.opp.IsClosed}"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aura:iteration>
+        </div>
+    </div>
+</aura:component>

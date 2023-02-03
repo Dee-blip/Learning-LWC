@@ -1,0 +1,24 @@
+<apex:page showheader="true" sidebar="true">
+
+<style type="text/css">
+.customPopup {
+    color: white;
+    left: 23%;
+    padding: 10px;
+    z-index: 9999;
+    
+    width: 500px;
+    top: 20%;
+    font-size: 16px;
+}
+</style>
+    <apex:outputPanel id="SalesAnalytics" styleClass="customPopup">
+       You will be redirected to a New Tab for Sales Analytics Application …
+
+     <script>
+         var url = "{!$Label.SalesAnalyticsDashboardURL}"
+         window.open(url);
+
+     </script>
+    </apex:outputPanel>
+</apex:page>

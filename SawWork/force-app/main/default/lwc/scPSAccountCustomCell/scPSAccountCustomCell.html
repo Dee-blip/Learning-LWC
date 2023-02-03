@@ -1,0 +1,12 @@
+<template>
+    <div class = "slds-m-left_small">
+            <a onclick={handleOpenRec}>{accountname}</a>
+            <template if:false={arerecipientspresent}>
+                
+            <lightning-button-icon class="slds-m-right_x-small" size="large" icon-name="standard:account" style="float:right" onclick={handleRecipientCreate} name="handleRecipientCreate" alternative-text="handleRecipientCreate" variant="bare" title="handleRecipientCreate"></lightning-button-icon>
+       
+         </template>
+            <!-- lightning-button-icon size="medium" icon-name="utility:account" onclick={handleRecipientCreate} variant="bare" name="handleRecipientCreate" alternative-text="handleRecipientCreate" title="handleRecipientCreate"></lightning-button-icon>-->
+            
+    </div> 
+</template>

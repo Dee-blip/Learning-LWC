@@ -1,0 +1,50 @@
+<aura:component >
+  <aura:attribute name="product" type="Product2"/>
+  <article class="slds-tile slds-tile_board">
+    <lightning:tile >
+      <aura:set attribute="media">
+        <lightning:icon iconName="standard:product" size="medium" alternativeText="Contract..."/>
+        <!-- <lightning:input type="checkbox-button" label=" " name="input2" checked="{! v.selectContract }"/> -->
+      </aura:set>
+      <ul >
+        <li class="slds-item slds-has-flexi-truncate">
+          <strong><ui:outputText value="{! v.product.Forecast_Product_Id__c }"/></strong>
+        </li>
+      </ul>
+    </lightning:tile>
+    <lightning:tile >
+      <ul >
+
+        <li class="slds-item slds-has-flexi-truncate">
+          <div class="slds-grid slds-wrap slds-grid_pull-padded">
+            <div class="slds-p-horizontal_small slds-size_2-of-6">Commit</div>
+            <div class="slds-p-horizontal_small slds-size_4-of-6">{!v.product.CurrencyIsoCode}&nbsp;
+              <aura:if isTrue="{!v.product.Average_Renewal_Commit_MRR__c == null }">
+                <ui:outputNumber value="0" format="0.00"/>
+                <aura:set attribute="else">
+                  <ui:outputNumber value="{! v.product.Average_Renewal_Commit_MRR__c }" format="0.00"/>
+                </aura:set>
+              </aura:if>
+            </div>
+          </div>
+        </li>
+
+        <li class="slds-item slds-has-flexi-truncate">
+          <div class="slds-grid slds-wrap slds-grid_pull-padded">
+            <div class="slds-p-horizontal_small slds-size_2-of-6">Usage</div>
+            <div class="slds-p-horizontal_small slds-size_4-of-6">{!v.product.CurrencyIsoCode}&nbsp;
+              <aura:if isTrue="{!v.product.Average_Renewal_Usage_MRR__c == null }">
+                <ui:outputNumber value="0" format="0.00"/>
+                <aura:set attribute="else">
+                  <ui:outputNumber value="{! v.product.Average_Renewal_Usage_MRR__c }" format="0.00"/>
+                </aura:set>
+              </aura:if>
+            </div>
+          </div>
+        </li>
+
+      </ul>
+    </lightning:tile>
+
+  </article>
+</aura:component>

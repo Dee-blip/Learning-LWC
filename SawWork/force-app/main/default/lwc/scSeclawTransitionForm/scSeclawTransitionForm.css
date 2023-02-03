@@ -1,0 +1,54 @@
+abbr:hover {
+    cursor: default;
+}
+
+label {
+    color: var(--lwc-colorTextLabel, rgb(62, 62, 60));
+    font-size: 0.8125rem;
+    padding-top: var(--lwc-varSpacingVerticalXxSmall, 0.25rem);
+    margin-bottom: var(--lwc-varSpacingVerticalXxxSmall, 0.125rem);
+}
+
+p.paragraph-break {
+    margin-bottom: 1.25rem;
+}
+
+.bottom-div {
+    height: 3rem;
+}
+
+.form-div {
+    min-height: 6rem;
+}
+
+.form-div-fix-spinner {
+    transform: translate(0, 0);
+}
+
+.form-error-container, lightning-messages {
+    z-index: 0;
+}
+
+.form-error {
+	margin-left: 0;
+    margin-right: 0;
+}
+
+.pre-wrap {
+    white-space : pre-wrap;
+}
+
+.seclaw-form-field {
+    margin-top: var(--lwc-varSpacingVerticalSmall, 0.75rem);
+    margin-bottom: var(--lwc-varSpacingVerticalLarge, 1.5rem);
+}
+
+.seclaw-form-heading-top {
+    margin-top: var(--lwc-varSpacingVerticalXSmall, 0.5rem);
+    margin-bottom: var(--lwc-varSpacingVerticalMedium, 1rem);
+}
+
+.seclaw-form-heading {
+    margin-top: var(--lwc-varSpacingVerticalXLarge, 2rem);
+    margin-bottom: var(--lwc-varSpacingVerticalMedium, 1rem);
+}

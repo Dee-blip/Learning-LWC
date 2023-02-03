@@ -1,0 +1,13 @@
+<apex:component >
+  <apex:attribute name="reportValue" description="when true layout will be renderd" type="String" required="true"/>
+  <apex:attribute name="reports" description="when true layout will be renderd" type="List" required="true"/>
+  <apex:outputPanel >
+    <apex:outputPanel >
+      <apex:selectList value="{!reportValue}" multiselect="false" size="1" onchange="{!test}"   >
+         <apex:selectOptions value="{!reports}"/>
+         <apex:actionSupport action="{!test}" event="onchange"/>
+      </apex:selectList>
+     </apex:outputPanel>
+     <analytics:reportChart cacheResults="false" reportId="{!reportValue}"  />
+  </apex:outputPanel>
+</apex:component>

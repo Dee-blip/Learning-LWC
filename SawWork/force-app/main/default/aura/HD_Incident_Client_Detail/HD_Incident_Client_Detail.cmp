@@ -1,0 +1,164 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global"  controller="HD_IncidentDetailController">
+    
+    <aura:handler name="init" action="{!c.populateClientInfo}" value="{!this}" />
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:dependency resource="markup://force:editRecord" type="EVENT" />
+    <aura:handler event="force:refreshView" action="{!c.populateClientInfo}" />
+    <aura:attribute name="clientDetails" type="List" />
+    <aura:attribute name="ticketDetails" type="Map" />
+    <aura:attribute name="owner" type="String" />
+    <aura:attribute name="placeHolder" type="Boolean" default="true"/> 
+    <aura:dependency resource="markup://c:HD_TextToHtml" type="COMPONENT"/><!-- Added the dependency Tag for better rendering -->
+    
+    <aura:renderIf isTrue="{!v.placeHolder}">
+    	<c:HD_Placeholder_service holderType="clientdetail"/>
+    </aura:renderIf>
+    <aura:renderIf isTrue="{!v.placeHolder == false}">
+    <div class="slds-grid">
+        <div class="slds-large-size--1-of-3 slds-p-right--xx-large slds-m-top--small">
+            <div class = "slds-p-bottom--small slds-m-top--none">
+                
+                <h3 class="slds-section-title--divider slds-truncate custom-title slds-border--bottom slds-border--top slds-border--right slds-border--left">
+                    <lightning:icon iconName="action:add_contact" size="xx-small"/>
+                    Client Information
+                </h3>
+            </div>
+            <div aura:id="clientimage">
+            <div class="slds-m-top--none slds-align--absolute-center" >                
+                <img class="picture-border" id="image1" src="{!v.ticketDetails.url}"  alt="Image not found" onerror="{!c.imageError}" onload="{!c.imageSucces}"/>   
+            </div>
+            <div>
+            	<hr></hr>
+            </div> 
+            </div>
+            <div class="slds-table_edit_container slds-is-relative">
+                <table class="slds-table  slds-table_fixed-layout slds-no-cell-focus "  role="grid">
+                    <tbody>
+                        <aura:iteration items="{!v.clientDetails}" var="clientDetail">
+                            <tr>
+                                <td role="gridcell"  data-label="Client Label" colspan="1">
+                                    <div class="slds-truncate slds-text-color--blue" >{!clientDetail[0]}</div>
+                                </td>
+                                <td  role="gridcell" data-label="Client Value" colspan="2">
+                                    <div class="slds-truncate" >{!clientDetail[1]}</div>
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table> 
+            </div>
+            <!--<p>{!v.ticketDetails.owner}</p> -->       
+        </div>
+        <div class="slds-large-size--2-of-3 slds-m-top--small">
+            <!--<div class="" aura:id="srCompoment">
+                <c:HD_Request_Detail_Component recordId="{!v.recordId}"/>
+            </div>-->
+            <aura:if isTrue="{!v.ticketDetails.type == 'Incident'}">
+                <div aura:id="ticketSummary" class="slds-p-bottom--small slds-m-top--none " id = "summary">
+                    
+                    <h3 class="slds-section-title--divider custom-title slds-border--left slds-border--right slds-border--top">
+                        <lightning:icon iconName="action:description " size="xx-small" />
+                        Description
+                    
+                    	<span onclick="{!c.showSummary}" class="add-pointer" >
+                        <lightning:icon iconName="utility:new_window" size="xx-small"  class="rightEnd"/>
+                    </span>
+                    </h3>
+                    <div class="slds-box custom-height--200px slds-scrollable custom-overflow">
+                        <pre class="custom-margin-top--m1perc"><c:HD_TextToHtml content="{!v.ticketDetails.summary}"/></pre>
+                    </div>
+                </div>
+            <div aria-hidden="false"  role="dialog" class="slds-modal slds-backdrop slds-fade-in-open custom-hide-modal " aura:id="summaryId" >
+                <div class="slds-modal__container custom-modal-body" >
+                    <div class="slds-modal__header">
+                        <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.hideSummary}">
+                            <lightning:icon iconName="utility:close" />
+                        </button>
+                        <h2 id="header43" class="slds-text-heading--medium">
+                            <lightning:icon iconName="action:description" />
+                            Ticket Description</h2>
+                        
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium ">
+                        <div >
+                            <pre class="bold-title">Short Description: </pre>
+                            <pre>  {!v.ticketDetails.shortDescription} </pre>
+                        </div>
+						<div >
+							<pre class="bold-title">Description: </pre>
+                            <pre>  <c:HD_TextToHtml content="{!v.ticketDetails.summary}"/></pre>
+                        </div>                        
+                    </div>
+                </div>
+            </div>
+                <aura:set attribute="else">
+                <div aura:id="requestdefTitle" class="slds-p-bottom--small slds-m-top--none " id = "title">
+                    
+                    <h3 class="slds-section-title--divider custom-title slds-border--left slds-border--right slds-border--top">
+                        <lightning:icon iconName="action:description " size="xx-small" />
+                        Service Request Title
+                    
+                    	<span onclick="{!c.showRequestTitle}" class="add-pointer" >
+                        <lightning:icon iconName="utility:new_window" size="xx-small"  class="rightEnd"/>
+                    </span>
+                    </h3>
+                    <div class="slds-box custom-height--200px slds-scrollable custom-overflow">
+                        <pre class="custom-margin-top--m1perc">{!v.ticketDetails.requestTitle}</pre>
+                    </div>
+                </div>
+            <div aria-hidden="false"  role="dialog" class="slds-modal slds-backdrop slds-fade-in-open custom-hide-modal " aura:id="requestTitleId" >
+                <div class="slds-modal__container custom-modal-body" >
+                    <div class="slds-modal__header">
+                        <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.hideRequestTitle}">
+                            <lightning:icon iconName="utility:close" />
+                        </button>
+                        <h2 id="header43" class="slds-text-heading--medium">
+                            <lightning:icon iconName="action:description" />
+                            Service Request Title</h2>
+                        
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium ">
+                        <div >
+                            <pre>  {!v.ticketDetails.requestTitle} </pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                </aura:set>
+		</aura:if>
+
+            
+            <div class="slds-p-bottom--small"  aura:id = "resolution">
+                <h3 class="slds-section-title--divider custom-title slds-border--left slds-border--right slds-border--top">
+                    <lightning:icon iconName="action:update_status" size="xx-small"/>
+                    Resolution
+                	<span onclick="{!c.showResolution}" class="add-pointer">
+                        <lightning:icon iconName="utility:new_window" size="xx-small"  class="rightEnd" />
+                    </span>
+                </h3>
+                <div class="{!'slds-box custom-height--200px slds-scrollable ' + v.ticketDetails.type}">
+                    <pre class="custom-margin-top--m1perc">{!v.ticketDetails.resolution}</pre>
+                </div>
+            </div>
+            <div aria-hidden="false"  role="dialog" class="slds-backdrop slds-modal slds-fade-in-open custom-hide-modal " aura:id="resolutionId">
+                <div class="slds-modal__container custom-modal-body">
+                    <div class="slds-modal__header">
+                        <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.hideResolution}">
+                            <lightning:icon iconName="utility:close" />
+                        </button>
+                        <h2 id="header43" class="slds-text-heading--medium">
+                            <lightning:icon iconName="action:update_status" />
+                            Resolution</h2>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium" >
+                        <div>
+                            <pre>  {!v.ticketDetails.resolution} </pre>
+                        </div>
+                    </div>
+                </div>
+            </div>        
+            
+        </div>
+    </div>
+    </aura:renderIf>
+</aura:component>

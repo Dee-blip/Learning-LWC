@@ -1,0 +1,231 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="HD_Email_Composer_DockedCtrl" >
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:attribute name="fromEmail" type="String" default=""/>
+    <aura:attribute name="ccAddresses" type="List" />
+    <aura:attribute name="toEmails" type="List" />
+    
+    <aura:attribute name="errorflag" type="boolean" default="false"/>
+    <aura:attribute name="errormsg" type="String"/>
+    
+    <aura:attribute name="subject" type="String" default="Akamai Ticketing Incident ticket  #(Ref:IN:00451226) has been created and assigned to EAE Ops"/>
+    <aura:attribute name="emailBody" type="String" default="paMela"/>
+    <aura:handler event="c:HD_Email_Composer_Docked_Event" action="{!c.composerOpeningHandler}"/>
+    
+    
+    <!-- HTML STARTS HERE -->
+    <div class="slds-docked_container" style="z-index:60001;" aura:id="hdemailComposer">
+        
+        <section class="Winter18BgFix custom-size slds-docked-composer slds-grid slds-grid_vertical slds-is-open " role="dialog" aria-labelledby="modal-heading-id-1" aria-describedby="modal-content-id-1" aura:id="hdemailComposersection">
+            
+            <!-- Alert -->
+            <aura:if isTrue="{!v.errorflag}">
+            <div  aura:id="compalert" class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                <span class="slds-assistive-text">error</span>
+                <span class="slds-icon_container slds-icon-utility-ban slds-m-right_x-small" title="Description of icon when needed">
+                    <lightning:icon class="slds-icon" iconName="utility:ban" size="x-small" alternativeText="minimize window" /> 
+                </span>
+                <h2>{!v.errormsg}<a href="javascript:void(0);">More Information</a></h2>
+                <button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse" title="Close" onclick="{!c.CloseValidationError}">
+                    <lightning:icon class="slds-button__icon" iconName="utility:close" size="x-small" alternativeText="Email" />
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+            </div>
+            </aura:if>
+            <!-- HD Alert -->
+            
+            <!-- Header Section -->
+            <header class="slds-docked-composer__header slds-grid slds-shrink-none" aria-live="assertive">
+                <div class="slds-media slds-media_center slds-size_1-of-1 slds-no-space">
+                    <div class="slds-media__figure slds-m-right_x-small">
+                        <span class="slds-icon_container">
+                            <lightning:icon iconName="standard:email" size="small" alternativeText="Email" />
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-truncate" id="modal-heading-id-1" title="New Email">Email</h2>
+                    </div>
+                    
+                    <div class="slds-col_bump-right slds-shrink-none">
+                        <button class="slds-button slds-button_icon slds-button_icon" title="Minimize window" aura:id="minimizebutton" onclick="{!c.minimizeComposer}">
+                            <lightning:icon class="slds-button__icon" iconName="utility:minimize_window" size="xx-small" alternativeText="minimize window" /> 
+                            <span class="slds-assistive-text">Minimize Composer Panel</span>
+                        </button>
+                        <button class="slds-button slds-button_icon slds-button_icon" title="Expand Composer" aura:id="expandbutton"  onclick="{!c.maximizeComposer}">
+                            <lightning:icon class="slds-button__icon" iconName="utility:expand_alt" size="xx-small" alternativeText="expand alt"/>  
+                            <span class="slds-assistive-text">Expand Composer Panel</span>
+                        </button>
+                        <button class="slds-button slds-button_icon slds-button_icon" title="Close" onclick="{!c.closeComposer}">
+                            <lightning:icon class="slds-button__icon" iconName="utility:close" size="xx-small" alternativeText="close" />
+                            <span class="slds-assistive-text">Close Composer Panel</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            <!-- END Header Section --> 
+            
+            <!-- Email Fields -->
+            <div class="slds-docked-composer__body" id="modal-content-id-1">
+                <div class="slds-email-composer">
+                    <!-- From -->
+                    <div class="slds-form-element slds-email-composer__combobox">
+                        <label class="slds-form-element__label" for="recipients-from">From</label>
+                        <div class="slds-form-element__control">
+                            <div class="slds-combobox_container slds-has-inline-listbox">
+                                <div id="selected-recipients-from" role="listbox" aria-orientation="horizontal">
+                                    <ul class="slds-listbox slds-listbox_inline" role="group" aria-label="Recipients:">
+                                        
+                                        <li role="presentation" class="slds-listbox__item">
+                                            <span class="slds-pill" role="option" tabindex="0" aria-selected="true">
+                                                <span class="slds-avatar slds-avatar_x-small slds-pill__icon_container">
+                                                    <!--img alt="Person name" src="https://contacts.akamai.com/photos/vs.jpg" title="User avatar"/-->
+                                                    <!--c:HD_email_to_corpid email="{!v.fromEmail}"/-->
+                                                    <lightning:avatar src="/bad/image/url.jpg" initials="HD" fallbackIconName="standard:groups" alternativeText="Helpdesk Email"/>
+                                                </span>
+                                                <span class="slds-pill__label" title="{!v.fromEmail}">{!v.fromEmail}</span>
+                                                <!-- span class="slds-icon_container slds-pill__remove" title="Remove">
+                                                        <lightning:icon iconName="utility:close" size="xx-small" alternativeText="link" />
+                                                        <span class="slds-assistive-text">Press delete or backspace to remove</span>
+                                                    </span -->
+                                            </span>
+                                        </li>
+                                        
+                                        <!--li>
+                                            <div class="slds-combobox" aria-expanded="false" aria-haspopup="listbox" role="combobox">
+                                                <div class="slds-combobox__form-element">
+                                                    <input type="text" class="slds-input slds-combobox__input" id="recipients-from" aria-autocomplete="list" aria-controls="selected-recipients-from" autocomplete="off" role="textbox" placeholder="..." onkeypress="{!c.addToEmail}"/>
+                                                </div>
+                                            </div>
+                                        </li -->
+                                    </ul>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- To -->
+                    <div class="slds-form-element slds-email-composer__combobox">
+                        <label class="slds-form-element__label" for="recipients-to">To</label>
+                        <div class="slds-form-element__control">
+                            <div class="slds-combobox_container slds-has-inline-listbox">
+                                <div id="selected-recipients-to" role="listbox" aria-orientation="horizontal">
+                                    <ul class="slds-listbox slds-listbox_inline" role="group" aria-label="Recipients:">
+                                        
+                                        <aura:iteration items="{!v.toEmails}" var="toemail" indexVar="toemailIndex">
+                                            <li role="presentation" class="slds-listbox__item">
+                                                <span class="slds-pill" role="option" tabindex="0" aria-selected="true">
+                                                    <span class="slds-avatar slds-avatar_x-small slds-pill__icon_container">
+                                                        <!--img alt="Person name" src="https://contacts.akamai.com/photos/vs.jpg" title="User avatar"/-->
+                                                        <c:HD_email_to_corpid email="{!toemail}"/>
+                                                    </span>
+                                                    <span class="slds-pill__label" title="{!toemail}">{!toemail}</span>
+                                                    <span class="slds-icon_container slds-pill__remove" title="Remove" data-index="{!toemailIndex}" onclick="{!c.removeToEmail}">
+                                                        <lightning:icon iconName="utility:close" size="xx-small" alternativeText="link" />
+                                                        <span class="slds-assistive-text">Press delete or backspace to remove</span>
+                                                    </span>
+                                                </span>
+                                            </li>
+                                        </aura:iteration>  
+                                        <li>
+                                            <div class="slds-combobox" aria-expanded="false" aria-haspopup="listbox" role="combobox">
+                                                <div aura:id="to-container"  class="slds-combobox__form-element" >
+                                                    <ui:inputEmail aura:id="recipients-to" placeholder="..." keyup="{!c.addToEmail}" value=""/>
+                                                    <!-- input type="text" class="slds-input slds-combobox__input" aura:id="recipients-to" id="recipients-to" aria-autocomplete="list" aria-controls="selected-recipients-to" autocomplete="off" role="textbox" placeholder="..." onkeypress="{!c.addToEmail}"/-->
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Cc -->
+                    <div class="slds-form-element slds-email-composer__combobox">
+                        <label class="slds-form-element__label" for="recipients-cc">Cc</label>
+                        <div class="slds-form-element__control">
+                            <div class="slds-combobox_container slds-has-inline-listbox">
+                                <div id="selected-recipients-cc" role="listbox" aria-orientation="horizontal">
+                                    <ul class="slds-listbox slds-listbox_inline" role="group" aria-label="Recipients:">
+                                        
+                                        <aura:iteration items="{!v.ccAddresses}" var="ccemail" indexVar="index">
+                                            <li role="presentation" class="slds-listbox__item">
+                                                <span class="slds-pill" role="option" tabindex="{!index}" aria-selected="true">
+                                                    <span class="slds-avatar slds-avatar_x-small slds-pill__icon_container">
+                                                        <!--img alt="Person name" src="{!v.trimccEmails}" title="User avatar"/-->
+                                                        <c:HD_email_to_corpid email="{!ccemail}"/>
+                                                    </span>
+                                                    <span class="slds-pill__label" title="{!ccemail}">{!ccemail}</span>
+                                                    <span class="slds-icon_container slds-pill__remove" title="Remove" data-index="{!ccemailIndex}" onclick="{!c.removeCcEmail}">
+                                                        <lightning:icon iconName="utility:close" size="xx-small" alternativeText="link" />
+                                                        <span class="slds-assistive-text">Press delete or backspace to remove</span>
+                                                    </span>
+                                                </span>
+                                            </li>
+                                        </aura:iteration>  
+                                        <li>
+                                            <div class="slds-combobox" aria-expanded="false" aria-haspopup="listbox" role="combobox">
+                                                <div class="slds-combobox__form-element">
+                                                    <ui:inputEmail aura:id="recipients-cc" placeholder="..." keyup="{!c.addccEmail}" value=""/>
+                                                    <!-- input type="text" class="slds-input slds-combobox__input" aura:id="recipients-cc" id="recipients-cc" aria-autocomplete="list" aria-controls="listbox-unique-id" autocomplete="off" role="textbox" placeholder="..." onkeypress="{!c.addccEmail}"/-->
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-form-element slds-email-composer__combobox">
+                        <label class="slds-form-element__label" for="input-subject-01">Subject</label>
+                        <div class="slds-form-element">
+                            <label class="slds-form-element__label slds-assistive-text" for="input-subject-01">Enter subject</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" id="input-subject-01" class="slds-input slds-input_bare" placeholder="Enter Subject" value="{!v.subject}"/>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+            </div>
+            <!-- END Email Fields -->
+            <!-- tEXT aREA -->
+            
+            <lightning:inputRichText value="{!v.emailBody}" class="wordwrap" />
+            
+            <!---end -->
+            <!-- footer section -->
+            <footer class="slds-docked-composer__footer slds-shrink-none">
+                <div class="slds-col_bump-left slds-grid slds-grid_vertical-align-center">
+                    <!-- div class="slds-grid slds-m-right_small" role="toolbar">
+                        <ul class="slds-grid" aria-label="Insert content">
+                            <li>
+                                <button class="slds-button slds-button_icon slds-button_icon-small" title="Attach File">
+                                    <lightning:icon class="slds-button__icon" iconName="utility:link" size="xx-small" alternativeText="link" />
+                                    <span class="slds-assistive-text">Attach File</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button class="slds-button slds-button_icon slds-button_icon-small" tabindex="-1" title="Insert Template">
+                                    <lightning:icon class="slds-button__icon" iconName="utility:insert_template" size="xx-small" alternativeText="insert template" />
+                                    <span class="slds-assistive-text">Insert Template</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button class="slds-button slds-button_icon slds-button_icon-small" tabindex="-1" title="Insert HTML">
+                                    <lightning:icon class="slds-button__icon" iconName="utility:insert_tag_field" size="xx-small" alternativeText="insert tag field" />
+                                    <span class="slds-assistive-text">Insert HTML</span>
+                                </button>
+                            </li>
+                        </ul>
+                        <button class="slds-button slds-button_icon slds-button_icon-small" tabindex="-1" title="Preview">
+                            <lightning:icon class="slds-button__icon" iconName="utility:preview" size="xx-small" alternativeText="preview" />
+                            <span class="slds-assistive-text">Preview</span>
+                        </button>
+                    </div -->
+                    <button class="slds-button slds-button_brand" onclick="{!c.sendEmailReply}">Send</button>
+                  </div>
+            </footer>            
+            <!-- END Of Footer section -->
+        </section>
+    </div>
+</aura:component>

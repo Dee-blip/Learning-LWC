@@ -1,0 +1,98 @@
+/* .applyBoxStyle .slds-accordion__summary-heading
+{
+    background: rgb(245, 245, 245) !important;
+
+    padding: var(--lwc-spacingXxSmall,0.25rem); 
+    border-radius: var(--lwc-borderRadiusMedium,0.25rem);
+    border: var(--lwc-borderWidthThin,1px) solid var(--lwc-colorBorder,rgb(221, 219, 218));
+
+
+} */
+
+/* .createPageAccordion [interop-accordionSection_accordionSection-host]
+{
+    display: inline !important;
+} */
+
+.createPageAccordion .applyBoxStyle
+{
+    display: inline !important;
+}
+.detailPageAccordion .applyBoxStyle
+{
+    display: inline !important;
+}
+
+.articleTitleCard .slds-card
+{
+    background-color: rgb(242, 242, 242);
+}
+
+.articleTitleCard .slds-card
+{
+    background-color: rgb(242, 242, 242);
+}
+
+
+.articleTitleCard .slds-card__body
+{
+    display: none
+}
+
+
+.historyTableCustom .richTextAreaCustom .slds-truncate
+{
+	white-space : normal !important;
+}
+
+
+.inputDescriptionClass .slds-textarea
+{
+    height : 300px;
+}
+
+.caseWidgetCard .slds-card
+{
+    background-color: #F4F5F4;
+    border-color: #F4F5F4;
+    border-radius: 0.4rem;  
+}
+
+.caseWidgetCard .slds-card__header{
+    padding-left: 9px;
+}
+
+.caseWidgetCard .slds-box{
+    border: none;
+}
+
+.attachment-file-upload .slds-form-element__label
+{
+    display: none;
+}
+
+.attachment-file-upload .slds-file-selector__text
+{
+    display: none;
+}
+
+.attachment-file-upload .slds-button__icon
+{
+    display: none;
+}
+
+
+.attachment-file-upload .slds-file-selector__dropzone
+{
+    border: none;
+}
+
+/*.attachmentTableClass .slds-button_icon-bare
+ {
+    Display : none;
+ }*/
+
+.jarvisCasePathComponent .slds-path__link
+{
+    z-index: 3 !important;
+}

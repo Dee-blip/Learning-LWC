@@ -1,0 +1,17 @@
+.THIS .slds-button__icon{
+    color:white;
+}
+.THIS.slds-page-header.cCustomerCommunityDocuments{
+    background: white;
+}
+.THIS .searchBtnCls{
+    float: right;
+    height: 36px;
+    background: rgb(216, 237, 255);
+    margin-top: -36px;
+    width: 35px;
+    background-color: #449cd6;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    color:white;
+}

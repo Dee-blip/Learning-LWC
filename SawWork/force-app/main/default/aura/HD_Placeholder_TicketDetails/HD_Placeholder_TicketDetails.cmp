@@ -1,0 +1,26 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global"  controller="HD_IncidentDetailController">
+    <aura:attribute name="horizontalTabs" type="Aura.Component[]" access="private"/>
+    <aura:attribute name="incType" type="String"/>
+    <aura:attribute name="recordId" type="Id" default="a5UR00000009piXMAQ"/>
+    <!--<aura:handler name="init" action="{!c.onInit}" value="this"/-->
+    <!--{!v.horizontalTabs}!-->
+    <aura:handler name="init" action="{!c.doInit}" value="this"/>
+    <div>
+          <c:HD_Incident_Client_Detail recordId="{!v.recordId}"/>
+          <aura:if isTrue="{!v.incType == 'Service Request'}">
+    
+            <c:HD_Request_Detail_Component recordId="{!v.recordId}"/>
+        
+          </aura:if>
+          <!--<aura:if isTrue="{!v.incType == 'Incident'}">
+                
+            <c:HD_Incident_Client_Detail recordId="{!v.recordId}"/>
+
+          </aura:if>-->
+          
+   
+    	
+        	
+        
+    </div>
+</aura:component>

@@ -1,0 +1,104 @@
+<aura:component controller="HD_CMRActions_Controller" implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+    <aura:registerEvent name="renderForm" type="c:hd_renderCreateFormEvent"/>
+    <aura:registerEvent name="refreshPreview" type="c:HD_CMR_PreviewRefreshEvent" />
+    <aura:registerEvent name="getChangeListEvent" type="c:getIncidentList"/>
+    <aura:attribute name = "currentChangeRequest" type = "BMCServiceDesk__Change_Request__c"/>
+    <aura:attribute name = "changeStatus" type = "String" default = 'CLOSED'/>
+    <div>
+        
+        
+        <div aria-hidden="false"  role="dialog" class="slds-backdrop slds-modal slds-fade-in-open custom-hide-modal" aura:id="createPIRFormId" id="PIRFormId">
+            
+            <div class="slds-modal__container custom-modal-body" aura:id="createPIRFormId2">
+                <div aura:id="Accspinner" class="slds-spinner_container slds-hide">
+                    <div role="status" class="slds-spinner slds-spinner--medium slds-spinner--brand">
+                        <span class="slds-assistive-text">Processing</span>
+                        <div class="slds-spinner__dot-a"></div>
+                        <div class="slds-spinner__dot-b"></div>
+                    </div>
+                </div>
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.hideCreateForm}">
+                        <lightning:icon iconName="utility:close" />
+                    </button>
+                    <h2 id="createheader" class="slds-text-heading--medium">
+                        New Post Implementation Review
+                    </h2>
+                </div>
+                <div class="modal-body scrollable slds-modal__content slds-p-around--medium">
+                    
+                    <ui:inputDefaultError aura:id="warn" value="{!v.warnings}" />
+                    <!--form-->
+                    <form class="slds-clearfix">                          
+                        
+                        <div class="slds-grid slds-grid--pull-padded-medium">
+                            <div class="slds-col slds-p-horizontal--medium">
+                                <lightning:select name="results" label="Change delivered required results" required="true" aura:id="resultsid" class="form-input" >
+                                    <option value="">--None--</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </lightning:select>
+                            </div>
+                            <div class="slds-col slds-p-horizontal--medium">
+                                <lightning:textarea name="serviceImpactDetails" label="Unaccounted Service Impact Details" aura:id="sidId" class="form-input" required="true"/>
+                            </div>
+                        </div>
+                        <br/>
+                        
+                        <div class="slds-grid slds-grid--pull-padded-medium">  
+                            <div class="slds-col slds-p-horizontal--medium">
+                                <lightning:select name="changeImplemented" label="Was the change implemented as planned" required="true" aura:id="changeImplementedId" class="form-input" >
+                                    <option value="">--None--</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </lightning:select>
+                            </div>
+                            
+                            <div class="slds-col slds-p-horizontal--medium">
+                                <lightning:textarea name="implementationWindowDetails" label="Details of implementation window varied" aura:id="implementId" class="form-input" required="true"/>
+                            </div>
+                        </div>
+                        <br/>     
+                        
+                        <div class="slds-grid slds-grid--pull-padded-medium">
+                            
+                            <div class="slds-col slds-p-horizontal--medium">
+                                <lightning:textarea name="additionalLessons" label="Additional lessons learnt" aura:id="lessonsId" class="form-input" required="true"/>
+                            </div>
+                            
+                        </div>                            
+                        <br/>
+                        <div class="slds-grid slds-grid--pull-padded-medium">
+                            <div class="slds-col slds-p-horizontal--medium ">
+                                <lightning:select name="testingCompleted" label="Post Implementation Testing Completed" aura:id="testingCompletedId" class="form-input" >
+                                    <option value="">--None--</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </lightning:select>
+                                
+                            </div>
+                            
+                        </div>
+                        <br/>
+                        <div class="slds-grid slds-grid--pull-padded-medium">
+                            <div class="slds-col slds-p-horizontal--medium">
+                                <lightning:textarea name="testDetails" label="Post Implementation Test Details" aura:id="testDetailsId" class="form-input"/>
+                                
+                            </div>
+                        </div>
+                        
+                        <br/>
+                        
+                    </form>
+                </div>
+                <div class="slds-modal__footer">
+                    <div class="slds-button-group" role="group">
+                        <ui:button class="slds-button slds-button--neutral" label="Save" aura:id="Save" press="{!c.savePIR}"></ui:button>
+           
+                        <button class="slds-button slds-button--neutral" aura:id = "Cancel" onclick = "{!c.hideCreateForm}">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

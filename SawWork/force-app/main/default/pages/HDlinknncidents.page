@@ -1,0 +1,337 @@
+<!-- 
+Modification Log
+===============================================================
+Date Author Modification
+Line 288,296 12 Aug 2020, Amogh M P, PRTORES-1812 HD Code scan 2020 - Blockers, Criticals Part 6
+-->
+<apex:page showHeader="false"   id="linkincipage" Controller="HD_linkincidents_extension" docType="html-5.0">
+<!----- Applying Stylesheets---->
+<!-- Latest compiled and minified CSS -->
+<apex:stylesheet value="{!URLFOR($Resource.HDscriptcss,'/bootstrapV3_3_0/css/bootstrap.min.css')}"/>
+<style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+      #panel {
+        position: absolute;
+        top: 5px;
+        left: 50%;
+        margin-left: -180px;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+      }
+      .close-glyphicon
+      {
+      position:relative;
+      top: -5px !important;
+      right: -12px !important;
+      }
+      
+      #map-canvas{
+      height: 450px;
+      }
+      /* changing the height of tab */
+      .nav > li > a{ padding: 6px 15px; }
+      
+     /* tab color */
+    .nav-tabs>li>a {
+     border-color: #777777;
+     border: 1px solid #ccc;
+     margin-right: -14px;
+     
+     background: #feffff; /* Old browsers */
+     background: -moz-linear-gradient(top,  #feffff 0%, #ddf1f9 35%, #a0d8ef 100%); /* FF3.6+ */    
+     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#feffff), color-stop(35%,#ddf1f9), color-stop(100%,#a0d8ef)); /* Chrome,Safari4+ */
+     background: -webkit-linear-gradient(top,  #feffff 0%,#ddf1f9 35%,#a0d8ef 100%); /* Chrome10+,Safari5.1+ */
+     background: -o-linear-gradient(top,  #feffff 0%,#ddf1f9 35%,#a0d8ef 100%); /* Opera 11.10+ */
+     background: -ms-linear-gradient(top,  #feffff 0%,#ddf1f9 35%,#a0d8ef 100%); /* IE10+ */
+     background: linear-gradient(to bottom,  #feffff 0%,#ddf1f9 35%,#a0d8ef 100%); /* W3C */
+     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', endColorstr='#a0d8ef',GradientType=0 ); /* IE6-9 */
+                   }
+     /* tabcolor active */
+         .nav-tabs>li.active>a 
+         {  
+              border: 1px solid #6495ED;
+         }            
+
+/* header rearrangment*/
+ table#apexpageid:srmpageblock:srmpageblocktable>thead>tr>th {background-color:red;}
+ .table > tbody > tr > td{padding: 4px; line-height: 1.429;font-size:12px;font-family: Arial,Helvetica,sans-serif; }
+ 
+ 
+ /* scrollable code */
+ 
+ /*END scrollable code */
+ 
+ 
+ 
+</style>
+<!-- END of STyleSheet -->
+<apex:pageMessages ></apex:pageMessages>
+<apex:form id="linkincipgform">
+<apex:actionFunction name="orderfunction" status="status" action="{!columnOrder}" reRender="globalOrder,linkincipgblocktable" />
+<apex:pageblock id="linkincipgblock" title="Link Incident to #">
+<apex:pageBlockButtons location="top" id="pgblockbuttonpanel">
+<apex:commandButton value="Link" id="link" onclick="linkRecords();return false;" rendered="{!linkButtonVisiblility}"/>
+<apex:actionStatus id="status" startText="Loading...">
+<apex:facet name="start"><img src="{!URLFOR($Resource.HDscriptcss,'ajax-loader.gif')}" width="25"></img></apex:facet>
+</apex:actionStatus>
+</apex:pageBlockButtons>
+<apex:outputLabel value="Search Include:"></apex:outputLabel>&nbsp;
+<apex:selectList multiselect="false" size="1" value="{!includeSelectListvalue}" id="includeSelectListvalue">
+<apex:selectOptions value="{!includes}"></apex:selectOptions>
+<apex:actionSupport event="onchange" reRender="linkincipgblocktable,pagecount" status="status"/>
+</apex:selectList>
+&nbsp;&nbsp;
+<apex:commandLink styleClass="glyphicon glyphicon-chevron-left" title="Previous" action="{!previousbutton}" reRender="linkincipgblocktable,pagenumber" id="leftpage" status="status"/>
+<span class="glyphicon glyphicon-minus"></span>&nbsp;
+<apex:input id="pagenumber" value="{!page_number}" size="2"><apex:actionSupport event="onchange" reRender="linkincipgblocktable,recordsummary" status="status"/></apex:input>&nbsp; <span id="pageof">Of</span> &nbsp;<apex:outputText id="pagecount" value="{!number_of_pages}"></apex:outputText>&nbsp;
+<span class="glyphicon glyphicon-minus"></span>&nbsp;
+<apex:commandLink styleClass="glyphicon glyphicon-chevron-right" title="Next" action="{!nextbutton}"  reRender="linkincipgblocktable,pagenumber" id="rightpage" status="status"/>&nbsp;&nbsp;
+<apex:commandLink styleClass="glyphicon glyphicon-refresh" title="Next"  reRender="" id="reloadbutton" status="status"/>&nbsp;&nbsp;
+&nbsp;<apex:inputText id="searchString" value="{!Search_String}" />&nbsp;&nbsp;
+<apex:commandLink id="searchbtn" styleClass="btn btn-default btn-lg" reRender="linkincipgblocktable" status="status"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></apex:commandLink>
+<apex:commandLink id="removebtn" action="{!emptySearchString}" styleClass="btn btn-default btn-lg" reRender="linkincipgblocktable"  status="status"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></apex:commandLink>
+&nbsp;
+<apex:inputHidden value="{!columnName}" id="columnName" />
+<apex:inputHidden value="{!globalOrder}" id="globalOrder" />
+
+<apex:pageBlockSection >
+
+</apex:pageBlockSection>
+
+<apex:dataTable value="{!IncidenttoLink}" var="inci" id="linkincipgblocktable" styleClass="table table-hover"  >
+
+<apex:column width="1">
+<apex:facet name="header">Link</apex:facet>
+<apex:inputCheckbox id="linkcheck" title="{!inci.id}"/>
+</apex:column>
+
+
+<apex:column >
+<apex:facet name="header"><apex:commandLink value="Incident" onclick="orderfunction();return false;" id="col1">&nbsp;<span class="{!globalorderCss}"/></apex:commandLink></apex:facet>
+<apex:outputText value="{!inci.name}"/>
+</apex:column>
+
+
+<apex:column >
+<apex:facet name="header"><apex:commandLink value="Type" onclick="orderfunction();return false;" id="col2">&nbsp;<span class="{!globalorderCss}"/></apex:commandLink></apex:facet>
+<apex:outputText value="{!inci.BMCServiceDesk__Type__c}"/>
+</apex:column>
+
+
+
+
+<apex:column >
+<apex:facet name="header">Status~</apex:facet>
+<apex:outputText value="{!inci.BMCServiceDesk__Status_ID__c}"/>
+</apex:column>
+
+</apex:dataTable>
+
+
+<apex:selectList multiselect="false" size="1" value="{!Incidentviewssize}" id="incidentview" >
+<apex:selectOption itemLabel="30" itemValue="30"></apex:selectOption>
+<apex:selectOption itemLabel="50" itemValue="50"></apex:selectOption>
+<apex:selectOption itemLabel="100" itemValue="100"></apex:selectOption>
+<apex:actionSupport event="onchange" reRender="linkincipgblocktable,pagecount" status="status"/>
+</apex:selectList>&nbsp;<apex:outputLabel value="Records Per Page"></apex:outputLabel>&nbsp;
+<apex:outputLabel value="Of Total Records : " id="recordsummary">{!Total_records}</apex:outputLabel>&nbsp;
+
+</apex:pageblock>
+</apex:form>
+
+<!-- Latest compiled and minified JavaScript -->
+<apex:includeScript value="{!URLFOR($Resource.HDscriptcss,'/jquery-2.1.1.min.js')}" loadOnReady="false"/>
+<apex:includeScript value="{!URLFOR($Resource.HDscriptcss,'/bootstrapV3_3_0/js/bootstrap.min.js')}" loadOnReady="false"/>
+<apex:includeScript value="{!URLFOR($Resource.HDscriptcss,'/jquery.tablesorter.js')}" loadOnReady="false"/>
+<!--- Calling Salesforce Ajax Library ----->
+<script src="../../soap/ajax/31.0/connection.js" type="text/javascript"></script>
+<script type="text/javascript">
+var __sfdcSessionId = '{!GETSESSIONID()}';
+var $j = jQuery.noConflict();
+var n = 0;
+$j(document).ready(function(){
+//calling A FUNCTION
+
+var col1 = $j('[id$=linkincipgblocktable]');
+     //alert($j('[id$=status]').html());
+
+
+//checkboxAdd();
+disableElements();
+//remove the string from the search field
+$j("[id$=removebtn]").click(function(){
+$j("[id$=searchString]").val('');
+$j("[id$=includeSelectListvalue]").prop('disabled',false);
+$j("[id$=incidentview]").prop('disabled',false); $j("[id$=pagenumber]").prop('disabled', '');$j("[id$=pagecount]").css({'text-decoration':'none'});$j("[id$=pageof]").css({'text-decoration':'none'});$j("[id$=pagenumber]").css({'text-decoration':'none'});
+});
+  
+});
+
+
+ //function to Select all the record on the fly
+ function selectAllCheckboxes(obj,receivedInputID)
+  {
+    console.log('---->');
+    var inputCheckBox = document.getElementsByTagName("input");                  
+    for(var i=0; i<inputCheckBox.length; i++)
+    {          
+    if(inputCheckBox[i].id.indexOf(receivedInputID)!=-1)
+    {
+    inputCheckBox[i].checked = obj.checked;
+    console.log('---->'+inputCheckBox[i].title);
+    }
+    }
+  }//function selectAllCheckboxes(obj,receivedInputID)
+  
+  //checkbox add all
+  function checkboxAdd()
+  {
+  
+  var checkboxids = $j('[id$=linkcheck]');
+    $j(checkboxids).on("click",function(){
+    if ($j(this).is(':checked'))
+     {
+        n = $j(this).length + n;
+        console.log('current checked --->'+n);
+        console.log('you checked --->'+$j(this).attr('title'));
+        if(n > 10)
+        {
+           alert('you can only choose 10 at a time');
+        }
+     }
+     else
+     {
+       n = n - 1;
+       console.log('current checked --->'+n);
+      }
+    
+    });
+  }//
+  
+function linkRecords()
+{
+//start of object instance
+//$j('[id$=status] span' ).show();
+sforce.connection.sessionId = __sfdcSessionId;
+var bmcInciLink = new sforce.SObject("BMCServiceDesk__Incident__c");
+//preparing the checkbox list
+var idstoLink = [];
+var checkboxids = $j('[id$=linkcheck]');
+$j(checkboxids).each(function () 
+{
+ if ($j(this).is(':checked'))
+     {
+     // alert($j(this).attr('title'));
+     idstoLink.push($j(this).attr('title')); 
+     }
+});
+//using checkbox list in the page
+if(idstoLink.length > 0 && idstoLink.length <= 10 )
+{
+ $j('[id$=status] span' ).show();
+ console.log('Got Ids ---->'+idstoLink);
+ for(index = 0; index < idstoLink.length; index++) 
+ {
+  
+  //updating data prepare
+ bmcInciLink.id = idstoLink[index];
+ bmcInciLink.BMCServiceDesk__FKIncident__c = '{!$CurrentPage.parameters.id}';
+ sforce.connection.update([bmcInciLink],{onSuccess : success, onFailure : failed});
+    
+ }//for(index = 0; index < fruits.length; index++)
+}//if(idstoLink.length > 0)
+else
+{
+var r=confirm("You can only select 10 incident at a Time !");
+if (r==true)
+{
+  console.log("You pressed OK!");
+}//if
+else
+{
+  console.log("You pressed Cancel!");
+}//else
+}
+
+//Success method
+function success(result) 
+{
+    if (result[0].getBoolean("success")) {
+    //code to close the status indicator
+     $j('[id$=status] span' ).hide();
+    console.log("Incident "+result[0].id +" linked succesfully, Please verify that all the Incident has been Linked correctly!");
+    
+    CloseAndRefresh();
+} else {
+        $j('[id$=status] span' ).hide();
+        
+        alert("Failed to link an incident :" +result[0].errors.message+ " Reason: ["+result[0].errors.statusCode+"]" );
+       }
+}//function success(result)
+
+//failure method
+function failed(error) 
+{
+$j('[id$=status] span' ).hide();
+alert("An error has occurred " + error);
+}//function failed(error)
+
+}//function scriptSave()
+
+ //function to close and refresh parent window
+function CloseAndRefresh()
+{
+var isConsole = '{!$CurrentPage.parameters.isConsole}';
+try{
+ if( isConsole == 'false')
+ {
+     parent.window.opener.location.href="/{!$CurrentPage.parameters.id}";
+ }
+ else
+ {
+  alert('Incident Linked. please reload the page to view the Incident...');
+  //window.opener.location.href="/apex/consoleIncidentRelatedList?id={!$CurrentPage.parameters.id}&isdtp=vw";
+ }
+ window.parent.location.reload();
+ window.close();
+
+ }//try
+ catch(err)
+ {
+ alert('Exception[]: '+err);
+ }//catch
+ return false;
+ }//function to close an refresh parent window
+ 
+ //disable view select List
+function disableElements()
+{
+$j("[id$=searchString]").prop('placeholder','Search...');
+
+//Conditional disabler for Search
+$j("[id$=searchString]").change(function(){ 
+var search_fieldvalue = $j("[id$=searchString]").val();
+if( search_fieldvalue.length > 1)
+{
+$j(this).css({'text-decoration':'none'});
+$j("[id$=pagenumber]").prop('disabled', 'disabled');
+$j("[id$=incidentview]").prop('disabled', 'disabled');
+$j("[id$=pagecount]").css({'text-decoration':'line-through'});
+$j("[id$=pageof]").css({'text-decoration':'line-through'});
+$j("[id$=pagenumber]").css({'text-decoration':'line-through'});
+$j("[id$=includeSelectListvalue]").prop('disabled','disabled');
+}
+else { $j("[id$=incidentview]").prop('disabled',false); $j("[id$=pagenumber]").prop('disabled', '');$j("[id$=pagecount]").css({'text-decoration':'none'});$j("[id$=pageof]").css({'text-decoration':'none'});$j("[id$=pagenumber]").css({'text-decoration':'none'});}
+});
+
+}//function disableElements()
+  
+</script>
+
+</apex:page>

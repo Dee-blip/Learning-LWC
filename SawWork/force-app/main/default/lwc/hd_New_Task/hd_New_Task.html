@@ -1,0 +1,84 @@
+<template>
+    <div class="slds-is-relative">
+        <lightning-spinner if:true={isLoading}></lightning-spinner>
+        <lightning-record-edit-form object-api-name="BMCServiceDesk__Task__c" onload={onFormLoaded}
+            onerror={onRecordSaveError} onsuccess={onRecordSaved}>
+            <lightning-messages>
+            </lightning-messages>
+            <lightning-layout multiple-rows>
+                <lightning-layout-item size="12">
+                    <lightning-input-field field-name="BMCServiceDesk__FKCategory__c" disabled value={defaultCategory}
+                        variant="label-inline">
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="4">
+                    <label class="slds-form-element__label" for="horizontal-input-id-01">Assign To</label>
+                </lightning-layout-item>
+                <lightning-layout-item size="8">
+                    <div class="slds-form-element slds-m-bottom_x-small">
+                        <div class="slds-form-element__control">
+                            <c-hd-lookup data-id="assignedTo" tab-index="1" show-object-list="true"
+                                id="horizontal-input-id-01" supported-objects={supportedObjects}
+                                search-placeholder="Search..." show-dropdown="true">
+                            </c-hd-lookup>
+                        </div>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item size="12">
+                    <lightning-input-field field-name="BMCServiceDesk__dueDateTime__c" tab-index="2" required
+                        variant="label-inline" value={defaultDueDate}>
+                    </lightning-input-field>
+                    <lightning-layout-item size="12">
+                        <lightning-input-field field-name="BMCServiceDesk__taskDescription__c" tab-index="3" required
+                            variant="label-inline">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-input-field class="slds-hide" field-name="BMCServiceDesk__openDateTime__c"
+                        variant="label-hidden" value={todaysDate}>
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="12">
+                    <lightning-input-field field-name="BMCServiceDesk__FKPriority__c" data-id="priority"
+                        class="slds-hide">
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="12">
+                    <lightning-input-field field-name="BMCServiceDesk__FKImpact__c" data-id="impact" class="slds-hide">
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="12">
+                    <lightning-input-field field-name="BMCServiceDesk__FKUrgency__c" data-id="urgency"
+                        class="slds-hide">
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="12">
+                    <lightning-input-field field-name="BMCServiceDesk__taskType__c" value="Tasks" class="slds-hide">
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="12">
+                    <lightning-input-field field-name="BMCServiceDesk__FKIncident__c" disabled value={parentIncident}
+                        variant="label-inline">
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="12">
+                    <lightning-input-field field-name="BMCServiceDesk__FKOpenBy__c" class="slds-hide"
+                        value={loggedInClient} variant="label-inline">
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="12">
+                    <lightning-input-field field-name="BMCServiceDesk__FKClient__c" class="slds-hide"
+                        value={loggedInClient} variant="label-inline">
+                    </lightning-input-field>
+                </lightning-layout-item>
+
+            </lightning-layout>
+        </lightning-record-edit-form>
+        <div
+            class="slds-modal__footer slds-border_top slds-p-top_small slds-text-align_center slds-m-top_small footerStyle">
+            <lightning-button class="slds-m-right_small" type="submit" name="Save" label="Save" onclick={handleSubmit}>
+            </lightning-button>
+            <lightning-button type="cancel" name="Cancel" label="Cancel" onclick={handleCancel}>
+            </lightning-button>
+        </div>
+    </div>
+</template>

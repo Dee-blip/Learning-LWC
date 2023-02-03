@@ -1,0 +1,15 @@
+<design:component label="Custom Welina Self Register">
+    <design:attribute name="startUrl"/>
+    <design:attribute name="regConfirmUrl" default="./CheckPasswordResetEmail"/>
+    <design:attribute name="firstnameLabel" default="First Name"/>
+    <design:attribute name="lastnameLabel" default="Last Name"/>
+    <design:attribute name="emailLabel" default="Email"/>
+    <design:attribute name="companyNameLabel" default="Company"/>
+    <design:attribute name="linkedInLabel" default="LinkedIn URL"/>
+    <design:attribute name="passwordLabel" default="Create Password"/>
+    <design:attribute name="confirmPasswordLabel" default="Confirm Password"/>
+    <design:attribute name="submitButtonLabel" default="Register"/>
+    <design:attribute name="cancelButtonLabel" default="Cancel"/>
+    <design:attribute name="includePasswordField" default="false"/>
+    <design:attribute name="extraFieldsFieldSet"/>
+</design:component>

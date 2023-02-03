@@ -1,0 +1,10 @@
+<template>
+    <div style={cssStyle}>
+        <lightning-combobox name="picklistChoice" label={labelName} value={value} placeholder="--Select an Option--"
+            required={isrequired} options={options} onchange={handleChange}>
+        </lightning-combobox>
+    </div>
+    <template if:true={error}>
+        <c-l2-qerror-panel errors={error}></c-l2-qerror-panel>
+    </template>
+</template>

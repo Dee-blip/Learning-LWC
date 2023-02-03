@@ -1,0 +1,60 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" 
+                controller="PartnerCommunityCustomSearchController" 
+                access="global">
+    <aura:attribute type="list" name="recordIds" />
+    <aura:attribute name="objectList" type="List" />
+    <aura:attribute name="showSearch" type="Boolean" default="false" />
+    <aura:attribute name="noRecords" type="Boolean" default="false" />
+    <aura:attribute name="loaded" type="Boolean" default="false" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    
+    <div class="pageSpinner">
+        <aura:if isTrue="{!v.loaded}" >
+            <lightning:spinner alternativeText="Loading" size="large" />
+        </aura:if>
+    </div>
+    <aura:if isTrue="{!v.noRecords}">
+        <div class="slds-grid slds-wrap slds-align_absolute-center slds-p-top_xx-large">
+            <div class="slds-align_absolute-center slds-col slds-size_1-of-1">
+                <span><img src="{!$Resource.datatablebootstrap + '/dist/img/no-results.png'}"/></span>
+            </div>
+            <div class="slds-align_absolute-center slds-col slds-size_1-of-1">
+                <span><h4>No search results</h4></span>
+            </div>
+            <div class="slds-align_absolute-center slds-col slds-size_1-of-1">
+                <span><p>We searched the objects you use most and didn't find any matches for your search.</p></span>
+            </div>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.showSearch}">
+        <!--<h2>Search Results</h2>-->
+        <div class="slds-vertical-tabs">
+            <ul class="slds-vertical-tabs__nav" role="tablist" aria-orientation="vertical">
+                <aura:iteration items="{!v.objectList}" indexVar="key" var="item" >
+                    <!--<li class="slds-vertical-tabs__nav-item" title="{!item.key}" role="presentation">-->
+                    <li class="{!item.active? 'slds-vertical-tabs__nav-item slds-is-active': 'slds-vertical-tabs__nav-item'}" data-value="{!item.key}" onclick="{!c.handleTabClickJS}" title="{!item.key}" role="presentation">
+                        <a class="slds-vertical-tabs__link" href="javascript:void(0)" role="tab" tabindex="{!item.active? '0': '-1'}" aria-selected="{!item.active? 'true': 'false'}" aria-controls="{!item.key}" id="{!item.key + __nav}">
+                            <!--<span class="slds-vertical-tabs__left-icon"></span>-->
+                            <!--<span class="slds-truncate" title="Tab 1">{!item.label}</span>-->
+                            <span class="labelSpan" title="Tab 1">{!item.label}</span>
+                            <span class="circleSpan slds-vertical-tabs__right-icon" style="float:right;">{!item.length}</span>
+                            <!--<span class="slds-vertical-tabs__right-icon"></span>-->
+                        </a>
+                    </li>
+                </aura:iteration>
+            </ul>
+            
+            <aura:iteration items="{!v.objectList}" indexVar="key" var="item" >
+                <div class="{!item.active? 'slds-vertical-tabs__content slds-show': 'slds-vertical-tabs__content slds-hide'}" id="{!item.key}" role="tabpanel" aria-labelledby="{!item.key + __nav}">
+                    <div class="slds-text-longform">
+                        <!--<h3 class="slds-text-heading_medium">{!item.key}</h3>-->
+                        <!--<aura:iteration items="{!item.value}" var="id">-->
+                        <c:PartnerCommunityCustomSearchResultItem records="{!item.value}" sObjectName="{!item.key}" />
+                        <!--</aura:iteration>-->
+                    </div>
+                </div>
+            </aura:iteration>
+        </div>
+    </aura:if>
+</aura:component>

@@ -1,0 +1,67 @@
+<aura:component implements="force:hasRecordId,lightning:actionOverride" controller="SC_SI_PageLayoutButton_Controllor">
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="showAddCaseModal" type="Boolean" default="false"/>
+    <aura:attribute name="incidentName" type="String" default='' />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="caseRecId" type="Id" />
+    <aura:attribute name="warningMessage" type="String" />
+    <aura:attribute name="showConfirm" type="Boolean"  default="false" />
+    
+    
+    
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <aura:if isTrue="{!v.showSpinner}">
+            <lightning:spinner alternativeText="Loading" size="medium" variant="brand" />
+        </aura:if> 
+        
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Associate Case to Service Incident</h2>
+            </header>
+            
+            
+            
+            
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                
+                <div class="demo-only" style="height:8rem">                   
+                    <!--Grid strcture to show fields-->
+                    <div class="slds-grid slds-m-top_small">
+                        <div class="slds-col">
+                            <!--<div class="slds-form-element__label slds-no-flex">Service Incident</div>-->
+                            <lightning:input style="width: 231px" value="{!v.incidentName}" disabled="true" label="Service Incident" />
+                        </div>    
+                        
+                        <div class="slds-col">                                                        
+                            <lightning:recordEditForm aura:id="caseDetails" objectApiName="SC_SI_Service_Incident__c" onsubmit="{!c.handleOnLink}">
+                                <lightning:messages />
+                                <lightning:inputField fieldName="Case_Number__c" />
+                                <br> </br> <br> </br>
+                                <!-- <div style="left: 50px"> -->
+                                <aura:if isTrue="{!!v.showConfirm}">
+                                    <lightning:button class="leftSide_button"  variant="brand" label="Link Case" type="submit" />
+                                    <lightning:button class="rightSide_button"  variant = "neutral" label="Cancel" onclick="{!c.handleCancel}"/>
+                                </aura:if>
+                                <!-- </div> -->
+                            </lightning:recordEditForm>                           
+                        </div> 
+                    </div>                    
+                </div>
+                <aura:if isTrue="{!v.showConfirm}">
+                    <footer class="slds-modal__footer">
+                        
+                        {!v.warningMessage} <lightning:button class="confirm_button" variant="brand" label="Confirm" onclick="{!c.handleConfirm}"  /> 
+                        <lightning:button   variant = "neutral" label="Cancel" onclick="{!c.handleCancel}"/>	
+                       				
+                    </footer> 
+                </aura:if>
+            </div>
+            
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>    
+    
+</aura:component>

@@ -1,0 +1,10 @@
+<design:component label="Custom Login Form">
+    <design:attribute name="startUrl"/>
+    <design:attribute name="usernameLabel" default="{!$Label.c.JV_Email}"/>
+    <design:attribute name="passwordLabel" default="{!$Label.c.JV_Password}"/>
+    <design:attribute name="loginButtonLabel" default="{!$Label.c.JV_Login}"/>
+    <design:attribute name="forgotPasswordLabel" default="{!$Label.c.JV_Forgot_Password}"/>
+    <design:attribute name="forgotPasswordUrl"/>
+    <design:attribute name="selfRegisterLabel" default="{!$Label.c.JV_Not_Member}"/>
+    <design:attribute name="selfRegisterUrl"/>
+</design:component>

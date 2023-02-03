@@ -1,0 +1,87 @@
+<apex:page standardController="Case" extensions="IRCaseActExpMLExtension">
+   <apex:form >
+   <apex:pageBlock title="Active Contract Manual Lists">
+   <apex:outputpanel style="overflow:scroll;height:150px;" layout="block">
+      <apex:pageBlockTable value="{!amlList}" var="manList" align="top" width="100%">
+         <apex:column >
+          <apex:facet name="header"><b>Manual List Id</b></apex:facet>
+          <a href="#" onclick="openAsSubtab('{!manList.Id}', '{!manList.Manual_List_Id__c}');return false">{!manList.Manual_List_Id__c}</a>
+         </apex:column>
+         <apex:column value="{!manList.Reason_Code__c}"/>
+         <apex:column value="{!manList.Review_Frequency__c}"/>
+         <apex:column value="{!manList.Review_Date__c}"/>
+         <apex:column value="{!manList.Priority__c}"/>
+         <apex:column value="{!manList.Description__c}"/>
+         <apex:column value="{!manList.Owner__c}"/>
+         <apex:column value="{!manList.End_Date__c}"/>
+         <apex:column value="{!manList.Accrual_Flag__c}"/>
+         <apex:column value="{!manList.Sub_Reason_Code__c}"/>
+      </apex:pageBlockTable>
+      </apex:outputpanel>
+   </apex:pageBlock>
+   <apex:pageBlock title="Expired Contract Manual Lists">
+   <apex:outputpanel style="overflow:scroll;height:150px;" layout="block">
+      <apex:pageBlockTable value="{!emlList}" var="manList" align="top" width="100%">
+         <apex:column >
+          <apex:facet name="header"><b>Manual List Id</b></apex:facet>
+          <a href="#" onclick="openAsSubtab('{!manList.Id}', '{!manList.Manual_List_Id__c}');return false">{!manList.Manual_List_Id__c}</a>
+         </apex:column>
+         <apex:column value="{!manList.Reason_Code__c}"/>
+         <apex:column value="{!manList.Review_Frequency__c}"/>
+         <apex:column value="{!manList.Review_Date__c}"/>
+         <apex:column value="{!manList.Priority__c}"/>
+         <apex:column value="{!manList.Description__c}"/>
+         <apex:column value="{!manList.Owner__c}"/>
+         <apex:column value="{!manList.End_Date__c}"/>
+         <apex:column value="{!manList.Accrual_Flag__c}"/>
+         <apex:column value="{!manList.Sub_Reason_Code__c}"/>
+      </apex:pageBlockTable>
+      </apex:outputpanel>
+   </apex:pageBlock>
+   <apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"/>
+   <apex:includeScript value="/support/console/28.0/integration.js"/>
+   <script>
+    var j$ = jQuery.noConflict();
+    j$(document).ready(function(){
+        var ifsArr = window.parent.document.getElementsByTagName("iframe");
+        var ifs=""
+        for(var i=0;i<ifsArr.length;i++){
+            if(ifsArr[i].title == "IRCaseActExpManList"){
+               ifs=ifsArr[i];
+            }
+        }
+        j$(ifs).load(function() {
+            var pbBodyArr = j$(ifs).contents().find("div.pbBody");
+            j$(ifs).contents().find("div.pbBody").find("tbody").each(function(index){
+             if(j$(this).text().length==0){
+               j$(pbBodyArr[index]).parent().hide();
+               j$(ifs).height( j$(ifs).contents().find("body").height() );
+             }
+          });
+        });
+    });
+   </script>
+   <!-- Open in a new tab in console or windows based on the view-->
+   <script>
+        var recordId;
+        var title;
+        function openAsSubtab(id, name)
+        {
+            recordId    = id;
+            title       = name;
+             if (sforce.console.isInConsole())
+                sforce.console.getEnclosingPrimaryTabId(openSubtab);
+             else
+                window.parent.location.href = '/' + id;
+        }
+
+        var openSubtab = function openSubtab(result)
+        {
+            //Open subTabs based on the retrieved primaryTab
+            var primaryTabId = result.id;
+            sforce.console.openSubtab(primaryTabId , '/'+recordId , true,
+                title , null , null, 'salesforceSubtab'+recordId);
+        };
+        </script>
+   </apex:form>
+</apex:page>

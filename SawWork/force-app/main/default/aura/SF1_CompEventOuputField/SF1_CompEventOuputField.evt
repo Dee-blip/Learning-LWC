@@ -1,0 +1,4 @@
+<!-- SF1_CompEventOuputField -->
+<aura:event type="COMPONENT" description="Event template">
+    <aura:attribute name="fieldid" type="String"/>
+</aura:event>

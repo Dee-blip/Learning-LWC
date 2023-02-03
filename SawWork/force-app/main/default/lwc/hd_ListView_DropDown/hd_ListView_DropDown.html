@@ -1,0 +1,71 @@
+<template>
+    <div class={dropdownClass}>
+        <c-hd_-horizontal_-radio_-group if:true={radioOptions} options={radioOptions} orientation="horizontal"
+            value={listViewType} onchange={handleRadioButtonChange}>
+        </c-hd_-horizontal_-radio_-group>
+        <div class="panel-content scrollable" id="content_1297:0" data-aura-rendered-by="1302:0"
+            data-scoped-scroll="true" style="padding: 0px;">
+            <div class="slds-form-element slds-lookup forceVirtualAutocompleteMenu">
+                <lightning-input type="search" placeholder="" onchange={handleOnchange} class="slds-m-horizontal_small">
+                </lightning-input>
+                <div class="list uiAbstractList forceVirtualAutocompleteMenuList" data-aura-rendered-by="1269:0"
+                    data-aura-class="uiAbstractList forceVirtualAutocompleteMenuList">
+                    <div class="listContent" data-aura-rendered-by="1271:0">
+                        <div tabindex="-1" style="max-height: 410px;" data-aura-rendered-by="1264:0"
+                            class="uiScroller scroller-wrapper scroll-bidirectional native" data-aura-class="uiScroller"
+                            data-scoped-scroll="true">
+                            <div data-aura-rendered-by="1265:0" class="scroller">
+                                <ul class="slds-dropdown__list slds-show" role="listbox" data-test-search-count="6"
+                                    aria-label="Incidents | List Views" data-aura-rendered-by="1234:0"
+                                    id="virtualAutocompleteListbox_6e2d7b9c46e43">
+                                    <template for:each={searchFilteredListViews} for:item="listItem">
+                                        <!-- <li class="slds-dropdown__header slds-text-heading--label forceVirtualAutocompleteMenuOption"
+                                        role="presentation" data-aura-rendered-by="1239:0"
+                                        data-aura-class="forceVirtualAutocompleteMenuOption">
+                                        <div class=" virtualAutocompleteOptionText virtualAutocompleteOptionHeader"
+                                            role="presentation" data-aura-rendered-by="1257:0">Recent List Views</div>
+                                    </li> -->
+                                        <li key={listItem.Name} data-id={listItem.Id}
+                                            class="slds-dropdown__item has-icon--left forceVirtualAutocompleteMenuOption"
+                                            role="presentation" onclick={onListViewSelected}
+                                            data-aura-class="forceVirtualAutocompleteMenuOption"><a role="option"
+                                                tabindex="-1" data-aura-rendered-by="1244:0" href="javascript:void(0);"
+                                                aria-selected="true">
+                                                <lightning-icon icon-name="utility:check"
+                                                    class="slds-icon slds-icon--selected slds-icon--x-small slds-icon-text-default slds-m-right--small slds-button__icon slds-icon-utility-check slds-icon_container forceIcon"
+                                                    role="button" data-aura-rendered-by="1247:0"
+                                                    data-aura-class="forceIcon">
+                                                    <span class="slds-assistive-text">Selected</span>
+                                                </lightning-icon><span class=" virtualAutocompleteOptionText"
+                                                    data-aura-rendered-by="1248:0">{listItem.Name}</span>
+                                            </a></li>
+                                    </template>
+                                </ul>
+                                <div class="infinite-loading"><span class="il"></span></div>
+                            </div>
+                        </div>
+                        <div class="emptyListContent" data-aura-rendered-by="1273:0">No results found.</div>
+                        <div class="loadingIndicator" data-aura-rendered-by="1275:0">
+                            <div class="indicator forceInlineSpinner" aria-hidden="false" role="alert"
+                                data-aura-rendered-by="1219:0" data-aura-class="forceInlineSpinner">
+                                <div data-aura-rendered-by="1225:0" class="forceDotsSpinner"
+                                    data-aura-class="forceDotsSpinner">
+                                    <div class="slds-spinner_medium slds-spinner slds-spinner_brand " role="status"
+                                        data-aura-rendered-by="1226:0"><span class="slds-assistive-text"
+                                            data-aura-rendered-by="1227:0">Loading...</span>
+                                        <div class="slds-spinner__dot-a" data-aura-rendered-by="1229:0"></div>
+                                        <div class="slds-spinner__dot-b" data-aura-rendered-by="1230:0"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><label class="uiLabel-hidden form-element__label uiLabel" for="1214:0"
+                    data-aura-rendered-by="1309:0" data-aura-class="uiLabel"><span class="assistiveText"
+                        data-aura-rendered-by="1310:0">Search
+                        lists...</span>
+                </label>
+            </div>
+        </div>
+    </div>
+</template>

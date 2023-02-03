@@ -1,0 +1,7 @@
+<!-- created for CR 1027650 CSAT: New Custom Tab to navigate to ABI Relation Survey Upload File Report
+Author: Sharath
+Date : 4/7/2011
+ -->
+<apex:page controller="CS_ABIReportController">
+<apex:outputPanel ><apex:iframe src="{!reportUrl}" scrolling="true" height="900px"/></apex:outputPanel>
+</apex:page>

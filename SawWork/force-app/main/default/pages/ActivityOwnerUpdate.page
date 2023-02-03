@@ -1,0 +1,18 @@
+<apex:page controller="ActivityMassUpdateController" showHeader="true" title="Activity Update" label="Activity Update" standardStylesheets="true" tabStyle="Task">
+<apex:form >
+    <apex:pageBlock title="Change Activity Owner">
+        <apex:PageblockSection id="OwnerBlk" columns="1" collapsible="false">
+            <apex:facet name="header">
+              <span style="color:black;">Select New Owner</span>
+            </apex:facet>
+            <apex:pageblocksectionItem >
+                <apex:OutputLabel value="Owner: "></apex:OutputLabel>
+                <apex:inputField id="User1"  label="Owner"  value="{!taskObj.OwnerId}"/>
+            </apex:pageblocksectionItem>        
+        </apex:PageblockSection>      
+        <apex:inputCheckbox value="{!checkEmail}"/>Send Notification Mail <br></br><br></br>
+        <apex:outputLabel style="padding-left:265px"><apex:commandButton value="Update"  action="{!updateOwner}" style="align:center" /></apex:outputLabel>
+        <apex:outputLabel style="padding-left:15px"><apex:commandButton value="Cancel" immediate="true" action="{!returnPage}"  style="align:center" /></apex:outputLabel>
+    </apex:pageBlock>
+</apex:form>
+</apex:page>

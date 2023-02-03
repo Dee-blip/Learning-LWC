@@ -1,0 +1,27 @@
+.THIS tbody {
+    display: block;
+    max-height: 200px;
+    overflow-y: scroll;
+}
+
+.THIS thead,
+.THIS tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    
+}
+
+.THIS td
+{		max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size:13px; 
+    
+}
+.THIS th{ 
+    font-size:14px !important;
+    color:#005fb2 !important;
+    font-weight:500 !important;    
+}

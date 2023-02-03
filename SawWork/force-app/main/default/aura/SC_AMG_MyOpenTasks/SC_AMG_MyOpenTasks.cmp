@@ -1,0 +1,151 @@
+<aura:component controller="SC_AMG_Home_Lightning" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" extends="c:AuraUtils" >
+    
+    <!--<aura:attribute name="columns" type="List"/>-->
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <!--  <aura:registerEvent name="AppEvent" type="c:RecIdAppEvent" /> -->
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:handler name="change" value="{!v.taskFilterVal}" action="{!c.updateTaskTable}"/>
+    <aura:handler name="destroy" value="{!this}" action="{!c.handleDestroy}"/>
+    
+    <aura:attribute name="columns" type="List" default="[]"/>
+    <aura:attribute name="data" type="List" access= "global" default="[]"/>
+    <aura:attribute name="taskCount" type="Integer" access= "global" default="-1"/>
+    <aura:attribute name="dataFiltered" type="List" access= "global" default="[]"/>
+    <aura:attribute name="filteredDataCount" type="Integer" default="0"/>
+    
+    <aura:attribute name="taskSearchText" type="String" default=""/>
+    
+    <aura:attribute name="keyField" type="String" default="id"/>
+    <!-- the container element determine the height of the datatable -->
+
+    <aura:attribute name="fieldsList" type="List" default="[]"/>
+    <aura:attribute name="selectedRowsCount" type="Integer" default="0"/>
+    <aura:attribute name="recId" type="Id" />
+    <aura:attribute name="showPop" type="boolean" default="false" />
+    <aura:attribute name="showSpinner" type="Boolean" default="true" />
+    <aura:attribute name="fieldList" type="String[]" />
+	<aura:attribute name="idList" type="String[]" />
+	
+    <aura:attribute name="taskFilterVal" type="String" default="My Tasks Due Today"/>
+    <aura:attribute name="loadSpinner" type="Boolean" default="false"/>
+    <aura:attribute name="isUserManager" type="Boolean" default="false"/>
+    
+    <aura:attribute name="sortedBy" type="String" default="Name"/>
+    <aura:attribute name="sortedDirection" type="String" default="asc"/>
+	<aura:attribute name="setIntervalId" type="Integer"/>
+    
+    <!-- LOAD MORE DATA ATTRIBUTES -->
+    <aura:attribute name="enableInfiniteLoading" type="Boolean" default="true"/>
+    <aura:attribute name="initialRows" type="Integer" default="50"/>
+    <aura:attribute name="rowsToLoad" type="Integer" default="20"/>
+    <aura:attribute name="totalNumberOfRows" type="Integer" default="10"/>
+    <aura:attribute name="loadMoreStatus" type="String" default="Scroll down to load more!"/>
+    <aura:attribute name="showRowNumberColumn" type="Boolean" default="false"/>
+    <aura:attribute name="rowNumberOffset" type="Integer" default="0"/>
+    <aura:attribute name="rowsToAdd" type="Integer" default="20"/>
+    <aura:attribute name="currentCount" type="Integer" default="50"/>
+    
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid slds-gutters">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                
+                <div>
+                    <aura:if isTrue="{!v.loadSpinner}">
+                        <div aura:id="spinnerId" class="slds-spinner_container">
+                            <lightning:spinner alternativeText="Loading" variant="brand" size="medium" />
+                        </div>
+                    </aura:if>
+                </div>
+                
+                <div class="slds-col slds-size_2-of-7">
+                    
+                    <ul class="slds-list_horizontal slds-media_center">
+                        <li>
+                            <lightning:icon iconName="standard:task" class="slds-icon" />
+                        </li>
+                        <li class="">
+                            <span style="font-size:17px;padding-left: 10px;">My Tasks <b>({!v.totalNumberOfRows})</b></span>
+                        </li>
+                    </ul>
+                    
+                </div>
+                
+                <aura:if isTrue="{!!v.isUserManager}">
+                    <div class="slds-col" >
+                        <lightning:select name="filterSelect" value="{!v.taskFilterVal}" class="label-hidden" variant="label-hidden">
+                            <option text="My Tasks Due Today"></option>
+                            <option text="My Open Tasks"></option>
+                            <option text="My Overdue Tasks"></option>
+                            <option text="My Team's Open Tasks"></option>
+                        </lightning:select>
+                    </div>
+                    
+                    <aura:set attribute ="else">
+                        <div class="slds-col" >
+                            <lightning:select name="filterSelect" value="{!v.taskFilterVal}" class="label-hidden" variant="label-hidden">
+                                <option text="My Team's Open Tasks"></option>
+                            </lightning:select>
+                        </div>
+                    </aura:set>
+                </aura:if>
+                
+                
+                <div class="slds-col">
+                    <lightning:button variant="brand" label="New Task" title="New Task" 
+                                      onclick="{!c.newTask}" />
+                </div>
+                
+                <!--
+                <div class="slds-col">
+                    <lightning:input value="{!v.taskSearchText}" placeholder="Search on Tasks..." type="text" name="Task Search" class="label-hidden" onchange="{!c.filter}"/>
+                    <p style="text-align:center">{!v.filteredDataCount} of {!v.taskCount}</p>
+                </div>	-->
+                
+                <div class="slds-col rightAlign">
+                    <button class="slds-button" label="Refresh"
+                            onclick="{!c.updateTaskTable}">
+                        <lightning:icon iconName="action:refresh" alternativeText="Refresh" size="x-small"/>
+                    </button>
+                </div>
+                
+            </header>
+        </div>
+        
+        <div class="slds-card__body slds-card__body_inner" style="height:240px;">
+            <aura:if isTrue="{!v.taskCount > 0}">
+                <div style="height:240px;">
+                    <lightning:datatable 
+                                         data="{!v.dataFiltered}" 
+                                         columns="{!v.columns}" 
+                                         keyField="taskRecId"
+                                         aura:Id="datatable"
+                                         onsort = "{!c.updateColumnSorting}"
+                                         sortedBy="{!v.sortedBy}" 
+                                         onrowaction="{! c.handleRowAction }"
+                                         sortedDirection="{!v.sortedDirection}"
+                                         hideCheckboxColumn = "true"
+                                         rowNumberOffset="0"
+                                         enableInfiniteLoading="{!v.enableInfiniteLoading}"
+                                         onloadmore="{!c.handleLoadMoreTasks}"
+                                         />
+                </div>
+                    <aura:set attribute ="else">
+                    <div class="slds-text-heading_medium slds-align_absolute-center" style="padding: 30px;height:240px;">
+                        <aura:if isTrue="{!v.taskCount == 0}">
+                            No Tasks?! No problem!
+                        
+                        <aura:set attribute="else">
+                            Loading Tasks... Hang tight!
+                        </aura:set> 
+                    </aura:if>
+
+                    </div>
+                </aura:set>
+            </aura:if>
+        </div>
+        <footer class="slds-card__footer"></footer>
+    </article>
+
+    
+</aura:component>

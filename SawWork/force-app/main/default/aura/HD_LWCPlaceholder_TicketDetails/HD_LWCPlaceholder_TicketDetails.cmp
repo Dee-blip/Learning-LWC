@@ -1,0 +1,13 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global"  controller="HD_IncidentDetailController">
+    <aura:attribute name="horizontalTabs" type="Aura.Component[]" access="private"/>
+    <aura:attribute name="incType" type="String"/>
+    <aura:attribute name="recordId" type="Id" default="a5UR00000009piXMAQ"/>
+    <aura:handler event="force:refreshView" action="{! c.handleForceRefreshViewForLWC }"></aura:handler>
+    <aura:handler name="init" action="{!c.doInit}" value="this"/>
+    <div>
+        <c:hdIncidentDetails aura:id="clientDetailLWC" recordId="{!v.recordId}"></c:hdIncidentDetails>
+        <!-- <aura:if isTrue="{!v.incType == 'Service Request'}">
+            <c:HD_LWC_Request_Detail_Component recordId="{!v.recordId}"/>
+        </aura:if> -->
+    </div>
+</aura:component>

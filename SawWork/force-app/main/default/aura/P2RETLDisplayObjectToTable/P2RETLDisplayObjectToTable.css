@@ -1,0 +1,339 @@
+/*Table CSS starts*/
+.THIS table{
+    width: 100% !important;   
+}
+ 
+.THIS td  { 
+    font-weight: 500 !important; 
+    
+}
+
+.THIS thead th  {
+    font-size:16px !important;
+    color:#54698d !important; 
+}
+
+.THIS tbody th {
+    font-weight:500 !important;
+    color:#005fb2 !important;
+    font-size:15px !important;
+    padding-top:7px !important;
+    padding-bottom:7px !important;
+    padding-left:10px !important;
+    padding-right:1px !important;
+    
+    
+}
+
+.THIS tr {
+    font-weight:500 !important;
+    color:#005fb2 !important;
+    font-size:15px !important;
+    
+    
+}
+.THIS tr td{
+    font-weight:500 !important;
+    padding-top:7px !important;
+    padding-bottom:7px !important;
+    padding-left:10px !important;
+    padding-right:1px !important;
+    color:#005fb2 !important;
+    font-size:15px !important;    
+}
+
+.THIS .slds-grid{
+    text-align:left !important;
+    display: flow-root !important;
+}
+
+.THIS .slds-th__action{
+    text-align:left !important;
+    display: flow-root !important;
+}
+
+.THIS .slds-table--header-fixed_container {
+    background-color:#f4f6fe !Important;
+}
+
+.THIS .slds-cell-fixed{
+    background-color:#e3e5ed !Important;
+}
+
+
+/*CSS to change column headings from uppercase to none  */
+.THIS th.slds-text-title_caps{
+    text-transform: none !Important;
+    
+}
+
+
+/*CSS to get purple stripes */
+.THIS .slds-table--striped tbody tr:nth-of-type(even) > th{
+    background-color:#f4f6fe    !Important;
+}
+
+.THIS .slds-table--striped tbody tr:nth-of-type(even) > td{
+    background-color:#f4f6fe    !Important;
+}
+
+
+
+/*CSS to get white stripes */
+.THIS .slds-table--striped tbody tr:nth-of-type(odd) > th{
+    background-color:#ffffff   !Important;
+}
+
+.THIS .slds-table--striped tbody tr:nth-of-type(odd) > td{
+    background-color:#ffffff    !Important;
+}
+
+.THIS .slds-table_bordered tbody th{
+    border-top:0px !Important;
+}
+
+.THIS .slds-table_bordered tbody td{
+    border-top:0px !Important;
+}
+
+.THIS.slds-table_header-fixed_container{
+    border:0px !Important;
+}
+
+
+.THIS.slds-table--header-fixed_container{
+    border:0px !Important;
+}
+
+
+/*Table CSS ends*/
+
+.THIS *:before  {
+    box-sizing: unset !important;
+}
+
+.THIS select {
+    font-size:15px;
+    color:#005fb2 !important;    
+}
+
+.THIS label {
+    font-size:15px !important;;
+    font-weight:bold !important;;
+    color:#182337 !important;    
+}
+
+.THIS .slds-resizable__handle{
+    background:#ecebea!important;
+}
+
+/*CSS for Board */
+.THIS h1{font-size:16px !important;
+    color:white !important;
+}
+
+/*Next and Previous Button CSS*/
+
+.THIS .Next_and_Previous_Button{
+    margin:0px !Important;
+    border:0px !Important;
+    padding:0px !Important;
+    color: white !Important;
+    background:#54698d !Important;
+    box-shadow: 0 5px 10px #333 !Important;
+    
+}
+
+.THIS .Next_and_Previous_Button:hover{
+    background:#182337 !Important;
+    box-shadow: 0 5px 10px #333 !Important;
+}
+
+
+.THIS .Next_and_Previous_Button:active{
+    background:#182337 !Important;
+    box-shadow: 0 2px 10px #111 !Important;
+    transform: translateY(4px) !Important;
+}
+
+/* Download Button CSS */
+.THIS .DownloadButton{
+    height:40px !Important;
+    width:40px !Important;
+    margin:0px !Important;
+    border:0px !Important;
+    padding:0px !Important;
+    color: white !Important;
+    background:#54698d !Important;
+    box-shadow: 0 5px 10px #333 !Important;
+}
+
+.THIS .DownloadButton:hover{
+    background:#182337 !Important;
+    box-shadow: 0 5px 10px #333 !Important;
+}
+
+
+.THIS .DownloadButton:active{
+    background:#182337 !Important;
+    box-shadow: 0 2px 10px #111 !Important;
+    transform: translateY(4px) !Important;
+}
+
+
+.THIS .align-right{
+    align:right !Important;
+    padding:1px !Important;
+}
+
+.THIS .align-left{
+    align:left !Important;
+    padding:1px !Important;
+}
+
+.THIS h4{
+    font-size:25px !Important;;
+    font-weight:500 !Important;;
+}
+
+.THIS .slds-button--neutral {
+    padding:0px !Important;
+    text-align: center !Important;;
+    vertical-align: middle !Important;
+    border: 0px !Important; 
+    margin:0px !Important; 
+    background-color: #f3f2f2 !Important;
+}
+
+.THIS .slds-button--neutral:hover {
+    border: 0px !Important; 
+    margin:0px !Important; 
+    background-color: #f3f2f2 !Important;
+}
+
+.THIS .slds-button--neutral:active {
+    margin:0px !Important; 
+    border: 0px !Important; 
+    background-color: #f3f2f2 !Important;
+}
+
+
+
+
+.THIS .slds-has-focus.slds-is-resizable .slds-th__action,.THIS .slds-has-focus.slds-is-resizable .slds-th__action:focus,.THIS .slds-has-focus.slds-is-resizable .slds-th__action:hover,.THIS .slds-has-focus.slds-is-resizable .slds-th__action:focus:hover,.THIS .slds-is-resizable .slds-th__action:focus,.THIS .slds-is-resizable .slds-th__action:focus:hover{
+    background-color: #e3e5ed !Important;
+    box-shadow: #e3e5ed 0 0 0 0px inset, #e3e5ed -0rem 0 0 inset !Important;
+}
+
+.THIS pseudo:before{
+    border:0px !Important;    
+}
+
+
+
+.THIS ul{
+    border-radius: .25rem !Important;
+    background:#f4f6fe !Important;
+    padding:0px !Important; 
+    margin:0px !Important; 
+    box-shadow: 0 5px 10px #777 !Important;
+    border:0px solid black!Important;
+}
+.THIS li{
+    padding:0px !Important; 
+    margin:0px !Important; 
+}
+
+.THIS .slds-lookup__result-text{
+    color:#005fb2 !Important;
+    font-size:14px  !Important;
+}
+
+.THIS .slds-dropdown-trigger{
+    color:#005fb2 !Important;
+    font-size:14px  !Important;
+}
+
+.THIS .slds-combobox__input{
+    color:#005fb2 !Important; 
+    font-size:16px  !Important;
+    box-shadow: 0 5px 10px #888 !Important;
+    border:0px solid black !Important; 
+    text-align:center !Important;
+}
+
+.THIS .slds-dropdown{
+    -webkit-transform:none !Important;
+    border:0px solid black !Important;
+    max-height: 110px !Important;
+}
+.THIS.slds-dropdown__item{
+    color:red !Important;
+}
+.THIS .slds-form-element__label {
+    display: inherit  !Important;
+}
+
+.THIS span.slds-listbox__option{
+    padding-top:6px !Important;
+    padding-bottom:6px !Important;
+    padding-left:12px !Important;
+    padding-right:12px !Important;
+    font-size:14px !Important;
+}
+
+/*CSS for the placeholder */
+
+.THIS .column_search{
+    color:#253045 !Important;
+    font-size:16px  !Important;
+    border:0px solid black !Important;
+}
+.THIS .column_search::-webkit-input-placeholder {
+    font-size:11px !important;
+    color: #54698d !important;
+    opacity:0.7 !Important;
+}
+.THIS .objectSearch {
+    color:#253045 !Important;
+    font-size:18px  !Important;
+    border:0px solid black !Important;
+}
+
+.THIS .objectSearch::-webkit-input-placeholder {
+    font-size:18px !important;
+    color: #54698d !important;
+    opacity:0.7 !Important;
+}
+
+.THIS .objectTitle {
+   padding-top: 15px!important;
+    font-size: 15px!important;
+    color: #253045!important;
+    font-weight: 1000;
+}
+
+/*CSS to remove focus properties when a cell in table is selected*/
+.THIS .slds-has-focus {
+    box-shadow:unset !important;
+    background-color: inherit !important;
+}
+
+.THIS .slds-th__action {
+    box-shadow:unset !important;
+    background-color: inherit !important;
+}
+
+.THIS .column_search {
+    padding-right:3px !important;
+    
+}
+ 
+.THIS .slds-table--header-fixed_container:before {
+     border-bottom: 0px solid rgb(217, 219, 221) !important;
+}
+
+
+.THIS .slds-table_bordered{
+    border: 0px solid rgb(217, 219, 221) !important;
+}

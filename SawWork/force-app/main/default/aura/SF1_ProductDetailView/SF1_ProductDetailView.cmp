@@ -1,0 +1,498 @@
+<aura:component controller="SF1_ManageProductsController" implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global">
+  <aura:attribute name="oppLineItemObj" type="OpportunityLineItem"/>
+  <aura:attribute name="opportunityObj" type="Opportunity"/>
+  <aura:attribute name="OppId" type="Id"/>
+  <aura:attribute name="OppLineItemId" type="Id"/>
+  <aura:attribute name="baseLineProdFlag" type="String" default="false"/>
+  <aura:attribute name="baseLineProdFlagValue" type="String" default="color:black"/>
+  <aura:attribute name="baseLineMonthlyCommitFlag" type="String" default="green"/>
+  <aura:attribute name="projectedMonthlyCommitFlag" type="String" default="green"/>
+  <aura:attribute name="oneTimeFeeFlag" type="String" default="black"/>
+  <aura:attribute name="NetMRRFlag" type="String" default="black"/>
+  <aura:attribute name="baselineMonthlyUsageFlag" type="String" default="black"/>
+  <aura:attribute name="projectedMonthlyFlag" type="String" default="black"/>
+  <aura:attribute name="netMonthlyFlag" type="String" default="black"/>
+  <aura:attribute name="EMRIFlag" type="String" default="black"/>
+  <aura:attribute name="CurrencyValue" type="String"/>
+  <aura:attribute name="oppCategoryValues" type="String[]"/>
+  <aura:attribute name="oppCategoryValue" type="String"/>
+  <aura:attribute name="oppSubCategoryValues" type="String[]"/>
+  <aura:attribute name="oppSubCategoryValue" type="String"/>
+  <aura:attribute name="oppCancellationLostValues" type="String[]"/>
+  <aura:attribute name="oppCancellationLostValue" type="String"/>
+  <aura:attribute name="aggregationPartnerValues" type="String[]"/>
+  <aura:attribute name="aggregationPartnerValue" type="String"/>
+  <aura:attribute name="competitorValues" type="String[]"/>
+  <aura:attribute name="competitorValue" type="String"/>
+  <aura:attribute name="productName" type="String"/>
+  <aura:attribute name="accountName" type="String"/>
+  <aura:attribute name="productNamesMap" type="Map" default="{}"/>
+  <aura:attribute name="categoryToSubcategoryMap" type="Map" default="{}"/>
+  <aura:attribute name="SubcategoryToCancelLossReasonMap" type="Map" default="{}"/>
+  <aura:attribute name="missingProductFeature" type="String"/>
+  <aura:attribute name="initialOutClause" type="String"/>
+  <aura:attribute name="consolidationAccount" type="String"/>
+  <aura:attribute name="unacceptableTermsAndConditions" type="String"/>
+  <aura:attribute name="AverageRenewalCommitMRRVal" type="String"/>
+  <aura:attribute name="ProjectedMonthlycommitfeesVal" type="String"/>
+  <aura:attribute name="NRRVal" type="String"/>
+  <aura:attribute name="UnitPriceVal" type="String"/>
+  <aura:attribute name="AverageRenewalUsageMRRVal" type="String"/>
+  <aura:attribute name="ProjectedAvgRevNonCommitVal" type="String"/>
+  <aura:attribute name="NetNonCommitVal" type="String"/>
+  <aura:attribute name="EMRIVal" type="String"/>
+  <aura:attribute name="termValue" type="Integer"/>
+  <aura:attribute name="termRequired" type="Boolean" default="false"/>
+  <aura:attribute name="termErrorMessage" type="String" default=""/>
+  <!--SFDC-3714 -->
+  <aura:attribute name="isSpecialistUser" type="Boolean" default="false"/>
+
+  <aura:attribute name="splForecastCategoryTouched" type="Boolean" default="false"/>
+  <aura:attribute name="splForecastCategory" type="List"/>
+  <aura:attribute name="splForecastCategoryFld" type="String"/>
+
+  <aura:attribute name="splCloseDateTouched" type="Boolean" default="false"/>
+  <aura:attribute name="splCloseDate" type="Date"/>
+  <aura:attribute name="splCloseDateFld" type="Date"/>
+
+  <aura:attribute name="splProMonComTouched" type="Boolean" default="false"/>
+  <aura:attribute name="splProMonComFld" type="String" default="0"/>
+  <aura:attribute name="proMonComFld" type="String" default="0"/>
+
+  <aura:attribute name="specialistOneTimeFeeTouched" type="Boolean" default="false"/>
+  <aura:attribute name="specialistOneTimeFee" type="String" default="0"/>
+
+  <!-- <aura:attribute name="splProMonUsgTouched" type="Boolean" default="false"/>
+  <aura:attribute name="splProMonUsgFld" type="String" default="0"/> -->
+  <aura:attribute name="proMonUsgFld" type="String" default="0"/>
+  <!--SFDC-3714 END-->
+  <aura:handler event="c:invokeProductDetailInit" action="{!c.doInit}"/>
+  <aura:registerEvent name="oppProdDetailsInvokeInit" type="c:invokeOppProdDetailsInit"/>
+  <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+  <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+  <div>
+    <center><lightning:spinner variant="brand" size="large" aura:id="ltngSpinner" class="slds-hide"/></center>
+  </div>
+
+  <ui:scrollerWrapper class="scrollerSize">
+    <div class="slds-panel slds-grid slds-grid_vertical slds-nowrap" aura:id="productDetailViewId">
+      <div class="slds-form slds-form_stacked slds-grow slds-scrollable_y">
+        <div class="slds-panel__section slds-border_bottom">
+          <div class="slds-media__body">
+            <div class="slds-button-group slds-m-top_small" role="group">
+              <button aura:id="BackProdBtnId" class="slds-button slds-button_neutral slds-grow slds-show" onclick="{!c.backAction}">
+                Back
+              </button>
+              <button aura:id="EditProdBtnId" class="slds-button slds-button_neutral slds-grow slds-show" onclick="{!c.editAction}">
+                Edit
+              </button>
+              <aura:if isTrue="{!if(v.baseLineProdFlag == 'true',true,false)}">
+                <button aura:id="CancelProdBtnId" class="slds-button slds-button_neutral slds-grow slds-show" onclick="{!c.showCancelPopUp}">
+                  Cancel
+                </button>
+                <aura:set attribute="else">
+                  <button aura:id="DeleteProdBtnId" class="slds-button slds-button_neutral slds-grow slds-show" onclick="{!c.showPopUp}">
+                    Delete
+                  </button>
+                </aura:set>
+              </aura:if>
+              <button aura:id="CancelEditProdBtnId" class="slds-button slds-button_neutral slds-grow slds-hide" onclick="{!c.cancelEditAction}">
+                Back
+              </button>
+              <button aura:id="SaveProdBtnId" class="slds-button slds-button_neutral slds-grow slds-hide" onclick="{!c.saveAction}">
+                Save
+              </button>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slds-panel__section slds-show" aura:id="readOnlyProdInfoId">
+        <h3 class="slds-text-heading_small slds-m-bottom_medium">Product Information</h3>
+        <ul>
+          <li class="slds-form-element slds-hint-parent slds-border_bottom">
+            <span class="slds-form-element__label">Product Name</span>
+            <div class="slds-form-element__control">
+              <span
+                class="slds-form-element__static"
+                style="{!if(v.baseLineProdFlag == 'true',
+                                   'color:green;white-space: normal;word-wrap: break-word;',
+                                   'color:black;white-space: normal;word-wrap: break-word;')}">
+                {!v.oppLineItemObj.Product_Name__c}
+              </span>
+            </div>
+          </li>
+        </ul>
+        <ul>
+          <li class="slds-form-element slds-hint-parent slds-border_bottom">
+            <span class="slds-form-element__label">Baseline Monthly Commit</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static" style="{!if(v.baseLineMonthlyCommitFlag == 'red',
+                                   'color:red',v.baseLineProdFlagValue)}">
+                <ui:outputtext value="{!v.AverageRenewalCommitMRRVal}"/>
+              </span>
+            </div>
+          </li>
+        </ul>
+        <ul>
+          <li class="slds-form-element slds-hint-parent slds-border_bottom slds-form-element_edit">
+            <span class="slds-form-element__label">Projected Monthly Commit</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static" style="{!if(v.projectedMonthlyCommitFlag == 'red',
+                                   'color:red',v.baseLineProdFlagValue)}">
+                <ui:outputtext value="{!v.ProjectedMonthlycommitfeesVal}"/>
+              </span>
+            </div>
+          </li>
+        </ul>
+        <ul>
+          <li class="slds-form-element slds-hint-parent slds-border_bottom slds-form-element_edit">
+            <span class="slds-form-element__label">One-Time Fee</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static" style="{!if(v.oneTimeFeeFlag == 'red',
+                                   'color:red',v.baseLineProdFlagValue)}">
+                <ui:outputtext value="{!v.NRRVal}"/>
+              </span>
+            </div>
+          </li>
+        </ul>
+        <ul>
+          <li class="slds-form-element slds-hint-parent slds-border_bottom slds-form-element_edit">
+            <span class="slds-form-element__label">Term</span>
+            <div class="slds-form-element__control">
+                <span class="slds-form-element__static">
+                  <ui:outputtext value="{!v.termValue}"/>
+                </span>
+                
+            </div>
+          </li>
+        </ul>
+        <ul>
+          <li class="slds-form-element slds-hint-parent slds-border_bottom slds-form-element_edit">
+            <span class="slds-form-element__label">Net MRR</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static" style="{!if(v.NetMRRFlag == 'red',
+                                   'color:red',v.baseLineProdFlagValue)}">
+                <ui:outputtext value="{!v.UnitPriceVal}"/>
+              </span>
+            </div>
+          </li>
+        </ul>
+        <ul>
+          <li class="slds-form-element slds-hint-parent slds-border_bottom slds-form-element_edit">
+            <span class="slds-form-element__label">Baseline Monthly Usage</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static" style="{!if(v.baselineMonthlyUsageFlag == 'red',
+                                   'color:red',v.baseLineProdFlagValue)}">
+                <ui:outputtext value="{!v.AverageRenewalUsageMRRVal}"/>
+              </span>
+            </div>
+          </li>
+        </ul>
+        <ul>
+          <li class="slds-form-element slds-hint-parent slds-border_bottom slds-form-element_edit">
+            <span class="slds-form-element__label">Projected Monthly Usage</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static" style="{!if(v.projectedMonthlyFlag == 'red',
+                                   'color:red',v.baseLineProdFlagValue)}">
+                <ui:outputtext value="{!v.ProjectedAvgRevNonCommitVal}"/>
+              </span>
+            </div>
+          </li>
+        </ul>
+        <ul>
+          <li class="slds-form-element slds-hint-parent slds-border_bottom slds-form-element_edit">
+            <span class="slds-form-element__label">Net Monthly Usage</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static" style="{!if(v.netMonthlyFlag == 'red',
+                                   'color:red',v.baseLineProdFlagValue)}">
+                <ui:outputtext value="{!v.NetNonCommitVal}"/>
+              </span>
+            </div>
+          </li>
+        </ul>
+        <ul>
+          <li class="slds-form-element slds-hint-parent slds-border_bottom slds-form-element_edit">
+            <span class="slds-form-element__label">EMRI</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static" style="{!if(v.EMRIFlag == 'red',
+                                   'color:red',v.baseLineProdFlagValue)}">
+                <ui:outputtext value="{!v.EMRIVal}"/>
+              </span>
+            </div>
+          </li>
+        </ul>
+         <ul>
+          <li class="slds-form-element slds-hint-parent slds-border_bottom slds-form-element_edit">
+            <span class="slds-form-element__label">Specialist Projected Monthly Commit</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static" >
+                <ui:outputtext value="{! v.splProMonComFld }"/>
+              </span>
+            </div>
+          </li>
+        </ul>
+        <ul>
+         <ul>
+          <li class="slds-form-element slds-hint-parent slds-border_bottom slds-form-element_edit">
+            <span class="slds-form-element__label">Specialist One-Time Fee</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static" >
+                <ui:outputtext value="{! v.specialistOneTimeFee}"/>
+              </span>
+            </div>
+          </li>
+        </ul>
+          <!-- <li class="slds-form-element slds-hint-parent slds-border_bottom slds-form-element_edit">
+            <span class="slds-form-element__label">Specialist Projected Monthly Usage</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static" >
+                <ui:outputtext value="{!v.splProMonUsgFld }"/>
+              </span>
+            </div>
+          </li> -->
+        </ul> 
+        <ul>
+          <li class="slds-form-element slds-hint-parent slds-border_bottom slds-form-element_edit">
+            <span class="slds-form-element__label">Specialist Forecast Category</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static" >
+                <ui:outputtext value="{!v.splForecastCategoryFld }"/>
+              </span>
+            </div>
+          </li>
+        </ul>
+        <ul>
+          <li class="slds-form-element slds-hint-parent slds-border_bottom slds-form-element_edit">
+            <span class="slds-form-element__label">Specialist Close Date</span>
+            <div class="slds-form-element__control">
+              <span class="slds-form-element__static" >
+                <ui:outputtext value="{!v.splCloseDateFld }"/>
+              </span>
+            </div>
+          </li>
+        </ul>
+        <br/>
+      </div>
+      <!--SFDC-3714 -->
+      <div class="slds-panel__section slds-hide" aura:id="editOnlyProdInfoId">
+        <h3 class="slds-text-heading_small slds-m-bottom_medium">Edit Product Information</h3>
+        <lightning:input type="number" placeholder="0" value="{!v.proMonComFld}" name="input1" label="Projected Monthly Commit" onchange="{! c.updateSpcltMonCmtFld }" step="any"/>
+        <br/>
+        <span class="slds-form-element__label">One-Time Fee</span>
+        <div class="slds-form-element__control">
+          <span class="slds-form-element__static">
+            <ui:inputNumber aura:id="oneTimename" value="{!v.oppLineItemObj.NRR__c}" class="slds-input" placeholder=""/>
+          </span>
+        </div>
+        <br/>
+        <br/>
+            <lightning:input type="number" label="Term" value="{!v.oppLineItemObj.Term__c}" required="{!v.termRequired}" aura:id = "TermValue" step="any"/>
+        <br/>
+        <div class="slds-hide" style="color:red;" aura:id="termErrorMessageId">
+            {!v.termErrorMessage}
+        </div>
+        <lightning:input type="number" label="Projected Monthly Usage" placeholder="0" value="{! v.proMonUsgFld }" onchange="{! c.updateSpcltMonUsgFld }" step="any"/>
+        <br/>
+
+        <lightning:input disabled="{! !v.isSpecialistUser }" type="number" label="Specialist Projected Monthly Commit" placeholder="0" value="{! v.splProMonComFld }" onchange="{! c.touchedMonCmtFld }" step="any"/>
+        <br/>
+
+          <lightning:input disabled="{! !v.isSpecialistUser }" type="number" label="Specialist One-Time Fee" placeholder="0" value="{! v.specialistOneTimeFee}" onchange="{! c.touchedSpecialistOneTimeFee}" step="any"/>
+          <br/>
+
+        <!-- <lightning:input disabled="{! !v.isSpecialistUser }" type="number" label="Specialist Projected Monthly Usage" placeholder="0" value="{! v.splProMonUsgFld }" onchange="{! c.touchedMonUsgFld }" step="any"/>
+        <br/> -->
+
+        <div>
+          <lightning:select value="{!v.splForecastCategoryFld}" label="Specialist Forecast Category" disabled="{! !v.isSpecialistUser }" onchange="{! c.touchedSplForecastCat }">
+            <aura:iteration items="{!v.splForecastCategory}" var="option" indexVar="key">
+              <option text="{!option.label}" label="{!option.value}" selected="{!option.isSelected}"/>
+            </aura:iteration>
+          </lightning:select>
+        </div>
+
+        <lightning:input disabled="{! !v.isSpecialistUser }" type="date" label="Specialist Close Date" value="{! v.splCloseDateFld }" onchange="{! c.touchedSplCloseDate }" step="any"/>
+        <br/>
+
+      </div>
+      <!--SFDC-3714 END-->
+    </div>
+    <br/>
+  </ui:scrollerWrapper>
+
+  <div class="demo-only slds-hide" style="height:120px;" aura:id="modalId">
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal slds-slide-up-saving">
+      <div class="slds-modal__container">
+        <header class="slds-modal__header">
+          <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+            Confirm Deletion
+          </h2>
+        </header>
+        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+          <p>
+            Are you sure you want to delete this product?
+          </p>
+        </div>
+        <footer class="slds-modal__footer">
+          <button class="slds-button slds-button_neutral" onclick="{!c.hidePopUp}">
+            Cancel
+          </button>
+          <button class="slds-button slds-button_brand" onclick="{!c.hidePopUpandDelete}">
+            Yes
+          </button>
+        </footer>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open" aura:id="backDropId"/>
+  </div>
+
+  <div class="demo-only slds-hide" style="height:120px;" aura:id="modalCancelId">
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal slds-slide-up-saving">
+      <div class="slds-modal__container">
+        <header class="slds-modal__header">
+          <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+            Confirm Cancellation
+          </h2>
+        </header>
+        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+          <p>
+            Are you sure you want to cancel this product? Cancelling it would set the Projected Monthly Commit and Projected Monthly Commit values to 0
+          </p>
+        </div>
+        <footer class="slds-modal__footer">
+          <button class="slds-button slds-button_neutral" onclick="{!c.hideCancelPopUp}">
+            Cancel
+          </button>
+          <button class="slds-button slds-button_brand" onclick="{!c.hideCancelPopUpandDelete}">
+            Yes
+          </button>
+        </footer>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open" aura:id="backDropId"/>
+  </div>
+
+  <div class="demo-only slds-hide" style="height:120px;" aura:id="addOppDetailsId" aria-hidden="false">
+    <section role="document" tabindex="-1" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal slds-slide-up-saving">
+      <div class="slds-modal__container">
+        <header class="slds-modal__header">
+          <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+            Opportunity Details
+          </h2>
+        </header>
+        <div class="slds-modal__content slds-p-around_small slds-show" id="modal-content-id-1" aura:id="oppPicklistDetailsId">
+          <div class="slds-hide" style="color:red;" aura:id="addOppErrorMessageId">
+            <p>
+              Please select a valid picklist value for all the fields</p>
+          </div>
+
+          <lightning:select aura:id="oppCategoryId" onchange="{!c.oppCategorySelection}" value="{!v.oppCategoryValue}" label="Loss Category" required="true">
+            <option text="--none--" label="--None--"/>
+            <aura:iteration items="{!v.oppCategoryValues}" var="val">
+              <option text="{!val}" label="{!val}"/>
+            </aura:iteration>
+          </lightning:select>
+          <br/>
+          <lightning:select aura:id="oppCategoryId" onchange="{!c.oppSubCategorySelection}" value="{!v.oppSubCategoryValue}" label="Opportunity Sub-Category" required="true">
+            <option text="--none--" label="--None--"/>
+            <aura:iteration items="{!v.oppSubCategoryValues}" var="val">
+              <option text="{!val}" label="{!val}"/>
+            </aura:iteration>
+          </lightning:select>
+          <br/>
+          <lightning:select aura:id="oppCategoryId" onchange="{!c.oppCancellationSelection}" value="{!v.oppCancellationLostValue}" label="Cancellation/Lost Reason" required="true">
+            <option text="--none--" label="--None--"/>
+            <aura:iteration items="{!v.oppCancellationLostValues}" var="val">
+              <option text="{!val}" label="{!val}"/>
+            </aura:iteration>
+          </lightning:select>
+
+        </div>
+        <div class="slds-modal__content slds-p-around_medium slds-hide" id="modal-content-id-2" aura:id="cancellationFieldsId">
+          <div class="slds-hide" style="color:red;" aura:id="cancellationErrorMessageId">
+            <p>
+              Please enter a valid value for all the fields</p>
+          </div>
+          <div class="slds-hide" aura:id="missingProductFeatureId">
+            <lightning:textarea name="myTextArea" value="{!v.missingProductFeature}" label="Missing Product Feature"/>
+            <br/>
+          </div>
+          <div class="slds-hide" aura:id="initialOutClauseId">
+            <lightning:textarea name="myTextArea" value="{!v.initialOutClause}" label="Initial Out Clause Description"/>
+            <br/>
+          </div>
+          <div class="slds-hide" aura:id="aggregationPartnerId">
+            <lightning:select aura:id="aggregationPartnerPickId" onchange="{!c.oppAggregationSelection}" value="{!v.aggregationPartnerValue}" required="true" label="Aggregation Partner">
+              <option text="--none--" label="--None--"/>
+              <aura:iteration items="{!v.aggregationPartnerValues}" var="val">
+                <option text="{!val}" label="{!val}"/>
+              </aura:iteration>
+            </lightning:select>
+            <br/>
+          </div>
+          <div class="slds-hide" aura:id="consolidationAccountId">
+
+            <span class="slds-form-element__label">Consolidation Account</span>
+            <c:SF1_LookupComponent placeholderText="Consolidation Account" type="Account" value="{!v.consolidationAccount}" fieldsToShowInSuggestion="Account_Name__c"/>
+
+            <br/><br/><br/><br/><br/><br/><br/><br/><br/>
+          </div>
+          <div class="slds-hide" aura:id="oppCompetitorId">
+            <lightning:select aura:id="competitorPickId" value="{!v.competitorValue}" label="Competitor">
+              <option text="--none--" label="--None--"/>
+              <aura:iteration items="{!v.competitorValues}" var="val">
+                <option text="{!val}" label="{!val}"/>
+              </aura:iteration>
+            </lightning:select>
+            <br/>
+          </div>
+          <div class="slds-hide" aura:id="unacceptableTermsandConditionsId">
+            <lightning:textarea name="myTextArea" value="{!v.unacceptableTermsAndConditions}" label="Unacceptable Terms and Conditions"/>
+            <br/>
+          </div>
+        </div>
+        <div aura:id="mainFooterId" class="slds-show">
+          <footer class="slds-modal__footer">
+            <button class="slds-button slds-button_neutral" onclick="{!c.addOppDetailsCancelAction}" aura:id="cancelButtonId">
+              Cancel
+            </button>
+          </footer>
+        </div>
+        <div aura:id="nextFooterId" class="slds-hide">
+          <footer class="slds-modal__footer">
+            <button class="slds-button slds-button_neutral" onclick="{!c.addOppDetailsCancelAction}" aura:id="cancelButtonId">
+              Cancel
+            </button>
+            <button class="slds-button slds-button_brand" onclick="{!c.addOppDetailsNextAction}" aura:id="nextButtonId">
+              Next
+            </button>
+          </footer>
+        </div>
+        <div aura:id="saveFooterId" class="slds-hide">
+          <footer class="slds-modal__footer">
+            <button class="slds-button slds-button_neutral" onclick="{!c.addOppDetailsCancelAction}" aura:id="cancelButtonId">
+              Cancel
+            </button>
+            <button class="slds-button slds-button_brand" onclick="{!c.addOppDetailsSaveAction}" aura:id="saveButtonId">
+              Save
+            </button>
+          </footer>
+        </div>
+        <div aura:id="saveAfterNextFooterId" class="slds-hide">
+          <footer class="slds-modal__footer">
+            <button class="slds-button slds-button_neutral" onclick="{!c.addOppDetailsBackAction}" aura:id="backButtonId">
+              Back
+            </button>
+            <button class="slds-button slds-button_brand" onclick="{!c.addOppDetailsSaveAction}" aura:id="saveButtonId">
+              Save
+            </button>
+          </footer>
+        </div>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open" aura:id="backDropId"/>
+  </div>
+
+</aura:component>

@@ -1,0 +1,53 @@
+<template>
+  
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+      <template if:true={showSpinner}>
+        <lightning-spinner variant="brand"
+              size="large">
+          </lightning-spinner>
+          </template>    
+      <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            
+            <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{headerLabel}</h2>
+           
+          </header>
+          <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+            <template if:true={showError}>
+              <template if:true={pocchimeform}>
+                <div style="font-weight:800;font-size:12px" class="slds-align_absolute-center">Below is a complete list of what needs to be in place before POC integration cases can be created.  Please review this list to assess what is left to complete.  Some of these may already be complete on your POC CHIME form.</div>
+                <div class="slds-m-top_medium">
+                  1) POC Chime form is in scoping stage<br/>
+                  2) All POC mandatory questions are answered<br/>
+                  3) Opportunity should be on the POC Chime Form <br/>
+                  4) An LOE Review is ONLY required for certain products.  If your product requires LOE Review (<lightning-icon icon-name="utility:warning" size="xx-small" variant="Error" alternative-text="Review Required" title="review Required"></lightning-icon>), that must be completed prior to submitting the POC integration case. <br/>
+                  5) If you have already submitted an LOE Review request, that LOE Review must be completed before the POC integration case can be created.<br/>
+                </div>
+              </template>
+              <template if:false={pocchimeform}>
+                <div style="font-weight:800;font-size:12px" class="slds-align_absolute-center">Below is a complete list of what needs to be in place before a PS integration case can be created.  Please review this list to assess what is left to complete.  Some of these may already be complete on your CHIME form.</div>
+                <div class="slds-m-top_medium">
+                  1) Chime form is in Scoping stage<br/>
+                  2) All mandatory questions are answered <br/>
+                  3) Opportunity should be on Chime Form <br/>
+                  4) An LOE Review is ONLY required for certain products.  If your product requires LOE Review (<lightning-icon icon-name="utility:warning" size="xx-small" variant="Error" alternative-text="Review Required" title="review Required"></lightning-icon>), that must be completed prior to submitting the integration case. <br/>
+                  5) If you have already submitted an LOE Review request, that LOE Review must be completed before the integration case can be created<br/>
+                  6) Opportunity should be Closed Won for non-Emergency CHIME<br/>
+                </div>
+              </template>    
+            
+            </template>
+            <template if:false={showError}>
+              <lightning-textarea  onchange={handleDescriptionChange} name="description" label="Notes" placeholder="Please put any details required for Integration...." value={description}></lightning-textarea>
+            </template>
+          </div>
+          <footer class="slds-modal__footer">
+            <button class="slds-button slds-button_neutral" onclick={handleCancel}>Cancel</button>
+            <template if:false={showError}>
+            <button class="slds-button slds-button_brand" onclick={submitCase}>{buttonLabel}</button>
+            </template>
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+</template>

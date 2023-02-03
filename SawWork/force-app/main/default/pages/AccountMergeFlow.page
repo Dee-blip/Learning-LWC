@@ -1,0 +1,11 @@
+<apex:page standardController="Account">
+    <apex:includeLightning />
+    <div id="lightning" />
+	<script>
+    	$Lightning.use("c:gsm_AccountMergeFlowApp", function () {
+	        $Lightning.createComponent("c:gsm_AccountMergeFlow", {recordId: "{!Account.Id}",accName: "{!Account.Name}"}, "lightning", function (cmp) {
+	          // do some stuff
+	        });
+	    });
+    </script>
+</apex:page>

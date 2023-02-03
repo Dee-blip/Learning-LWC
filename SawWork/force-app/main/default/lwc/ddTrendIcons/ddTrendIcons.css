@@ -1,0 +1,19 @@
+.red {
+  fill: #ff3d3d;
+}
+
+.green {
+  fill: #66ba6a;
+}
+
+.yellow {
+  fill: #f5a623;
+}
+
+.blur {
+  fill-opacity: 0.25;
+}
+
+.highlight {
+   fill-opacity: 0.8;
+}

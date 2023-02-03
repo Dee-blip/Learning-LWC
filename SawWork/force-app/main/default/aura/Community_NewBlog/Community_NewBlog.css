@@ -1,0 +1,14 @@
+/*toggleCss.css*/
+.THIS.hideSection {
+    display: none;
+}
+.THIS.showSection {
+    display: block;
+}
+.THIS.buttonStyleCls{
+    font-size: .8125rem !important;
+    width: 100% !important;
+    height: 45px !important;
+    border: solid !important;
+    font-weight: 700 !important;
+}

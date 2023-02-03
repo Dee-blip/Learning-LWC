@@ -1,0 +1,40 @@
+<!--
+  @description       : 
+  @author            : Vishnu Vardhan
+  @group             : 
+  @last modified on  : 12-23-2021
+  @last modified by  : Vishnu Vardhan
+  Modifications Log
+  Ver   Date         Author           Modification
+  1.0   12-22-2021   Vishnu Vardhan   Initial Version
+-->
+<template>
+    <div class="c-modal-container" onkeydown={handleEscape} tabindex="0">
+        <div class="c-modal-background">
+            <div class="c-modal">
+                <section class={css}>
+                    <div class="slds-modal__container">
+                        <header class="c-modal-header">
+                            <lightning-button-icon class="slds-modal__close slds-m-right_x-small absol" title="Close" icon-name="utility:close" icon-class="slds-button_icon-inverse"
+                            onclick={handleDialogClose}></lightning-button-icon>
+
+                            <div class="c-modal-title">
+                                <slot name="header"></slot>
+                            </div>
+                            <!-- <button class="c-modal-close" onclick={handleDialogClose}>&times;</button> -->
+                        </header>
+                        <div class="slds-modal__content c-modal-content" style="overflow: hidden;">
+                            <slot></slot>
+                        </div>
+
+                        <footer class="slds-modal__footer slds-hide">
+                            <slot name="footer" onslotchange={handleSlotFooterChange}></slot>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </div>
+        </div>
+    </div>
+
+</template>

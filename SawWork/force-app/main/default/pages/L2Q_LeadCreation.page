@@ -1,0 +1,10 @@
+<apex:page standardController="Lead" extensions="L2Q_Portal_DefaultValues" action="{!redirectCheck}">
+    <apex:includeLightning />
+    <div id="lightning" />
+	<script>
+    	$Lightning.use("c:GSM_GenericFormApplication", function () {
+	        $Lightning.createComponent("c:GSM_GenericFormComponent", {sObjectName: "Lead",objectLabel: "Create Partner Lead", defaultValues: '{!defaultValuesForLead}', customMetaDataObjName: "Lead", currentRecordTypeId: "0120f000001IslP", returnValPrefix: '{!returnValPrefix}'}, "lightning", function (cmp) {
+	        });
+	    });
+    </script>
+</apex:page>

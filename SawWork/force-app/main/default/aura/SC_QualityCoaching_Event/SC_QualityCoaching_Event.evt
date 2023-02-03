@@ -1,0 +1,6 @@
+<!-- SC_QualityCoaching_Event -->
+<aura:event type="APPLICATION" description="Quality Coaching">
+    <aura:attribute name="sourceId" type="String"/>
+    <aura:attribute name="sourceType" type="String"/>
+    <aura:attribute name="parentType" type="String"/>
+</aura:event>

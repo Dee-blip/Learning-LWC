@@ -1,0 +1,2410 @@
+<!-------------------------------------------------------------------------------------------------------------------------
+Page Name       : CMC_IncidentNOtificationTool
+Controller      : CMC_IncidentNotificationToolController
+Author          : Aditya Sonam
+Created Date    : 01-March-2017
+CR              : 3426181
+---------------------------------------------------------------------------------------------------------------------------
+History
+----------------------------------------------------------------------------------------------------------------------------
+Date                Developer Name      Jira            Description
+01-Aug-2017         Vamsee S            ESESP-650       Prevent User from sending mailer if total count of valid contacts is 0
+05-Feb-2017			Aditya Sonam	    ESESP-886		INT for Authorized Contact SOCC
+23-Aug-2018         Vamsee S            ESESP-778       Keep the 'Indirect customer' checkbox = True by default
+07-Dec-2020			Vamsee S			ESESP-3817		Service Incident Lightning Migration
+--------------------------------------------------------------------------------------------------------------------------->
+
+
+<apex:page StandardController="EB_AkaMailer__c" extensions="CMC_IncidentNotificationToolController" id="thePage" sidebar="false" showHeader="true" tabStyle="CMC_Incident_Notification__tab" cache="false" title="INT - Mailer">
+    
+    <!--- Custom CSS --->
+    <style>
+        
+        th {
+        text-align: left !important;
+        width: 13% !important;
+        padding-left: 2% !important;
+        }
+        
+        .Custom22Tab .tertiaryPalette,
+        .individualPalette .Custom22Block .tertiaryPalette,
+        .layoutEdit .individualPalette .Custom22Block .tertiaryPalette {
+        background-color: #0993BF !important;
+        border-color: #097395;
+        border-radius: 5px !important;
+        padding-left: 0.75% !important;
+        }
+        
+        .Custom22Tab .secondaryPalette, .individualPalette .Custom22Block .secondaryPalette {
+        background-color: #33c;
+        border-color: #209aea !important;
+        }
+        .headerStyle {
+        height: 10px !important;
+        font-size: 10% !important;
+        padding-left: 0.75%;
+        }
+        
+        .bPageBlock .pbTitle {
+        width: 30% !important; 
+        }
+        
+        /* Filters CSS */ 
+        #leftFilterSection { 
+        float:left;width: 70%; 
+        }
+        #rightFilterSection { 
+        width: 28%;
+        padding-left: 2%;
+        padding-top: 2%;
+        }
+        
+        /* toggle button CSS*/
+        .toggle-btn-grp { 
+        margin:3px 0; 
+        }
+        .toggle-btn { 
+        text-align:centre; 
+        margin:15px 5px;
+        padding:0.1em 1em; 
+        color:#000; 
+        background-color:#FFF; 
+        border-radius:10px; 
+        display:inline-block; 
+        border:solid 1px #CCC; 
+        cursor:pointer;
+        }
+        
+        .toggle-btn-grp.joint-toggle .toggle-btn { 
+        margin:5px 0; 
+        padding:0.4em 2em; 
+        border-radius:0;
+        border-right-color:white;
+        }
+        
+        .toggle-btn:hover { 
+        border:solid 1px #3496e8 !important; 
+        background:#f8f8f8;
+        }
+        
+        .toggle-btn.success { 
+        background:lightgreen;
+        border:solid 1px green !important; 
+        }
+        
+        .btwFilterSpace{
+        padding-bottom: 0.3%;
+        padding-top: 0.3%;
+        } 
+        
+        #fade{
+        display: none;
+        position:absolute;
+        top: 0%;
+        left: 0%;
+        width: 100%;
+        height: 100%;
+        background-color: #ababab;
+        z-index: 1001;
+        -moz-opacity: 0.8;
+        opacity: .70;
+        filter: alpha(opacity=80);
+        }
+        .fadeModal{
+        display: block;
+        position:absolute;
+        top: 0%;
+        left: 0%;
+        width: 100%;
+        height: 100%;
+        background-color: #ababab;
+        z-index: 1001;
+        -moz-opacity: 0.8;
+        opacity: .70;
+        filter: alpha(opacity=80);
+        }
+        
+        .modal{
+        display: none;
+        position: absolute;
+        top: 45%;
+        left: 45%;
+        width: 80px;
+        height: 80px;
+        padding:30px 15px 0px;
+        border: 3px solid #ababab;
+        box-shadow:1px 1px 10px #ababab;
+        border-radius:20px;
+        background-color: white;
+        z-index: 1002;
+        text-align:center;
+        overflow: auto;
+        }
+        .modalCreateMailer{
+        display: none;
+        position: absolute;
+        top: 45%;
+        left: 45%;
+        width: 80px;
+        height: 80px;
+        padding:30px 15px 0px;
+        border: 3px solid #ababab;
+        box-shadow:1px 1px 10px #ababab;
+        border-radius:20px;
+        background-color: white;
+        z-index: 1002;
+        text-align:center;
+        overflow: auto;
+        } 
+        
+        .popupBackground {
+        /* Background color */
+        background-color:black;
+        opacity: 0.20;
+        filter: alpha(opacity = 20);
+        
+        /* Dimensions */
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 998;
+        position: absolute;
+        
+        /* Mouse */
+        cursor:wait;
+        }
+        
+        .PopupPanel {
+        /* Background color */
+        border: solid 2px blue;
+        background-color: white;
+        
+        /* Dimensions */
+        left: 50%;
+        width: 200px;
+        margin-left: -100px;
+        top: 50%;
+        height: 50px;
+        margin-top: -25px;
+        z-index: 999;
+        position: fixed;
+        
+        /* Mouse */
+        cursor:pointer;
+        }  
+        
+        .removeAttCls .btn .removeImportAttCls {
+        padding: 2px 5px;
+        color: rgb(198, 84, 84);
+        margin-right: 137px;
+        text-rendering: auto;
+        font: 11px BlinkMacSystemFont;
+        cursor: pointer;
+        background: #ffffff;
+        display: inline-block;
+        }
+        
+        .filterFileCls{width: 212px;}
+        
+        .validateAndSaveStatus{ 
+        text-align: center;
+        margin: 10px;
+        }
+        
+        #outerProgressBar {
+        display: none;
+        width: 50%;
+        height: 15%;
+        position: fixed;
+        top: 50%;
+        left: 24%;
+        border-radius: 20px;
+        background: rgb(255, 255, 255);
+        z-index:1003;
+        }
+        
+        #progressBar{
+        display: block;
+        width: 0%;
+        height: 100%;
+        position: relative;
+        background: #57CD70;
+        border-radius: 10px;
+        }
+        #progressBarOutline{
+        display: block;
+        width: 96%;
+        height: 20%; 
+        position: relative;
+        top: 50%;
+        left: 2%;
+        border-radius: 10px;
+        background: rgba(153, 153, 153, 0.47);"
+        }
+        
+    </style>
+    <apex:includeScript value="/support/console/28.0/integration.js" />
+    <apex:includeScript value="{!$Resource.JQuery_New}" />
+    <apex:pageMessages rendered="true" id="msg1"/>
+    
+    <apex:form > 
+        <apex:actionStatus id="statusSaveAccount">
+            <apex:facet name="start">
+                <div class="fadeModal"/>     
+                <div class="modalCreateMailer" style="display:block;">
+                    <img id="creatingMailerModalId" src="{!$Resource.CMCLoadingImage}" width="50" height="50"/><b id="textModalId">Saving..</b>
+                </div>
+            </apex:facet>
+            <apex:facet name="stop">  
+            </apex:facet>
+        </apex:actionStatus>
+        
+        <div id="outerProgressBar" class="outerProgressBarClass">
+            <div id="progressBarOutline" class="progressBarOutlineClass">
+                <div id="progressBar" class="progressBarClass"/>
+                <div id="progressBarText" style="display:block;font-size:100%;position:absolute;margin: 0.5%;">Calculating Total Email..</div>
+            </div>
+            <div id="progressTextId" class ="progressTextClass" style="display:block;font-size:100%;text-align:center;"> 
+                <b>  Total Contact Selected :  <apex:outputText id="totalCount" value="{!totalCount}"/> , Success : <apex:outputText id="successCount" value="{!successCount}"/> , Failure: <apex:outputText id="failureCount" value="{!failureCount}"/></b>
+            </div>
+        </div>
+        
+        <div id="fade"></div>
+        <div id="saveStatus" style="display:none" class="modal">
+            <img id="loaderSaveId" src="{!$Resource.CMCLoadingImage}" width="50" height="50"/><b>Saving..</b>
+        </div>
+        <div id="sendEmailStatus" style="display:none" class="modal">
+            <img id="loaderSendEmailId" src="{!$Resource.CMCLoadingImage}" width="50" height="50"/><b>Sending Email..</b>
+        </div>
+        <div id="onLoad" style="display:none" class="modal">
+            <img id="onLoadId" src="{!$Resource.CMCLoadingImage}" width="50" height="50"/><b>Loading..</b>
+        </div>
+        
+        <apex:actionPoller id="actionPollerId" action="{!emailProcessCount}" reRender="mailerStatus,outerProgressBar,progressTextId,totalCount,successCount,failureCount,completionPercentageId,progressBar,enbledPoller" interval="5" enabled="{!enbledPoller}" oncomplete="incrementCount();" /> 
+        <apex:actionFunction name="invokePoller" action="{!emailProcessCount}" id="invokePoller" reRender="mailerStatus,actionPollerId,progressTextId,totalCount,successCount,failureCount,completionPercentageId,enbledPoller" />
+        
+        <apex:actionFunction name="ValidateSINumber" action="{!ValidateSINumber}" reRender="msg1">
+            <apex:param name="SINumber" value="" assignTo="{!SINumber}"/>
+        </apex:actionFunction>
+        
+        <apex:actionFunction name="sendTestEmail" action="{!sendTestEmail}" rerender="msg1,testEmailSentId" oncomplete="enablePeerReviewButton();closeModal();emailAlertMsg();" />
+        
+        <apex:actionFunction name="queryBuildForAttachment" action="{!queryBuildForAttachment}" rerender="msg1,testCount,totalEmailCount,validEmailCount,invalidEmailCount,totalAccountCount,totalAccountCountAllCust" status="statusSaveAccount" oncomplete="reloadPage();"/>
+        
+        <apex:actionFunction name="createMailerData" action="{!createMailerData}" rerender="msg1,preMailerErrorReportId,savedJSONString,allFileAttachmentId,CMCApprovalStatusId,mailerName,mailerIdHidden,filterIdList,allFilterId,totalEmailCount,validEmailCount,invalidEmailCount,totalAccountCount,totalAccountCountAllCust" oncomplete="onCompleteSaveMailer('saveMailer');">
+            <apex:param name="mailerFormInput" assignTo="{!mailerFormInput}" value="" />
+        </apex:actionFunction>
+        
+        <apex:actionFunction name="updateFilterJSONWithId"  action="{!updateFilterJSONWithId}" reRender="msg1" oncomplete="closeModal();">
+            <apex:param name="updatedFilterJSON" assignTo="{!updatedFilterJSON}" value=""/>
+            <apex:param name="mailerIdForUpdate" assignTo="{!mailerIdForUpdate}" value=""/> 
+        </apex:actionFunction>
+        
+        <apex:actionFunction name="saveOnSendMailer" action="{!createMailerData}" oncomplete="onCompleteSaveMailer('sendMailer');">
+            <apex:param name="mailerFormInput" assignTo="{!mailerFormInput}" value="" />
+        </apex:actionFunction>
+        <apex:actionFunction name="reloadPage" action="{!reloadPage}" oncomplete="callReloadMethod();" status="statusSaveAccount" reRender="savedJSONString,testCount,msg1,emailCount,totalEmailCount,validEmailCount,invalidEmailCount,totalAccountCount,totalAccountCountAllCust,peerReviewer,testEmailSentId,mailerApprovedId,mailerName,completionPercentageId,mailerIdHidden,sendMailerStatusId,savedJSONString,allFileAttachmentId,allFilterId,filterIdList"/>
+        
+        <!--apex:actionFunction name="updateFilterListValue" action="{!updateFilterListValue}" reRender="op2,leftFilterSection,filterWrapper,filterPanelId" oncomplete="closeModal();">
+            <apex:param name="selectionType" assignTo="{!selectionType}" value="" />
+        </apex:actionFunction-->
+        
+        <apex:pageblock id="pb">
+            
+            <div class="buttonSection" id="buttonSection" html-data-role="buttonSection">
+                <apex:pageBlockButtons location="both">
+                    <apex:inputHidden id="filterIdList" value="{!filterIdList}"/>
+                    <apex:inputHidden id="mailerIdHidden" value="{!mailerId}"/>
+                    <apex:inputHidden id="allFilterId" value="{!allFilterId}"/>
+                    <apex:inputHidden id="testEmailSentId" value="{!testEmailSent}"/>
+                    <apex:inputHidden id="mailerApprovedId" value="{!mailerApprovedVal}"/>
+                    <apex:inputHidden id="savedJSONString" value="{!savedJSONString}"/>
+                    <apex:inputHidden id="allFileAttachmentId" value="{!allFileAttachmentId}"/>
+                    <apex:inputHidden id="completionPercentageId" value="{!completionPercentage}"/>
+                    <apex:inputHidden id="sendMailerStatusId" value="{!sendMailerStatus}"/>
+                    <apex:inputHidden id="mailerName" value="{!mailerName}"/>
+                    <apex:inputHidden id="peerReviewer" value="{!peerReviewer}"/>
+                    <apex:inputHidden id="errorMessage" value="{!errorMessage}"/>
+                    <apex:inputHidden id="preMailerErrorReportId" value="{!preMailerErrorReportId}"/>
+                    <apex:inputHidden id="isSendTestEmailEnabled" value="{!isSendTestEmailEnabled}"/>
+                    <apex:inputHidden id="mailerStatus" value="{!mailerStatus}"/>
+                    <apex:commandButton value="Validate Mailer" style="width: 10%;" id="validateMailerId" onclick="validateAndCreateJSONFilters();validateSINumber('validateBtn');sendTestEmailValidation('validateBtn');return false;"/>
+                    <apex:commandButton value="Save" style="width: 10%;" disabled="false" id="SaveId" onclick="openModal('saveStatus');saveMailer('saveMailer');return false;"/>
+                    <apex:commandButton value="Error Report" style="width: 10%;" disabled="true" id="RecipientReport" onclick="openExceptionReport();return false;"/>                   
+                    <apex:commandButton value="Send Test E-mail To Me" style="width: 15%;" disabled="{!isSendTestEmailEnabled}" id="SendTestEmail" onclick=" openModal('sendEmailStatus');sendTestEmailValidation('sendTestEmail');return false;"/>
+                    <apex:commandButton value="Peer Review" style="width: 10%;" disabled="true" id="PeerReview" onclick="validateSINumber('peerReview');return false;"/>
+                    <apex:commandButton value="Preview and Send Mailer" style="width: 15%;" disabled="true" id="SendMailer" onclick="openModal('saveStatus');saveMailer('sendMailer');return false;"/>
+                </apex:pageBlockButtons> 
+            </div>
+            
+            <div class="validateAndSaveStatus"/> 
+            
+            <!-- Page Block Section for Notification Content -->
+            <apex:pageBlockSection showHeader="true" title="Notification Content" columns="1" collapsible="false">
+                <div id="NotificationContentDivId">
+                    <apex:inputField value="{!mailerObject.CMC_IRAPT_SI_Number__c}" required="false" id="CMCSINumber"/>
+                    <apex:selectList size="1" multiselect="false" id="CMCTemplateName" value="{!templateName}"  label="Template Name"  style="width:20%;" required="false" onchange="enabledSendTestEmailButton(this); return false;"> 
+                        <apex:selectOptions value="{!TemplateNames}"></apex:selectOptions>
+                    </apex:selectList>
+                    <apex:inputField value="{!mailerObject.CMC_Subject__c}" style="width:75%;" id="CMCSubject" />
+                    <apex:inputField value="{!mailerObject.EB_AdditionalIssueDescription__c}" id="CMCDescription"/>
+                </div> 
+                <div id="displayTemplateError"> 
+                </div>
+            </apex:pageBlockSection>
+            
+            <!-- Page Block Section for Notification Recipients -->
+            <apex:pageBlockSection collapsible="false" showHeader="true" title="Notification Recipients" columns="1">
+                <apex:pageBlockSectionItem > 
+                    <apex:outputPanel >
+                        <div id="CustomerContactOptionDivId" class="CustomerContactOptionDiv" data-role ="ContactTypeSection">
+                            <apex:selectRadio id="checkboxContactType24" value="{!contactRadioDefault}" immediate="true"  onchange="hideManualEmailSection(this);" style="padding-top: 0.5%;padding-right: 10px;" >
+                                <apex:selectOptions rendered="true"  value="{!RadioItems}"/>
+                            </apex:selectRadio>
+                            
+                            <div class="wrapManualEmailHide" style="padding-left: 2%;">                
+                                <div class="toggle-btn-grp" id="toggle-btn-grpId">
+                                    <label onchange="hideEmailTextArea('true');" class="toggle-btn toggle-btn-EmailText">
+                                        <input type="radio" name="toggleButton" checked="true" title="toggleBtn-EnterEmail" itemLabel="toggleBtnEnterEmail" id="toggleId1"/>
+                                        Enter Email Addresses
+                                    </label>
+                                    <label onchange="hideEmailTextArea('false');" class="toggle-btn toggle-btn-EmailImport">
+                                        <input type="radio" name="toggleButton" title = "toggleBtn-ImportEmail" itemLabel="toggleBtnImportEmail" id="toggleId2"/>
+                                        Import Email Addresses
+                                    </label>
+                                </div>
+                                
+                                <div class="emailTextSection">                    
+                                    <span id="warningMessageId" style="background: rgba(245, 161, 174, 0.78);">
+                                        <b>Warning:</b> Manually Entered Email Addresses will not be Validated Against Account or Contact
+                                        <br/><br/>
+                                    </span>                    
+                                    <span id ="textEmailAddId">Copy and Paste List of Email Addresses to Notify:</span><br/><br/> 
+                                    <textarea type="textarea" id="manualEmailId" value="" style="width:40%;height:100px;" label="manualEmail" data-title ="manual-email" title="Enter comma separated email addresses" maxlength="60000" placeholder= "Enter comma separated email addresses"/>                                            
+                                </div><br/>
+                                
+                                
+                                <div class ="importButton">                                     
+                                    <b>Import File:</b>
+                                    <input type="hidden" data-title="filterUploadId" id="filterUploadId" value=""/>
+                                    <input class="importFileUploadClass" id="fileupload" accept=".csv" type="file" label="Import" multiple="" title="Select from file, to import long list of values into Value field (comma separated)"/>
+                                    <a class="importFileLinkCls" style="display:none;" data-title="importFileLink" id="importFileLinkId" href="#" target="_blank">No File Selected</a>
+                                    <button class="removeImportAttCls" id="removeImportAtt" type="button" onclick="removeImportFileURL(this)" style=" display:none;padding: 2px 8px; color:#C65454;margin-right: 128px;">Remove File</button>
+                                </div>
+                                <apex:outputPanel layout="none" id="outPutPanelId">
+                                    <div id="emailCount" class="emailCountHyperlinkSec" style="display:block;margin-top: 1%;">
+                                        <apex:outputText id="totalEmailCount" value="{!totalEmailCount}" />
+                                        addressess have been uploaded, of which 
+                                        <a id="validEmailID" href="#" target="_blank">
+                                            <apex:outputText id="validEmailCount" value="{!validEmailCount}"/>
+                                        </a>
+                                        are valid and
+                                        <a  id="invalidEmailID" href="#" target="_blank">
+                                            <apex:outputText id="invalidEmailCount" value="{!invalidEmailCount}"/>
+                                        </a>
+                                        are invalid contacts for the customer filtered above.
+                                    </div>
+                                </apex:outputPanel>
+                                
+                            </div>
+                        </div>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <!-- Page Block Section for ALL and Selected Recipients Options -->     
+            <div class ="completeFilterSection" id="completeFilterSectionId">   
+                <apex:pageBlockSection >
+                    <apex:pageBlockSectionItem >
+                        <apex:outputPanel >
+                            <span id="customerSelectId">
+                                <br/><b>Send Notification To : </b><br/><br/>
+                                <span id ="24x7Section">
+                                    &nbsp;&nbsp;&nbsp;&nbsp; <apex:inputCheckbox label="Partners" selected="true" title="Partner" id="partnerId"/>Partner&nbsp;&nbsp;&nbsp;
+                                    &nbsp;<apex:inputCheckbox label="Direct Customers" selected="true" title="Direct Customer" id="DirectCustomerId"/>Direct Customer&nbsp;&nbsp;&nbsp;
+                                    &nbsp; <apex:inputCheckbox label="Indirect Customers" selected="true" title="Indirect Customer" id="IndirectCustomerId"/>Indirect Customer<br/><br/><br/>
+                                </span>
+                                <span id ="autorizedContSection">
+                                    <apex:selectRadio id="authorizedCheckbox" style="padding-bottom: 2%;">
+                                        <apex:selectOption id="ENRId" itemLabel="Emergency Notification Recipients" itemValue="false" html-data-title="Emergency Notification Recipients" />
+                                        <apex:selectOption id="MNRId" itemLabel="Maintenance Notification Recipients" itemValue="true" html-data-title="Maintenance Notification Recipients" />
+                                    </apex:selectRadio>
+                                </span>   
+                                <apex:selectRadio id="checkbox1" onchange="hideFilterFunction(this);" style="padding-top: 1.5%;padding-bottom: 2%;" onselect="hideFilterFunction(this);">
+                                    <br/><b>For Group(s) Selected Above Send Notification To:</b>
+                                    <apex:selectOption itemLabel="All Customers" itemValue="false" html-data-title="All Customers"/>&nbsp;&nbsp;
+                                    <apex:selectOption itemLabel="Selected Customers" itemValue="true" html-data-title="Selected Customers" />
+                                </apex:selectRadio>
+                            </span>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+                
+                
+                <apex:pageBlockSection >
+                    <apex:pageBlockSectionItem >
+                        <apex:outputPanel layout="none" >
+                            <div id="accountTotalCountAllCust" class="accountCountUrlAllCust" style="display:none;margin-top: 1%;">
+                                <apex:outputText id="totalAccountCountAllCust" value="{!totalAccountCount}"/>
+                                <apex:outputText id="allCustTotalCountMessage" value=""/> 
+                                <a id="totalAccontCountHrefAllCust" href="#" target="_blank">
+                                    <apex:outputText >Click here to see list.</apex:outputText>
+                                </a>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+                
+                
+                
+                <!-- Page Block Section for Filter Section -->
+                <div style="display: flex;" >
+                    <div id ="leftFilterSection" class="wrapSectionHide" style="display:block;width:100%;margin:auto;">      
+                        <apex:pageBlockSection columns="1">
+                            <apex:pageBlockSectionItem >
+                                <apex:outputPanel id="op2">
+                                    
+                                    <div style ="margin-bottom: 5px;">
+                                        <b style="padding-left: 3%;padding-right: 6%;">Field</b>
+                                        <b style="padding-left: 10%;padding-right: 8%;">Condition</b>                              
+                                        <b style="padding-left: 11%;padding-right: 11%;">Value</b>  
+                                        <b style="padding-left: 8%;padding-right: 28%;">File</b>
+                                    </div>
+                                    
+                                    <div id="filterWrapper">                               
+                                        <div data-role="filter" style="display:none;">
+                                            
+                                            <apex:outputLabel title="serial-number" value="" style="padding: 5px" html-data-title="serial-number"/>
+                                            <apex:selectList value="{!typeId}" multiselect="false" size="1" title="filter-type" style="padding-left: 2%;" id="filterTypeId" html-data-title="filter-type" onchange="enableFileButton(event); return false;">
+                                                <apex:selectOptions value="{!Types}" />
+                                            </apex:selectList>
+                                            
+                                            <span style="padding-left: 4%;">
+                                                <apex:selectList onchange="enableFileButton(event); return false;" value="{!conditionId}" multiselect="false" size="1" style="right-padding:50px;" title="filter-condition" html-data-title="filter-condition" id="conditionId">
+                                                    <apex:selectOptions value="{!Conditions}"/>
+                                                </apex:selectList>
+                                            </span>
+                                            
+                                            <span style="padding-left: 4%;display: inline-block;text-align: center;width:25%;">  
+                                                <apex:inputText value="{!valueId}" title="filter-value" style="width:100%;display:inline;" html-data-title="filter-value" html-pattern="[A-Za-z0-9,-]*" id="valueId" html-class="filterValCls"/>
+                                                <a style="width:100%;display:block;" data-title="attachmentLink" id="attachmentLinkId" href="#" target="_blank" class="filterAttLinkCls">No File Selected</a> 
+                                            </span>
+                                            
+                                            <span style="padding-left: 4%;">
+                                                <input style="width: 212px;" class="filterFileCls" type="file" id="file-input" accept=".csv"  data-title="filter-file" disabled ="true" title="Select from file, to import long list of values into Value field (comma separated)"/>
+                                                <button class="removeAttCls" id="removeAtt" type="button" onclick="removeFileURL(this)" style=" display:none;padding: 2px 8px; color:#C65454;margin-right: 128px;">Remove File</button>
+                                            </span>
+                                            <span style="padding-left: 4%;">  
+                                                <apex:actionRegion >
+                                                    <apex:commandButton value="Remove" style="padding: 2px 8px; color:#C65454;" onclick="removeFilter(event); return false;"/>
+                                                </apex:actionRegion>
+                                            </span>
+                                            <input type="hidden" name="attachmentId" value="" data-title="filterId"/>
+                                        </div>
+                                        
+                                        <div data-role="filter" id="filterPanelId">
+                                            
+                                            <apex:outputLabel title="serial-number" value="1" style="padding: 5px" html-data-title="serial-number"/>
+                                            
+                                            <apex:selectList value="{!typeId}" multiselect="false" size="1" title="filter-type" style="padding-left: 2%;" html-data-title="filter-type" onchange="enableFileButton(event); return false;">                           
+                                                <apex:selectOptions value="{!Types}" />
+                                            </apex:selectList>
+                                            
+                                            <span style="padding-left: 4%;">
+                                                <apex:selectList onchange="enableFileButton(event); return false;" value="{!conditionId}" multiselect="false" size="1" style="right-padding:50px;" title="filter-condition" html-data-title="filter-condition">
+                                                    <apex:selectOptions value="{!Conditions}"/>
+                                                </apex:selectList>
+                                            </span>
+                                            
+                                            <span style="padding-left: 4%;display: inline-block;text-align: center;width: 25%;">  
+                                                <apex:inputText html-class="filterValCls" value="{!valueId}" title="filter-value" style="width:100%;" html-data-title="filter-value"/>
+                                                <a class="filterAttLinkCls" style="display:block;" data-title="attachmentLink" id="attachmentLinkId" href="#" target="_blank">No File Selected</a> 
+                                            </span>
+                                            
+                                            <span style="padding-left: 4%;" >
+                                                <input style="width: 212px;" class="filterFileCls" type="file" id="file-input" accept=".csv" data-title="filter-file" disabled ="true" title="Select from file, to import long list of values(csv file only) into Value field (comma separated)"/>
+                                                <button class="removeAttCls" id="removeAtt" type="button" onclick="removeFileURL(this)" style="display:none;padding: 2px 8px; color:#C65454;margin-right: 128px;">Remove File</button>
+                                            </span>
+                                            <input type="hidden" name="attachmentId" value="" data-title="filterId"/>
+                                            
+                                        </div>     
+                                    </div>
+                                    <br/>
+                                    
+                                    <apex:actionRegion >
+                                        <apex:commandbutton value="Add More" onclick="addAnotherFilter(); return false;" />
+                                    </apex:actionRegion>
+                                    <apex:outputPanel layout="none" >
+                                        <div id="accountTotalCount" class="accountCountUrl" style="display:block;margin-top: 1%;">
+                                            <apex:outputText id="totalAccountCount" value="{!totalAccountCount}"/>
+                                            <apex:outputText id="totalCountMessage" value=""/>
+                                            <a id="totalAccontCountHref" href="#" target="_blank">
+                                                <apex:outputText >Click here to see list.</apex:outputText>
+                                            </a>
+                                        </div>
+                                    </apex:outputPanel>
+                                </apex:outputPanel>
+                            </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>
+                    </div>
+                    
+                    <div id= "rightFilterSection" class="wrapSectionHide">                        
+                        <div style="text-align:center"><b>Filter Logic</b></div> <br/>
+                        <input type="Text" value="{!FilterLogicId}" data-title="filter-Logic" title="Enter Filter Logic using Conditional Operator [ AND,OR,() ] and Numbers. Use Space after each operator." style="width:95%;text-transform:uppercase" placeholder=" Example: 1 AND ( 2 OR 3 )" />
+                    </div>    
+                </div>                          
+            </div>
+            
+            <div id="peerReviewSectionId" class="peerReviewBlock">     
+                <apex:pageBlockSection columns="1" showHeader="true" title="Peer Review" collapsible="false">
+                    <apex:inputField value="{!mailerObject.CMC_Peer_Reviewer__c }" style="width:15%" id="peerReviewUser"/>
+                    <apex:inputField id="CMCApprovalStatusId" value="{!mailerObject.CMC_Approval_Status__c}" style="width:15%" onchange="setApprovalStatus(); return false;"/>
+                    <apex:inputField value="{!mailerObject.CMC_Reviewer_Comments__c}" style="height:50px;width:50%"/>            
+                </apex:pageBlockSection>         
+            </div> 
+            <div class="validateAndSaveStatus"/> 
+        </apex:pageblock>
+    </apex:form>
+    
+    
+    
+    <script type="text/javascript">
+    
+    var $j = jQuery.noConflict();
+    
+    //On Load
+    $j(document).ready(function() {
+        openModal('onLoad');
+        reloadFilterSection('onLoad');
+        
+        //if($j("[id*= 'CMCSubject']").val()==""){$j("[id*= 'CMCSubject']").val('Akamai Proactive Notification');}
+                  
+            //On load if url has no id then updating the same url
+            if(window.location.href.split('#')[1] !== ""){
+                history.pushState("", "", window.location.href);
+            }
+            setTimeout(function () {
+                closeModal();
+            }, 3000); 
+        });
+    
+    window.onload = detectPopupBlocker;
+    
+    function reloadFilterSection(callType){
+
+        $j("[data-title='filter-file']").prop("disabled", true);
+            //$j("[data-title='24x7Contact']").prop("checked",true);
+        $j("[data-title='Selected Customers']").prop("checked",true); 
+        $j("[data-title='Emergency Notification Recipients']").prop("checked",true);
+        $j('.peerReviewBlock option[value="PartnerUserLookup"],[value="CustomerSuccessUserLookup"]').hide();
+        $j("#filterWrapper").find("div[data-role='filter']").addClass('btwFilterSpace');
+        $j(".peerReviewBlock").hide();
+        $j(".emailCountHyperlinkSec").hide();
+        $j(".accountCountUrl").hide();
+        $j(".accountCountUrlAllCust").hide();
+        $j(".toggle-btn-EmailText").css("background-color", "#A3DD8C");// change the selected button to green
+        $j(".wrapManualEmailHide").hide(); // hide the import button on load
+        $j(".importButton").hide(); 
+        $j(".completeFilterSection").show(); // hide the complete filter section on load
+        $j("[id*='msg1']").text("");
+        $j('.filterAttLinkCls').hide();
+        
+        if(callType === 'onLoad') {  
+            $j("[id*='autorizedContSection']").hide();
+            $j("input[id*='checkboxContactType24']")[0].checked = true;
+                    /*On refresh and reload calling reload function if JSON string is populated
+        and passing saved JSON String, Populated by controller
+        */
+            var JSONString = $j("[id*='savedJSONString']").val();
+            var fileAttachmentId = $j("[id*='allFileAttachmentId']").val();
+            var onLoadtemplateName = "{!templateName}" === '' ? "{!mailerSubject}" : "{!templateName}";
+            var onLoadSINumber = "{!onLoadSINumber}";
+            var onLoadEvent = 'onLoad';
+            
+            if(JSONString != ""){
+                reloadFormWithData(JSONString,fileAttachmentId,onLoadtemplateName,onLoadSINumber,onLoadEvent);
+            }else{
+                addFilterOnLoad(3);
+                hideManualEmailSection('24x7Contact');
+                
+            }
+        }
+            
+        else if(callType === 'filterTypeChange'){
+
+            var accType = $j("input[id*=checkboxContactType24]:checked").parent().children('label').text().trim();
+            if(accType === "Authorized Contacts"){
+                $j("[id*='autorizedContSection']").show();
+            }
+            else if(accType === "Only Send To Manually Entered Email Addresses"){
+                $j(".wrapManualEmailHide").show();
+                $j(".completeFilterSection").hide();
+                $j("[id*='autorizedContSection']").hide();
+            }
+            else if(accType === "24x7 Contact Types"){
+                $j("[id*='autorizedContSection']").hide();
+            }
+        }   
+    }
+    
+    
+    function detectPopupBlocker()
+    {
+        var windowUrl = 'about:blank';
+        var windowId = 'testPopup_' + new Date().getTime();
+        var windowFeatures = 'left=0,top=0,width=400px,height=200px';
+        var windowRef = window.open(windowUrl, windowId, windowFeatures);
+        
+        if ( !windowRef || windowRef == null || typeof(windowRef) == 'undefined' )
+        {
+            alert('A popup blocker was detected. Please turn it off and refresh the page to use this application.');
+            $j("[id*='pb']").hide(); 
+            closeModal();
+        } 
+        else 
+        {
+            // No popup blocker was detected...
+            windowRef.close();
+        }
+    }
+    
+    /*
+      This function reload the previously saved data and populate the the fields value.
+      Accepts JSON String and file Attachement Id. Values are fetched from controller's constructor.      
+      */
+    function reloadFormWithData(JSONString,fileAttachmentId,onLoadtemplateName,onLoadSINumber,event){
+        
+        var JSONParsed = JSONString !=="" ? $j.parseJSON(JSONString) : null;
+        var attachmentIdParsed = fileAttachmentId !=="" ? $j.parseJSON(fileAttachmentId) : null;
+		var downloadLinkAttFile = window.location.href.substr(0, window.location.href.indexOf('com'))+'com/servlet/servlet.FileDownload?file=';
+        var approvalStatusValue = $j("[id*='CMCApprovalStatusId']")[0].value;
+        //$j("[id*='mailerName']")[0].value = "{!mailerName}";
+        enabledSendTestEmailButton();
+        
+        
+        //enabling Peer Review Button based on Template value
+        if(approvalStatusValue === "Approved"){ 
+            $j("input[id*='SendMailer']").removeClass('btnDisabled').addClass('btn');
+            $j("[id*='peerReviewUser']")[8].value = $j("[id*='peerReviewer']").val();
+            $j("input[id*='RecipientReport']").removeClass('btnDisabled').addClass('btn');
+            $j("input[id*='RecipientReport']").prop('disabled','');
+        }
+        if(onLoadtemplateName !== ""){
+            $j("input[id*='SendTestEmail']").removeClass('btnDisabled').addClass('btn');
+            $j("input[id*='SendTestEmail']").prop('disabled','');
+        }
+        
+        //displaying peer review block and button when SI Number is populated 
+        if(onLoadSINumber !== "" && approvalStatusValue !== ""){
+            $j("input[id*='PeerReview']").removeClass('btnDisabled').addClass('btn');
+            $j("input[id*='PeerReview']").prop('disabled','');
+            if(approvalStatusValue === "Approved"){
+                $j(".peerReviewBlock").show();
+                if($j("[id*='ErrorId']").length == 0 &&
+                   $j("[id*='templateErrorId']").length == 0 &&
+                   $j("[id*='CustTypeErrorId']").length == 0 &&
+                   $j("[id*='peerReviewErrorId']").length == 0 &&
+                   $j("[id*='LogicFailedId']").length == 0 &&
+                   $j("[id*='FilterLimitId']").length == 0)
+                { 
+                    $j("input[id*='SendMailer']").prop('disabled',false);
+                    setFiltersSectionToReadOnly();
+                }
+            }
+        }
+        
+        // When refreshed/reloaded first populating filters based on its length.
+        if(JSONParsed !== null && JSONParsed.Filters !== ""){
+            
+            if(event === 'onLoad'){
+                JSONParsed.Filters.length > 4 ? addFilterOnLoad(JSONParsed.Filters.length-1): addFilterOnLoad(3);
+            }
+            
+            //logic to populate all fields under 24x7 Contact Type Section
+            if(JSONParsed.AccountInfo.ContactType == "24x7 Contact Types" || JSONParsed.AccountInfo.ContactType == "Authorized Contacts"){
+                
+                $j("input[id*='partnerId']").prop('checked',false);
+                $j("input[id*='DirectCustomerId']").prop('checked',false);
+                $j("input[id*='IndirectCustomerId']").prop('checked',false);
+                $j("input[id*='authorizedCheckbox']").parent().find("[data-title='Emergency Notification Recipients']").prop("checked",false);
+                $j("input[id*='authorizedCheckbox']").parent().find("[data-title='Maintenance Notification Recipients']").prop("checked",false);
+                
+                for(var i=0;i<JSONParsed.AccountInfo.AccountType.length;i++){
+                    
+                    if(JSONParsed.AccountInfo.ContactType == "24x7 Contact Types"){
+                        if(event !== 'onFilterChange'){
+                            hideManualEmailSection('24x7Contact');
+                        }
+
+                        $j("input[id*='checkboxContactType24']")[0].checked = true;
+                        $j(".wrapManualEmailHide").hide();
+                        $j(".completeFilterSection").show();
+                        $j("[id*='autorizedContSection']").hide();
+                        $j("[id*='24x7Section']").show();
+						$j("[id*='totalCountMessage']").text(' Customers selected.');
+                        
+                        if(JSONParsed.AccountInfo.AccountType[i] == "Partner"){
+                            $j("input[id*='partnerId']").prop('checked',true);
+                        }
+                        if(JSONParsed.AccountInfo.AccountType[i] == "Direct Customer"){
+                            $j("input[id*='DirectCustomerId']").prop('checked',true);
+                        }
+                        if(JSONParsed.AccountInfo.AccountType[i] == "Indirect Customer"){
+                            $j("input[id*='IndirectCustomerId']").prop('checked',true);
+                        }
+                    }
+                    else if(JSONParsed.AccountInfo.ContactType == "Authorized Contacts"){
+                        if(event !== 'onFilterChange'){
+                            hideManualEmailSection('authorizedContacts');
+                        }
+                        $j("input[id*='checkboxContactType24']")[2].checked = true;
+                        $j(".wrapManualEmailHide").hide();
+                        $j(".completeFilterSection").show();
+                        $j("[id*='24x7Section']").hide();
+                        $j("[id*='autorizedContSection']").show();
+                        $j("[id*='totalCountMessage']").text(' Policy Domains selected.');
+                        if(JSONParsed.AccountInfo.AccountType[i] == "Emergency Notification Recipients"){
+                            $j("input[id*='authorizedCheckbox']").parent().find("[data-title='Emergency Notification Recipients']").prop("checked",true);
+                        }
+                        else if(JSONParsed.AccountInfo.AccountType[i] == "Maintenance Notification Recipients"){
+                            $j("input[id*='authorizedCheckbox']").parent().find("[data-title='Maintenance Notification Recipients']").prop("checked",true);
+                        }
+                    }
+                }
+                
+                
+                //Populating filters,attachments and filter logic based on the Customer Selection of 'Selected Customers' 
+                if(JSONParsed.AccountInfo.CustomerSelection == " Selected Customers"){
+                    $j("input[id*='checkbox1']").parent().find("[data-title='Selected Customers']").prop('checked',true).change();
+                    $j("input[id*='checkbox1']").parent().find("[data-title='All Customers']").prop('checked',false);
+                    $j("#rightFilterSection [data-title='filter-Logic']")[0].value = JSONParsed.FilterLogic;
+                    $j(".accountCountUrl").show();
+                    $j(".accountCountUrlAllCust").hide();
+                    
+                    for(var j=1;j<=JSONParsed.Filters.length;j++){
+                        $j("#filterWrapper").find("[data-title='filterId']")[j].value = JSONParsed.Filters[j-1].Id;
+                        $j("#filterWrapper").find("[data-title='serial-number']")[j].innerText = j;
+                        $j("#filterWrapper").find("[data-title='filter-type']")[j].value = JSONParsed.Filters[j-1].CMC_Filter_Field__c;
+                        $j("#filterWrapper").find("[data-title='filter-condition']")[j].value = JSONParsed.Filters[j-1].CMC_Filter_Condition__c;
+                        $j("#filterWrapper").find("[data-title='filter-value']")[j].value = JSONParsed.Filters[j-1].CMC_Filter_Value__c;
+                        
+                        if($j("#filterWrapper").children().find("[data-title='attachmentLink']")[j].text !== 'No File Selected' && $j("#filterWrapper").children().find("[data-title='attachmentLink']")[j].text !== ""){
+                            $j("#filterWrapper").children().find("[data-title='filter-type']")[j].disabled = true;
+                            $j("#filterWrapper").children().find("[data-title='filter-condition']")[j].disabled = true;
+                        }
+                        
+                        if(attachmentIdParsed !== null){
+                            for(var k=1;k<=attachmentIdParsed.length;k++){
+                                if(attachmentIdParsed !== "" && attachmentIdParsed[k-1].slNo == j){ 
+                                    $j("#filterWrapper").children().find("[data-title='attachmentLink']")[j].text = attachmentIdParsed[k-1].filename.substring(0,25)+"...";
+                                    $j("#filterWrapper").children().find("[data-title='attachmentLink']")[j].href = downloadLinkAttFile+attachmentIdParsed[k-1].attachmentId;
+                                    $j("#filterWrapper").children().find("[data-title='filter-value']")[j].style.display ='none';
+                                    $j("#filterWrapper").children().find("[data-title='attachmentLink']")[j].style.display ='inline-block';
+                                    $j("#filterWrapper").children().find("[data-title='filter-file']")[j].style.display='none';
+                                    $j("button[id*='removeAtt']")[j].style.display = 'inline-block';
+                                    $j("#filterWrapper").children().find("[data-title='filter-type']")[j].disabled = true;
+                                    $j("#filterWrapper").children().find("[data-title='filter-condition']")[j].disabled = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                //populating All Customers
+                else{
+                    $j("input[id*='checkbox1']").parent().find("[data-title='All Customers']").prop('checked',true).change();
+                    $j("input[id*='checkbox1']").parent().find("[data-title='Selected Customers']").prop('checked',false);
+                    if(JSONParsed.AccountInfo.ContactType == "Authorized Contacts"){
+                    	$j("[id*='totalCountMessage']").text(' Policy Domains selected.');
+                    }
+                    else if(JSONParsed.AccountInfo.ContactType == "24x7 Contact Types"){
+                    	$j("[id*='totalCountMessage']").text(' Customers selected.');
+                    }
+                    
+                }
+            }
+        }
+        
+        //Logic to populate Manual Email Section and displaying contents in email text and import file.
+        else if(JSONParsed.AccountInfo.CustomerSelection === " All Customers"){
+            //addFilterOnLoad(3);
+               if(JSONParsed.AccountInfo.ContactType == "Authorized Contacts"){
+                    $j("[id*='allCustTotalCountMessage']").text(' Policy Domains selected.');
+               }
+               else if(JSONParsed.AccountInfo.ContactType == "24x7 Contact Types"){
+                    $j("[id*='allCustTotalCountMessage']").text(' Customers selected.');
+               }
+            $j("input[id*='checkbox1']").parent().find("[data-title='All Customers']").prop('checked',true).change();
+            $j("input[id*='checkbox1']").parent().find("[data-title='Selected Customers']").prop('checked',false);
+            $j(".accountCountUrl").hide();
+            $j(".accountCountUrlAllCust").show();
+            if($j("div[data-role='filter']").find("[data-title='filterId']").length < 4){
+                addFilterOnLoad(3);
+            }
+        }
+            else{
+                if($j("div[data-role='filter']").find("[data-title='filterId']").length < 4) {addFilterOnLoad(3);}
+                $j(".wrapManualEmailHide").parent().find("[data-title='manualEmail']").prop('checked',true).change();
+                $j("input[id*='checkboxContactType24']")[1].checked = true;
+                $j(".wrapManualEmailHide").show();
+                $j(".completeFilterSection").hide();
+                $j("[id*='24x7Section']").hide();
+                $j("[id*='autorizedContSection']").hide();
+                if(JSONParsed.AccountInfo.ContactType == "Manual Email Addresses"){
+                    $j(".wrapManualEmailHide").parent().find("[title='toggleBtn-EnterEmail']").prop('checked','true').change();
+                    $j(".wrapManualEmailHide").parent().find("[data-title='manual-email']")[0].value = JSONParsed.AccountInfo.EmailTextArea;
+                    $j(".emailCountHyperlinkSec").show();
+                }
+                else if(attachmentIdParsed !== null){
+                    $j(".wrapManualEmailHide").parent().find("[title='toggleBtn-ImportEmail']").prop('checked','true').change();
+                    $j(".wrapManualEmailHide").children().find("#fileupload")[0].style.display='none';
+                    $j(".wrapManualEmailHide").children().find("[data-title='importFileLink']")[0].style.display ='inline-block';
+                    $j(".wrapManualEmailHide").children().find("[data-title='importFileLink']")[0].text = attachmentIdParsed[0].filename.substring(0,25)+"...";
+                    $j(".wrapManualEmailHide").children().find("[data-title='importFileLink']")[0].href = downloadLinkAttFile+attachmentIdParsed[0].attachmentId;
+                    $j("button[id*='removeImportAtt']")[0].style.display = 'inline-block';
+                    $j(".wrapManualEmailHide").children().find("[data-title='filterUploadId']")[0].value = JSONParsed.forDelete;
+                    $j('.emailTextSection span').last().hide();
+                    $j('.emailTextSection textarea').hide();
+                    $j(".emailCountHyperlinkSec").show();
+                }
+            }
+        
+        if($j("[id*='sendMailerStatusId']").val() != 'Draft'){
+            $j("[id*='pb'] input").attr('disabled',true);
+            $j("[id*='pb'] select").attr('disabled',true);
+            $j("input[id*='RecipientReport']").prop('disabled',true);
+            $j("input[id*='SendMailer']").prop('disabled',true);
+            $j("input[id*='SendTestEmail']").prop('disabled',true);
+            $j("input[id*='validateMailerId']").prop('disabled',true);
+            $j("input[id*='SendTestEmail']").removeClass('btn').addClass('btnDisabled');
+            $j("input[id*='SaveId']").removeClass('btn').addClass('btnDisabled');
+            $j("input[id*='PeerReview']").removeClass('btn').addClass('btnDisabled');
+            $j("input[id*='SendMailer']").removeClass('btn').addClass('btnDisabled');
+            $j("input[id*='validateMailerId']").removeClass('btn').addClass('btnDisabled'); 
+            $j("input[id*='RecipientReport']").removeClass('btn').addClass('btnDisabled');
+        }
+        createDownloadLink();
+        setTimeout(function () {
+            closeModal();
+        }, 3000);
+        
+    }
+    
+    //function to add 3 filter on load - Called from OnLoad function 
+    function addFilterOnLoad(noOfFilter){
+        for (var i = 0; i < noOfFilter; i++) {
+            var filterWrapper = $j("#filterWrapper");
+            var countChild = $j("#filterWrapper").children().length; // Increment the child count
+            var nodeToCopy = filterWrapper.find("div[data-role='filter']").first();
+            var clonedNode = nodeToCopy.clone();
+            clonedNode.attr("style", "");
+            $j("#filterWrapper").append(clonedNode);
+            $j('#filterWrapper label').last().text(countChild);
+        }
+    }
+    
+    // Function to show/hide the filter block when ALL Customer selected          
+    function hideFilterFunction(varAccInput) {
+        var bool = varAccInput.value;
+        if (bool == 'true') {
+            $j(".wrapSectionHide").show();
+            $j(".accountCountUrlAllCust").hide();   
+        }
+        else{
+            $j(".wrapSectionHide").hide();
+            $j(".accountCountUrl").hide();
+        }
+        if($j("input[id*='checkbox1']").parent().find("[data-title='Selected Customers']").is(':checked') && $j("div[data-role='filter']").find("[data-title='filter-type']")[1].value !== "--None--" && window.location.href.split('?id=')[1] !== undefined){
+            $j(".accountCountUrl").show();
+            $j(".accountCountUrlAllCust").hide(); 
+        }
+        else if(window.location.href.split('?id=')[1] !== undefined && $j("input[id*='checkbox1']").parent().find("[data-title='All Customers']").is(':checked') && $j("div[data-role='filter']").find("[data-title='filter-type']")[1].value === "--None--"){
+            $j(".accountCountUrlAllCust").show();
+            $j(".accountCountUrl").hide();
+        }
+    }
+    
+    // function to show/hide Email Addresses Text Area and Import Email Addresses Section when Only Send to Manual Email button Selected
+    function hideManualEmailSection(varCheckBox){
+        openModal('onLoad');
+        
+        $j("#filterWrapper").find("[data-title='filter-type']").find('option').remove();
+        $j("#filterWrapper").find("[data-title='filter-condition']").find('option').remove();
+  
+        var selectedRadio;
+        if($j(varCheckBox).val() !== undefined){
+            selectedRadio = $j(varCheckBox).val();
+        }
+        else{
+            selectedRadio = varCheckBox;
+        }
+        
+        if (selectedRadio === '24x7Contact') {
+            $j(".wrapManualEmailHide").hide();
+            $j(".completeFilterSection").show();
+            $j("[id*='autorizedContSection']").hide();
+            $j("[id*='24x7Section']").show();
+            $j("input[id*='partnerId']").prop('checked',true);
+            $j("input[id*='DirectCustomerId']").prop('checked',true);
+            $j("#filterWrapper").find("[data-title='filter-type']").append('<option value="--None--">--None--</option>');
+            $j("#filterWrapper").find("[data-title='filter-type']").append('<option value="Account ID">Account ID</option>');
+            $j("#filterWrapper").find("[data-title='filter-type']").append('<option value="Customer Name">Customer Name</option>');
+            $j("#filterWrapper").find("[data-title='filter-type']").append('<option value="Geography">Geography</option>');
+            $j("#filterWrapper").find("[data-title='filter-type']").append('<option value="Support Level">Support Level</option>');
+            $j("#filterWrapper").find("[data-title='filter-type']").append('<option value="Marketing Product Name">Marketing Product Name</option>');
+            
+            
+            $j("#filterWrapper").find("[data-title='filter-condition']").append('<option value="--None--">--None--</option>');
+            $j("#filterWrapper").find("[data-title='filter-condition']").append('<option value="Equal To">Equal To</option>');
+            $j("#filterWrapper").find("[data-title='filter-condition']").append('<option value="Not Equal To">Not Equal To</option>');
+            $j("#filterWrapper").find("[data-title='filter-condition']").append('<option value="Contains">Contains</option>');
+            $j("#filterWrapper").find("[data-title='filter-condition']").append('<option value="Does Not Contain">Does Not Contain</option>');
+            $j("#filterWrapper").find("[data-title='filter-condition']").append('<option value="In">In</option>');
+        }
+        else if(selectedRadio === "manualEmail"){
+            $j(".wrapManualEmailHide").show();
+            $j(".completeFilterSection").hide(); 
+        }
+        else if(selectedRadio === "authorizedContacts"){
+            $j(".wrapManualEmailHide").hide();
+            $j(".completeFilterSection").show();
+            $j("[id*='24x7Section']").hide();
+            $j("[id*='autorizedContSection']").show();
+            $j("[data-title='Emergency Notification Recipients']").prop("checked",true);
+            $j("#filterWrapper").find("[data-title='filter-type']").append('<option value="--None--">--None--</option>');
+            $j("#filterWrapper").find("[data-title='filter-type']").append('<option value="Marketing Product Name">Marketing Product Name</option>');
+            $j("#filterWrapper").find("[data-title='filter-type']").append('<option value="Policy Domain Name">Policy Domain Name</option>');
+            
+            $j("#filterWrapper").find("[data-title='filter-condition']").append('<option value="--None--">--None--</option>');
+            $j("#filterWrapper").find("[data-title='filter-condition']").append('<option value="Equal To">Equal To</option>');
+            $j("#filterWrapper").find("[data-title='filter-condition']").append('<option value="Not Equal To">Not Equal To</option>');
+            $j("#filterWrapper").find("[data-title='filter-condition']").append('<option value="Contains">Contains</option>');
+            $j("#filterWrapper").find("[data-title='filter-condition']").append('<option value="Does Not Contain">Does Not Contain</option>');
+            $j("#filterWrapper").find("[data-title='filter-condition']").append('<option value="In">In</option>');
+        }
+        
+        var savedString = $j("[id*='savedJSONString']").val();
+        var savedFilterJSON = savedString !=="" ? $j.parseJSON(savedString) : null;
+        var fileAttId = $j("[id*='allFileAttachmentId']").val();
+        var attachmentIdParsed = fileAttId !=="" ? $j.parseJSON(fileAttId) : null;
+        var onLoadtemplateName = "{!templateName}" === '' ? "{!mailerSubject}" : "{!templateName}";
+        var onLoadSINumber = "{!onLoadSINumber}";
+        var onLoadEvent = 'onFilterChange'; 
+        if(savedFilterJSON !== null && savedFilterJSON !== undefined){
+            
+            if((savedFilterJSON.AccountInfo.ContactType == "24x7 Contact Types" && selectedRadio ==='24x7Contact')
+               ||(savedFilterJSON.AccountInfo.ContactType == "Authorized Contacts" && selectedRadio ==='authorizedContacts')){
+  
+                reloadFormWithData(savedString,fileAttId,onLoadtemplateName,onLoadSINumber,onLoadEvent);
+  
+            }
+            else{
+                 for(var j=1;j<=savedFilterJSON.Filters.length;j++){
+                     
+                        $j("#filterWrapper").find("[data-title='filterId']")[j].value = "removed";
+                        $j("#filterWrapper").find("[data-title='serial-number']")[j].innerText = j;
+                        $j("#filterWrapper").find("[data-title='filter-type']")[j].value = '--None--';
+                        $j("#filterWrapper").find("[data-title='filter-condition']")[j].value = '--None--';
+                        $j("#filterWrapper").find("[data-title='filter-value']")[j].style.display ='block';
+                        $j("#filterWrapper").find("[data-title='filter-value']")[j].value = '';
+                        
+                        if($j("#filterWrapper").children().find("[data-title='attachmentLink']")[j].text !== 'No File Selected' && $j("#filterWrapper").children().find("[data-title='attachmentLink']")[j].text !== ""){
+                            $j("#filterWrapper").children().find("[data-title='filter-type']")[j].disabled = false;
+                            $j("#filterWrapper").children().find("[data-title='filter-condition']")[j].disabled = false;
+                        }
+                        
+                        if(attachmentIdParsed !== null){
+                            for(var k=1;k<=attachmentIdParsed.length;k++){
+                                if(attachmentIdParsed !== "" && attachmentIdParsed[k-1].slNo == j){ 
+                                    $j("#filterWrapper").children().find("[data-title='attachmentLink']")[j].text = '';
+                                    $j("#filterWrapper").children().find("[data-title='attachmentLink']")[j].href = '';
+                                    $j("#filterWrapper").children().find("[data-title='filter-file']")[j].style.display='inline-block';
+                                    $j("button[id*='removeAtt']")[j].style.display = 'none';
+                                    $j("#filterWrapper").children().find("[data-title='filter-type']")[j].disabled = false;
+                                    $j("#filterWrapper").children().find("[data-title='filter-condition']")[j].disabled = false;
+                                    $j("#filterWrapper").children().find("[data-title='filter-file']")[j].disabled = true;
+                                }
+                            }
+                        }
+                    }
+            }
+        
+        }
+        
+        closeModal();
+    }
+    
+    
+    // function to show/hide email text area and import button and change color of toggle button when Email Button is selected  
+    function hideEmailTextArea(checkboxVal){
+        var emailTextEnabled = checkboxVal.value;
+        if(checkboxVal == 'true'){
+            $j(".emailTextSection").show();
+            $j(".importButton").hide();
+            $j('.emailTextSection span').last().show();
+            $j('.emailTextSection textarea').show();
+            
+            $j(".toggle-btn-EmailText").css("background-color", "#A3DD8C");
+            $j(".toggle-btn-EmailImport").css("background-color", "#F9F9F9");
+        }
+        else{
+            $j(".emailTextSection").show();
+            $j(".importButton").show();
+            $j('.emailTextSection span').last().hide();
+            $j('.emailTextSection textarea').hide();
+            
+            $j(".toggle-btn-EmailText").css("background-color", "#F9F9F9");
+            $j(".toggle-btn-EmailImport").css("background-color", "#A3DD8C");
+        }
+    }
+    
+    //Function to add rows to filter condition           
+    function addAnotherFilter() {
+        var filterWrapper = $j("#filterWrapper");
+        var countChild = $j("#filterWrapper").children().length; // Increment the child count
+        var nodeToCopy = filterWrapper.find("div[data-role='filter']").first();
+        var clonedNode = nodeToCopy.clone();
+        clonedNode.attr("style", "btwFilterSpace");
+        if($j("#filterWrapper").find("div[data-role='filter']").length < 10){
+            $j("#filterWrapper").append(clonedNode);
+            $j('#filterWrapper label').last().text(countChild);
+            $j("#FilterLimitId").remove("p");
+        }
+        else{
+            $j("#FilterLimitId").remove("p");
+            $j('#leftFilterSection').append('<p id="FilterLimitId" style="color:red">Error: You have reached the maximum limit for filters.</p>');
+        }
+        
+    }
+    
+    //Function to remove rows from filter condition          
+    function removeFilter(event) {
+        $j(event.target).closest("div[data-role='filter']")[0].remove();
+        var filtersForSl = $j("div[data-role='filter']");
+        var filtersForSlData = [];
+        for (var i = 1; i < filtersForSl.length; i++) {
+            $j(filtersForSl.get(i)).find("[data-title='serial-number']").html(i);
+            $j("#FilterLimitId").remove("p");
+        }
+        
+        return false;
+    }
+    
+    /*Function to enable/disable file button based on filter Condition Value
+    function enableFileButton(event) {
+        var conditionVar = $j(event.target).closest("div[data-role='filter']").find("[data-title='filter-condition']").val();
+        if (conditionVar == "In") {
+            $j(event.target).closest("div[data-role='filter']").find("[data-title='filter-file']").prop("disabled", false);
+        }else{
+            $j(event.target).closest("div[data-role='filter']").find("[data-title='filter-file']").prop("disabled", true);
+            $j(event.target).closest("div[data-role='filter']").find("input[id*=file-input]").val('');
+        }    
+    }*/
+    
+    //Function to enable/disable file button based on filter Condition Value
+    function enableFileButton(event) {
+        var conditionVar = $j(event.target).closest("div[data-role='filter']").find("[data-title='filter-condition']").val();
+        var filterTypeVar = $j(event.target).closest("div[data-role='filter']").find("[data-title='filter-type']").val();
+        var isAutorizedContactChecked = $j("input[id*='checkboxContactType24']")[2].checked;
+        if (conditionVar === "In") {
+            $j(event.target).closest("div[data-role='filter']").find("[data-title='filter-file']").prop("disabled", false);
+        }
+        else{
+            $j(event.target).closest("div[data-role='filter']").find("[data-title='filter-file']").prop("disabled", true);
+            $j(event.target).closest("div[data-role='filter']").find("input[id*=file-input]").val('');
+        }
+        if(isAutorizedContactChecked){
+            if(filterTypeVar === "Marketing Product Name"){
+                $j(event.target).closest("div[data-role='filter']").find("[data-title='filter-condition']").find('[value="Contains"]').prop("disabled", true);
+                $j(event.target).closest("div[data-role='filter']").find("[data-title='filter-condition']").find('[value="Does Not Contain"]').prop("disabled", true);
+            }
+            else{
+                $j(event.target).closest("div[data-role='filter']").find("[data-title='filter-condition']").find('[value="Contains"]').prop("disabled", false);
+                $j(event.target).closest("div[data-role='filter']").find("[data-title='filter-condition']").find('[value="Does Not Contain"]').prop("disabled", false);
+            }
+        }
+    }
+    
+    // function to check if filter logic is valid
+    function checkFilterLogic(filterLogicStringVal,filterOrderValArray){
+        var filterLogicInput = filterLogicStringVal.toUpperCase();
+        $j('#LogicFailedId').remove("p");            
+        setTimeout(function() {$j('#LogicSuccessId').remove("p");}, 5000) ;//function to remove success message in 5 sec
+        if(filterLogicInput != ""){
+            var filterString = filterLogicInput;
+            var result = parse(filterString,filterOrderValArray);                
+        }
+    }
+    
+    //Building RegEx for Filter Logic to accept only valid characters and format  
+    function tokenize(code) {
+        var results = [];
+        var tokenRegExp = /\s*([A-Za-z]+|[0-9]+|\S)\s*/g;        
+        var m;
+        while ((m = tokenRegExp.exec(code)) !== null)
+            results.push(m[1]);
+        return results;
+    }
+    
+    // Function to check if number is valid     
+    function isNumber(token,filterOrderValArray) { 
+        var validNumberMin = $j(filterOrderValArray).first()[0];
+        var ValidNumberMax = $j(filterOrderValArray).last()[0];
+        var regexToken = new RegExp("^["+validNumberMin.toString()+"-"+ValidNumberMax.toString()+"]$");
+        return token !== undefined && token.match(regexToken) !== null;
+    }
+    
+    function parse(code,filterOrderValArray) {
+        filterCountFlag = false;
+        for (var i = 0, len = filterOrderValArray.length; i < len; i++) {
+            if (code.indexOf(filterOrderValArray[i]) < 0){
+                filterCountFlag = true;
+            }
+        }
+        if(filterCountFlag){
+            //display error message
+            $j('#rightFilterSection').append('<p id="LogicFailedId" style="color:red"> Error: Expression is not valid. Please include all filters</p>');
+            return false;
+        }
+        var tokens = tokenize(code);
+        var position = 0;
+        var isErroredCount = false;
+        
+        function parsePrimaryExpr() {
+            var t = tokens[position];
+            if (isNumber(t,filterOrderValArray)) {
+                position++;
+                return {type: "number", value: t};
+            } 
+            else if (t === "(") {
+                position++;
+                var expr = parseExpr();
+                if (tokens[position] !== ")"){
+                    if(isErroredCount == false){
+                        isErroredCount = true;
+                        $j('#rightFilterSection').append('<p id="LogicFailedId" style="color:red"> Error: Expression is not valid. Expecting ")" </p>');
+                    }
+                }
+                position++;
+                return expr;
+            } 
+                else { 
+                    if(isErroredCount == false){
+                        isErroredCount = true;
+                        $j('#rightFilterSection').append('<p id="LogicFailedId" style="color:red"> Error: Expression is not valid.</p>');
+                    }                     
+                }
+        }
+        
+        function parseMulExpr() {
+            var expr = parsePrimaryExpr();
+            var t = tokens[position];
+            while (t === "AND") {
+                position++;
+                var rhs = parsePrimaryExpr();
+                expr = {type: t, left: expr, right: rhs};
+                t = tokens[position];
+            }
+            return expr;
+        }
+        
+        function parseExpr() {
+            var expr = parseMulExpr();
+            var t = tokens[position];
+            while (t === "OR") {
+                position++;
+                var rhs = parseMulExpr();
+                expr = {type: t, left: expr, right: rhs};
+                t = tokens[position];
+            }
+            return expr;
+        }
+        
+        var result = parseExpr();
+        if (position !== tokens.length){
+            if(isErroredCount == false)
+                $j('#rightFilterSection').append('<p id="LogicFailedId" style="color:red"> Error: Expression is not valid.</p>');
+        }
+        else{ 
+            if(isErroredCount == false && $j("[id*='LogicSuccessId']").length == 0){
+                $j('#rightFilterSection').append('<p id="LogicSuccessId" style="color:green"> Success: Expression is valid.</p>');
+            }
+        }
+        return result;
+    }     
+    
+        
+    //Function for form validation
+    function validateForm(serialNo,customerSelection,filterType,filterCondition,filterValue,filterFile,filterFileURL){
+        
+        if(serialNo==1 && customerSelection == " Selected Customers" && filterType == "--None--"
+           && filterCondition =="--None--" && (filterValue =="" || filterFile =="")){
+            $j("#ErrorId").remove("p");
+            $j('#leftFilterSection').append('<p id="ErrorId" style="color:red">Error: First filter can not be Empty. Please populate the first filter to save.</p>');                        
+            return true;
+        }
+        else if(customerSelection == " Selected Customers" && (filterType != "--None--"
+            && filterCondition =="--None--" && (filterValue =="" || filterFile ==""))){
+            $j("#ErrorId").remove("p");
+            $j('#leftFilterSection').append('<p id="ErrorId" style="color:red"> Error: Filter criteria field is invalid. Please populate all fields for the selected filter row.</p>');
+            return true;                        
+        }
+        else if(customerSelection == " Selected Customers" && (filterType == "--None--"
+            && filterCondition !="--None--" && (filterValue =="" || filterFile ==""))){
+                $j("#ErrorId").remove("p");
+                $j('#leftFilterSection').append('<p id="ErrorId" style="color:red"> Error: Filter criteria field is invalid. Please populate all fields for the selected filter row.</p>'); 
+                return true;
+        }
+        else if(customerSelection == " Selected Customers" && (filterType == "--None--"
+            && filterCondition =="--None--" && filterValue !="")){
+                    $j("#ErrorId").remove("p");
+                    $j('#leftFilterSection').append('<p id="ErrorId" style="color:red"> Error: Filter criteria field is invalid. Please populate all fields for the selected filter row.</p>'); 
+                    return true;
+        }
+        else if(customerSelection == " Selected Customers" && (filterType != "--None--"
+            && filterCondition !="--None--" && filterValue =="" && filterCondition !="In" )){
+                        $j("#ErrorId").remove("p");
+                        $j('#leftFilterSection').append('<p id="ErrorId" style="color:red"> Error: Filter criteria field is invalid. Please populate all fields for the selected filter row.</p>'); 
+                        return true;
+        }
+        else if(customerSelection == " Selected Customers" && filterValue !="" && filterFile !="" && filterCondition =="In"){
+                            $j("#ErrorId").remove("p");
+                            $j('#leftFilterSection').append('<p id="ErrorId" style="color:red"> Error: You can either enter a value or import file.</p>'); 
+                            return true;
+        }
+        
+        else if(customerSelection == " Selected Customers" && filterValue =="" && filterFile =="" && filterCondition =="In" && filterFileURL =="No File Selected" ){
+                                $j("#ErrorId").remove("p");
+                                $j('#leftFilterSection').append('<p id="ErrorId" style="color:red"> Error: Value or File field is required with \'In\' Condition.</p>');
+                                return true;
+        }
+        else if(customerSelection == " Selected Customers" && filterCondition =="In" && filterFileURL =="" && filterFile =="" && filterValue =="" && filterFileURL !="No File Selected"){
+                                    $j("#ErrorId").remove("p");
+                                    $j('#leftFilterSection').append('<p id="ErrorId" style="color:red"> Error: Value or File field is required with \'In\' Condition.</p>');
+                                    return true;
+        }
+        else if(checkfile()){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    
+    //function to remove all error/success message from page
+    function removeErrorSuccessMessages(){
+        $j("#templateErrorId").remove("p");
+        $j("#mailerSaveSuccess").remove("p");
+        $j("#CustTypeErrorId").remove("p");
+        $j("#ErrorId").remove("p");
+        $j("#templateErrorId").remove("p");
+        $j("#peerReviewErrorId").remove("p");
+        $j("#mailerSaveSuccess").remove("p");
+        $j('#LogicId').remove("p");
+        $j('#LogicFailedId').remove("p");
+        $j('#templateErrorId').remove("p");
+        $j('#FilterLimitId').remove("p");
+        $j('#peerReviewEmailErrorId').remove("p");
+        $j('#peerReviewEmailAccountId').remove("p");
+        
+        $j("[id*='ErrorId']").remove('p');
+    }
+    
+    //function to send test email and throw error message when template is not populated
+    function sendTestEmailValidation(callLocation){
+        
+        var isDescEmpty = $j.trim($j("[id*='CMCDescription']").parent().find("iframe").contents().find('body').text()) !== "" ? false : true;
+        $j('#displayTemplateError').children("#templateErrorId").remove("p");
+        if($j("[id*= 'CMCTemplateName']").val() ==""){
+            if($j("[id*= 'CMCSubject']").val() =="" && isDescEmpty){
+                // $j('#displayTemplateError').append('<p id="templateErrorId" style="color:red"> Error:Please remove spaces from Content field.</p>');
+                $j('#displayTemplateError').append('<p id="templateErrorId" style="color:red"> Error:Please populate either Template field or Subject and Content field.</p>');                     
+                closeModal();
+            }
+            else if(isDescEmpty || ($j("[id*='CMCDescription']").parent().find("iframe").contents().find('body').html() == "<br>" || $j("[id*='CMCDescription']").parent().find("iframe").contents().find('body').html() == "") || $j("[id*= 'CMCSubject']").val() == ""){
+                $j('#displayTemplateError').append('<p id="templateErrorId" style="color:red"> Error:Please populate Subject and Content field.</p>');                      
+                closeModal();
+            }
+                else if($j("[id*='CMCSubject']").val().length < 8){
+                    $j('#displayTemplateError').append('<p id="templateErrorId" style="color:red"> Error: Subject should be minimum 8 character long.</p>');
+                    closeModal();
+                }
+        }
+        if($j('#displayTemplateError').children("#templateErrorId").length == 0 && callLocation == "sendTestEmail"){
+            sendTestEmail();
+        }
+        if($j('#displayTemplateError').children("#templateErrorId").length == 0 && $j('#displayTemplateError').children("#ErrorId").length == 0 && callLocation == "validateBtn"){
+            displayValidationStatus();
+        }
+    }
+    
+    //function for validating template, subject and content for send test email
+    // called from sendTestEmailValidation();
+    function displayValidationStatus(){
+        if($j('#rightFilterSection').children("#LogicFailedId").length == 0 && 
+           $j('#completeFilterSectionId').children("#CustTypeErrorId").length == 0 &&
+           $j('#wrapManualEmailHide').children("#ErrorId").length == 0 &&
+           $j('#displayTemplateError').children("#ErrorId").length == 0 &&
+           $j('#displayTemplateError').children("#peerReviewErrorId").length == 0 &&
+           $j('#leftFilterSection').children("#ErrorId").length == 0 &&
+           $j("[id*='displayTemplateError']").find("p").length == 0){
+            $j('.validateAndSaveStatus').append('<p id="successStatus" style="color:green">Success: Mailer is Valid. </p>');
+            setTimeout(function() {$j("[id*='successStatus']").remove("p")}, 3000);
+        }
+    }
+    
+    //function to pass JSON string to controller for processing using action function createMailerData
+    //called from Save button
+    function saveMailer(buttonEvent){
+        var dataForSave = validateAndCreateJSONFilters();
+        var peerReviewError = $j("[id*='ErrorId']").length;  
+        if(dataForSave!=undefined && dataForSave["isValid"] && peerReviewError == 0){ 
+            if(buttonEvent == 'saveMailer'){
+                createMailerData(JSON.stringify(dataForSave["controllerData"]));
+            }
+            else{
+                validateSINumber('sendMailer');
+                peerReviewError = $j("[id*='ErrorId']").length;
+                if(peerReviewError == 0){
+                    saveOnSendMailer(JSON.stringify(dataForSave["controllerData"]));
+                }
+                else{
+                    closeModal();
+                }
+            }    
+            return false; 
+        }
+        else{
+            closeModal();
+            $j('#NotificationContentDivId').append('<p id="mailerSaveSuccess" style="color:red">Error: Mailer not saved. Please fix all the errors and click Save. </p>');
+            return false;
+        }
+    }
+    
+    //Function to capture the filled information and store as JSON
+    // Called from saveMailer()     
+    function validateAndCreateJSONFilters() {
+        
+        var contactTypeVal = $j("input[id*=checkboxContactType24]:checked").parent().children('label').text().trim();
+        var customerSelection = $j("input[id*=checkbox1]:checked").parent().children('label').text();
+        var filterLogicVal = $j("#rightFilterSection [data-title='filter-Logic']").val();            
+        var accountTypeInfo = [];
+        var customerType = [];
+        var filterOrderValArr =[];
+        var accountTypeData = {};
+        var controllerData={};
+        var dataForSave={};
+        var subject = $j("[id*= 'CMCSubject']").val();
+        var contentBody = $j.trim($j("[id*='CMCDescription']").parent().find("iframe").contents().find('body').text());
+        removeErrorSuccessMessages();
+        
+        if(contentBody !== "" && contentBody !== "<br>"){
+            sendTestEmailValidation('onEachSave');
+        }
+        
+        if($j('#displayTemplateError').children("#templateErrorId").length == 0){
+            
+            if(($j.trim(subject) != "" || subject.indexOf(' ') >= 0) && $j.trim(subject).length < 8){
+                $j('#ErrorId').remove("p");
+                $j('#displayTemplateError').append('<p id="ErrorId" style="color:red"> Error: Subject should be minimum 8 character long.</p>'); 
+            }
+            
+            if(($j("select[id*=CMCApprovalStatusId]")[0].value !== "--None--" && $j("select[id*=CMCApprovalStatusId]")[0].value !== "") && $j("[id*='peerReviewUser']")[8].value === ""){
+                $j('#ErrorId').remove("p"); 
+                $j("#peerReviewSectionId").append('<p id="ErrorId" style="color:red">Error:Peer reviewer is empty. Please select a reviewer.</p>');
+            }
+            
+            if($j("input[type='checkbox']:checked").length ==0 && $j("input[id*=checkboxContactType24]:checked").parent().children('label').text().trim() == "24x7 Contact Types"){
+                $j("#CustTypeErrorId").remove("p");
+                $j('#completeFilterSectionId').append('<p id="CustTypeErrorId"style="color:red">Error: No Option selected under section <b>"Send Notification To"</b>.Please select atleast one option.</p>');
+            }
+            
+            //updating filter Id with each filter 
+            var jsonAllFilterId = $j("input[id*='allFilterId']").val();
+            var filterLength = $j("div[data-role='filter']").find("[data-title='filterId']").length - 1;
+            var NewJSONString = $j("[id*='savedJSONString']").val();
+            var parsedJSONString = NewJSONString !=="" ? JSON.parse(NewJSONString) : null;
+            var parsedFilterID = jsonAllFilterId !=="" ? JSON.parse(jsonAllFilterId) : null;
+            if(parsedFilterID !== null){
+                for(var i=0;i<parsedFilterID.allFilters.length;i++){
+                    if(i <= filterLength.length && $j("div[data-role='filter']").find("[data-title='filterId']")[i+1].value !== 'removed'){
+                        $j("div[data-role='filter']").find("[data-title='filterId']")[i+1].value = parsedFilterID.allFilters[i].Id;  
+                    }
+                }
+            }
+            else if(parsedJSONString !== undefined && parsedJSONString !== null){
+                if(parsedJSONString.AccountInfo.CustomerSelection == " Selected Customers" && parsedJSONString.Filters.length >0){
+                    for(var j=1;j<=parsedJSONString.Filters.length;j++){
+                        $j("#filterWrapper").find("[data-title='filterId']")[j].value = parsedJSONString.Filters[j-1].Id;
+                    }
+                }
+            }
+            
+            //storing field values as JSON for 24x7 contact types
+            if(contactTypeVal == "24x7 Contact Types" || contactTypeVal == "Authorized Contacts"){
+                var accountTypeVal = contactTypeVal == "24x7 Contact Types" ? $j("input[type='checkbox']:checked") : $j('input[id*="authorizedCheckbox"]:checked').data("title").trim();
+                var contactTypeVal = contactTypeVal;
+                var accountTypeValLength = accountTypeVal.length;
+ 
+                //check for partner,direct and indirect
+                if(accountTypeVal.length > 0){
+                    if(contactTypeVal == "24x7 Contact Types"){
+                        for(var j=0;j<accountTypeValLength;j++){                       
+                            var accountTypeValue = accountTypeVal[j].title;
+                            customerType.push(accountTypeValue);
+                        }
+                    }
+                    else{
+                        var accountTypeValue = accountTypeVal;
+                        customerType.push(accountTypeValue);
+                    }
+                    
+                    accountTypeData["ContactType"] = contactTypeVal;
+                    accountTypeData["AccountType"]= customerType;
+                    accountTypeData["CustomerSelection"]= customerSelection;                    
+                    accountTypeInfo.push(accountTypeData);
+                    
+                    //Creating JSON for Selected Customers
+                    if(customerSelection != " All Customers"){
+                        var filters = $j("div[data-role='filter']");
+                        var filtersData = [];
+                        var finalFilterData = [];
+                        var filterLogicForPush ={"CMC_Filter_Logic__c":filterLogicVal};
+                        var accountInfoForPush ={"AccountInfo":accountTypeInfo};
+                        
+                        for (var i = 1; i < filters.length; i++) {                   
+                            var filter = $j(filters.get(i));                    
+                            var filterSlNo = i;
+                            var filterType = filter.find("[data-title='filter-type']").val();
+                            var filterCondition = filter.find("[data-title='filter-condition']").val();
+                            var filterValue = filter.find("[data-title='filter-value']").val();
+                            var filterFile = filter.find("[data-title='filter-file']").val();
+                            var filterFileURL = filter.find("[data-title='attachmentLink']").text();
+                            var filterId;
+                            
+                            //Validating Data
+                            var isFormInvalid = validateForm(filterSlNo,customerSelection,filterType,filterCondition,filterValue,filterFile,filterFileURL);
+                            if(isFormInvalid){break;}
+                            
+                            if(filterType != "--None--"){               
+                                var filterData = {};
+                                if(parsedFilterID !== null){
+                                    for(var j=0;j<parsedFilterID.allFilters.length;j++){
+                                        if(parsedFilterID.allFilters[j].CMC_Filter_Order__c == filterSlNo && $j("div[data-role='filter']").find("[data-title='filterId']")[j+1].value !== 'removed'){
+                                            filterId = parsedFilterID.allFilters[j].Id;
+                                            break;
+                                        }
+                                        else{
+                                            filterId = '';
+                                        }
+                                    }
+                                }
+                                else{
+                                    filterId = $j("#filterWrapper").find("[data-title='filterId']")[i].value !== "" ? $j("#filterWrapper").find("[data-title='filterId']")[i].value : '';
+                                }
+                                filterData["Id"] = filterId;
+                                filterData["CMC_Filter_Order__c"] = filterSlNo;
+                                filterData["CMC_Filter_Field__c"] = filterType;
+                                filterData["CMC_Filter_Condition__c"] = filterCondition;
+                                filterData["CMC_Filter_Value__c"] = filterValue;
+                                filtersData.push(filterData);
+                                filterOrderValArr.push(filterSlNo);                            
+                            }
+                        }
+                        
+                        if($j('#leftFilterSection').children("#ErrorId").length == 0 && $j('#displayTemplateError').children("#ErrorId").length ==0 && isFilterinSequence(filterOrderValArr)){ 
+                            if(filterLogicVal != ""){
+                                checkFilterLogic(filterLogicVal,filterOrderValArr);                    
+                            }
+                            if($j('#rightFilterSection').children("#LogicFailedId").length == 0 && $j('#peerReviewSectionId').children("#ErrorId").length ==0){    
+                                controllerData["Filters"] =filtersData;
+                                controllerData["FilterLogic"] =filterLogicVal;
+                                controllerData["AccountInfo"] =accountTypeData;
+                                
+                                // blanking out all input fields not relevant to this section
+                                $j('.emailTextSection textarea').val('')
+                                $j('.importFileUploadClass').val('')
+                                $j('.importFileUploadClass').val('');
+                                $j('#importFileLinkId')[0].href ="#";
+                                $j('#importFileLinkId')[0].text ="No File Selected";
+                                $j('.removeImportAttCls').hide();
+                                $j('.importFileUploadClass').show();
+                                $j('.importFileLinkCls').hide();
+                                
+                                //Adding data to Array
+                                dataForSave["isValid"] =true;
+                                dataForSave["controllerData"] =controllerData;
+                                
+                                //returning data to saveMailer()
+                                return dataForSave;  
+                            }                      
+                        }
+                    }
+                    
+                    //For All Customers
+                    else{
+                        // Resetting page section which are not relevant
+                        $j('.filterValCls').show();
+                        $j('#filterWrapper a').hide();
+                        $j('#filterWrapper').find('select').val("--None--");
+                        $j('#filterWrapper').find('input:text').val('');
+                        $j('#filterWrapper button').hide();
+                        $j('.filterFileCls').val('');
+                        $j('.filterFileCls').show();
+                        $j('.wrapSectionHide').children('input').val('');
+                        $j('#filterWrapper select').prop('disabled',false);
+                        $j('.importFileUploadClass').val('');
+                        $j('#importFileLinkId')[0].href ="";
+                        $j('#importFileLinkId')[0].text ="";
+                        $j('.emailTextSection textarea').val('')
+                        $j('.importFileUploadClass').val('')
+                        $j('.removeImportAttCls').hide();
+                        $j('.importFileUploadClass').show();
+                        $j('.importFileLinkCls').hide();
+                        for(var m = 1; m < $j("div[data-role='filter']").length; m++){ 
+                            $j("div[data-role='filter']").find("[data-title='filterId']")[m].value = '';
+                        }
+                        controllerData["Filters"] ="";
+                        controllerData["FilterLogic"] ="";
+                        controllerData["AccountInfo"] =accountTypeData;
+                        dataForSave["isValid"] = $j('#displayTemplateError').children("#ErrorId").length ==0 ? true : false;
+                        dataForSave["controllerData"] = controllerData;
+                        return dataForSave;
+                    }
+                }
+            }
+            
+            // Manual Email Section
+            else if($j('#toggleId1').is(':checked')){
+                
+                var emailTextAreaVal = $j("textarea#manualEmailId").val();
+                var manualContactTypeVal = "Manual Email Addresses";
+                
+                //Email Text Area Section
+                if(emailTextAreaVal !== '' && $j.trim(emailTextAreaVal).length >= 1 && $j.trim(emailTextAreaVal).length <= 50000){
+                    accountTypeData["ContactType"] = manualContactTypeVal;
+                    accountTypeData["AccountType"]= customerType;
+                    accountTypeData["CustomerSelection"]= ''; 
+                    accountTypeData["EmailTextArea"]= emailTextAreaVal;
+                    
+                    controllerData["forDelete"] ="true";
+                    controllerData["Filters"] ="";
+                    controllerData["FilterLogic"] ="";
+                    controllerData["AccountInfo"] =accountTypeData;
+                    
+                    //blanking out all input fields not relevant to this section
+                    $j('.filterValCls').show();
+                    $j('#filterWrapper a').hide();
+                    $j('#filterWrapper').find('select').val("--None--");
+                    $j('#filterWrapper').find('input:text').val('');
+                    $j('#filterWrapper button').hide();
+                    $j('.filterFileCls').val('');
+                    $j('.filterFileCls').show();
+                    $j('.wrapSectionHide').children('input').val('');
+                    $j('#filterWrapper select').prop('disabled',false);
+                    $j('.importFileUploadClass').val('');
+                    $j('#importFileLinkId')[0].href ="#";
+                    $j('#importFileLinkId')[0].text ="No File Selected";
+                    
+                    for(var m = 1; m < $j("div[data-role='filter']").length; m++){ 
+                        $j("div[data-role='filter']").find("[data-title='filterId']")[m].value = '';
+                    }
+                    
+                    if($j('#displayTemplateError').children('#ErrorId').length ==0 && $j('#peerReviewSectionId').children("#ErrorId").length ==0){
+                        dataForSave["isValid"] =true;
+                        dataForSave["controllerData"] =controllerData; 
+                    }
+                    
+                    return dataForSave;
+                }
+                else{
+                    $j("#ErrorId").remove("p");
+                    if($j.trim(emailTextAreaVal).length > 50000){
+                        $j('.wrapManualEmailHide').append('<p id="ErrorId" style="color:red"> Error: Reached maximum character limit of 50000. Please use Import File.</p>');
+                    }
+                    else{
+                        $j('.wrapManualEmailHide').append('<p id="ErrorId" style="color:red"> Error: Email Text Area is Empty.</p>');
+                    }
+                }
+            } 
+            
+            //Import Email Section
+                else if($j("input#fileupload").val() !== '' || ($j("[id*='importFileLinkId']").text() !== 'No File Selected' && $j("[id*='importFileLinkId']").text() !== '')){
+                    
+                    var importEmailVal = $j("input#fileupload").val();
+                    var importContactTypeVal = "Import Email Addresses";
+                    var isNewFile = $j(".wrapManualEmailHide").children().find("#fileupload")[0].value !=="" ? "true" : "false";
+                    
+                    accountTypeData["ContactType"] = importContactTypeVal;
+                    accountTypeData["AccountType"]= customerType;
+                    accountTypeData["CustomerSelection"]= customerSelection; 
+                    accountTypeData["ImportFile"]= importEmailVal;
+                    
+                    controllerData["forDelete"] = isNewFile;
+                    controllerData["Filters"] ="";
+                    controllerData["FilterLogic"] ="";
+                    controllerData["AccountInfo"] =accountTypeData;
+                    
+                    //blanking out all input fields not relevant to this section
+                    $j('.filterValCls').show();
+                    for(var i=0; i<=$j('#filterWrapper a').length-1;i++){
+                        $j('#filterWrapper a')[i].text ="";
+                        $j('#filterWrapper a')[i].href ="#";
+                    }
+                    $j('.filterAttLinkCls').show();                
+                    $j('#filterWrapper').find('select').val("--None--");
+                    $j('#filterWrapper').find('input:text').val('');
+                    $j('#filterWrapper button').hide();
+                    $j('.filterFileCls').val('');
+                    $j('.filterFileCls').show();
+                    $j('.wrapSectionHide').children('input').val('');
+                    $j('#filterWrapper select').prop('disabled',false);
+                    $j('.emailTextSection textarea').val('');
+                    
+                    for(var m = 1; m < $j("div[data-role='filter']").length; m++){ 
+                        $j("div[data-role='filter']").find("[data-title='filterId']")[m].value = '';
+                    }
+                    
+                    if(!checkfile() && $j('#displayTemplateError').children('#ErrorId').length ==0 && $j('#peerReviewSectionId').children("#ErrorId").length ==0){
+                        dataForSave["isValid"] =true;
+                        dataForSave["controllerData"] =controllerData;
+                    }
+                    
+                    return dataForSave;
+                    
+                }
+                    else if($j("[id*='importFileLinkId']").text() === 'No File Selected' || $j("[id*='importFileLinkId']").text() === ''){
+                        $j("#ErrorId").remove("p");
+                        $j('.wrapManualEmailHide').append('<p id="ErrorId" style="color:red"> Error: No file choosen. Please Choose a file.</p>');
+                    }
+        }
+        else{
+            dataForSave["isValid"] ="";
+            dataForSave["controllerData"] ="";
+            return dataForSave;
+        }    
+    }
+    
+    //function to check if filters are in sequence 
+    //Called from function validateAndCreateJSONFilters()  
+    function isFilterinSequence(filterOrderVal){
+        var isSLNumberInSequence = 1;            
+        
+        for(i=0;i<filterOrderVal.length;i++){
+            if(filterOrderVal[i] === isSLNumberInSequence){   
+                isSLNumberInSequence++;                       
+            }
+            else{
+                $j('#leftFilterSection').append('<p id="ErrorId" style="color:red"> Error: Filters or Filter Logic are not set in order.</p>');
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    //function to check if either 24x7 section fileds are populated or Manual Email Section fields are populated
+    //Called from function validateAndCreateJSONFilters
+    function isFltrPopltedWithOnlySendEmail(callType){
+        if(callType ==="manualEmailSec"){
+            var filtersTotal = $j("div[data-role='filter']");
+            for (var i = 1; i < filtersTotal.length; i++) {                   
+                var filter = $j(filtersTotal.get(i)); 
+                if(
+                    filter.find("[data-title='filter-type']").val() !== "--None--" ||
+                    filter.find("[data-title='filter-condition']").val() !== "--None--" ||
+                    filter.find("[data-title='filter-value']").val() !== "" ||
+                    filter.find("[data-title='filter-file']").val() !== ""
+                ){
+                    $j('.wrapManualEmailHide').append('<p id="ErrorId" style="color:red"> Error: Please remove all the filters value from \'24x7 Contact Type\' Section to proceed.</p>');
+                    return true;
+                }
+                else if($j("input#fileupload").val() === "" && $j("textarea#manualEmailId").val() === "" && $j("#CustomerContactOptionDivId").children().find('.importFileLinkCls')[0].text ===""){
+                    $j('.wrapManualEmailHide').append('<p id="ErrorId" style="color:red"> Error: No email addresses found. Please enter email addresses or import email addresses.</p>');
+                    return true;
+                }
+                    else{
+                        return false;
+                    }
+            }
+        }
+        else{
+            if($j("input#fileupload").val() !== "" || $j("textarea#manualEmailId").val() !== ""){ 
+                
+                $j('#leftFilterSection').append('<p id="ErrorId" style="color:red"> Error: Please remove all the fields value from \'Only Send To Manually Entered Email Addresses\' Section to proceed.</p>');
+                return true;
+            }
+            else{
+                return false;
+            }
+        }    
+    }
+    
+    
+    //function to check if attachment is valid(.csv only allowed)
+    //Called from function validateForm();
+    function checkfile() {
+        var fileLength = $j("input[id*=file-input]");
+        var importManualEmail = $j("input[id*=fileupload]").eq(0).prop('files')[0];
+        if(importManualEmail !== '' && importManualEmail !== undefined){
+            if(checkFileForCSV(importManualEmail)){
+                $j('.wrapManualEmailHide').append('<p id="ErrorId" style="color:red"> Error: File selected doesn\'t match the acceptable file format(.csv).</p>');
+                return true;
+            }
+        }
+        else{
+            for(var i=0;i < fileLength.length;++i) {
+                if( $j("input[id*=file-input]").eq(i).val() != "" && $j("input[id*=file-input]").eq(i).val() != undefined){
+                    var eachFilterFile = $j("input[id*=file-input]").eq(i).prop('files')[0];
+                    if(checkFileForCSV(eachFilterFile)){
+                        $j('#leftFilterSection').append('<p id="ErrorId" style="color:red"> Error: File selected doesn\'t match the acceptable file format(.csv).</p>');
+                        return true;  
+                    }
+                }
+            }
+        }
+    }
+    
+    //check for csv file format
+    function checkFileForCSV(fileSource){
+        var validExts = new Array(".csv");
+        var fileExt = fileSource.name;
+        fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+        if(validExts.indexOf(fileExt) < 0) {
+            return true;
+        }
+        else{
+            return false;
+        }
+    }               
+    
+    
+    
+    // Function to read and add files
+    // constants across all the function calls 
+    var maxStringSize = 6000000;    // Maximum String size is 6,000,000 characters
+    var maxFileSize = 4350000;      // After Base64 Encoding, this is the max file size
+    var chunkSize = 950000;         // Maximum Javascript Remoting message size is 1,000,000 characters
+    var count;
+    var numberOfFileProcessed = 0;
+    var numberOfFileForProcessing = 0;
+    
+    function uploadFileAtt() {
+        
+        $j("#fileErrorId").remove("p");
+        var filterFileOrImportFile = $j("input[id*=checkboxContactType24]:checked").parent().children('label').text().trim();
+        var totalFileLength = $j("input[id*=file-input]");
+        count = 0;
+        
+        //File processing for 24x7 Contact Types
+        if(filterFileOrImportFile === "24x7 Contact Types" || filterFileOrImportFile === "Authorized Contacts"){
+            for(var i=0;i <= $j("input[id*=file-input]").length -1;i++){
+                if($j("input[id*=file-input]")[i].value !== ""){
+                    numberOfFileForProcessing += 1;
+                }
+            }
+            
+            //files from the filters
+            for(var i=0;i <totalFileLength.length;i++) {
+                if( $j("input[id*=file-input]").eq(i).val() != "" && $j("input[id*=file-input]").eq(i).val() != undefined){
+                    var eachFile = $j("input[id*=file-input]").eq(i).prop('files')[0];
+                    if (valid(eachFile)) {                                  
+                        fileWorker(eachFile,i); // assigning to a seperate worker function to avoid concurreny issues across threads. */
+                    }
+                    else{
+                        $j('#leftFilterSection').append('<p id="fileErrorId" style="color:red"> Maximum accepted file size is ' + maxFileSize + ', your file size is ' + eachFile.size+'</p>');
+                        alert("Maximum accepted file size is " + maxFileSize + ", your file size is " + eachFile.size);
+                    }
+                }                    
+            } 
+        }
+        
+        //files from import file of manual email section
+        var files = $j("input[id*=fileupload]").eq(0).prop('files')[0];            
+        if(files != "" && files != undefined){
+            numberOfFileForProcessing = $j("input[id*=fileupload]").eq(0).prop('files').length;
+            var importSl = "";
+            if (valid(files)) { 
+                fileWorker(files,importSl);  // assigning to a seperate worker function to avoid concurreny issues across threads. */
+            }
+            else{
+                var errorStr = 'Maximum accepted file size is ' + maxFileSize + ', your file size is ' + eachFile.size;
+                $j('#leftFilterSection').append('<p id="fileErrorId" style="color:red">'+errorStr+'</p>');
+                alert("Maximum accepted file size is " + maxFileSize + ", your file size is " + file.size);
+            }
+        }
+    }
+    
+    // Checking file size
+    function valid(file) {
+        return (file.size <= maxFileSize);            
+    }
+    
+    /* Parllel worker that reads each individual file using FileReader each individual file.
+         * Call the recursive function to uplaod chunks of file along with meta data to track state. 
+         */
+    
+    function fileWorker(file,slNo) {
+        var fileReader = new FileReader();                        
+        var filterIdString = $j("input[id*='filterIdList']").val();
+        filterIdString = filterIdString.slice(0, -1);
+        var filterIdsArray = filterIdString.split(',');
+        parentFilterId =filterIdsArray[count];
+        
+        //executes at the end 
+        fileReader.onloadend = function(event) {
+            
+            var payload = window.btoa(this.result);  //base-64 encoding
+            var positionIndex = 0;
+            var parentId;
+            var is24x7Type;
+            
+            //Getting parentId and 24x7 check
+            if($j("input[id*=fileupload]").eq(0).prop('files').length > 0){
+                parentId = $j("input[id*='mailerIdHidden']").val();
+                is24x7Type= false;
+            }
+            else if($j("input[id*='allFilterId']").val() != ""){
+                var allFilterObj = $j.parseJSON($j("input[id*='allFilterId']").val());
+                if(allFilterObj !== null && allFilterObj !== undefined){
+                    for(var i=0;i <allFilterObj.allFilters.length;i++){
+                        if(allFilterObj.allFilters[i].CMC_Filter_Order__c === slNo.toString()){
+                            parentId = allFilterObj.allFilters[i].Id.replace(/"/g, "");
+                            is24x7Type = true;
+                        }
+                    }
+                } 
+            }
+                else if(filterIdString != ""){
+                    parentId = filterIdsArray[count];
+                    is24x7Type = true;
+                }
+            
+            count++;
+            var attachmentName = file.name;
+            var attachmentId = null;
+            uploadChunk(is24x7Type,parentId, attachmentId, attachmentName, payload, positionIndex,slNo);               
+        }
+        fileReader.onerror = function(event) {
+            $j('#leftFilterSection').append('<p id="fileErrorId" style="color:red"> Error: There was an error reading the file. Please try again.</p>');
+        }
+        fileReader.onabort = function(event) {
+            $j('#leftFilterSection').append('<p id="fileErrorId" style="color:red"> Error: There was an error reading the file. Please try again.</p>');
+        }
+        fileReader.readAsBinaryString(file);  //Read the body of the file
+        
+    }
+    
+    /* Uploads the attachment into salesforce.
+         * @param parentId - parent id of the record the file should be added to, if invalid, the transaction fails.
+         * @param attachmentId - attachment id of the payload, if null creates a new attachment for the parent.
+         * @param attachmentName - file name of the uploaded file.
+         * @param payload - base64 encoded payload
+         * @param positionIndex - position of the processed payload (used to maintain state to chunkify the payload) 
+         */
+    
+    function uploadChunk(is24x7Type,parentId, attachmentId, attachmentName, payload, positionIndex,slNo) {
+        $j("#mailerSaveSuccess").remove("p");
+        $j("#fileErrorId").remove("p"); 
+        if (positionIndex < payload.length) { 
+            openModal('saveStatus');
+            var chunkPayload = "";
+            if(payload.length <= positionIndex + chunkSize) {
+                chunkPayload = payload.substring(positionIndex);
+                //calling controller remote action method processChunk()
+            Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.CMC_IncidentNotificationToolController.processChunk}',
+                                                      is24x7Type,parentId, attachmentId, attachmentName, chunkPayload, function(result, event) {
+                                                          
+                                                          // handling exception
+                                                          if(event.type === 'exception') {
+                                                              $j('#leftFilterSection').append('<p id="fileErrorId" style="color:red"> Error: An exception occured while processing file. Please try again. Error Message:'+event.message+'</p>');
+                                                              closeModal();
+                                                          }
+                                                          
+                                                          //on success
+                                                          else if(event.status) {
+                                                              positionIndex += chunkSize;
+                                                              
+                                                              //on error displaying error message
+                                                              if(result.indexOf("Error") >= 0){
+                                                                  $j('#leftFilterSection').append('<p id="fileErrorId" style="color:red"> Error: An exception occured while processing file. Please try again. Error Message:'+result+'</p>');
+                                                                  closeModal();
+                                                              }
+                                                              
+                                                              //on success creating hyperlink for attachement and adding remove file button
+                                                              else{
+                                                                  var downloadAttFile = window.location.href.substr(0, window.location.href.indexOf('my'))+'content.force.com/servlet/servlet.FileDownload?file=';
+                                                                  
+                                                                  //hyperlink for filters
+                                                                  if(slNo !== ""){
+                                                                      if($j("#filterWrapper").children().find("[data-title='filter-file']")[slNo].value !== ""){
+                                                                          //$j('.filterAttLinkCls').show();
+                                                                          $j("#filterWrapper").children().find("[data-title='attachmentLink']")[slNo].style.display ='inline-block';
+                                                                          $j("#filterWrapper").children().find("[data-title='attachmentLink']")[slNo].text = attachmentName.substring(0,25)+"...";
+                                                                          $j("#filterWrapper").children().find("[data-title='attachmentLink']")[slNo].href = downloadAttFile+result;
+                                                                          $j("#filterWrapper").children().find("[data-title='filter-value']")[slNo].style.display ='none';                                       
+                                                                          $j("#filterWrapper").children().find("[data-title='filter-file']")[slNo].style.display='none';
+                                                                          $j("button[id*='removeAtt']")[slNo].style.display = 'inline-block';
+                                                                          $j("#filterWrapper").children().find("[data-title='filter-file']")[slNo].disabled = true;
+                                                                          $j("input[id*=file-input]").eq(slNo).val('');
+                                                                      }
+                                                                  }
+                                                                  //hyperlink for manual email import email
+                                                                  else if($j("#CustomerContactOptionDivId").children().find('.importFileUploadClass').val() !== ""){
+                                                                      $j("#CustomerContactOptionDivId").children().find('.importFileUploadClass').hide();
+                                                                      $j("#CustomerContactOptionDivId").children().find('.removeImportAttCls').show();
+                                                                      $j("#CustomerContactOptionDivId").children().find('.importFileLinkCls')[0].text = attachmentName.substring(0,25)+"...";
+                                                                      $j("#CustomerContactOptionDivId").children().find('.importFileLinkCls')[0].href = downloadAttFile+result;
+                                                                      $j("#CustomerContactOptionDivId").children().find('.importFileLinkCls').show();
+                                                                      $j("input[id*=fileupload]").eq(0).val('');
+                                                                  }
+                                                                  
+                                                                  uploadChunk(is24x7Type,parentId, result, attachmentName, payload, positionIndex,slNo);
+                                                                  closeModal();
+                                                              }  
+                                                          }
+                                                              else {
+                                                                  $j('#leftFilterSection').append('<p id="fileErrorId" style="color:red"> Error: An exception occured while processing file. Please try again. Error Message:'+event.message+'</p>');
+                                                                  closeModal();
+                                                              }
+                                                      },
+                                                      {buffer: false, escape: true, timeout: 120000}
+                                                     );
+            }
+            else{
+                //chunkPayload = payload.substring(positionIndex, positionIndex + chunkSize);
+               $j('#leftFilterSection').append('<p id="fileErrorId" style="color:red"> Error: File content is too big to process. Please split the file among filters and try again.</p>');
+               closeModal();
+            }
+        }  
+        else {
+            numberOfFileProcessed += 1;
+            if(numberOfFileForProcessing == numberOfFileProcessed){
+                numberOfFileProcessed = 0;
+                numberOfFileForProcessing = 0;
+                afterSaveProcessing();
+            }                
+        }  
+    }
+    
+    //function to update ID in the URL
+    //called from oncomplete action function createMailer 
+    function updateURlWithID(){
+        $j("#mailerSaveSuccess").remove("p");
+        var newURL = 'CMC_IncidentNotificationTool?id='+$j("input[id*='mailerIdHidden']").val()+'#';
+        history.pushState("", "", newURL);
+        createDownloadLink();
+    }
+    
+    // building url for downloading valid, invalid, total email
+    function createDownloadLink(){
+        
+        //if filter is none then show emailCountHyperlinkSec on manual email section else accountCountUrl on filter section
+        //accountCountUrlAllCust
+        var allCustomerSelect = $j("input[id*='checkbox1']").parent().find("[data-title='All Customers']").is(':checked');
+        var selectedCustSelect = $j("input[id*='checkbox1']").parent().find("[data-title='Selected Customers']").is(':checked');
+        if(allCustomerSelect){
+            $j(".accountCountUrlAllCust").show();
+        }
+        else if(selectedCustSelect && $j("div[data-role='filter']").find("[data-title='filter-type']")[1].value !=="--None--"){
+            $j(".accountCountUrl").show();
+        }
+            else{
+                $j(".emailCountHyperlinkSec").show();
+            }
+        //$j("div[data-role='filter']").find("[data-title='filter-type']")[1].value ==="--None--" ? $j(".emailCountHyperlinkSec").show() : $j(".accountCountUrl").show();
+        
+        var validEmailCountURL = 'CMC_DownloadAsCSV?mailerId='+$j("input[id*='mailerIdHidden']").val()+'&download=validEmails';
+        var invalidEmailCountURL = 'CMC_DownloadAsCSV?mailerId='+$j("input[id*='mailerIdHidden']").val()+'&download=invalidEmails';
+        var totalAccountCountURL = 'CMC_DownloadAsCSV?mailerId='+$j("input[id*='mailerIdHidden']").val()+'&download=AccountDetails';
+        var totalPDCountURL = 'CMC_DownloadAsCSV?mailerId='+$j("input[id*='mailerIdHidden']").val()+'&download=PolicyDomainDetails';
+        var selectedAccType = $j("input[id*=checkboxContactType24]:checked").parent().children('label').text().trim();
+        var hyperlinkArr = $j(".emailCountHyperlinkSec").children();
+        $j("#totalAccontCountHref")[0].href =  selectedAccType === "Authorized Contacts" ? totalPDCountURL : totalAccountCountURL;
+        $j("#totalAccontCountHrefAllCust")[0].href = selectedAccType === "Authorized Contacts" ? totalPDCountURL : totalAccountCountURL;
+        
+        
+        for(var i=0;i<hyperlinkArr.length;i++){
+            if($j(".emailCountHyperlinkSec").children()[i].id == "validEmailID"){
+                $j(".emailCountHyperlinkSec").children()[i].href = validEmailCountURL;
+            }
+            else if($j(".emailCountHyperlinkSec").children()[i].id == "invalidEmailID"){
+                $j(".emailCountHyperlinkSec").children()[i].href = invalidEmailCountURL;
+            }
+        }  
+    }
+    
+    
+    //functionto enable Peer Review Button, called after send test email
+    function enablePeerReviewButton(){
+        if($j("[id*='CMCApprovalStatusId']")[0].value !== 'Approved' && $j("[id*='msg1']").text() === ''){
+            $j("input[id*='PeerReview']").removeAttr('disabled').removeClass('btnDisabled').addClass('btn');
+        }
+    }  
+    
+    //function to show the peer review section when SI is populated and Mailer Id is created 
+    function showPeerReviewSection(){
+        $j("#peerReviewErrorId").remove("p");
+        var showPeerReviewSec = $j("input[id*=testEmailSentId]").val();        
+        var CMCSINumber = $j("[id*= 'CMCSINumber']").val()
+        if(showPeerReviewSec && (CMCSINumber != "000000000000000" || CMCSINumber != "") && window.location.href.split('?id=')[1] !== undefined){
+            $j(".peerReviewBlock").show();   
+        }
+        else{
+            $j("#displayTemplateError").append('<p id="peerReviewErrorId" style="color:red">Error:SI Number is mandatory. Please populate the SI Number to show Peer Review Section.</p>');
+        }
+    }
+    
+    //function to set filter section to Read Only on Approved  
+    function setFiltersSectionToReadOnly(){ 
+        var approvalStatus = $j("select[id*=CMCApprovalStatusId]")[0].value;
+        if(approvalStatus == 'Approved'){
+            $j('div.CustomerContactOptionDiv input').attr('disabled',true);
+            $j('div.completeFilterSection select').attr('disabled',true);
+            $j('div.completeFilterSection input').attr('disabled',true);
+            $j('div.peerReviewBlock img').attr('hidden',true);
+            $j('div.peerReviewBlock input').attr('disabled',true);
+            $j('div.peerReviewBlock option').attr('disabled',true);
+            $j('div.peerReviewBlock textarea').attr('disabled',true);
+            $j("input[id*='PeerReview']").addClass('btnDisabled')
+            $j("input[id*='SendMailer']").removeAttr('disabled').removeClass('btnDisabled').addClass('btn');
+            $j("input[id*='SendTestEmail']").removeAttr('disabled').removeClass('btnDisabled').addClass('btn');
+            $j('div.wrapManualEmailHide input').attr('disabled',true);
+            $j('div.wrapManualEmailHide textarea').attr('disabled',true);
+            $j('div.wrapManualEmailHide button').attr('disabled',true);
+            $j('.toggle-btn').children().prop('disabled',true);
+            $j('.importFileUploadClass').prop('disabled',true);
+            $j('.emailTextSection textarea').prop('disabled',true);
+            $j('div.completeFilterSection button').attr('disabled',true);
+            $j("input[id*='RecipientReport']").removeClass('btnDisabled').addClass('btn');
+            $j("input[id*='RecipientReport']").prop('disabled',false);
+            $j("[id*='CMCSINumber']").parent().find("a").hide();
+            $j("input[id*='CMCSINumber']").attr('disabled',true);
+            $j("[id*='peerReviewUser']").prop('disabled',true);
+            $j("[id*='CMCApprovalStatusId']").prop('disabled',true)
+        }
+        else{
+            $j('div.CustomerContactOptionDiv input').attr('disabled',false);
+            $j('div.completeFilterSection select').attr('disabled',false);
+            $j('div.completeFilterSection input').attr('disabled',false);
+            $j('div.peerReviewBlock img').attr('hidden',false);
+            $j('div.peerReviewBlock input').attr('disabled',false);
+            $j('div.peerReviewBlock option').attr('disabled',false);
+            $j('div.peerReviewBlock textarea').attr('disabled',false);
+            $j('div.completeFilterSection button').attr('disabled',false);
+            for(var i=1;i<$j("div[data-role='filter']").length;i++){
+                if($j("div[data-role='filter']").find("[data-title='filter-condition']")[i].value !== "In"){
+                    $j('div.completeFilterSection #file-input')[i].disabled = true; 
+                }
+            }
+        }
+    }
+    
+    
+    //function to set Hidden Approval status to update only Email Template Section
+    function setApprovalStatus(){
+        $j("input[id*='mailerApprovedId']").val(true);
+    }
+    
+    
+    //function to show loading image on click of Validate and Save
+    function openModal(statusInput) {
+        document.getElementById('fade').style.display = 'block';
+        
+        if(statusInput == "saveStatus"){
+            document.getElementById('saveStatus').style.display = 'block';
+            document.getElementById('sendEmailStatus').style.display = 'none';
+            document.getElementById('onLoad').style.display = 'none';
+        }
+        else if(statusInput == "sendEmailStatus"){
+            document.getElementById('saveStatus').style.display = 'none';
+            document.getElementById('sendEmailStatus').style.display = 'block';
+            document.getElementById('onLoad').style.display = 'none';
+        }
+            else if(statusInput == "onLoad"){
+                document.getElementById('onLoad').style.display = 'block';
+                document.getElementById('saveStatus').style.display = 'none';
+                document.getElementById('sendEmailStatus').style.display = 'none';
+            }
+                else{
+                    document.getElementById('saveStatus').style.display = 'none';
+                    document.getElementById('fade').style.display = 'none';
+                    document.getElementById('sendEmailStatus').style.display = 'none';
+                    document.getElementById('onLoad').style.display = 'none';
+                }
+        return false;          
+    }
+    
+    
+    //function to disable loading image 
+    function closeModal() {
+        document.getElementById('sendEmailStatus').style.display = 'none';
+        document.getElementById('saveStatus').style.display = 'none';
+        document.getElementById('fade').style.display = 'none';
+        document.getElementById('onLoad').style.display = 'none';
+        return false;
+    }
+    
+    //function to remove file URL and bring Value field back
+    function removeFileURL(event){            
+        $j(event.closest("div")).find('.filterValCls').show();
+        $j(event.closest("div")).find('.filterFileCls').show();
+        $j(event.closest("div")).find('.filterAttLinkCls').hide();
+        $j(event.closest("div")).find('.removeAttCls').hide();        
+        $j(event.closest("div")).find('.filterFileCls').val("");
+        $j(event.closest("div")).find('.filterFileCls').prop('disabled',"");
+        $j(event.closest("div")).find("[data-title='attachmentLink']")[0].text ="";
+        $j(event.closest("div")).find("[data-title='attachmentLink']")[0].href ="";
+        $j(event.closest("div")).find("[data-title='filter-type']")[0].disabled = false;
+        $j(event.closest("div")).find("[data-title='filter-condition']")[0].disabled = false;
+        $j(event.closest("div")).find("[data-title='filterId']")[0].value = "removed";
+    }
+    
+    //function to remove file URL from import file section
+    function removeImportFileURL(event){
+        $j(event.closest("div")).find('.importFileUploadClass').show();
+        $j(event.closest("div")).find('.removeImportAttCls').hide();
+        $j(event.closest("div")).find('.removeImportAttCls').val("");
+        $j("#CustomerContactOptionDivId").children().find('.importFileLinkCls').hide();
+        $j("#CustomerContactOptionDivId").children().find('.importFileLinkCls').text("");
+        $j("#CustomerContactOptionDivId").children().find('.importFileLinkCls').href=("");
+        $j("#CustomerContactOptionDivId").children().find('.importFileUploadClass')[0].value ="";
+        $j(event.closest("div")).find("[data-title='filterUploadId']")[0].value = true; 
+    }
+    
+    //function to set filter ID on each filters after Save
+    function setFilterIdOnEachFilter(){
+        var updatedFilterJSON = validateAndCreateJSONFilters();
+        var mailerIdForUpdate = $j("input[id*='mailerIdHidden']").val(); 
+        if(updatedFilterJSON != undefined && updatedFilterJSON["isValid"]){                  
+            updateFilterJSONWithId(JSON.stringify(updatedFilterJSON["controllerData"]),mailerIdForUpdate);
+            console.log('JSON-New:'+JSON.stringify(updatedFilterJSON["controllerData"]),mailerIdForUpdate);
+        }
+    }
+    
+    //On Complete of Save
+    function onCompleteSaveMailer(buttonEvent){
+        if(buttonEvent == 'saveMailer'){            
+            var isErrored = $j("[id*='msg1']").text();
+            var numberOfFile = 0;
+            for(var i=0;i <= $j("input[id*=file-input]").length -1;i++){
+                if($j("input[id*=file-input]")[i].value !== ""){
+                    numberOfFile += 1;
+                }
+            }
+            if(isErrored === ""){
+                if(numberOfFile > 0 || $j("input[id*=fileupload]").eq(0).prop('files')[0] !== undefined){
+                    uploadFileAtt(); 
+                }
+                else{
+                    afterSaveProcessing();
+                }
+            }
+            else{
+                closeModal();
+            }
+        }
+        else{
+            sendTestEmailValidation('sendMailer');
+            closeModal();
+            
+            // Opening preview pop up window when called from send mailer button  
+            if($j('#displayTemplateError').children("#peerReviewErrorId").length == 0 
+               && $j('#displayTemplateError').children("#ErrorId").length == 0
+               && $j('#displayTemplateError').children("#templateErrorId").length == 0){
+                openSendMailerPopUp('{!$Page.CMC_EmailPreview}');
+            }
+            else{
+                $j('#NotificationContentDivId').append('<p id="mailerSaveSuccess" style="color:red">Error: Mailer not saved. Please fix all the errors and click Save. </p>');  
+            }
+        }
+    }
+    
+    //post save processing
+    function afterSaveProcessing(){
+        if($j("[id*='CMCApprovalStatusId']")[0].value === 'Approved'){
+            $j(".modalCreateMailer b#textModalId").text('Creating Mailer..');//changing modal text when saved after approved 
+        }
+        replaceFilterIDRemoved();
+        setFiltersSectionToReadOnly();
+        updateURlWithID();
+        setFilterIdOnEachFilter();
+        queryBuildForAttachment();
+        enabledSendTestEmailButton('afterSave');
+        if($j("[id*='successStatus']").length == 0) {$j('.validateAndSaveStatus').append('<p id="successStatus" style="color:green">Success: Mailer Saved Successfully. </p>');}
+        setTimeout(function() {$j("[id*='successStatus']").remove("p");}, 1000);                  
+    }
+    
+    // Removing Id from filter when remove file button is clicked
+    function replaceFilterIDRemoved(){
+        var allFilters = $j("div[data-role='filter']");
+        if(allFilters !== ''){
+            for (var i = 1; i < allFilters.length; i++) {
+                if($j("div[data-role='filter']").find("[data-title='filterId']")[i].value ==='removed'){
+                    $j("div[data-role='filter']").find("[data-title='filterId']")[i].value = ''; 
+                }
+            }
+        }
+    }
+    
+    //Reloading the page with new data without refreshing the page
+    function callReloadMethod(){
+        var JSONStringReload = $j("[id*='savedJSONString']").val();
+        var fileAttachmentIdReload = $j("[id*='allFileAttachmentId']").val();
+        var onLoadtemplateNameReload = "{!templateName}" === '' ? "{!mailerSubject}" : "{!templateName}";
+        var onLoadSINumberReload = "{!onLoadSINumber}";
+        var onReloadEvent = 'onReLoad';
+        if(JSONStringReload !== ""){
+            reloadFormWithData(JSONStringReload,fileAttachmentIdReload,onLoadtemplateNameReload,onLoadSINumberReload,onReloadEvent);
+        }
+    }
+    
+    //function to open Send Mailer Pop Up
+    var popup = '';
+    function openSendMailerPopUp(page){
+        if(popup === ''){
+            popup = window.open(page+'?mailerId='+$j("input[id*='mailerIdHidden']").val(),'_blank','toolbar=no, scrollbars=yes, resizable=yes, top=300, left=500, width=900, height=800');
+            if (popup == null || typeof(popup)=='undefined') {  
+                alert('Please disable your pop-up blocker, refesh the page and click the "Preview and Send Mailer" button again.'); 
+            } 
+            else {  
+                popup.focus();
+            }
+            //if(window.focus) {popup.focus();}
+        }
+        else if(!popup.closed){
+            popup.close();
+            popup = window.open(page+'?mailerId='+$j("input[id*='mailerIdHidden']").val(),'_blank','toolbar=no, scrollbars=yes, resizable=yes, top=300, left=500, width=900, height=800');
+        }
+            else{
+                popup = window.open(page+'?mailerId='+$j("input[id*='mailerIdHidden']").val(),'_blank','toolbar=no, scrollbars=yes, resizable=yes, top=300, left=500, width=900, height=800');
+            }
+        return false;
+    }
+    
+    //function to disabled all fields and button when send mailer is clicked on pop up window
+    function HandlePopupResult(result) {
+        if(result === "sendMailerId"){
+            $j("[id*='pb'] input").attr('disabled',true);
+            $j("[id*='pb'] select").attr('disabled',true);
+            $j("input[id*='pb'].btn").attr('disabled',true).removeClass('btn').addClass('btnDisabled');  
+            $j(".outerProgressBarClass")[0].style.display = 'block';
+            document.getElementById('fade').style.display = 'block';
+            invokePoller();
+            
+        }
+    }
+    
+    //function for building progress bar
+    function incrementCount(){
+        $j("#progressBarText").text($j("[id*='mailerStatus']").val());
+        var width = $j("[id*='completionPercentageId']").val();
+        if(width < 100 && width > 0){
+            $j("#progressBar").width(width+'%');
+            $j(".outerProgressBarClass")[0].style.display = 'block';
+            document.getElementById('fade').style.display = 'block';
+            $j("#progressBar").show();
+        }
+        else if(width == 100){
+            $j("#progressBar").width(100+'%');
+            $j("#progressBar").show();               
+            setTimeout(function() { alert("Mailer Processed. Redirecting To Detail Page.");window.location.href = "/"+$j("input[id*='mailerIdHidden']").val();},1000);                
+        }
+            else if(width > 100){
+                setTimeout(function() { alert("Email Sent - Failed to Process Contacts. Redirecting To Detail Page.");window.location.href = "/"+$j("input[id*='mailerIdHidden']").val();},1000);
+            }
+    }
+    
+    // function to show peer review section when editing on the same page
+    function validateSINumber(calledFrom){
+        $j("[id*='msg1']").text('');
+        $j("#peerReviewErrorId").remove("p");
+        $j("#peerReviewEmailErrorId").remove("p");
+        $j("#peerReviewAccountErrorId").remove("p");
+        
+        //authorized Contact/24x7 or Manual Email :authorized Contact/24x7 uses sames error msg
+        var accSelection = $j("input[id*=checkboxContactType24]:checked").parent().children('label').text().trim();
+        var is24x7AuthorizedSection;
+        if(accSelection === 'Authorized Contacts' || accSelection === '24x7 Contact Types'){
+            is24x7AuthorizedSection = true;
+        }
+        else{
+            is24x7AuthorizedSection = false;
+        }
+        
+        //Get number of valid emails
+        var emailCount = $j("[id*= ':validEmailCount']")[0].innerText;
+        //Get number of accounts which are satisfying the filter condition
+        var accountCount = $j("[id*= ':totalAccountCount']")[0].innerText;
+        //Type of customer selection
+        var is24x7Selected = is24x7AuthorizedSection;//$j("input[id*='checkboxContactType24']").prop('checked');
+        //SI number
+        var siNumber = $j(" input[id*='CMCSINumber']").last().val();
+        
+        if(is24x7Selected == false && emailCount == "0"){
+            if(calledFrom === "peerReview"){
+                $j('.wrapManualEmailHide').append('<p id="peerReviewEmailErrorId" style="color:red">Error: Number of Valid Email Addresses are 0. Please provide valid Email Addresses to show Peer Review Section.</p>');
+            }
+            else if(calledFrom === "sendMailer"){
+                $j('.wrapManualEmailHide').append('<p id="peerReviewEmailErrorId" style="color:red">Error: Number of Valid Email Addresses are 0. Please create new Mailer with valid Email Addresses.</p>');
+            }
+        }
+        else if(is24x7Selected == true && accountCount == "0"){
+            if(calledFrom === "peerReview"){
+                if(accSelection === '24x7 Contact Types')
+                    $j('#leftFilterSection').append('<p id="peerReviewAccountErrorId" style="color:red">Error: Number of Accounts selected are 0. Please update the filters to show Peer Review Section.</p>');
+                else if(accSelection === 'Authorized Contacts')
+                   $j('#leftFilterSection').append('<p id="peerReviewAccountErrorId" style="color:red">Error: Number of Policy Domains selected are 0. Please update the filters to show Peer Review Section.</p>');
+            }
+            else if(calledFrom === "sendMailer"){
+                if(accSelection === '24x7 Contact Types')
+                	$j('#leftFilterSection').append('<p id="peerReviewAccountErrorId" style="color:red">Error: Number of Accounts selected are 0. Please create new Mailer with valid Filters.</p>');
+                else if(accSelection === 'Authorized Contacts')
+                    $j('#leftFilterSection').append('<p id="peerReviewAccountErrorId" style="color:red">Error: Number of Policy Domains selected are 0. Please create new Mailer with valid Filters.</p>');
+            }
+        }
+        else if(siNumber != ""){
+            $j("[id*='msg1']").hide();
+            ValidateSINumber(siNumber);
+            if(calledFrom === "peerReview" && $j("[id*='msg1']").text()===""){
+                showPeerReviewSection();
+            }
+        }
+        else{
+            if(calledFrom === "peerReview"){
+                $j("#displayTemplateError").append('<p id="peerReviewErrorId"style="color:red">Error:SI Number is mandatory. Please populate the SI Number to show Peer Review Section.</p>');
+            }
+            else if(calledFrom === "sendMailer"){
+                $j("#displayTemplateError").append('<p id="peerReviewErrorId"style="color:red">Error:SI Number is mandatory. Please populate the SI Number to Send Mailer.</p>');
+            }
+            else{
+                $j("#displayTemplateError").append('<p id="peerReviewErrorId"style="color:red">Error:SI Number is mandatory. Please populate the SI Number.</p>'); 
+            }
+        }
+    }
+    
+    
+    function openExceptionReport(){
+        var preMailerErrReportId = $j("[id*='preMailerErrorReportId']").val();
+        if(window.location.href.split('?id=')[1] !== undefined){
+            window.open("/"+preMailerErrReportId+"?pv0="+$j("[id*='mailerName']").val());
+        }
+    }
+    
+    function enabledSendTestEmailButton(emailTemplateEvent){
+        if(($j("[id*='CMCTemplateName']")[0].value !=="" || ($j.trim($j("[id*='CMCDescription']").parent().find("iframe").contents().find('body').text()) !== "" && $j("[id*= 'CMCSubject']").val() != "")) && window.location.href.split('?id=')[1] !== undefined){
+            $j("input[id*='SendTestEmail']").removeClass('btnDisabled').addClass('btn');
+            $j("input[id*='SendTestEmail']").prop('disabled','');
+        }
+    }
+    
+    function emailAlertMsg(){
+        if($j("[id*='msg1']").text() === ''){
+            alert('Email Sent Successfully.');
+        } 
+        else{
+            alert('Email Not Sent.');
+        }
+    }
+    
+    </script> 
+</apex:page>

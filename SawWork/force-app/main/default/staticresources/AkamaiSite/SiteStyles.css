@@ -1,0 +1,119 @@
+.topPanelContainer {
+	text-align:left;
+	border:1px solid #ccc;
+}
+
+.topPanel {
+    background-color: white;
+    border: 0px solid #ccc;
+    padding-left:5px;
+    padding-right:5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 5px;
+    height:100%;
+}
+
+.topPanelright {
+    background-color: white;
+    border: 1px solid #ccc;
+    padding-left:5px;
+    padding-right:5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 10px;
+    height:100%;
+}
+
+.title {
+    font-size: larger;
+    font-weight: bold;
+}
+
+.poweredByImage {
+	vertical-align: middle;
+	margin:12px 8px 8px 0;
+}
+
+img {
+    border: none;
+}
+
+
+.header_1 {
+	color: #FFF;
+	font-size: 21px;
+	font-weight: bold;
+}
+.header_2 {
+	color: #FFF;
+	font-size: 21px;
+	font-weight: normal;
+}
+.header_3 {
+	color: #FFF;
+	font-size: 12px;
+	font-weight: normal;
+}
+
+.copy {
+	color: #FFF;
+	font-size: 12px;
+	font-weight: bold;
+	line-height: 1.5;
+}
+.copy_b {
+	color: #CCC;
+	font-size: 12px;
+	font-weight: normal;
+	line-height: 1.2;
+}
+.fieldHolder
+{
+	width: 307px;
+	height: 51px;
+	background: url(img/form_bg.png) no-repeat;
+	float: left;
+}
+*:focus {outline: none;}
+.textInput
+{
+	width: 280px;
+	height: 51px;
+	background: none;
+	border: none;
+	color: #444444;
+	font-size: 20px;
+	margin-top: -5px;
+	padding-left: 10px;
+}
+
+.textInput2
+{
+	width: 280px;
+	height: 51px;
+	background: none;
+	border: none;
+	color: #444444;
+	font-size: 20px;
+	margin-top: -6px;
+	padding-left: 10px;
+}
+#LoginBtn{
+ background:url(img/login_off.png) no-repeat;
+ 
+    width: 126px;
+    height: 57px;
+    border: none;
+
+}
+#LoginBtn:hover{
+ background:url(img/login_over.png) no-repeat;
+ 
+    width: 126px;
+    height: 57px;
+    border: none;
+
+}

@@ -1,0 +1,83 @@
+<apex:page controller="IRCaseLockScreenController" tabStyle="Draft_Invoice__c" sidebar="false" showHeader="true" lightningStylesheets="true">
+<style>
+    /* This is for the full screen DIV */
+    .popupBackground {
+        /* Background color */
+        background-color:black;
+        opacity: 0.20;
+        filter: alpha(opacity = 20);
+    
+        /* Dimensions */
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 998;
+        position: absolute;
+        
+        /* Mouse */
+        cursor:wait;
+    }
+ 
+    /* This is for the message DIV */
+    .PopupPanel {
+        /* Background color */
+        border: solid 2px blue;
+        background-color: white;
+ 
+        /* Dimensions */
+        left: 50%;
+        width: 200px;
+        margin-left: -100px;
+        top: 50%;
+        height: 50px;
+        margin-top: -25px;
+        z-index: 999;
+        position: fixed;
+
+        /* Mouse */
+        cursor:pointer;
+    }
+</style>
+  <br/>
+  <h1 style="font-size:150%">Invoice Review Cases Lock Screen</h1>
+  <br/>
+  <apex:actionStatus id="statusSaveTrip" stopText="">
+    <apex:facet name="start">
+        <div>
+            <div class="popupBackground" />
+            <div class="PopupPanel">
+                <table border="0" width="100%" height="100%">
+                    <tr>
+                        <td align="center"><b>Please Wait</b></td>
+                    </tr>
+                    <tr>
+                        <td align="center"><img src="{!$Resource.ProgressBarPackman}"/></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </apex:facet>
+  </apex:actionStatus>
+  <apex:form id="myForm">
+   <apex:pageBlock id="LockScreen">
+        <apex:pageMessages id="PageMessages"/>
+        <div class='Warning' style="color:red">
+            <b>IMPORTANT! Please ensure you have the correct Invoice Review Cycle Date Range. On button click, cases will be locked for specified Date Range alone and this cannot be undone.</b>
+        </div>
+        <apex:pageBlockSection title="Final Final">
+            <apex:pageBlockSectionItem >
+                <apex:outputText value="Invoice Review Cycle Start Date"/>
+                <apex:inputField value="{!dummyCase.IR_Invoice_Date__c }" required="false" onkeypress="return noenter(event);"/>
+            </apex:pageBlockSectionItem>
+             <apex:pageBlockSectionItem >
+                 <apex:outputText value="Invoice Review Cycle End Date"/>
+                 <apex:inputField value="{!dummyCase.IRCache_Acceptance_Date__c}" required="false" onkeypress="return noenter(event);"/>
+            </apex:pageBlockSectionItem>
+        </apex:pageBlockSection>
+         <apex:pageBlockButtons location="bottom" id="pageButtons">
+             <apex:commandButton action="{!submit}" rerender="myForm" value="Lock Cases" status="statusSaveTrip"/>
+        </apex:pageBlockButtons>
+    </apex:pageBlock>
+  </apex:form>
+</apex:page>

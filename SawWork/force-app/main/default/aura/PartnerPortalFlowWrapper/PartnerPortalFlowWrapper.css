@@ -1,0 +1,80 @@
+.THIS {
+    background-color: white !important;
+}
+
+.THIS .body {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.THIS .flow_container{
+    background-color: white !important;
+    min-height: 500px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+}
+
+.THIS .slds-card__header-link{
+    font-size: 20px;
+    padding-bottom: 15px;
+}
+
+.THIS .slds-form-element__label {
+    font-size: 15px !important;
+    padding-bottom: 10px !important;
+}
+
+.THIS .slds-rich-text-editor__output {
+    font-family: Ubuntu-Light;
+    font-size: 15px !important;
+}
+
+.THIS .slds-grid header {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    text-align: center;
+}
+
+.THIS .slds-form-element__legend {
+    font-size: 18px;
+}
+
+.THIS .flowruntimeDisplayText {
+    font-size: 17px !important;
+    padding-bottom: 10px !important;
+}
+
+.THIS .uiInput--textarea {
+    height: 70px;
+    width:775px;
+    font-size: 15px;
+    font-family: Ubuntu-Light;
+}
+
+.THIS .slds-form-element__control {
+    font-size: 15px;
+    font-family: Ubuntu-Light;
+}
+
+.THIS .slds-input {
+    height:30px;
+}
+
+.THIS .slds-m-bottom_x-small {
+    padding-bottom: 15px;
+}
+
+.THIS .slds-button {
+    width: 100px;
+    height:30px;
+    font-size: 15px;
+}
+
+.THIS .slds-card__footer {
+    padding-right: 28px;
+}
+
+.THIS .slds-button_icon {
+    width:10px;
+    height:10px;
+}

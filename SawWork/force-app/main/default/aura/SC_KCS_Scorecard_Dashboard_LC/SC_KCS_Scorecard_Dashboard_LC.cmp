@@ -1,0 +1,163 @@
+<!--=====================================================================================================+
+    Component name      :   SC_KCS_Scorecard_Dashboard_LC   
+    Author              :   Supreeth
+    Created             :   18-Feb-19
+    Purpose             :  Scorecard dashboard create and edit
+             
+    Last Modified         Developer                 Purpose            
+    ============= ========================         ==========
+    18-FEB-19       Supreeth                        ESESP-1779
+    22-Sep-19       Pinkesh                         ESESP-2316: Quality Coaching Create/Edit button
++=====================================================================================================-->
+
+<aura:component implements="lightning:actionOverride,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:utilityItem" controller="SC_KCS_Scorecard_Dashboard" access="global">
+    <!-- attributes -->
+    <aura:attribute name="sourceId" type="String"/>
+    <aura:attribute name="sourceType" type="String"/>
+    <aura:attribute name="parentType" type="String"/>
+    
+    <!--1. To store the list of Scorecard criteria.-->
+    <aura:attribute name="Scorecard_Criteria_List" type="List"/>
+
+    <!--2. To store the  Scorecard object.-->
+    <aura:attribute name="Scorecard_obj" type="Object" default="[]"/>
+
+    <!--3. To store the  label of the save button. Label changes dynamically during action call.-->
+    <aura:attribute name="Dynamic_button_label" type="String" default="Save"/>
+    
+    <!--4. To check if the save button should be disabled-->
+    <aura:attribute name="Is_save_button_disabled" type="Boolean" />
+    
+     <aura:attribute name="User_Authorized" type="Boolean" default="false"/>
+    
+    <lightning:spinner aura:id="mySpinner" variant="brand" size="large"/>
+    
+    <!-- for utility functions -->
+    <lightning:utilityBarAPI aura:id="utilitybar" />
+    
+  
+    <ltng:require styles="{! $Resource.SC_Akatec_LightningMigration +'/SC_Akatec_Lightning_Resource/CSS/popup.css'}" />
+    
+   
+   <!-- initialization-->
+    <!--<aura:handler name="init" value="{! this }" action="{! c.init }"/>-->
+    
+    <!-- Method to get and populate the data. Called from the Utility Component -->
+    <aura:method name="getData" description="Method to populate the data">
+        <aura:attribute name="sourceId" type="String" />
+        <aura:attribute name="sourceType" type="String" />
+        <aura:attribute name="parentType" type="String" />
+    </aura:method>
+
+<aura:if isTrue="{!v.User_Authorized}">
+    <div class="slds-p-around_small">
+        <!-- Begin of Table-->
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered" style="width:100%">
+           <!-- table heading-->
+           <thead>
+                <tr class="slds-line-height_reset">
+                    
+                    <th class="slds-text-title_caps" scope="col">
+                        <div class="slds-truncate" >Criteria No.</div>
+                    </th>
+                    <th class="slds-text-title_caps" scope="col">
+                        <div class="slds-truncate" >Criteria Name</div>
+                    </th>
+                    <th class="slds-text-title_caps" scope="col">
+                        <div class="slds-truncate" >Points</div>
+                    </th>
+                    <th class="slds-text-title_caps" scope="col">
+                        <div class="slds-truncate" >Response</div>
+                    </th>
+                    <th class="slds-text-title_caps" scope="col">
+                        <div class="slds-truncate" >Fixed</div>
+                    </th>
+                </tr>
+            </thead>
+             <!-- table Body-->
+            <tbody id="myTable">
+                <aura:iteration items="{!v.Scorecard_Criteria_List}" var="kcs">
+                    <tr class="slds-hint-parent" style="height:50px;">
+                        
+                        <td>
+                            <div class="slds-truncate">
+                                {!kcs.Criteria_Number__c}
+                            </div>
+                        </td  >
+                        <td style="">
+                            <div class="slds-truncate">
+                                {!kcs.Criteria_Name__c}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="slds-truncate">
+                                {!kcs.Points__c}
+                            </div>
+                        </td>
+                        <td style="width: 150px; overflow: hidden;" >
+                            <!-- Logic for thumbs up coloring-->
+                            <div style="width:50px; float:left;">
+                                <aura:if isTrue="{!kcs.Response__c=='Good'}">
+                                    <img src="{!$Resource.SC_Akatec_LightningMigration +'/SC_Akatec_Lightning_Resource/Images/like_green.png'}" style="width: 30px;border-radius: 1px;
+    " id="{!kcs.Criteria_Number__c}" onclick ="{!c.uncheckgood}" />
+                                
+                                </aura:if>
+                                <aura:if isTrue="{!kcs.Response__c != 'Good'}" >
+                                
+                                    
+                                      <img src="{!$Resource.SC_Akatec_LightningMigration +'/SC_Akatec_Lightning_Resource/Images/like.png'}" style="width: 30px;border-radius: 1px;
+      " id="{!kcs.Criteria_Number__c}" onclick ="{!c.checkgood}"/>
+                               </aura:if>
+                            </div>
+                            <!-- Logic for thumbs down coloring-->
+                            <aura:if isTrue="{!kcs.Response__c=='Need Fix'}">
+                             
+                                
+                                  <img src="{!$Resource.SC_Akatec_LightningMigration +'/SC_Akatec_Lightning_Resource/Images/dislike_red.png'}" style="width: 30px;border-radius: 1px;" id="{!kcs.Criteria_Number__c}" onclick ="{!c.uncheckbad}" />
+                              
+                                <aura:set attribute="else">
+                                   
+                                      <img src="{!$Resource.SC_Akatec_LightningMigration +'/SC_Akatec_Lightning_Resource/Images/dislike.png'}" style="width: 30px;border-radius: 1px;" id="{!kcs.Criteria_Number__c}" onclick ="{!c.checkbad}"/>
+                          
+                                </aura:set>
+                            </aura:if>
+                        </td>
+                        <td style="width: 150px; overflow: hidden;"  >
+                            <div style="width:75px; float:left;">
+                                <!-- Logic for checkbox filling-->
+                                <aura:if isTrue="{!kcs.Fixed__c==false}">
+                               
+                                     
+                                     <img src="{!$Resource.SC_Akatec_LightningMigration +'/SC_Akatec_Lightning_Resource/Images/empty.png'}" style="width: 30px;" id="{!kcs.Criteria_Number__c}" onclick ="{!c.checkFixed}"/>
+                     
+                                </aura:if>
+    
+                                <aura:if isTrue="{!kcs.Fixed__c == true}" >
+                                
+                                     <img src="{!$Resource.SC_Akatec_LightningMigration +'/SC_Akatec_Lightning_Resource/Images/task2.png'}" style="width: 30px;" id="{!kcs.Criteria_Number__c}" onclick ="{!c.uncheckFixed}"/>
+                     
+                                </aura:if>
+                            </div>
+                        </td>
+                    </tr>
+                </aura:iteration>  
+            </tbody>
+        </table>
+        <!-- End of table. -->
+        <br/>
+        
+        <!-- Input text area for notes-->
+        <div class="slds-p-around_small">
+            <h6 style="font-size: 15px !important;"> <b>Notes</b></h6>
+            <lightning:textarea name="input3" required="true" placeholder="type your notes here..."  value="{!v.Scorecard_obj.Notes__c}"/>
+        </div>
+        <br/>
+       
+       <!-- Save button-->
+        <div align="center">  
+            <lightning:button variant="brand" label="{!v.Dynamic_button_label}" onclick="{! c.Save_Scorecard }" disabled ="{!v.Is_save_button_disabled}" />
+        </div>   
+    </div>
+    </aura:if>
+   
+</aura:component>

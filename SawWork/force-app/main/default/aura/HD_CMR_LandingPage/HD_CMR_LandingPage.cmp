@@ -1,0 +1,32 @@
+<aura:component controller="HD_CMR_ChangeCalendar"
+  implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+
+  <!--aura dependencies -->
+  <aura:dependency resource="c:HD_CMR_Calendar" />
+  <aura:dependency resource="c:HD_CMR_IndexRecordPage" />
+  <!--aura dependencies -->
+
+
+  <!-- event handlers -->
+  <aura:handler event="c:HD_CMR_View_Change" action="{!c.changeView}" name="HD_CMR_View_Change" />
+  <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+  <!-- -->
+
+
+  <!-- Logic to render the default view (Calendar/Index) page -->
+  <!-- This also controls the rendering of the desired view (Calendar/Index) : handled by events -->
+  <aura:attribute name="current_view" default="cal" type="string" />
+  <aura:attribute name="showNewUI" default="false" type="Boolean" />
+  <aura:if isTrue="{!v.showNewUI}">
+    <c:hd_CMR_Console></c:hd_CMR_Console>
+    <aura:set attribute="else">
+      <aura:if isTrue="{!v.current_view == 'cal'}">
+        <c:HD_CMR_Calendar />
+        <aura:set attribute="else">
+          <c:HD_CMR_IndexRecordPage />
+        </aura:set>
+      </aura:if>
+    </aura:set>
+  </aura:if>
+
+</aura:component>

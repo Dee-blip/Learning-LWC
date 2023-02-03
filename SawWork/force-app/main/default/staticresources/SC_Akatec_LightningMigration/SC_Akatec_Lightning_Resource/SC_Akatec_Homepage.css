@@ -1,0 +1,95 @@
+.textInputStyle .slds-input
+{
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    border-bottom: 1px solid #000000;
+}
+
+.filterStyle a
+{
+    padding: 0 !important;
+}
+
+.inlinecheckbox .slds-checkbox
+{
+	display: inline !important;
+}
+
+.EscinQmenu .slds-dropdown
+{
+    min-width : 30rem !Important;
+    max-width: 30rem !important;
+}
+
+.EscinQmenu .slds-dropdown_length-with-icon-10, .slds-dropdown--length-with-icon-10
+{
+    overflow-y: hidden !Important;
+    max-height : 20rem;
+    border: 1px solid #a7a9ab;
+}
+
+.CasesinQmenu .slds-dropdown
+{
+    min-width : 60rem !Important;
+    max-width: 60rem !important;
+}
+
+.CasesinQmenu .slds-dropdown_length-with-icon-10, .slds-dropdown--length-with-icon-10
+{
+    overflow-y: hidden !Important;
+    max-height : 30rem;
+    border: 1px solid #a7a9ab;
+}
+
+.slds-icon-action-filter
+{
+    background-color:#057398 ;
+}
+
+.slds-icon-standard-work-plan-rule
+{
+	background-color: #0079bc !important;
+}	
+
+.btnheight
+{
+    height: 22.22222px !important;
+}
+
+.Orange
+{
+	color: Orange !important;
+}
+
+.Green
+{
+	color:Green !important;
+}
+
+.Grey
+{
+	color: Grey !important;
+}
+
+.Purple
+{
+	color: Purple !important;
+}
+
+.datatableStyle .slds-scrollable_y
+{
+    height: inherit !important;
+}
+
+.datatableStyle
+{
+    overflow: auto;
+    padding-top: 1.5vh;
+    /*zoom: 90%;*/
+}
+
+.rightAlign
+{
+    text-align: right;
+}

@@ -1,0 +1,5 @@
+<apex:page standardController="Deployment_Step__c">
+  <apex:outputPanel >
+  <iframe src="https://bugzilla.akamai.com/show_bug.cgi?id={!Deployment_Step__c.CR_Number__c}" height="500px" width="100%"/>
+  </apex:outputPanel>
+</apex:page>

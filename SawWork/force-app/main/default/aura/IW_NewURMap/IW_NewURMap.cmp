@@ -1,0 +1,139 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickAction,lightning:actionOverride" access="global" controller="IW_NewUserRegionCntrl">
+    <aura:attribute Name="userRec" type="object" access="public"/>
+    <aura:attribute name="records" type="List" default="[]"/>
+    
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:attribute name="msgTheme" type="String" default="slds-theme_error"/>
+    <aura:attribute name="isDispMsg" type="String" default="none" />
+    <aura:attribute name="openNewuserRec" type="boolean" default="true" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:donewaiting" action="{!c.hideSpinner}"/>
+    
+    <aura:attribute name="recordTypeName" type="string" default="Investment Work"/>
+    <!--Adding RAMD record type for RAMD 2.0 -->
+    <aura:attribute name="options" type="List" default="[
+                                                        {'label': 'Investment Work', 'value': 'Investment Work'},
+                                                        {'label': 'RAMD', 'value': 'RAMD'},
+                                                        {'label': 'DealDesk', 'value': 'DealDesk'},
+                                                        {'label': 'Chime', 'value': 'Chime'}
+                                                        ]"/>
+    
+    
+    
+    <!--<aura:registerEvent name="closeNewUserRegionMap" type="c:InvWB_closeNewUserRegionMap"/>-->
+    
+    <aura:if isTrue="{!v.Spinner1}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <div aura:id="editDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">            
+            <div class="slds-modal__header">
+                <h2 id="header43" class="slds-text-heading--medium">User to Region Mapping</h2>
+            </div>
+            <div class="slds-modal__content slds-p-around--large slds-grid slds-wrap" style="display:flex;min-width:30rem;" >
+                <div class = "slds-grid slds-gutters" style="width:600px">
+                    <div class="slds-col userAndRecordType">
+                        <abbr title="required" class="slds-required" >*</abbr>
+                        <label class="slds-form-element__label" for="input-id-02">User</label>
+                        <div Style="display: inline-block;">
+                            <lightning:helptext content="Select User to map to a Region" iconName="utility:info" class="popover"/>
+                        </div> 
+                        
+                        <div class="slds-form-element__control">
+                            <c:InvWB_Lookup objectName="User"
+                                            field_API_text="Name"
+                                            field_API_val="Id"
+                                            limit="4"
+                                            field_API_search="Name"
+                                            lookupIcon="standard:user" 
+                                            selItem="{!v.userRec}" 
+                                            placeholder="Enter space after text to search User"
+                                            aura:id="userLookupId"
+                                            />
+                        </div>
+                    </div>
+                    <div class="slds-col userAndRecordType">
+                        <!--<abbr title="required" class="slds-required" >*</abbr>
+                         <label class="slds-form-element__label" for="input-id-02">Record Type</label>
+                         <div Style="display: inline-block;">
+                             <lightning:helptext content="Select Record type for the User to Region Map" iconName="utility:info" class="popover"/>
+                         </div> -->
+                        <lightning:combobox name="RecordTypePicklist" label ="Record Type"  value="Investment Work" placeholder="Select Record Type" options="{! v.options }" onchange="{! c.handleChange }"/>
+                    </div>
+                </div>
+                <div align ="center" Style ="margin-left: 45px; margin-top: 20px;">
+                    <div class="slds-form-element">
+                        <!-- DGRAT Buttons to pick and choose -->
+                        <div align="center">
+                            <!-- 
+                            <ul class="slds-button-group-list" >
+                                <li ><button class="slds-button slds-button_neutral" id="Division" onclick="{!c.add}" >Division</button></li>
+                                <li ><button class="slds-button slds-button_neutral" id="Geography" onclick="{!c.add}" >Geography</button></li>
+                                <li ><button class="slds-button slds-button_neutral" id="Region" onclick="{!c.add}" >Region</button></li>
+                                <li ><button class="slds-button slds-button_neutral" id="Area" onclick="{!c.add}" >Area</button></li>
+                                <li ><button class="slds-button slds-button_neutral" id="Territory" onclick="{!c.add}" >Territory</button></li>
+                            </ul>
+                            -->
+                            <ul class="slds-button-group-list" >                                
+                                <li ><button class="slds-button slds-button_neutral" id="Geography" onclick="{!c.add}" >Geography</button></li>
+                                <li ><button class="slds-button slds-button_neutral" id="Region" onclick="{!c.add}" >Region</button></li>
+                                <li ><button class="slds-button slds-button_neutral" id="Area" onclick="{!c.add}" >Area</button></li>
+                                <li ><button class="slds-button slds-button_neutral" id="Zone" onclick="{!c.add}" >Zone</button></li>
+                                <li ><button class="slds-button slds-button_neutral" id="Territory" onclick="{!c.add}" >Territory</button></li>
+                            </ul>
+                            <br></br>
+                            <h1 class="slds-col slds-size_12-of-12" align="center"><b>Click on above buttons to create User to Region Map</b></h1>
+                            <br></br>
+                            
+                            <!-- SELECT DGRAT values corresponding to the user -->
+                            <div class="slds-scrollable slds-scrollable_y" style="height:29em;">
+                                <table class="slds-table slds-table_bordered slds-table_cell-buffer" style = "width:500px">
+                                    <tbody>
+                                        <aura:iteration items="{!v.records}" var="rec" indexVar="index">
+                                            <tr scope="row">
+                                                <td>
+                                                    <c:InvWB_Lookup objectName="pse__Region__c"
+                                                                    field_API_text="Name"
+                                                                    field_API_val="Id"
+                                                                    limit="40"
+                                                                    field_API_search="Name"
+                                                                    field_boolean_flag = "psa_old__c"
+                                                                    search_addedFilter = "{!'(' + rec.type +')'}"
+                                                                    lookupIcon="standard:user" 
+                                                                    selItem="{!rec.value}" 
+                                                                    placeholder="{!'Enter space after text to search ' + rec.type}"
+                                                                    aura:id="{!rec.Id}" 
+                                                                    />
+                                                </td>      
+                                                <td data-label="clear"  id="{!index}">
+                                                    <lightning:buttonIcon iconName="utility:clear"  alternativeText="clear" onclick="{!c.remove}"/>
+                                                </td>
+                                            </tr>     
+                                        </aura:iteration>   
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>    
+            
+            <div class="slds-modal__footer">                
+                <lightning:button variant="neutral" label="Close" onclick="{!c.close}"/>
+                <lightning:button variant="brand" type="Save" label="Save" onclick="{!c.onSave}"/>
+            </div>
+        </div>
+    </div>
+    <div aura:id="overlay" class="slds-backdrop slds-backdrop--open"></div>
+    
+    
+</aura:component>

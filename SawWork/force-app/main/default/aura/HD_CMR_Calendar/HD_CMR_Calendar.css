@@ -1,0 +1,67 @@
+.THIS .spinner-pos{
+    position: fixed;
+  z-index: 999;
+  height: 2em;
+  width: 2em;
+  overflow: show;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.THIS .ViewButtons{
+    
+    padding : 5px;
+    border-radius: 5px;
+    border: 1px solid #73AD21;
+    box-shadow: 1px 1px 1px #888888;
+    
+}
+
+.THIS .ViewButtons:hover{
+    
+    
+    
+}
+
+.THIS .foo {
+  float: left;
+  width: 15px;
+  height: 15px;
+  margin: 5px;
+  border: 1px solid rgba(0, 0, 0, .2);
+}
+
+.THIS .C1 {
+  background: #6C3483;
+}
+
+.THIS .C2 {
+  background: #2980B9;
+}
+
+.THIS .C3 {
+  background: #85C1E9;
+}
+
+.THIS .N1 {
+  background: #148F77;
+}
+
+.THIS .R1 {
+  background: #F5B7B1;
+}
+
+.THIS .BL {
+  background: rgb(171, 178, 185);
+}
+
+.THIS .ER {
+  background: #D1F2EB;
+}
+
+.THIS  .fc-center h2{
+  font-size : 2em;
+}

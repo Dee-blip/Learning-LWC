@@ -1,0 +1,40 @@
+<aura:component controller="PartnerCommunityNavigationController">
+    
+    <ltng:require styles="{! $Resource.bootstrap4 + '/dist/css/bootstrap.min.css'}" 
+                  scripts="{!join(',', 
+                           $Resource.jquery350, 
+                           $Resource.bootstrap4 + '/dist/js/bootstrap.min.js')
+                           }" afterScriptsLoaded="{!c.scriptsLoaded}"/>
+    
+    <aura:attribute name="menuItems" type="NavigationMenuItem" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+        <nav class="navbar navbar-expand navbar-dark bg-info">
+            <div class="container-fluid">
+                <!--<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"><p>More</p></span>
+                </button>-->
+                <div class="collapse navbar-collapse justify-content-center" id="navbarNavDropdown">
+                    <ul class="navbar-nav align-self-end" id="nav">
+                        <li class="nav-item blackItems">
+                            <a class="nav-link blackItems" href="/partners/s">Home</a>
+                        </li>
+                        <aura:iteration items="{!v.menuItems}" var="item">
+                            <li class="nav-item" data-value="{!item.Id}" onclick="{!c.onClick}">
+                                <a href="javascript:void(0);" data-menu-item-id="{!item.Id}" class="nav-link blackItems">
+                                    <span style="white-space: pre;">{!item.Label}</span>
+                                </a>
+                        	</li>
+                        </aura:iteration>
+                        <li class="nav-item dropdown d-none">
+                            <a class="nav-link dropdown-toggle blackItems" href="#" id="navbarDropdownMenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                More
+                            </a>
+                            <ul class="navDropDown dropdown-menu dropdown-menu-right bg-info" style="min-width:310px; !important;background-color: white !important;" aria-labelledby="navbarDropdownMenu">
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+</aura:component>

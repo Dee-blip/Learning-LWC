@@ -1,0 +1,13 @@
+.THIS .slds-col{
+    max-width:45%;
+    padding-top: 2.0em;
+}
+
+.THIS .seperator{
+    border-top : 0.8em solid rgb(221, 219, 218);
+}
+
+.THIS .recordError{
+    font-size: 1.2em;
+    color: #FF9494;
+}

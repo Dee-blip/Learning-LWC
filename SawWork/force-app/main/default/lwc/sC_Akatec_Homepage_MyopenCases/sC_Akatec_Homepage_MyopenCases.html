@@ -1,0 +1,504 @@
+<template>
+
+    <template if:true={showCaseClosureModal}>
+        <lightning-record-edit-form record-id={caseRecordId} record-type-id={caseRecordtypeid} object-api-name="Case"
+            onerror={handleCaseError} onsubmit={handleCaseSubmit} onload={handleCaseLoad}
+            onsuccess={handleCaseCloseSuccess}>
+
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open modalZIndex">
+                <div class="slds-modal__container" style="font-size: 11px; max-width: 42rem">
+                    <header class="slds-modal__header">
+
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                            title="Close" onclick={closeCaseEditModal}>
+                            <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                                size="small"></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+
+                        <h2 id="modal-heading-015" class="slds-text-heading_medium slds-hyphenate">
+                            Close Case - {akamcaseid}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-15">
+                        <template if:true={showrecordeditspinner}>
+                            <div style="opacity: 0.7;" class="slds-spinner_container">
+                                <lightning-spinner alternative-text="Loading" variant="brand" size="medium">
+                                </lightning-spinner>
+                            </div>
+                        </template>
+                        <lightning-messages></lightning-messages>
+                        <lightning-input-field variant="label-inline" field-name="Resolution_Sent__c">
+                        </lightning-input-field>
+                        <lightning-input-field variant="label-inline" field-name="Status">
+                        </lightning-input-field>
+                        <lightning-input-field variant="label-inline" field-name="Case_Product__c">
+                        </lightning-input-field>
+                        <lightning-input-field variant="label-inline" field-name="Task_LOE__c">
+                        </lightning-input-field>
+                        <lightning-input-field variant="label-inline" field-name="Sub_Type__c">
+                        </lightning-input-field>
+                        <lightning-input-field variant="label-inline" field-name="Service_Category__c">
+                        </lightning-input-field>
+                        <lightning-input-field variant="label-inline" field-name="Problem__c">
+                        </lightning-input-field>
+                        <lightning-input-field variant="label-inline" field-name="Sub_Problem__c">
+                        </lightning-input-field>
+                        <lightning-input-field variant="label-inline" field-name="Root_Cause_technical__c">
+                        </lightning-input-field>
+                        <lightning-input-field variant="label-inline" field-name="Resolved_Date__c">
+                        </lightning-input-field>
+                        <lightning-input-field variant="label-inline" field-name="Solution_Summary__c">
+                        </lightning-input-field>
+
+
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_brand" type="submit" name="Save" title="Save">Close this
+                            case!</button>
+                    </footer>
+                </div>
+            </section>
+        </lightning-record-edit-form>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!--Akachat Modal Functionality-->
+    <template if:true={showAkachatModal}>
+
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open modalZIndex">
+            <div class="slds-modal__container" style="font-size: 11px; max-width: 42rem">
+                <header class="slds-modal__header">
+
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Close" onclick={closeCaseEditModal}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                            size="small"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                        Chat Transcript</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+
+                    <template for:each={akachatdetails} for:item='chat'>
+
+                        <div key={chat.ChatDuration} class="slds-grid slds-gutters">
+                            <div class="slds-col" style="float: left;">
+                                <b>Chat Duration : </b>{chat.ChatDuration} Seconds </div>
+                            <div class="slds-col">
+                                <b>Visitor's Location : </b>{chat.Location} </div>
+                            <div class="slds-col">
+                                <b>Chat Owner : </b>{chat.Owner.Name} </div>
+                        </div>
+                        <br key={chat.ChatDuration} />
+                        <div key={chat.ChatDuration} class="slds-box">
+                            <lightning-formatted-rich-text key={chat.ChatDuration} class="slds-form-element__static"
+                                value={chat.Body} linkify>
+                            </lightning-formatted-rich-text>
+
+                            <br key={chat.ChatDuration} />
+                            <template if:true={showsupervisortranscript}>
+
+                                <h3 key={chat.ChatDuration} class="slds-text-title_caps"><b>Supervisor Body</b></h3>
+                                <div key={chat.ChatDuration} class="slds-box">
+                                    <lightning-formatted-rich-text key={chat.ChatDuration}
+                                        class="slds-form-element__static" value={chat.SupervisorTranscriptBody} linkify>
+                                    </lightning-formatted-rich-text>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <template if:true={showEditModal}>
+        <lightning-record-edit-form record-id={caseRecordId} record-type-id='012G0000000z10xIAA' object-api-name="Case"
+            onerror={handleCaseError} onload={handleCaseLoad} onsubmit={handleCaseSubmit}
+            onsuccess={handleCaseEditSuccess}>
+
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open modalZIndex">
+                <div class="slds-modal__container" style="font-size: 11px; max-width: 42rem">
+                    <header class="slds-modal__header">
+
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                            title="Close" onclick={closeCaseEditModal}>
+                            <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                                size="small"></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+
+                        <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">
+                            Edit Case - {akamcaseid}</h2>
+                    </header>
+
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                        <template if:true={showrecordeditspinner}>
+                            <div style="opacity: 0.7;" class="slds-spinner_container">
+                                <lightning-spinner alternative-text="Loading" variant="brand" size="medium">
+                                </lightning-spinner>
+                            </div>
+                        </template>
+                        <lightning-messages></lightning-messages>
+
+                        <lightning-input-field variant="label-inline" field-name="Next_Action__c">
+                        </lightning-input-field>
+                        <lightning-input-field variant="label-inline" field-name="Issue_Summary__c">
+                        </lightning-input-field>
+                        <lightning-input-field variant="label-inline" field-name="Customer_Expectations__c">
+                        </lightning-input-field>
+                        <lightning-input-field variant="label-inline" field-name="Override_Next_Case_Update__c">
+                        </lightning-input-field>
+                        <lightning-input-field variant="label-inline" field-name="Override_Next_Case_Update_Reason__c">
+                        </lightning-input-field>
+                    </div>
+
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_brand" type="submit" name="Save"
+                            title="Save">Save</button>
+                    </footer>
+                </div>
+            </section>
+
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </lightning-record-edit-form>
+    </template>
+
+    <div style="zoom:90%">
+        <lightning-layout>
+            <lightning-layout-item size={myopencasessize}>
+                <div class="slds-card slds-page-header"
+                    style="height: auto;margin-top: 15px;margin-top: 0px;padding-top: 0px;padding-bottom: 4px;">
+                    <div class="slds-grid slds-gutters">
+
+                        <!-- *************************** HEADER **********************************************-->
+                        <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                            <div>
+                                <template if:true={showspinner}>
+                                    <div style="opacity: 0.7;" class="slds-spinner_container">
+                                        <lightning-spinner alternative-text="Loading" variant="brand" size="medium">
+                                        </lightning-spinner>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="slds-media__figure slds-col slds-size_1-of-5">
+
+                                <ul class="slds-list_horizontal slds-media_center">
+                                    <li>
+                                        <template if:true={displayCase}>
+                                            <lightning-button-icon icon-name="utility:chevrondown" variant="bare"
+                                                style="padding-right: 6px; padding-left: 2px;"
+                                                alternative-text="Collapse" title="Collapse" onclick={hidemycasesTable}>
+                                            </lightning-button-icon>
+                                        </template>
+
+                                        <template if:false={displayCase}>
+                                            <lightning-button-icon icon-name="utility:chevronright" variant="bare"
+                                                style="padding-right: 6px; padding-left: 2px;"
+                                                alternative-text="Collapse" title="Collapse" onclick={showmycasesTable}>
+                                            </lightning-button-icon>
+                                        </template>
+                                    </li>
+
+                                    <li style="margin-right: 5px;">
+                                        <lightning-icon icon-name="standard:case" size="medium" alternative-text="cases"
+                                            title="cases">
+                                        </lightning-icon>
+                                    </li>
+
+                                    <li>
+                                        <div class="slds-media__body">
+                                            <div class="slds-page-header__name">
+                                                <div class="slds-page-header__name-title">
+                                                    <h2>
+                                                        <span class="slds-text-heading_small slds-truncate"><b>Open Cases ({TotalCount})</b></span>
+                                                    </h2>
+                                                </div>
+                                            </div>
+                                            <p class="slds-page-header__name-meta">Updated <lightning-relative-date-time
+                                                    value={nowMyopenCases}></lightning-relative-date-time>
+                                            </p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!--If manager is viewing option-->
+                            <template if:true={isManager}>
+
+                                <div class="slds-col slds-size_1-of-6">
+                                    <lightning-input type="toggle" label="My Team Cases" name="MyTeamCases"
+                                        onchange={handletoggleChecked}></lightning-input>
+                                </div>
+                                <div class="slds-col slds-size_1-of-5 managerwotablecondensed">
+                                    <div >
+                                        <lightning-input name="enter-search" 
+                                            type="search"
+                                            onchange={handleKeyUp}
+                                            placeholder="Search for Cases..">
+                                        </lightning-input>
+                                    </div>
+                                </div>
+                                <div class="slds-media slds-col slds-size_2-of-9" style="padding-top: 12px;">
+                                    <lightning-button-menu icon-name="utility:filterList" menu-alignment="right">
+                                        <div class="slds-panel__body" style="padding-bottom: 0;width:max-content">
+
+                                            <div class="slds-media__body">
+                                                <div>
+                                                    <h3><b>Work Type</b></h3>
+                                                </div>
+                                                <div class="slds-p-around--x-small">
+
+                                                    <lightning-checkbox-group name="Work Type" options={worktypeoptions}
+                                                        value={CaseWorktypevalue} class="inlinecheckbox"
+                                                        onchange={handleworktypeChange}>
+                                                    </lightning-checkbox-group>
+                                                </div>
+                                            </div>
+                                            <div class="slds-has-divider_top-space" role="separator"></div>
+                                            <div class="slds-media__body">
+                                                <div>
+                                                    <h3><b>Severity</b></h3>
+                                                </div>
+                                                <div class="slds-p-around--x-small">
+                                                    <lightning-checkbox-group name="Severity" options={severityoptions}
+                                                        value={severityvalue} class="inlinecheckbox"
+                                                        onchange={handlesevChange}>
+                                                    </lightning-checkbox-group>
+                                                </div>
+                                            </div>
+
+                                            <div class="slds-has-divider_top-space" role="separator"></div>
+
+                                            <div class="slds-media__body">
+                                                <div>
+                                                    <h3><b>Status</b></h3>
+                                                </div>
+                                                <div class="slds-p-around--x-small">
+                                                    <lightning-checkbox-group name="Status" options={Statusoptions}
+                                                        value={Statusvalue} onchange={handlestatusChange}>
+                                                    </lightning-checkbox-group>
+                                                </div>
+                                            </div>
+
+                                            <div class="slds-has-divider_top-space" role="separator"></div>
+
+                                            <div class="slds-modal__footer"
+                                                style="padding: 5px; text-align: center;border: none; background-color: white;box-shadow: none;">
+                                                <button type="button" class="slds-button slds-button_brand"
+                                                    onclick={getMyOpenCasesData}>Apply</button>
+                                            </div>
+                                        </div>
+                                    </lightning-button-menu>
+                                </div>
+                            </template>
+
+                            <!--If agent is viewing options-->
+                            <template if:false={isManager}>
+                                <div class="slds-col slds-size_1-of-5 nmwotablecondensed">
+                                    <div >
+                                        <lightning-input name="enter-search"
+                                        onchange={handleKeyUp}
+                                        type="search"
+                                            placeholder="Search for Cases..">
+                                        </lightning-input>
+                                    </div>
+                                </div>
+                                <div class="slds-media slds-col slds-size_2-of-9" style="padding-top: 12px;">
+                                    <lightning-button-menu icon-name="utility:filterList" menu-alignment="right">
+                                        <div class="slds-panel__body" style="padding-bottom: 0;width:max-content">
+
+                                            <div class="slds-media__body">
+                                                <div>
+                                                    <h3><b>Work Type</b></h3>
+                                                </div>
+                                                <div class="slds-p-around--x-small">
+
+                                                    <lightning-checkbox-group name="Work Type" options={worktypeoptions}
+                                                        value={CaseWorktypevalue} class="inlinecheckbox"
+                                                        onchange={handleworktypeChange}>
+                                                    </lightning-checkbox-group>
+                                                </div>
+                                            </div>
+                                            <div class="slds-has-divider_top-space" role="separator"></div>
+                                            <div class="slds-media__body">
+                                                <div>
+                                                    <h3><b>Severity</b></h3>
+                                                </div>
+                                                <div class="slds-p-around--x-small">
+                                                    <lightning-checkbox-group name="Severity" options={severityoptions}
+                                                        value={severityvalue} class="inlinecheckbox"
+                                                        onchange={handlesevChange}>
+                                                    </lightning-checkbox-group>
+                                                </div>
+                                            </div>
+                                            <div class="slds-has-divider_top-space" role="separator"></div>
+
+                                            <div class="slds-media__body">
+                                                <div>
+                                                    <h3><b>Status</b></h3>
+                                                </div>
+                                                <div class="slds-p-around--x-small">
+                                                    <lightning-checkbox-group name="Status" options={Statusoptions}
+                                                        value={Statusvalue} onchange={handlestatusChange}>
+                                                    </lightning-checkbox-group>
+                                                </div>
+                                            </div>
+                                            <div class="slds-has-divider_top-space" role="separator"></div>
+
+                                            <div class="slds-modal__footer"
+                                                style="padding: 5px; text-align: center;border: none; background-color: white;box-shadow: none;">
+                                                <button type="button" class="slds-button slds-button_brand"
+                                                    onclick={getMyOpenCasesData}>Apply</button>
+                                            </div>
+                                        </div>
+                                    </lightning-button-menu>
+                                </div>
+
+
+                                <div class="slds-col" style="padding-top: 12px;">
+                                    <lightning-button-menu icon-name="utility:settings" variant="border-filled"
+                                        menu-alignment="right" nubbin>
+                                        <div class="slds-panel__body" style="padding-bottom: 0">
+
+                                            <div class="slds-media__body" style="width: max-content">
+                                                <div class="slds-grid slds-grid_align-spread">
+                                                    <h3><b>Columns to display</b></h3>
+                                                </div>
+
+                                                <div class="slds-p-around--x-small">
+                                                    <lightning-checkbox-group options={MyOpenCasesColOptions}
+                                                        value={MyOpenCasesColvalue} onchange={handlecColChange}>
+                                                    </lightning-checkbox-group>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning-button-menu>
+                                </div>
+                            </template>
+
+                            <div class="slds-col rightAlign" style="padding-top: 12px;">
+                                <button class="slds-button" onclick={getMyOpenCasesData}>
+                                    <lightning-icon icon-name="action:refresh" alternative-text="Refresh Dashboard"
+                                        size="x-small">
+                                    </lightning-icon>
+                                </button>
+                            </div>
+
+                        </header>
+                    </div>
+                </div>
+
+                <div class="datatableStyle" style="padding-top: 0px; border-radius: 4px;">
+                    <div id="divForDatatable" class="panelmyOpenCases" style="height:50vh;">
+
+                        <lightning-datatable data={data} columns={transformedColumns} hide-checkbox-column=false
+                            column-widths-mode="auto" key-field=akamcaseid default-sort-direction={defaultSortDirection}
+                            sorted-direction={sortDirection} sorted-by={sortedBy} onsort={onHandleSort}
+                            enable-infinite-loading onloadmore={loadMoreData} class="MycasesDatatable"
+                            onrowaction={handleRowActions} wrap-text-max-lines=2 onresize={onColumnWidthResize}>
+                        </lightning-datatable>
+                    </div>
+                </div>
+            </lightning-layout-item>
+            <lightning-layout-item class="sidenavslot slds-hidden" size={sidenavsize} style="height: 0;padding-left:8px;" >
+                <div class="sidenav">
+                    <div class="slds-panel__header" style="padding: 0.75rem; justify-content: center">
+                        <h1 class="slds-text-heading_medium" style="font-size: 17px;text-align: center">New Task -
+                            {akamcaseid}</h1>
+                    </div>
+                    <div class="slds-panel__body" style="padding-top: 0px;">
+
+                        <div>
+                            <div>
+                                <div class="slds-grid slds-grid_align-spread slds-timeline__trigger slds-m-top_medium">
+                                    <div
+                                        class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                                        <h3>Task Type</h3>
+                                    </div>
+                                </div>
+
+                                <div class="slds-m-bottom_x-small">
+                                    <lightning-combobox name="taskType" label="Task Type" required
+                                        variant="label-hidden" placeholder="Select Task Type" options={tasktypevalues}
+                                        onchange={tasktypechange} data-name="taskType">
+                                    </lightning-combobox>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div>
+                                <div class="slds-grid slds-grid_align-spread slds-timeline__trigger slds-m-top_medium">
+                                    <div
+                                        class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                                        <h3>Subject</h3>
+                                    </div>
+                                </div>
+
+                                <div class="slds-m-bottom_x-small">
+                                    <lightning-input name="taskSubject" class="taskSubject textInputStyle sideNavFields"
+                                        type="text" required variant="label-hidden" data-name="taskSubject" onchange={handleSubjectChange}></lightning-input>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div>
+                                <div class="slds-grid slds-grid_align-spread slds-timeline__trigger slds-m-top_medium">
+                                    <div
+                                        class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                                        <h3>LOE (Hours)</h3>
+                                    </div>
+                                </div>
+
+                                <div class="slds-m-bottom_x-small">
+                                    <lightning-input type="number" message-when-bad-input="Please enter a valid LOE"
+                                        step=".01" name="loehrs" max="24"
+                                        message-when-range-overflow="Hours cannot exceed 24" min="0"
+                                        message-when-range-underflow="Hours cannot be below 0"
+                                        class="taskloe textInputStyle sideNavFields" required variant="label-hidden" data-name="taskloe" onchange={handleLOEChange}>
+                                    </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div>
+                            <div>
+                                <div class="slds-grid slds-grid_align-spread slds-timeline__trigger slds-m-top_medium">
+                                    <div
+                                        class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                                        <h3>Visibility</h3>
+                                    </div>
+                                </div>
+
+                                <div class="slds-m-bottom_x-small">
+                                    <lightning-combobox name="taskVisibility" label="Visibility" required
+                                        variant="label-hidden" placeholder="Select Task Visibility"
+                                        options={TaskVisibilityoptions} onchange={taskvisibilitychange} data-name="taskVisibility">
+                                    </lightning-combobox>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-has-divider_top-space" role="separator"></div>
+                        <div class="slds-modal__footer" style="padding: 5px; text-align: center;border: none; background-color: white;box-shadow: none;">
+
+                            <button class="slds-button slds-button_neutral" onclick={closeNav}>Cancel</button>
+                            <button class="slds-button slds-button_brand" onclick={createNewTaskLOE}>Save</button>
+                            </div>
+                    </div>
+                </div>
+            </lightning-layout-item>
+        </lightning-layout>
+
+    </div>
+</template>

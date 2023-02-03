@@ -1,0 +1,8 @@
+<aura:component >
+    <aura:attribute name="pageNumber" type="String"/>
+    <aura:attribute name="currentPageNumber" type="String"/>
+    <aura:attribute name="currnetPagesCount" type="String"/>
+    <aura:registerEvent name="goToPage" type="c:CommunityBlogPageChangeEvt"/>
+    <!-- Highlight the current page count -->
+    <lightning:button class="selBtnCls" variant="{!v.pageNumber == v.currentPageNumber ? 'brand' : 'neutral' }" label="{!v.pageNumber}" onclick="{!c.openthePage}" />
+</aura:component>

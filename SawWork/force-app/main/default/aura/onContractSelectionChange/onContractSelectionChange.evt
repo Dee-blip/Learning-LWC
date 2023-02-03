@@ -1,0 +1,8 @@
+<!-- onContractSelectionChange -->
+<aura:event type="APPLICATION" description="Used for publishing contractSelection change.">
+    <aura:attribute name="contracts" type="String[]" />
+    <aura:attribute name="contractproducts" type="String[]" />
+    <aura:attribute name="accountId" type="String" />
+    <aura:attribute name="withBaseline" type="Boolean" />
+    <aura:attribute name="hasCurrencyMisMatch" type="Boolean" default="false"/>
+</aura:event>

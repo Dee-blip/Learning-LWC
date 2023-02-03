@@ -1,0 +1,275 @@
+<!--
+ - Created by kusharma on 14/12/17.
+ - Sujay - Added changes as per FFPSA - 411
+ -->
+
+<apex:page id="RAMDCitizenshipEditor" controller="RAMDCitizenshipEditorCtrl" tabStyle="Account" sideBar="false"
+           title="RAMD Citizen Support" showHeader="true">
+    <apex:includeScript value="{!$Resource.JQuery_New}"/>
+    <apex:includescript value="{! URLFOR($Resource.LicenseReportStaticResource, 'js/jquery.dataTables.min.js')}"/>
+    <apex:stylesheet value="{! URLFOR($Resource.LicenseReportStaticResource, 'css/jquery.dataTables.css')}"/>
+    <script type="text/javascript">
+
+            j$ = jQuery.noConflict();
+
+            function confirmSaveAction(){
+                //validate if atleast one record is selected
+                if(j$('.recordSelection:checked').length ==0){
+                    alert('Please select atleast one record');
+                    return false;
+                }  
+                //user might have selected checkbox. But not selected usa citizen option
+                var validSelection = true;
+                j$('.recordSelection:checked').each(function(){ 
+                    if (j$(this).closest('tr').find('.selectedRecordClass').val() == ""){
+                        alert('Please select Citizen Support. Currently for '+ j$(this).closest('tr').find('.userName').text() + ' You have selected None');
+                        validSelection = false;
+                        return false; 
+                    }    
+                });
+                //although in valid cases , we were returning false, browser was interpretting false from only loop. Hence this explicit return 
+                if(!validSelection){
+                    return validSelection;
+                }    
+                var updateUserRec = confirm("Only checked rows will be saved. Do you wish to proceed?");
+                if (updateUserRec == true) {
+                    updateUser();
+                }
+                else {
+                    return false;
+                }
+            }
+
+            function confirmDeleteAction(userId, userName){
+
+                j$('[id$=userIdHidden]').val(userId);
+                j$('[id$=userNameHidden]').val(userName);
+                var updateUserRec = confirm("Do you wish to proceed with the action?");
+                if (updateUserRec == true) {
+                    removeUser();
+                }
+                else {
+                    return false;
+                }
+            }
+
+            j$(document).ready( function () {
+                var contactTable = j$('[id$="userCitizenSupportDetail"]').DataTable({
+                    "order": [1,'DESC'],
+                    "pageLength": 10
+                });
+
+                var auditTrailTable = j$('[id$="auditTrailDetail"]').DataTable({
+                    "order": [2,'DESC'],
+                    "pageLength": 5
+                });
+
+                var auditTrailTable = j$('[id$="searchResultDetail"]').DataTable({
+                    "order": [2,'DESC'],
+                    "pageLength": 10
+                });
+            });
+
+           function createDataTable() {
+                var contactTable = j$('[id$="userCitizenSupportDetail"]').DataTable({
+                    "destroy": true,
+                    "order": [1,'asc'],
+                    "processing": true,
+                    "pageLength": 10
+                });
+
+                var searchResultTable = j$('[id$="searchResultDetail"]').DataTable({
+                    "destroy": true,
+                    "order": [1,'asc'],
+                    "processing": true,
+                    "pageLength": 10
+                });
+
+                var auditTrailTable = j$('[id$="auditTrailDetail"]').DataTable({
+                    "destroy": true,
+                    "order": [2,'DESC'],
+                    "processing": true,
+                    "pageLength": 5
+                });
+
+
+           }
+    
+            function showApprovedSection(){
+                console.log('hi');
+                loadApprovedRecords(); 
+                return false;
+            }
+    
+            function removeAdditionText(){
+                document.getElementById('org.ajax4jsf.oncomplete').style.display = "none";
+            }
+            
+            function removeSearch(){
+                j$('[id$="searchQueryId"]').val("");
+            }
+
+            function hideApprovedUserTable(){
+                document.getElementById('$Component.formId.pgBlkId.citizenTable').style.display = "none";
+            }
+            
+            function setFocusOnLoad(){ /*NOOP*/ }
+            
+    </script>
+    
+    <apex:pageMessages id="pgMsgs"/>
+    <br />
+    <b><center>RAMD Citizen Support</center></b>
+    <apex:form id="formId">
+        <div style="text-align: right">
+                <b><a href="#" onclick="showApprovedSection();">
+                                 View Approved User Records
+                </a></b>
+        </div><br/>
+        <apex:pageBlock id="pgBlkId">
+            <apex:pageBlockSection id="searchPgBlkSectionId" title="Search Section" columns="1">
+                <apex:inputTextarea id="searchQueryId" value="{! queryString}" label="Search Query"
+                                    title="Enter Email, Akam User Id or Username separated by , or ;" style="width:80%;"
+                                    rows="3"/>
+                </apex:pageBlockSection>
+            <center>
+                <apex:commandButton value="Search" title="Search user rec" id="searchButtonId"
+                                    action="{!searchUserRecs}" oncomplete="createDataTable(); removeAdditionText();" reRender="pgBlkTbl,pgMsgs,citizenTables,pgBlkId" status="FilterLoading"/>
+            </center><br/>
+            <apex:outputPanel id="citizenTables">
+                <apex:pageBlockSection id="tablePgBlkSec" title="Approved User Records" columns="1" rendered="{!lUserRecsWrapped.size > 0}">
+
+                    <apex:outputPanel id="pgBlkTbl">
+                        <body>
+                        <table id="userCitizenSupportDetail" class="display"
+                               style="white-space: nowrap;table-layout: fixed;width:100%">
+                            <thead>
+                            <tr style="height:30px">
+                                <th style="width:30px"> </th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Akam User Id</th>
+                                <th>Citizen Support 
+                                    <a title="Click here to view the U.S. Citizen Verification Instruction" 
+                                       href="https://docs.google.com/document/d/1AI1Su7gmXesbXnDjCZLJQrUvVpzRMcXXXSRNQotFVGA/view" 
+                                       target="_blank" style="text-decoration:none; color:#2c48e2;" >&#9432;
+                                    </a>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <apex:repeat id="detailsTbl" value="{! lUserRecsWrapped}" var="userToDisplay">
+                                <tr style="height:30px" id="{! userToDisplay.userRec.Id}">
+                                    <td>
+                                        <apex:commandLink id="clId" value="Delete" onClick="confirmDeleteAction('{! userToDisplay.userRec.Id}','{! userToDisplay.userRec.Name}');"
+                                                          onComplete=""
+                                                          style="color:#2c48e2">
+                                        </apex:commandLink>
+                                    </td>
+                                    <td >{!userToDisplay.userRec.Name}</td>
+                                    <td>{!userToDisplay.userRec.Email}</td>
+                                    <td>{!userToDisplay.userRec.AKAM_User_ID__c}</td>
+                                    <td>
+                                        <apex:selectList id="supportPLSearch" value="{! userToDisplay.userRec.Citizen_Support__c}"
+                                                         multiSelect="false" size="1" disabled="true" style="color:#000">
+                                            <apex:selectOptions value="{! lCitizenSupportOptions}"/>
+                                        </apex:selectList>
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                            </tbody>
+                        </table>
+                        </body>
+                    </apex:outputPanel>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection id="searchTablePgBlkSec" title="Search Results" columns="1" rendered="{!lSearchedUserRecsWrapped.size > 0}">
+                    <apex:outputPanel id="pgBlkTblSearch">
+                        <body>
+                        <table id="searchResultDetail" class="display"
+                               style="white-space: nowrap;table-layout: fixed;width:100%">
+                            <thead>
+                            <tr style="height:30px">
+                                <th style="width:30px"> </th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Akam User Id</th>
+                                <th>Citizen Support 
+                                    <a title="Click here to view the U.S. Citizen Verification Instruction" href="https://docs.google.com/document/d/1AI1Su7gmXesbXnDjCZLJQrUvVpzRMcXXXSRNQotFVGA/view" 
+                                       target="_blank" style="text-decoration:none; color:#2c48e2;" >&#9432;
+                                    </a>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <apex:repeat id="searchDetailsTbl" value="{! lSearchedUserRecsWrapped}" var="userToDisplay">
+                                <tr style="height:30px" id="{! userToDisplay.userRec.Id}">
+                                    <td>
+                                        <apex:inputCheckbox styleClass="recordSelection" value="{! userToDisplay.isSelected}" disabled="{!userToDisplay.isApproved}"/>
+                                    </td>
+                                    <td class="userName">{!userToDisplay.userRec.Name}</td>
+                                    <td>{!userToDisplay.userRec.Email}</td>
+                                    <td>{!userToDisplay.userRec.AKAM_User_ID__c}</td>
+                                    <td>
+                                        <apex:selectList id="supportPLSearch" value="{! userToDisplay.userRec.Citizen_Support__c}"
+                                                         multiSelect="false" size="1" styleClass="selectedRecordClass">
+                                            <apex:selectOptions value="{! lCitizenSupportOptions}"/>
+                                        </apex:selectList>
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                            </tbody>
+                        </table>
+                        </body>
+                        <center>
+                            <apex:commandButton value="Update User Record" title="Update User Rec" id="updateButtonId" onClick="return confirmSaveAction();"
+                                                rendered="{! IF(lSearchedUserRecsWrapped.size>0,true,false)}"  onComplete=""/>
+                        </center><br/>
+                    </apex:outputPanel>
+                </apex:pageBlockSection>
+            </apex:outputPanel>
+            <outputPanel>
+                <apex:pageBlockSection id="auditTrailSecId" title="Action History" columns="1" rendered="{!lRAMdAuditTrail.size > 0}">
+                    <apex:outputPanel id="auditTrailOP">
+                        <body>
+                        <table id="auditTrailDetail" class="display"
+                               style="white-space: nowrap;table-layout: fixed;width:100%">
+                            <thead>
+                            <tr style="height:30px">
+                                <th>User</th>
+                                <th>Updated By</th>
+                                <th>Timestamp</th>
+                                <th>Action Performed</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <apex:repeat value="{! lRAMdAuditTrail}" var="auditTrailToDisplay">
+                                <tr style="height:30px" id="{! auditTrailToDisplay.Id}">
+                                    <td>{!auditTrailToDisplay.User_Name__c}</td>
+                                    <td>{!auditTrailToDisplay.Updated_By__c}</td>
+                                    <td>{!auditTrailToDisplay.Modified_Date__c}</td>
+                                    <td>{!auditTrailToDisplay.Field_Updated__c}</td>
+                                </tr>
+                            </apex:repeat>
+                            </tbody>
+                        </table>
+                        </body>
+                    </apex:outputPanel>
+                </apex:pageBlockSection>
+                <h3><center>For more historial data, see&nbsp;<apex:outputLink id="reportLink" rendered="true" target="_blank" value="/{! auditTrailReportId}" title="Full Report" style="font-size:15px; color:#2c48e2;">Full Report</apex:outputLink></center></h3>
+            </outputPanel>
+        </apex:pageBlock>
+        <apex:actionFunction name="removeUser" action="{! removeCitizenSupport}" id="removeCitiSuppId" reRender="pgBlkTbl,pgMsgs,tablePgBlkSec,pgBlkId"  status="FilterLoading" onComplete="createDataTable(); removeAdditionText();" >
+        </apex:actionFunction>
+        <apex:actionFunction name="updateUser" action="{! saveUserRec}"  id="updateUserRecs" reRender="pgBlkTbl,pgMsgs,tablePgBlkSec,pgBlkId" status="FilterLoading" onComplete="createDataTable(); removeAdditionText();removeSearch();"/>
+        <apex:actionFunction name="loadApprovedRecords" action="{!showApprovedUsers}" rerender="pgBlkTbl,pgMsgs,tablePgBlkSec,pgBlkId" status="FilterLoading" onComplete="createDataTable(); removeAdditionText();removeSearch();"/>
+        <apex:inputHidden id="userIdHidden" value="{! userIdToRemove}"/>
+        <apex:inputHidden id="userNameHidden" value="{! userNameToRemove}"/>
+    </apex:form>
+    <apex:actionStatus id="FilterLoading">
+        <apex:facet name="start">
+            <c:enhancedActionStatus BackColor="#FFF0F0" borderColor="#ffffff" borderSize="3" height="20px"
+                                    width="150px" ImageUrl="/changemgmt/img/spinner24.gif" Message="Please Wait"
+                                    messageStyle="color:darkred;font-size:11pt;font-weight:bold;"/>
+        </apex:facet>
+    </apex:actionStatus>
+</apex:page>

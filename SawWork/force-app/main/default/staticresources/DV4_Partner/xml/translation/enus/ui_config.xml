@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui>
+	<pltfm><![CDATA[Akamai Platform]]></pltfm>
+	<prmap><![CDATA[Print Map]]></prmap>
+	<svmap><![CDATA[Save Map]]></svmap>
+	<compare>
+		<wait><![CDATA[Please wait. This process may take up to 2 minutes to complete.]]></wait>
+		<abort><![CDATA[Abort]]></abort>
+	</compare>
+	<formview>
+		<hlink><![CDATA[Methodology & Data Collection]]></hlink>
+		<ddown1>
+			<item1><![CDATA[Real-time Report]]></item1>
+			<item2><![CDATA[Weeklong Report]]></item2>
+			<item3><![CDATA[Previous Weeklong Report]]></item3>
+		</ddown1>
+		<desc1><![CDATA[Comparison URL]]></desc1>
+		<desc2><![CDATA[Enter Website Address for real-time report]]></desc2>
+		<submit><![CDATA[Compare]]></submit>
+		<desc3><![CDATA[Previous Report Listing]]></desc3>
+		<desc4><![CDATA[Success! You will receive an email in a week's time with a link to the report.]]></desc4>
+		<desc5><![CDATA[Application Performance Comparison]]></desc5>
+		
+		<calc>
+			<label><![CDATA[Optional]]></label>
+			<mn_st_vst><![CDATA[Monthly Site Visits]]></mn_st_vst>
+			<cr_conv_rate><![CDATA[Current Conversion Rate]]></cr_conv_rate>
+			<avg_ord_val><![CDATA[Average Order Value]]></avg_ord_val>
+			<cr_rev><![CDATA[Current Site Revenue per Month]]></cr_rev>
+			<ad_rev><![CDATA[Additional Site Revenue Per Month]]></ad_rev>
+		</calc>
+	</formview>
+	<brkdn>
+		<label><![CDATA[Breakdown]]></label>
+		<lbl_city><![CDATA[Performance By City]]></lbl_city>
+		<lbl_city_smp><![CDATA[Performance By City (sample cities)]]></lbl_city_smp>
+		<lbl_region><![CDATA[Performance By Region]]></lbl_region>
+		<lbl_gbl><![CDATA[Average Global Performance]]></lbl_gbl>
+		<lbl_wk_lng><![CDATA[Weeklong Performance Test]]></lbl_wk_lng>
+	</brkdn>
+	<drpdn>
+		<label><![CDATA[Region]]></label>
+		<global><![CDATA[Global]]></global>
+		<amrcs><![CDATA[Americas]]></amrcs>
+		<emea><![CDATA[EMEA]]></emea>
+		<asia><![CDATA[Asia]]></asia>
+	</drpdn>
+	<map>
+		<prf_imp><![CDATA[Performance Improvement]]></prf_imp>
+		<est_imp><![CDATA[Estimated Improvement]]></est_imp>
+		<graph>
+			<cnn><![CDATA[Connection]]></cnn>
+			<firstb><![CDATA[First Byte]]></firstb>
+			<dnld><![CDATA[Download]]></dnld>
+		</graph>
+		<pdf>
+			<org><![CDATA[Origin]]></org>
+			<impr><![CDATA[Improvement]]></impr>
+			<citynm><![CDATA[City Name]]></citynm>
+			<citynm_imp><![CDATA[City Name (Improvement)]]></citynm_imp>
+			<orgsec><![CDATA[Origin (seconds)]]></orgsec>
+			<akmsec><![CDATA[Akamai (seconds)]]></akmsec>
+		</pdf>
+		<save>
+			<msg><![CDATA[Flash is about to open file save dialog. Please click ok to proceed.]]></msg>
+			<yes><![CDATA[OK]]></yes>
+			<no><![CDATA[CANCEL]]></no>
+		</save>
+	</map>
+ </ui>

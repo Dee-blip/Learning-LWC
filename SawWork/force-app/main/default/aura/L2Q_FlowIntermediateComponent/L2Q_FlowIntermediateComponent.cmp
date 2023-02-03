@@ -1,0 +1,48 @@
+<aura:component>
+    <aura:attribute name="titleVar" type="String" default="Title" />
+    <aura:attribute name="iconNameVar" type="String" default="standard:account" />
+    <aura:attribute name="lookupFieldType" type="String" default="account" />
+    <aura:attribute name="lookupFieldValue" type="String" default="" />
+    <aura:attribute name="lookupFilter" type="String" default="" />
+    <aura:attribute name="lookupFieldLabel" type="String" default="FieldLabel" />
+    <aura:attribute name="lookupFieldHelpText" type="String" default="" />
+    <aura:attribute name="redirectionUrl" type="String" default="/" />
+    <aura:attribute name="isRequired" type="boolean" default="true" />
+
+    <c:SF1_CustomLoader />
+
+    <lightning:card iconName="{! v.iconNameVar }" variant="narrow">
+        <aura:set attribute="title">
+            <strong>
+                <ui:outputText value="{! v.titleVar }" />
+            </strong>
+        </aura:set>
+        <aura:set attribute="actions">
+            <lightning:buttonIcon iconName="utility:back" onclick="{! c.moveBack }" size="large"
+                alternativeText="Back" />
+        </aura:set>
+        <div class="slds-border_top" style="padding:15px;">
+            <aura:if isTrue="{! v.isRequired}">
+                <span style="color: red">*</span>
+            </aura:if>
+            <aura:text value="{! v.lookupFieldLabel }" />
+            &nbsp;
+            <aura:if isTrue="{! and(v.lookupFieldHelpText != null, v.lookupFieldHelpText != '') }">
+                <div class="slds-form-element__icon slds-align-middle">
+                    <lightning:icon iconName="utility:info" alternativeText="Info" size="xx-small"
+                        title="{! v.lookupFieldHelpText }" />
+                </div>
+            </aura:if>
+            &nbsp;
+            <div style="padding-right:50%">
+                <c:SF1_LookupComponent type="{! v.lookupFieldType }" value="{! v.lookupFieldValue }"
+                    fieldsToShowInSuggestion="createddate" whereClause="{! v.lookupFilter }" />
+            </div>
+        </div>
+        <div style="padding:15px;height:350px;">
+            <button type="button"
+                disabled="{! and(v.isRequired, or(v.lookupFieldValue == null, v.lookupFieldValue == ''))}"
+                class="slds-button slds-button_brand" onclick="{! c.redirectToFlow }">Next</button>
+        </div>
+    </lightning:card>
+</aura:component>

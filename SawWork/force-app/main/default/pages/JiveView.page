@@ -1,0 +1,121 @@
+<apex:page standardController="Case"  extensions="JiveViewCtrl" action="{!retrieveCaseThreads}"> 
+
+<!--<apex:page standardController="Case"  extensions="caseThreadPageController,Pagination" >-->
+<head>
+ <style>
+   a.pageLink { 
+        text-decoration: none;
+        color:black;
+    }
+    a.pageNav {
+       color:black;
+    }
+    
+    a.pageLink:hover {
+        text-decoration: underline;
+       
+    }
+  </style>
+
+</head>
+<apex:form id="apexformId">  
+<apex:actionFunction action="{!pageChangedCon}" name="pageChangedConFn" rerender="threadSearchResults,threadPages"> 
+        <apex:param name="pageNo" value=""/>
+</apex:actionFunction>
+<apex:actionFunction name="checkIfPageSizeChangedFn" action="{!checkIfPageSizeChanged}"  rerender="caseThreadssection" > 
+</apex:actionFunction>
+
+
+<apex:pageBlock id="mainblock">
+        
+      <apex:outputPanel layout="none">
+      <!-- <apex:pageBlockSection columns="1" title="Case Thread"  id="caseThreadssection"> -->
+      <apex:pageBlockSection columns="1"  id="caseThreadssection">
+          
+             <!-- <apex:outputPanel layout="none" id="threadSubject"><div style="font-weight:bold;" >Subject - {!threadItems[0].subject}</div></apex:outputPanel> -->
+            <!-- <apex:outputPanel layout="none" id="threadSubject" rendered="{!Case.subject!=NULL}"><div style="font-weight:bold;" >Subject : {!Case.subject}</div></apex:outputPanel>-->
+           
+            <!--  <apex:outputPanel layout="none" id="threadSubject" rendered="{!Case.subject!=NULL}"><div style="font-weight:bold;" >Subject :<a href="{!case.JiveURL__c}" target="_blank">{!Case.subject}</a>
+                           </div></apex:outputPanel> -->
+            
+              <apex:outputPanel layout="none" id="threadSubject" rendered="{!Case.subject!=NULL}"><div style="font-weight:bold;" >Subject :<a href="{!case.JiveURL__c}" target="_blank">{!caseSubject}</a>
+                           </div></apex:outputPanel>
+            
+            
+            
+            <apex:outputPanel layout="none" id="threadSearchResults" rendered="{!threadItems.size>0}">
+          
+              <!-- <apex:pageBlockTable border="0" rules="none" value="{!threadItems}" var="threadItem" title="Displays Case Thread Messages" rows="2" >  -->  
+                <apex:pageBlockTable border="0" rules="none" value="{!threadItems}" var="threadItem" title="Displays Case Thread Messages" rows="{!pageSize}" first="{!((currentConPage - 1) * pageSize)}" >
+                    <!--  <apex:column style="border-botom:0px;" width="5%" headerValue="Child Reply? " >
+                        {!threadItem.isChildReply}
+                    </apex:column>-->
+                    <apex:column style="border-botom:0px;" width="40%" headerValue="Description">
+                        <div>
+                         <a href="{!threadItem.replyURL}" target="_blank">{!threadItem.description}</a>
+                        
+                        </div>
+                        
+                    </apex:column>
+                    
+                    <apex:column style="border-botom:0px;" width="45%" headerValue="Author" >
+                        <!--     <apex:inputCheckbox value="{!threadItem.isSelected}"/> -->
+                        {!threadItem.author}
+                    </apex:column>
+                 
+                    <apex:column style="border-botom:0px;" width="10%" headerValue="Last Updated" >
+                       <!--               <apex:inputCheckbox value="{!threadItem.isSelected}"/> -->
+                       <apex:outputText value="{0,date,MM/dd/yyyy}">
+                           <apex:param value="{!threadItem.contentUpdatedDate}" />
+                       </apex:outputText>
+                    </apex:column>
+                 </apex:pageBlockTable>
+               
+            </apex:outputPanel>
+            <apex:outputPanel layout="inline"><apex:outputLabel value="No replies exist in Jive" rendered="{!threadItems.size==0}"/></apex:outputPanel>
+        
+        
+    
+        
+           
+           <!--  <apex:outputPanel layout="inline" id="threadPages" rendered="{!pageCountCon >= 1}"> -->
+            <apex:outputPanel layout="inline" id="threadPages" rendered="{!AND(pageCountCon >= 1,threadItems.size>0)}">
+                
+                <div style="text-align:center;color:grey">
+                    <apex:outputLink value="#" disabled="{!IF(AND(pageCountCon > 1, currentConPage != 1), false, true)}" onclick="pageChangedConFn({!currentConPage-1});return false;" styleClass="pageNav">Previous </apex:outputLink>
+                    <apex:repeat value="{!ConPageNumbers}" var="pageNum" rendered="{!IF(pageCountCon > 1, true, false)}">
+                        <span style="text-align:center;padding-left:10px;">
+                            <apex:outputText value="{!pageNum}" rendered="{!IF(TEXT(currentConPage) != pageNum, false, true)}" style="font-weight: bold;font-size: 12pt;color: #3B73B9;"/>
+                            <apex:outputLink value="#" rendered="{!IF(TEXT(currentConPage) == pageNum, false, true)}" onclick="pageChangedConFn('{!pageNum}');return false;" styleClass="pageLink">{!pageNum}</apex:outputLink>
+                        </span>
+                    </apex:repeat>
+                    <apex:outputLink value="#" disabled="{!IF(AND(pageCountCon > 1, currentConPage != pageCountCon),false, true)}" onclick="pageChangedConFn({!currentConPage+1});return false;" styleClass="pageNav"> Next</apex:outputLink>
+                    
+                    <div style="float:right;color:black">
+                        
+                        <apex:outputText value="Page {!currentConPage} of {!pageCountCon}" styleClass="pageLink"/>
+                    </div>
+                    <div style="float:left;color:black">
+                        <apex:outputLabel value="Results Found : {!threadItems.size}"/>
+                        <apex:outputLabel value="Page Size : " style="margin-left:10px"/>
+                        <apex:selectList size="1" value="{!pageSize}" onchange="checkIfPageSizeChangedFn()" >
+                            <apex:selectOptions value="{!pageLst}"/>
+                        </apex:selectList>
+                         
+                        
+                     </div>
+                </div>
+                   </apex:outputPanel>
+                   
+                
+        </apex:pageBlockSection>
+        </apex:outputPanel>
+        
+        
+   
+</apex:pageBlock> 
+</apex:form>
+
+
+
+</apex:page>

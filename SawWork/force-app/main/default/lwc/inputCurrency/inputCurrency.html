@@ -1,0 +1,17 @@
+<template>
+    <div class="slds-form">
+        <div class={fromCss}>
+            <label class="slds-form-element__label" for="inp">
+                <abbr if:true={required} title="required" class="slds-required">*</abbr>
+                {label}</label>
+            <div class={inpCss}>
+                <input type={displayType} value={displayValue} placeholder={formattedPlaceholder} class="slds-input"
+                    onfocus={handleFocus} onblur={handleBlur} onkeyup={handleChange} min="0" step={step} />
+
+                <div class="slds-p-bottom_x-small">
+                    <div if:true={inpErrorMsg} class="slds-form-element__help invalid-inp">{inpErrorMsg}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

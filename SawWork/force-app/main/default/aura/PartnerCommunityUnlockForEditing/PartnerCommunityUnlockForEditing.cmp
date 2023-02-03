@@ -1,0 +1,40 @@
+<aura:component controller="PartnerCommCommonController" 
+                extends="c:PartnerCommunityParentComponent" 
+                implements="flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" 
+                access="global" >
+    
+    <aura:attribute name="recordId" type="String" />
+    <!-- Progress bar for Showing Submission progress -->
+    <aura:attribute name="progress" type="Integer" default="0"/>
+    <aura:attribute name="isProgressing" type="Boolean" default="false"/>
+    <aura:attribute name="confirmUnlockText" type="Boolean" default="You are procceding with record unlock. Click unlock to confirm" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+    
+    	<aura:if isTrue="{!v.isProgressing}" >
+            <div class="slds-m-top_xx-large">
+                <lightning:progressBar value="{!v.progress}" size="large"/>
+            </div>
+        </aura:if>
+        <article class="slds-card">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            Unlock the record
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            <div class="slds-card__body slds-card__body_inner"> 
+                <div class="slds-text-heading_medium">{!v.confirmUnlockText}
+                </div>
+            </div>
+            <footer class="slds-card__footer">
+                <button class="slds-button slds-button_neutral" onclick="{!c.handleCancelJS}">Cancel</button>
+                <button class="slds-button slds-button_neutral" onclick="{!c.handleUnlockJS}">Unlock</button>
+            </footer>
+        </article>
+    
+</aura:component>

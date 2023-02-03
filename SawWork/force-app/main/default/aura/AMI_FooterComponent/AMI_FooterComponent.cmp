@@ -1,0 +1,9 @@
+<aura:component>
+                <aura:handler name="init" action="{!c.init}" value="{!this}" />
+                   <aura:attribute name="year" type="Date" />
+                
+        <div class="home-page-footer">
+                      <p class="text">  Copyright (c) {!v.year}, Akamai Technologies, Inc.
+                        All rights reserved. </p>
+        </div>
+</aura:component>

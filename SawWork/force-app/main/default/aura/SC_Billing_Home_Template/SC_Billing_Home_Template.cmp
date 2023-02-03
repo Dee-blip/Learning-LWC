@@ -1,0 +1,50 @@
+<!--=====================================================================================================+
+    Component name      :   SC_Billing_HomeTemplate
+    Author              :   Sharath Prasanna
+    Created             :   24 Jun 2020
+    Purpose             :  Custom flexipage for Billing Home
+
+    Last Modified Developer           		Purpose            
+    ============= ========================  =======
+    24 Jun 2020     Sharath Prasanna	  				Initial Development
+
++=====================================================================================================-->
+<aura:component implements="lightning:homeTemplate">
+    
+    <aura:attribute name="leftUp" type="Aura.Component[]" />
+    <aura:attribute name="rightUp" type="Aura.Component[]" />
+    <aura:attribute name="secondRow" type="Aura.Component[]" /> 
+    <aura:attribute name="thirdRow" type="Aura.Component[]" />
+    
+    
+    <div>
+        <lightning:layout>
+            <lightning:layoutItem size = "12" class = "slds-p-left_x-small slds-p-right_x-small">
+                {!v.secondRow}
+            </lightning:layoutItem>
+        </lightning:layout>        
+    </div>
+
+    <div>          
+        <lightning:layout horizontalAlign="spread">  
+            <lightning:layoutItem size = "6" class="slds-p-left_x-small slds-p-right_x-small slds-p-bottom_x-small slds-p-top_x-small">   
+                {!v.leftUp}  
+            </lightning:layoutItem>  
+                        
+            <lightning:layoutItem size = "6" class = "slds-p-left_x-small slds-p-right_x-small slds-p-bottom_x-small slds-p-top_x-small">  
+                {!v.rightUp}  
+            </lightning:layoutItem>  
+        </lightning:layout>  
+    </div>  
+
+    <div>
+        <lightning:layout>
+            <lightning:layoutItem size = "12" class = "slds-p-left_x-small slds-p-right_x-small">
+                {!v.thirdRow}
+            </lightning:layoutItem>
+        </lightning:layout>        
+    </div>
+
+    
+    
+</aura:component>

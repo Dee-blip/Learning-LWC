@@ -1,0 +1,6 @@
+<aura:event type="APPLICATION">
+    <aura:attribute name="sortBy" type="String"/>
+    <aura:attribute name="sortDirection" type="String"/>
+
+    
+</aura:event>

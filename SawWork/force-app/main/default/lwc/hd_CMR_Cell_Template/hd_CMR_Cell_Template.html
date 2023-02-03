@@ -1,0 +1,6 @@
+<template>
+    <ul class="slds-list_horizontal">
+        <div style="max-height:100px;overflow:hidden">{cellValue}</div>
+        <lightning-helptext if:true={showPopover} content={cellValue}></lightning-helptext>
+    </ul>
+</template>

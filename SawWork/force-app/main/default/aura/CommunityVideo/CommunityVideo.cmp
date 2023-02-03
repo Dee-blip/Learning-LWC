@@ -1,0 +1,8 @@
+<!--/*Customer Community Component*/-->
+<aura:component >
+    <aura:attribute name="videoTitle" type="String"/>
+    <aura:attribute name="videoId" type="String"/>
+    <aura:registerEvent name="goToPage" type="c:CommunityBlogPageChangeEvt"/>
+    <!-- Highlight the current page count -->
+    <div class="slds-truncate" title="{!v.videoTitle}"><a onclick="{!c.playTheVideo}">{!v.videoTitle}</a></div>
+</aura:component>

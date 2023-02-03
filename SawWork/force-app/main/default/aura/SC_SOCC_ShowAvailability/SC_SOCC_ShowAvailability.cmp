@@ -1,0 +1,65 @@
+<!--
+Author          : Pinkesh 
+Description     : Component for Escalation Contact.[WARNING: THIS COMPONENT IS USED IN 7 DIFFERENT PLACES (AND COMMUNITY). PLEASE TEST ALL SCENARIOS BEFORE DEPLOYING CHANGES!!
+
+Date                 Developer                  JIRA #          Description                                                       
+23 Sep 2019         Pinkesh/Sumukh							SOCC CAR 2 - RunBooks 
+17 Jun 2021         Tejaswini                               SOCC - Availability changes
+-->
+<aura:component implements="lightning:actionOverride,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:isUrlAddressable" access="global">
+    <!-- attributes coming from the parent component -->
+    <aura:attribute name="escConRec" type="Object"/>
+    <!-- 1. To the timezone of current logged in user -->
+    <aura:attribute name="currentUserTimeZone" type="String"/>
+    <aura:attribute name="data" type="String"/>
+    
+    <aura:attribute name="lAvailability" type="List"/>
+       
+   <div class="slds-grid cell-content" style="display:flex;flex-wrap: wrap;">
+       <span id="Monday" class="slds-badge" style="{!v.escConRec.dayAndColor.Monday}" >
+         <ui:outputText value ="M" title="{!v.escConRec.Monday}"/>
+           <!--onmouseover="{!c.toggleToolTip}" onmouseout="{!c.toggleToolTip}"
+			<h1>M</h1>
+           <div aura:id="Monday1" class="slds-popover slds-popover_tooltip slds-nubbin_bottom-left toggle" role="tooltip" style="position:absolute;top:-2.50rem;white-space:pre-wrap;margin-left:-0.8rem;">
+           <div class="slds-popover__body slds-grid cell-content">
+               <lightning:formattedRichText value="{!v.escConRec.Monday}" />
+           </div>
+           </div>-->
+       </span>
+       
+       <span id="Tuesday" class="slds-badge" style="{!v.escConRec.dayAndColor.Tuesday}">
+       	 <ui:outputText value ="T" title ="{!v.escConRec.Tuesday}"/>
+       </span>
+       <span id="Wednesday" class="slds-badge" style="{!v.escConRec.dayAndColor.Wednesday}" >
+       	<ui:outputText value ="W" title="{!v.escConRec.Wednesday}"/>
+       </span>
+       <span id="Thursday" class="slds-badge" style="{!v.escConRec.dayAndColor.Thursday}">
+       	<ui:outputText value ="T" title="{!v.escConRec.Thursday}"/>
+       </span>
+       <span id="Friday" class="slds-badge" style="{!v.escConRec.dayAndColor.Friday}">
+       	<ui:outputText value ="F" title="{!v.escConRec.Friday}"/>
+       </span>
+       <span id="Saturday" class="slds-badge" style="{!v.escConRec.dayAndColor.Saturday}"  >
+       	<ui:outputText value ="S" title="{!v.escConRec.Saturday}"/>
+       </span>
+       <span id="Sunday" class="slds-badge" style="{!v.escConRec.dayAndColor.Sunday}"  >
+       	<ui:outputText value ="S" title="{!v.escConRec.Sunday}"/>
+       </span>
+       &nbsp;&nbsp;
+       
+       <span id="OutOfOffice">
+           
+           <lightning:icon  iconName="standard:event" alternativeText="Event" title="{!v.escConRec.OutOfOffice}" style="{!v.escConRec.isOOORecordPresent}"/>
+           
+           <!--<aura:if isTrue="{!v.escConRec.isOOORecordPresent =='False'}">
+               <lightning:icon  iconName="standard:event" alternativeText="Event" title="{!v.escConRec.OutOfOffice}" style="background-color:#f97c7c"/>
+           </aura:if>-->
+       
+       </span>
+       
+       
+       &nbsp;
+       
+    </div>
+      
+</aura:component>

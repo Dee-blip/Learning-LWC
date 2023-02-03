@@ -1,0 +1,6 @@
+<aura:component controller="SF1_LocateAccountController">
+<aura:attribute name="acc_id" type="Id" access="global"/>
+<aura:attribute name="opp_id" type="Id" />
+<aura:registerEvent name="SetError" type="c:LTNG_EVT_SetError"/>
+<lightning:button class="button" variant="brand" label="Select"  type="submit" onclick="{!c.doLink}" />	
+</aura:component>

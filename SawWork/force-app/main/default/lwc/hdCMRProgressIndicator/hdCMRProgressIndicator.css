@@ -1,0 +1,21 @@
+:host {
+  --sds-c-progress-step-color-backgroud: #4bca81;
+}
+
+.approveButton {
+  background-color: var(--sds-c-button-color-backgroud, #4bca81);
+  border-radius: var(--sds-c-button-radius-border, 10rem);
+  width: var(--sds-c-button-sizing-width, 35px);
+  height: var(--sds-c-button-sizing-height, 35px);
+}
+
+.rejectButton {
+  background-color: var(--sds-c-button-color-backgroud, red);
+  border-radius: var(--sds-c-button-radius-border, 10rem);
+  width: var(--sds-c-button-sizing-width, 35px);
+  height: var(--sds-c-button-sizing-height, 35px);
+}
+
+.textAreaHeight {
+  --sds-c-textarea-sizing-min-height: 180px;
+}

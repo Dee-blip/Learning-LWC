@@ -1,0 +1,55 @@
+.numberCircle 
+{
+    min-width: 20px !important;
+    max-width: fit-content !important;
+    line-height: 19px !important;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 10px;
+    border: 1px solid lightgrey;
+    vertical-align: middle;
+    padding: 0;
+    margin: 3px;
+}
+
+.tooltip
+{
+    display: none;
+}
+
+.numberCircle:hover + .tooltip
+{
+    display: block;
+}
+
+.burlyBubble
+{
+    background-color: burlywood;
+    color: white;
+    border: none;
+}
+
+.bisqueBubble
+{
+    background-color: bisque;
+    border: none;
+}
+
+.darkGreyBubble
+{
+    background-color: #4d4d4a;
+    color: white;
+    border: none;
+}
+
+.lightGreyBubble
+{
+    background-color: lightgray;
+    border: none;
+}
+
+.bubbleLabel
+{
+    font-size: 11px;
+    margin: 6px;
+}

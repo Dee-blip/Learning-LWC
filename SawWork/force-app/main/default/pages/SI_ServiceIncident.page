@@ -1,0 +1,592 @@
+<!--Modified by ssawhney on 26/03/2013 for CR 2065285 - Resolution, Diagnosis/Technical notes should be mandatory at the time of Phase 2 -->
+<!--Modified by ssawhney on 20/06/2013 for CR 2031706 - SI: Add a section for customer facing notification/advisory -->
+<!--Modified by Himanshu on 22-Sep-14  for CR 2375247 - Add Hour Field on the Query-->
+<!--Modified by Aditya on 25/11/2014 for CR 2628246 -SI : Add picklist Field How was the Issue Detected  -->
+<!--Modified by Jay on 19/02/2015 for 2627751 and CR  2824410 -SI : added 2 new fields to display time spent by owner and others  -->
+<!--Modified by Jay on 23/03/2015 for 2824410 : addded new field to display time spent by user -->
+<!-- Modified by Aditya on 14-Aug-15 for CR 3110191- Adding Tier Count on Si Page-->
+<!-- Modified by Vamsee on 30-Nov-15 for CR 3150211 & 3222671 - Adding Business Unit Category & Etherpad Link on SI Page
+<!-- Modified by Vamsee on 30-Aug-16 for CR 3469801 & 3486181 - Adding Executive Summary & Impact started field editable-->
+<!-- Modified by Pinkesh on 22-Oct-2018 for ESESP-780 - Made Etherpad field editable-->
+<!-- Modified by Pinkesh on 22-Oct-2018 for ESESP-410 - Changed Type Of Customer Impact to multi Select picklist-->
+<!--Modified by Sheena on 01-march-2020 for ESESP-1767 - Added Incident Declared Date/Time field)-->
+<!--Modified by Sheena on 27-April-2020 for ESESP-3460 - Changed the position of Description and Customer Advisory fields -->
+
+<apex:page StandardController="BMCServiceDesk__Incident__c" extensions="SI_ServiceIncidentDetails" sidebar="false" id="serviceIncidentDetails">
+    <script type="text/javascript" src="/resource/Jquery/js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="/resource/Jquery/js/jquery-ui-1.8.17.custom.min.js"/>
+        <link rel="stylesheet" type="text/css" href="/resource/Jquery/css/flick/jquery-ui-1.8.17.custom.css"></link>
+        <style>
+            .pbSubheader{
+                background-color: #1797C0 !important;
+                color: white !important;
+            }
+    </style>
+    <apex:form >
+        
+        <script>
+        
+        var temp;
+    var SiSaveDone;
+    var Picklists ;
+    jQuickFilterEdit$ = jQuery.noConflict();
+    
+    
+    
+    
+    
+    function PreSaveJavaScript()
+    {
+        jQuickFilterEdit$('html')[0].click();
+    }
+    
+    function PostSaveJavaScript()
+    {
+        var inlineEditsofthePage =  jQuickFilterEdit$('.CustomInlineEdits'); 
+        var inlineEditsUserLookup = jQuickFilterEdit$('.CustomInlineEditUserLookUps');   
+        
+        for(i=0;i<inlineEditsofthePage.length;i++)
+        {
+            try
+            {
+                var sel = inlineEditsofthePage[i].getElementsByTagName('select')[0];
+                var lab = inlineEditsofthePage[i].getElementsByTagName('label')[0];
+                if(sel.children[sel.selectedIndex].innerHTML != lab.innerHTML )
+                {
+                    lab.innerHTML=sel.children[sel.selectedIndex].innerHTML;
+                }
+            }
+            catch(e)
+            {
+            }
+        }
+        for(i=0;i<inlineEditsUserLookup.length;i++)
+        {
+            try
+            {
+                var lab = inlineEditsUserLookup[i].getElementsByTagName('label')[0];
+                var tex = inlineEditsUserLookup[i].getElementsByTagName('input')[inlineEditsUserLookup[i].getElementsByTagName('input').length -1];
+                if(lab.innerHTML!=tex.value)
+                {
+                    lab.innerHTML=tex.value;
+                }
+            }
+            catch(e)
+            {
+            }
+        }
+    }
+    function CustomInlineEdit(obj)
+    {
+        var div=obj.getElementsByTagName('div');
+        var label=obj.getElementsByTagName('label');
+        var select=obj.getElementsByTagName('select');
+        label[0].style.display="none";
+        select[0].style.display="";
+        select[0].className="CustomInlineEditDiv";
+        var i=0;
+        for(i=0;i<div.length;i++)
+        {
+            if(div[i].className=='requiredInput')
+            {
+                div[++i].className='requiredBlock';
+            }
+        }
+        jQuickFilterEdit$(select[0]).click(function(event){
+            event.stopPropagation();
+        });
+    }
+    
+    function changebgColormouseover(obj)
+    {
+        
+        obj.style.background='#E3F3FF url("/img/func_icons/util/pencil12.gif") no-repeat scroll right 2px';
+    }
+    function changebgColormouseout(obj)
+    {
+        
+        obj.style.background='';
+    }
+    function closeOpenCustomInlineEdit()
+    {
+        var inlineEditsofthePage =  jQuickFilterEdit$('.CustomInlineEdits'); 
+        var inlineEditsUserLookup = jQuickFilterEdit$('.CustomInlineEditUserLookUps');     
+        
+        var count=0;
+        var selectedValue;   
+        for(count; count < inlineEditsofthePage.length; count++)
+        {
+            var sel=inlineEditsofthePage[count].getElementsByTagName('select');
+            if(sel.length > 0 && sel.length < 2)
+            {
+                
+                
+                sel[0].style.display="none";
+            }
+            var lab = inlineEditsofthePage[count].getElementsByTagName('label')[0];
+            
+            
+            lab.style.display="";
+            var div =  inlineEditsofthePage[count].getElementsByTagName('div');
+            var i=0;
+            for(i=0;i<div.length;i++)
+            {
+                if(div[i].className=='requiredBlock')
+                {
+                    div[i].className='';
+                }
+            }
+            
+            
+        }
+        
+        count=0;
+        
+        for(count; count < inlineEditsUserLookup.length; count++)
+        {
+            var sel=inlineEditsUserLookup[count].getElementsByTagName('span');
+            var lab;
+            if(sel.length > 0 )
+            {
+                innerCount=0;
+                for(innerCount;innerCount<sel.length;innerCount++)
+                {
+                    if(sel[innerCount].className=='lookupInput')
+                    {
+                        
+                        lab = inlineEditsUserLookup[count].getElementsByTagName('label')[0];
+                        
+                    }
+                }
+                
+            }
+            div =  inlineEditsUserLookup[count].getElementsByTagName('div')[0];
+            div.style.display="none";
+            lab.style.display="";
+        }
+        
+        
+        
+    }
+    
+    jQuickFilterEdit$('html').click(function() {
+        closeOpenCustomInlineEdit();
+    });
+    
+    function customInlineEditUserLookup(obj)
+    {
+        
+        var div=obj.getElementsByTagName('div');
+        var label=obj.getElementsByTagName('label');
+        var select=obj.getElementsByTagName('select');
+        label[0].style.display="none";
+        
+        div[0].style.display="";
+        jQuickFilterEdit$(div[0]).click(function(event){
+            event.stopPropagation();
+        });
+        
+    }
+    
+    
+    function changeColorOfLookUPLabel(obj) {
+        var lab = obj.parentNode.parentNode.previousSibling;
+        if(lab.title !=null && lab.title != "")
+        {
+            
+            lab.innerHTML = obj.value;
+            lab.style.color='#FF6A00';
+            lab.style.fontWeight='bold';
+            if(obj.value == '')
+            {
+                lab.innerHTML ='Deleted';
+            }
+        }
+    }
+    function changeColorOfLabel(obj) {
+        var par = obj.parentNode;
+        
+        var lab = obj.previousSibling;
+        var opts = obj.children;
+        var innerCount=0;
+        for(innerCount;innerCount<opts.length;innerCount++)
+        {
+            if(opts[innerCount].selected)
+            {
+                lab.innerHTML=opts[innerCount].innerHTML;
+            }
+        }
+        
+        
+        
+        lab.style.color='#FF6A00';
+        lab.style.fontWeight='bold';
+        var img = par.getElementsByTagName('img')[0];
+        img.style.display="";
+    }
+    function revertPickListValue(obj)
+    {   
+        var par = obj.parentNode;
+        var sel = par.getElementsByTagName('select')[0];
+        var lab = par.getElementsByTagName('label')[0];
+        var inp = par.getElementsByTagName('input')[0];
+        sel.value = inp.value;
+        
+        var opts = sel.children;
+        var innerCount=0;
+        for(innerCount;innerCount<opts.length;innerCount++)
+        {
+            if(opts[innerCount].selected)
+            {
+                lab.innerHTML=opts[innerCount].innerHTML;
+            }
+        }
+        lab.style.color='';
+        lab.style.fontWeight='';
+        obj.style.display="none";
+        
+        
+        
+    }
+    
+    
+    
+    
+    </script>
+    <apex:outputLabel style="color:red">
+        All date/time fields are displayed in time zone: {!UserTImezone}.  Date format is per your Locale in your  <apex:outputLink value="/{!UserSalesforceId}/e" target="_Blank" style="color:red;"> Personal Settings</apex:outputLink>
+    </apex:outputLabel>
+    <apex:actionStatus id="SavingIncident">
+        <apex:facet name="start">
+            <c:enhancedActionStatus BackColor="#ffffff" borderColor="#ffffff" borderSize="2" height="50px" width="150px" ImageUrl="/changemgmt/img/spinner24.gif" Message="Processing" messageStyle="color:darkred;font-size:11pt;font-weight:bold;"/>
+        </apex:facet>  
+    </apex:actionStatus>
+    <apex:pageBlock id="Block" >
+        <!-- All date/time fields are displayed in time zone: {!UserTImezone} -->
+        <apex:pageBlockButtons >
+            
+            <apex:commandButton action="{!edit1}" id="editButton" value="Edit" reRender="MyJS,Block"   />
+            <apex:commandButton action="{!save1}" id="saveButton" value="Save" status="SavingIncident" reRender="MyJS,Block" onclick="PreSaveJavaScript();" oncomplete="PostSaveJavaScript();"  />
+            <apex:commandButton action="{!Revert}" id="RevertButton" reRender="MyJS,Block"  value="Cancel" status="SavingIncident" />
+            <apex:commandButton action="{!sendMail}" reRender="Block"   value="Resend Notification" status="SavingIncident" onclick="if(!confirm('Are you sure?')){return false;}"/>
+            
+        </apex:pageBlockButtons>
+        <apex:outputPanel id="MyJS">
+            <script>
+            if ('{!newLocation}' != '') {
+                top.location = '{!newLocation}';
+            }
+            SiSaveDone = true;
+            </script>
+        </apex:outputPanel>
+        
+        
+        
+        
+        <apex:messages style="color:{!messageColor}" StyleClass="IncidentPageErrors"/>
+        
+        <apex:inlineEditSupport showOnEdit="saveButton, cancelButton"
+                                event="ondblclick"                  
+                                resetFunction="resetInlineEdit" />
+        
+        
+        
+        <apex:pageBlockSection columns="2" collapsible="true"  title="General Information"  >
+            
+            
+            <apex:OutputField label="Title" value="{!ServiceIncident.BMCServiceDesk__Service_Request_Title__c}" style="width:260%">   
+            </apex:OutputField>
+            <apex:pageBlockSectionItem labelStyle="color:red;" dataStyle="color:red;" rendered="{!HistoricalIncident}" >
+                <apex:outputLabel >SD Dashboard Incident #</apex:outputLabel>
+                <apex:OutputField value="{!ServiceIncident.SI_SD_Dashboard_Incident__c}" >
+                    <apex:inlineEditSupport disabled="true"/>
+                </apex:OutputField>   
+            </apex:pageBlockSectionItem>
+            <apex:pageBlockSectionItem rendered="{!!HistoricalIncident}">
+            </apex:pageBlockSectionItem>
+            
+            <apex:OutputField value="{!ServiceIncident.Name}">
+                
+            </apex:OutputField>
+            
+            
+            <apex:pageBlockSectionItem dataStyleClass="CustomInlineEdits" onDatadblclick="CustomInlineEdit(this);" ondatamouseover="changebgColormouseover(this);" ondatamouseout="changebgColormouseout(this);">
+                
+                
+                <apex:outputLabel >Category</apex:outputLabel>
+                <apex:outputPanel layout="block" styleClass="requiredInput">
+                    <apex:outputPanel layout="block" styleClass=""/>
+                    <apex:outputLabel value="{!ServiceIncident.BMCServiceDesk__FKCategory__r.Name}" title="Category"  />
+                    
+                    <apex:selectList id="Category" size="1" value="{!ServiceIncident.BMCServiceDesk__FKCategory__c}" multiselect="false" onchange="changeColorOfLabel(this);"  style="display:none;"  >
+                        
+                        <apex:selectOptions value="{!CategoryValues}"></apex:selectOptions>
+                    </apex:selectList>
+                    <apex:inputHidden value="{!Category}" />
+                    
+                    <img src="/img/func_icons/util/ileUndo16.gif"  onclick="revertPickListValue(this);" style="vertical-align:middle;display:none;" />
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+            
+            
+            <apex:pageBlockSectionItem dataStyleClass="CustomInlineEdits" onDatadblclick="CustomInlineEdit(this);" ondatamouseover="changebgColormouseover(this);" ondatamouseout="changebgColormouseout(this);">
+                <apex:outputLabel >Status (Phase)</apex:outputLabel>
+                <apex:outputPanel layout="block" styleClass="requiredInput">
+                    <apex:outputPanel layout="block" styleClass=""/>
+                    <!--apex:outputLabel value="{!ServiceIncident.BMCServiceDesk__FKStatus__r.Name}" title="Status"  /-->
+                    <apex:outputLabel value="{!LegacyStatusName}" title="Status"  />
+                    
+                    <apex:selectList id="status" size="1" value="{!ServiceIncident.BMCServiceDesk__FKStatus__c}" multiselect="false" onchange="changeColorOfLabel(this);"  style="display:none;" >
+                        
+                        <apex:selectOptions value="{!StatusValues}"></apex:selectOptions>
+                    </apex:selectList>
+                    <apex:inputHidden value="{!Status}" />
+                    <img src="/img/func_icons/util/ileUndo16.gif"  onclick="revertPickListValue(this);" style="vertical-align:middle;display:none;" />
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>    
+            
+            <apex:outputField value="{!ServiceIncident.Incident_Declared_Date_Time__c}"  />
+            
+            <!-- Start of Changes for CR 2505702 by ssawhney - Service Incident End date nomenclature should be changed to Incident Closed date -->
+            <apex:OutputField value="{!ServiceIncident.SI_OutageStart__c}" >   
+                <apex:inlineEditSupport showOnEdit="saveButton, cancelButton"
+                                        event="ondblclick"                        
+                                        resetFunction="resetInlineEdit" />
+            </apex:OutputField>
+            
+            <apex:outputField value="{!ServiceIncident.SI_StatusChangeDate__c}"  />
+            
+            <apex:OutputField value="{!ServiceIncident.SI_OutageEnd__c}" >
+                <!-- End of Changes for CR 2505702 by ssawhney - Service Incident End date nomenclature should be changed to Incident Closed date -->
+                <apex:inlineEditSupport showOnEdit="saveButton, cancelButton"
+                                        event="ondblclick" disabled="true"                        
+                                        resetFunction="resetInlineEdit" />  
+            </apex:OutputField>
+            
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel >Total Time spent On Incident </apex:outputLabel>
+                <apex:outputtext value="{!totalTimeSpent}" styleClass="IncidentDetailOwner" title="value" />
+            </apex:pageBlockSectionItem>
+            
+            
+            <apex:pageBlockSectionItem onDatadblclick="customInlineEditUserLookup(this);" dataStyleClass="CustomInlineEditUserLookUps" ondatamouseover="changebgColormouseover(this);" ondatamouseout="changebgColormouseout(this);">
+                <apex:outputLabel >Owner (Technical Incident Manager)</apex:outputLabel>
+                <apex:outputPanel >
+                    <apex:outputLabel value="{!ServiceIncident.Owner.Name}" styleClass="IncidentDetailOwner" title="value" />
+                    <apex:InputField value="{!ServiceIncident.OwnerId}" required="false" styleClass="IncidentDetailOwner" onchange="changeColorOfLookUPLabel(this);" style="display:none;"  />
+                    
+                    <!--img src="/img/func_icons/util/ileUndo16.gif"  onclick="revertLookupValue(this);" style="vertical-align:middle;" />
+<apex:inputHidden value="{!ServiceIncident.OwnerId}" />
+<apex:inputHidden value="{!ServiceIncident.Owner.Name}" /-->
+                    
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+            
+            
+            
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel >Total LOE(Hours) </apex:outputLabel>
+                <apex:outputtext value="{!BMCServiceDesk__Incident__c.Total_LOE_on_Service_Incident__c }" styleClass="IncidentDetailOwner" title="value" />
+            </apex:pageBlockSectionItem>
+            
+            <apex:OutputField value="{!ServiceIncident.SI_Type_of_customer_impact__c}"/>
+            
+            <apex:pageBlockSectionItem onDatadblclick="customInlineEditUserLookup(this);" dataStyleClass="CustomInlineEditUserLookUps" ondatamouseover="changebgColormouseover(this);" ondatamouseout="changebgColormouseout(this);">
+                <apex:outputLabel >GSS Incident Manager / Business Information Lead</apex:outputLabel>
+                <apex:outputPanel >
+                    <apex:outputLabel value="{!ServiceIncident.SI_GSS_Inc_Manager_BIL__r.Name}" styleClass="IncidentDetailOwner" title="value" />
+                    <apex:InputField value="{!ServiceIncident.SI_GSS_Inc_Manager_BIL__c}" required="false" styleClass="IncidentDetailOwner" onchange="changeColorOfLookUPLabel(this);" style="display:none;"  />
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+            
+            <apex:pageBlockSectionItem >
+            </apex:pageBlockSectionItem>
+            
+            <apex:pageBlockSectionItem dataStyleClass="CustomInlineEdits" onDatadblclick="CustomInlineEdit(this);" ondatamouseover="changebgColormouseover(this);" ondatamouseout="changebgColormouseout(this);" >
+                <apex:outputPanel >
+                    <apex:outputLink value="https://docs.akamai.com/incidents/procedure/severity-definition.html" target="_blank"  >Definition</apex:outputLink>  
+                    <apex:outputLabel >Impact (Customer Severity)</apex:outputLabel>
+                </apex:outputPanel>
+                <apex:outputPanel layout="block" styleClass="requiredInput">
+                    <apex:outputPanel layout="block" styleClass=""/>
+                    <apex:outputLabel value="{!ServiceIncident.BMCServiceDesk__FKImpact__r.Name}" title="Impact"   />
+                    <apex:selectList id="impact" size="1"  multiselect="false" value="{!ServiceIncident.BMCServiceDesk__FKImpact__c}" style="display:none;" onchange="changeColorOfLabel(this);">
+                        <apex:actionSupport event="onchange"  reRender="recentmodify"></apex:actionSupport>
+                        <apex:selectOptions value="{!ImpactValues}"></apex:selectOptions>
+                    </apex:selectList>
+                    <apex:inputHidden value="{!Impact}" />
+                    <img src="/img/func_icons/util/ileUndo16.gif"  onclick="revertPickListValue(this);" style="vertical-align:middle;display:none;" />
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+            
+            <apex:pageBlockSectionItem dataStyleClass="CustomInlineEdits" onDatadblclick="CustomInlineEdit(this);" ondatamouseover="changebgColormouseover(this);" ondatamouseout="changebgColormouseout(this);">
+                <apex:outputLabel >Urgency (Aggregate Severity)</apex:outputLabel>
+                <apex:outputPanel layout="block" styleClass="">
+                    <apex:outputPanel layout="block" styleClass=""/>
+                    
+                    <apex:outputLabel value="{!ServiceIncident.BMCServiceDesk__FKUrgency__r.Name}" title="Urgency"  />
+                    <apex:selectList id="Urgency" size="1"  multiselect="false" value="{!ServiceIncident.BMCServiceDesk__FKUrgency__c}" onchange="changeColorOfLabel(this);" style="display:none;">
+                        <apex:actionSupport event="onchange"  reRender="recentmodify" ></apex:actionSupport>
+                        <apex:selectOptions value="{!UrgencyValues}"></apex:selectOptions>
+                    </apex:selectList>
+                    <apex:inputHidden value="{!Urgency}" />
+                    <img src="/img/func_icons/util/ileUndo16.gif"  onclick="revertPickListValue(this);" style="vertical-align:middle;display:none;" />
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+            
+            
+            <!--Aditya Start of Change CR:2628246 Adding "How was the Issue Detected" Field -->
+            
+            <apex:pageBlockSectionItem dataStyleClass="CustomInlineEdits" onDatadblclick="CustomInlineEdit(this);" ondatamouseover="changebgColormouseover(this);" ondatamouseout="changebgColormouseout(this);" rendered="{!!disableIssueDetected}">
+                <apex:outputLabel > How was the Issue Detected </apex:outputLabel>
+                <apex:outputPanel layout="block" styleClass="">
+                    <apex:outputPanel layout="block" styleClass=""/>
+                    <apex:outputLabel value="{!ServiceIncident.How_was_the_Issue_Detected__c}" for="IncidentOrigin"  />
+                    <apex:selectList id="IncidentOrigin" disabled="{!disableIssueDetected}" size="1"  multiselect="false" value="{!ServiceIncident.How_was_the_Issue_Detected__c}" onchange="changeColorOfLabel(this);" style="display:none;">
+                        <apex:actionSupport event="onchange"  reRender="recentmodify" ></apex:actionSupport>
+                        <apex:selectOptions value="{!IncidentOrigin}"></apex:selectOptions>
+                    </apex:selectList>
+                    <img src="/img/func_icons/util/ileUndo16.gif"  onclick="revertPickListValue(this);" style="vertical-align:middle;display:none;" />
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>
+            <!-- End of Change CR: 2628246-->
+            
+            
+            
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel >Description (Customer Impact)</apex:outputLabel>
+                <apex:OutputField value="{!ServiceIncident.BMCServiceDesk__incidentDescription__c}" style="width:100%;height:120px;">
+                    
+                </apex:OutputField>
+            </apex:pageBlockSectionItem>
+            
+            <apex:pageBlockSectionItem >
+                <!-- Start of changes for CR 2031706-->
+                <apex:outputLabel >Customer Advisory</apex:outputLabel>
+                <apex:OutputField value="{!ServiceIncident.Customer_Advisory__c}" style="width:100%;height:120px;">
+                </apex:OutputField>
+                <!-- End of changes for CR 2031706-->
+            </apex:pageBlockSectionItem>
+            
+            
+            
+            <!--apex:outputField value="{!ServiceIncident.RecordType.Name}" label="Record Type"/--> 
+            
+            <apex:outputField value="{!ServiceIncident.Days_Open__c}" label="Days Open"/>
+            <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+            
+            <apex:OutputField value="{!ServiceIncident.CreatedById}"/>
+            <apex:OutputField value="{!ServiceIncident.CreatedDate}"/>
+            <apex:OutputField value="{!ServiceIncident.Etherpad_Link__c}"/>
+            <apex:OutputField value="{!ServiceIncident.Total_Tier_Count__c}" rendered="{!TierRender}"  />
+            
+            
+        </apex:pageBlockSection>
+        
+        
+        
+        
+        
+        <apex:pageBlockSection title="Impact/Details" columns="1" collapsible="true">
+            
+            <apex:OutputField value="{!ServiceIncident.SI_Technical_Notes__c}" style="width:100%;height:80px;resize:vertical">
+                
+            </apex:OutputField>
+            <apex:OutputField value="{!ServiceIncident.SI_Diagnosis__c}" style="width:100%;height:80px;resize:vertical">
+                
+            </apex:OutputField>
+            <apex:OutputField value="{!ServiceIncident.SI_Impacted_CP_Codes_Domains__c}" style="width:100%;height:80px;resize:vertical">
+                
+            </apex:OutputField>
+            <!--Start of Changes by ssawhney on 26/03/2013 for CR 2065285 -->
+            <apex:OutputField label="Resolution/Mitigation" value="{!ServiceIncident.BMCServiceDesk__incidentResolution__c}" style="width:100%;height:80px;resize:vertical">
+                <!--End of Changes for CR 2065285 -->
+            </apex:OutputField>
+            <apex:OutputField value="{!ServiceIncident.SI_Incident_Caused_By__c}">
+                
+            </apex:OutputField>
+            <apex:OutputField value="{!ServiceIncident.SI_Network__c}">
+                
+            </apex:OutputField>
+            <apex:OutputField value="{!ServiceIncident.SI_Business_Unit_Category__c}" >
+            </apex:OutputField>
+            <apex:OutputField value="{!ServiceIncident.SI_Executive_Summary__c}" >
+            </apex:OutputField>
+        </apex:pageBlockSection>
+        
+        
+        
+        <apex:pageBlockSection title="Platform Details" columns="2" collapsible="true">
+            
+            <apex:OutputField value="{!ServiceIncident.SI_Incident_Sensitivity__c}" >
+                
+            </apex:OutputField>
+            <apex:OutputField value="{!ServiceIncident.SI_Incident_Review_Status__c}" >
+                
+            </apex:OutputField>
+            
+            
+            <!--apex:OutputField value="{!ServiceIncident.SI_Related_Severe_Vulnerability__c}" style="width:260%" >
+
+</apex:OutputField>
+<apex:pageBlockSectionItem >
+</apex:pageBlockSectionItem-->
+            <apex:OutputField value="{!ServiceIncident.SI_Incident_Review_Present_Date__c}" >
+            </apex:OutputField>
+            <apex:OutputField value="{!ServiceIncident.SI_Platform_Review_Date__c}">
+                
+            </apex:OutputField>
+            
+            
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+    
+</apex:form>
+
+
+<!--<apex:pageBlock title="Associated Cases">
+<apex:iframe src="{!IncidentNumberForReport}" scrolling="true" height="500"/>
+</apex:pageBlock>-->
+
+
+<!--apex:relatedList list="Service_Incident_Contacts__r" subject="{!ServiceIncident}" title="Akamai Contacts"></apex:relatedList>
+
+<apex:relatedList list="Root_Cause__R" subject="{!ServiceIncident}" title="Root Cause(s)/Reason(s)"></apex:relatedList>
+
+<apex:relatedList list="Service_Incident_Impacted_Customers__r" subject="{!ServiceIncident}" title="Impacted Accounts"></apex:relatedList>
+<apex:relatedList list="Service_Incident_Impacted_Products__r" subject="{!ServiceIncident}" title="Impacted Products/Modules"></apex:relatedList>
+
+<apex:relatedList list="Associated_Work_Items__r" subject="{!ServiceIncident}" title="Associated CRs/NOCC Tickets/Severe Vulnerabilities"></apex:relatedList>
+<apex:relatedList list="NotesAndAttachments" subject="{!ServiceIncident}"></apex:relatedList>
+
+<c:GenericHistoryComponent recordLimit="10" myObject="{!ServiceIncident}"/-->
+
+
+
+<apex:pageblock id="CustomHistoryList" title="Incident History List" >
+    <apex:form >
+        <apex:pageBlockTable value="{!IncidentHistory}" var="IH" >     
+            <apex:column value="{!IH.incidentHistory.BMCServiceDesk__date__c}"/>
+            <apex:column value="{!IH.incidentHistory.BMCServiceDesk__FKUser__c}"/>
+            <!--<apex:column value="{!IH.incidentHistory.BMCServiceDesk__description__c}"/>-->
+            <apex:column value="{!IH.incidentHistory.BMCServiceDesk__duration__c}"/>
+            
+            <apex:column >
+                <apex:facet name="header">                     
+                    <apex:OutputText value="Notes">
+                    </apex:OutputText>
+                </apex:facet>
+                <apex:outputLink value="/apex/SI_EmailPreview?Notes={!IH.incidentHistory.Id}" title="{!IH.incidentHistory.BMCServiceDesk__note__c}" id="previewlink" target="_blank">{!IH.splitString[0]} <br/> {!IH.splitString[1]}...</apex:outputLink>
+            </apex:column>   
+            
+        </apex:pageBlockTable>
+        
+        <apex:panelGrid columns="4" rendered="{!renderPaginationIncidentHis}">
+            <apex:commandLink action="{!first}">First</apex:commandlink>
+            <apex:commandLink action="{!previous}" rendered="{!hasPrevious}">Previous</apex:commandlink>
+            <apex:commandLink action="{!next}" rendered="{!hasNext}">Next</apex:commandlink>
+            <apex:commandLink action="{!last}">Last</apex:commandlink>
+        </apex:panelGrid>     
+    </apex:form>
+</apex:pageblock>
+</apex:page>

@@ -1,0 +1,30 @@
+.mainTableWidth{
+    width:100%;
+}
+
+.reducedWidth{
+    width:50%;
+}
+
+.reducedWidth1{
+    width:60%;
+    float:left;
+}
+
+.pagination{
+background-color:blue;
+}
+
+.slds-picklist__label{
+    width: 30vw;
+    height: 33px;
+}
+
+.slds-page-header{
+    height: 53px;
+    border-radius: 5px;
+}
+
+.subHeader{
+    font-size: 14px;
+}

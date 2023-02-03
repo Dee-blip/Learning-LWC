@@ -1,0 +1,69 @@
+<apex:page standardController="OpportunityLineItem" title="Opportunity Product TEST" tabStyle="Opportunity">
+    <apex:sectionHeader title="{!OpportunityLineItem.Product_Name__c}"/>
+    <apex:pageMessages />
+    <apex:form >
+        <apex:pageBlock mode="maindetail" title="Opportunity Product Edit">
+            <apex:pageBlockButtons >
+               <apex:commandButton value="Save" action="{!save}"/>
+               <apex:commandButton value="Cancel" action="{!cancel}"/>               
+            </apex:pageBlockButtons>
+            <!--apex:pageBlockSection title="Product Information" collapsible="false">
+                  <apex:repeat value="{!$ObjectType.OpportunityLineItem.FieldSets.Forecasting_Product_Information_Edit}" 
+                        var="field">
+                      <apex:InputField value="{!OpportunityLineItem[field]}" />
+                  </apex:repeat>
+                   <apex:PageblocksectionItem >
+                       <apex:OutputLabel value="MRR "></apex:OutputLabel>
+                       <apex:InputText value="{!OpportunityLineItem.MRR__c}" required="true"></apex:InputText>
+                   </apex:PageblocksectionItem> 
+                   <apex:PageblocksectionItem rendered="{!OpportunityLineItem.PricebookEntry.Product2.UOM__c=='Applications'}">
+                       <apex:OutputLabel value="# of Apps "></apex:OutputLabel>
+                       <apex:InputText value="{!OpportunityLineItem.Quantity__c}"></apex:InputText>
+                   </apex:PageblocksectionItem> 
+                   <apex:PageblocksectionItem rendered="{!OpportunityLineItem.PricebookEntry.Product2.UOM__c!='Applications'}">
+                       <apex:OutputLabel value=" "></apex:OutputLabel>
+                   </apex:PageblocksectionItem> 
+                   <apex:PageblocksectionItem >
+                       <apex:OutputLabel value="Reseller Retail Price "></apex:OutputLabel>
+                       <apex:InputText value="{!OpportunityLineItem.Reseller_Retail_Price__c}"></apex:InputText>
+                   </apex:PageblocksectionItem>
+                   <apex:PageblocksectionItem rendered="{!OpportunityLineItem.PricebookEntry.Product2.UOM__c!='Applications'}">
+                       <apex:OutputLabel value=" "></apex:OutputLabel>
+                   </apex:PageblocksectionItem>                     
+                   <apex:PageblocksectionItem >
+                       <apex:OutputLabel value="One Time Fee "></apex:OutputLabel>
+                       <apex:InputText value="{!OpportunityLineItem.NRR__c}"></apex:InputText>
+                   </apex:PageblocksectionItem>                                                                                                                                                         
+            </apex:pageBlockSection-->
+            <apex:pageBlockSection title="Product Information" collapsible="false">
+               <apex:repeat value="{!$ObjectType.OpportunityLineItem.FieldSets.Forecasting_Product_Information_Edit}" 
+                        var="field">
+                  <apex:InputField value="{!OpportunityLineItem[field]}" />
+               </apex:repeat>
+                   <apex:InputText rendered="{!OpportunityLineItem.PricebookEntry.Product2.UOM__c=='Applications'}" value="{!OpportunityLineItem.Quantity__c}"></apex:InputText>
+                  <!--apex:PageblocksectionItem rendered="{!OpportunityLineItem.PricebookEntry.Product2.UOM__c=='Applications'}">
+                       <apex:OutputLabel value="# of Apps "></apex:OutputLabel>
+                       <apex:InputText value="{!OpportunityLineItem.Quantity__c}"></apex:InputText>
+                   </apex:PageblocksectionItem--> 
+            </apex:pageBlockSection>
+            <!--apex:pageBlockSection title="Other Information" collapsible="false">
+               <apex:repeat value="{!$ObjectType.OpportunityLineItem.FieldSets.Forecasting_Other_Information}" 
+                        var="field">
+                  <apex:inputField value="{!OpportunityLineItem[field]}" />
+               </apex:repeat>
+            </apex:pageBlockSection-->
+            <apex:pageBlockSection title="System Information" collapsible="false">
+               <apex:repeat value="{!$ObjectType.OpportunityLineItem.FieldSets.Forecasting_System_Information}" 
+                        var="field">
+                  <apex:inputField value="{!OpportunityLineItem[field]}" />
+               </apex:repeat>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Description Information" collapsible="false" columns="1">
+               <apex:repeat value="{!$ObjectType.OpportunityLineItem.FieldSets.Forecasting_Description_Information}" 
+                        var="field">
+                  <apex:inputField value="{!OpportunityLineItem[field]}" style="width:600px"/>
+               </apex:repeat>
+            </apex:pageBlockSection>
+         </apex:pageBlock>
+     </apex:form>
+</apex:page>
