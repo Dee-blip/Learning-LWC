@@ -1,5 +1,0 @@
-<apex:page title="Helpdesk Loading Please wait . . ." controller="HD_RF_PageRedirect"  sidebar="false"  standardStylesheets="false" action="{!Redirect}" >
-<h4> Redirecting, Please wait...... </h4>
-<br></br>
-Logged in as : {!$User.FirstName&' '&$User.LastName}
-</apex:page>

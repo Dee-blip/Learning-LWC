@@ -1,4 +1,0 @@
-<aura:event type="APPLICATION" description="Event template" >
-    <aura:attribute name="noOfPages" type="String"/>
-    <aura:attribute name="noOfRecords" type="String"/>
-</aura:event>

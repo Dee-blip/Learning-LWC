@@ -1,5 +1,0 @@
-<apex:page >
-	
-	<apex:pageMessage severity="error" summary="Site content can only be viewed from your Site url." strength="3"/>
-	
-</apex:page>

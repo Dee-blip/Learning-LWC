@@ -1,4 +1,0 @@
-<aura:event type="APPLICATION" access="global" description="Event template">
-    <aura:attribute name="paramMap" type="Map"/>
-    <aura:attribute name="nameOfCmp" type="String" />
- </aura:event>

@@ -1,5 +1,0 @@
-<!--------------------------------------------------------------------
-Description     : Redirection page for case creation, edit and clone
----------------------------------------------------------------------->
-<apex:page StandardController="Case" extensions="SC_EditCaseController" action="{!Redirect}" showHeader="false" standardStylesheets="true">
-</apex:page>

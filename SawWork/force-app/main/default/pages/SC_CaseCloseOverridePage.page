@@ -1,5 +1,0 @@
-<!--------------------------------------------------------------
-Description     : Redirection page for case   
----------------------------------------------------------------->
-<apex:page StandardController="Case" extensions="SC_EditCaseController" action="{!CloseRedirect}" showHeader="false" standardStylesheets="true">
-</apex:page>

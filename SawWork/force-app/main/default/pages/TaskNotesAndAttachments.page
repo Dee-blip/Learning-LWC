@@ -1,3 +1,0 @@
-<apex:page standardController="Task">
-    <c:NotesAndAttachmentVfComp parentSobjectId="{!Task.Id}"/>
-</apex:page>

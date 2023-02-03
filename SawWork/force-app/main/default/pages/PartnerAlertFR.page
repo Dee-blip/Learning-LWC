@@ -1,4 +1,0 @@
-<apex:page showHeader="false" sidebar="false" standardController="SFDC_MDF__c" >
-  <div style="color: red;"><b>Please Click on Submit for Approval button.
-  </b></div>
-</apex:page>

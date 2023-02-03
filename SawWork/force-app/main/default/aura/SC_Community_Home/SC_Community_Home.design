@@ -1,6 +1,0 @@
-<design:component >
-	<design:attribute name="button1Label" label="Button 1 Label" default="{!$Label.c.JV_Get_Started}"/>
-    <design:attribute name="button1URL" label="Button 1 URL" default="/customers/s/get-started/"/>
-    <design:attribute name="button2Label" label="Button 2 Label" default="{!$Label.c.JV_Community_News}"/>
-    <design:attribute name="button2URL" label="Button 2 URL" default="/customers/s/topic/0TO290000006KKiGAM/news-events/"/>
-</design:component>

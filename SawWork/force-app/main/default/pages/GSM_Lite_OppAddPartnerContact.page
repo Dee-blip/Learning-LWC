@@ -1,3 +1,0 @@
-<apex:page standardController="Opportunity" extensions="GSM_Lite_Controller_LinkRedirector" action="{!addPartnerContact}">
-	
-</apex:page>

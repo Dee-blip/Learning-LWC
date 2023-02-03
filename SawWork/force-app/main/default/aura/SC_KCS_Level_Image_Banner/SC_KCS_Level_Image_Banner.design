@@ -1,6 +1,0 @@
-<design:component>
-	<design:attribute name="overlayText" label="Overlay Text" />
-    <design:attribute name="imageURL" label="Image: URL" />
-    <design:attribute name="textColor" label="Text Color" />
-    <design:attribute name="textSize" label="Text Size" datasource="large,medium,small" default="medium" />
-</design:component>

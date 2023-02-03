@@ -1,4 +1,0 @@
-<!-- accountChangeEvent -->
-<aura:event type="APPLICATION" description="Used for publishing account change.">
-    <aura:attribute name="acc" type="Account" />
-</aura:event>

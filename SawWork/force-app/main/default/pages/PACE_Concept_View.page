@@ -1,1 +1,0 @@
-<apex:page action="{!URLFOR($Action.PACE_Concept__c .List, $ObjectType.PACE_Concept__c )}"/>

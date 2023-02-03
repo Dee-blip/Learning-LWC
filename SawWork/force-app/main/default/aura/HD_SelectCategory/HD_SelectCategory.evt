@@ -1,5 +1,0 @@
-<aura:event type="APPLICATION">
-    <aura:attribute name="categoryId" type="Id"/>
-    <aura:attribute name="categoryName" type="String"/>
-    
-</aura:event>

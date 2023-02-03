@@ -1,5 +1,0 @@
-div[id*='idTotalsSection'] tr:not(:last-child) {
-display: none;
-}
-img[title="Usage Price Tiers"]{display: none;}
-.aptSearchProductName img {display: none;}

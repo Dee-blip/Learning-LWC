@@ -1,7 +1,0 @@
-.titleHover {
-  border-bottom: var(--lwc-borderWidthThin, 1px) solid;
-}
-
-.refreshRotate {
-  animation: rotate 0.4s;
-}

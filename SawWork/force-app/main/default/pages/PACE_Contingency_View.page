@@ -1,1 +1,0 @@
-<apex:page action="{!URLFOR($Action.Contingency__c.List, $ObjectType.Contingency__c)}"/>

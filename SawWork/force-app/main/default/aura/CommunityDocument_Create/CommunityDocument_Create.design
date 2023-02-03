@@ -1,4 +1,0 @@
-<design:component >
-    <design:attribute name="action" label="Action" datasource="Create, Edit" />
-    <design:attribute name="documentGroupId" label="Group Id" default="{!recordId}"/>
-</design:component>

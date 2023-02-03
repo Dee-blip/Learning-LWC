@@ -1,4 +1,0 @@
-<!--/*Customer Community Component*/-->
-<aura:event type="APPLICATION">
-    <aura:attribute name="startURL" type="Map"/>  
-</aura:event>

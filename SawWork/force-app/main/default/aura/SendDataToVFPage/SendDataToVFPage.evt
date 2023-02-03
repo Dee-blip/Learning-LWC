@@ -1,5 +1,0 @@
-<aura:event type="APPLICATION">
-    <aura:attribute name="operationName" type="String"/>
-    <aura:attribute name="recordId" type="String" />
-
-</aura:event>

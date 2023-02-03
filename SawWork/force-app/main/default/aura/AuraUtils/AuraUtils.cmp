@@ -1,5 +1,0 @@
-<aura:component abstract="true">
-    <aura:registerEvent name="Loading" type="c:Loading" />
-	<aura:registerEvent name="DoneLoading" type="c:DoneLoading" />
-	{!v.body}
-</aura:component>

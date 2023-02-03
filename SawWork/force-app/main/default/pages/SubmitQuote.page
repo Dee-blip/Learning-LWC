@@ -1,3 +1,0 @@
-<apex:page standardController="SBQQ__Quote__c" extensions="QuoteExtController" action="{!onSubmit}">
-<apex:pageMessages />
-</apex:page>

@@ -1,5 +1,0 @@
-<apex:page showHeader="TRUE" > 
-    <apex:outputPanel >
-        <apex:enhancedList customizable="TRUE" type="Activity" height="540" rowsPerPage="100"/>
-    </apex:outputPanel> 
-</apex:page>

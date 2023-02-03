@@ -1,2 +1,0 @@
-<apex:page id="partner-login-page" controller="PartnerLoginController" action="{!redirectToIdp}" showHeader="false" title="{!$Label.site.site_login}">
-</apex:page>

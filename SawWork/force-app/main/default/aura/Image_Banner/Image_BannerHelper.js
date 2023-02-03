@@ -1,4 +1,0 @@
-({
-    myHelperAction: function(component) {
-    }
-})

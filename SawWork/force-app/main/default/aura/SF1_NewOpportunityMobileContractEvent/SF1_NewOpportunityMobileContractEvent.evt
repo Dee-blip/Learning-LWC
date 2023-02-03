@@ -1,4 +1,0 @@
-<aura:event type="APPLICATION" access="global">
-  <aura:attribute name="selectedContractId" type="String" />
-  <aura:attribute name="isPushContract" type="Boolean" default="true"/>
-</aura:event>

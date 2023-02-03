@@ -1,6 +1,0 @@
-<aura:documentation>
-	<aura:description>SLA Gauge Description</aura:description>
-	<aura:example name="ExampleName" ref="exampleComponentName" label="Label">
-		Uses the extenal library by justGauge
-	</aura:example>
-</aura:documentation>

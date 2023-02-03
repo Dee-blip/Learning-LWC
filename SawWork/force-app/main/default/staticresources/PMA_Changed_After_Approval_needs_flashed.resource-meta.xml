@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<StaticResource xmlns="http://soap.sforce.com/2006/04/metadata">
-    <cacheControl>Private</cacheControl>
-    <contentType>image/jpeg</contentType>
-    <description>This resource stores image to alert approver that the fields have changed in PMA after it was approved.</description>
-</StaticResource>

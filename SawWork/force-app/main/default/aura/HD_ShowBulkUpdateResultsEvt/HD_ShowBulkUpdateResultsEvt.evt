@@ -1,3 +1,0 @@
-<aura:event type="COMPONENT" >
-    <aura:attribute name="results" type="Object"/>
-</aura:event>

@@ -1,6 +1,0 @@
-<apex:page standardController="Lead" extensions="ConvertPartnerLead" standardStylesheets="true">
-  <script>
-    var leadrecordId = "{!JSENCODE(leadrecordId)}"; //SFDC-6464
-    window.location.href = '{!JSENCODE($Label.L2Q_LeadConvertFlowUrl)}' + leadrecordId;//SFDC-6464
-  </script>
-</apex:page>

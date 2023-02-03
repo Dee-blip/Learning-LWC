@@ -1,4 +1,0 @@
-<apex:page standardController="Opportunity" extensions="GSM_Lite_Controller_LinkRedirector" action="{!redirectToURL}">
-
-	
-</apex:page>

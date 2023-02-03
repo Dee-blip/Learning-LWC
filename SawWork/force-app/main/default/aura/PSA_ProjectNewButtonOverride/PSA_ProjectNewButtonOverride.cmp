@@ -1,3 +1,0 @@
-<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,lightning:actionOverride,lightning:isUrlAddressable" access="global" >
-    <c:psaProjectTemplateSelection> </c:psaProjectTemplateSelection>
-</aura:component>

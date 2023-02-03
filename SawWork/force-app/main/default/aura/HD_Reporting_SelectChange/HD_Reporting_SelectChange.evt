@@ -1,3 +1,0 @@
-<aura:event type="COMPONENT" description="Despatched when a select has changed value" >
-  <aura:attribute name="selectedOptions" type="Map" description="Selected Options" access="global" default="" />
-</aura:event>

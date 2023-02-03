@@ -1,6 +1,0 @@
-<aura:component implements="flexipage:availableForAllPageTypes" access="global" >
-	<div aura:id="container">
-        <lightning:workspaceAPI aura:id="workspace" />
-        <lightning:button label="Advanced IR Search" onclick="{!c.openTab }" />
-    </div>
-</aura:component>

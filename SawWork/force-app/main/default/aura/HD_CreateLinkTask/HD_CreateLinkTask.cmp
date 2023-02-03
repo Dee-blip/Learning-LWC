@@ -1,6 +1,0 @@
-<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="HD_Problem_Incident_Clone_Extension">
-    <aura:attribute name="recordId" type="Id" default="{!recordId}"/>
-    <div >
-        <ui:button label="Create and link Task to Incident" press="{!c.linkTask}"/>  
-    </div>	
-</aura:component>

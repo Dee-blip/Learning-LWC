@@ -1,3 +1,0 @@
-<aura:event type="APPLICATION" description="AMG Pass filter value from Home to SLA Alerts">
-    <aura:attribute name="filterValue" type="String"/>
-</aura:event>

@@ -1,6 +1,0 @@
-<aura:component >
-<aura:handler name="init" value="{!this}" action="{!c.titleBuilder}" />
-<aura:attribute name="objectType" type="list" />
-<aura:attribute name="unifiedheading" type="String"/>
-{!v.unifiedheading}
-</aura:component>

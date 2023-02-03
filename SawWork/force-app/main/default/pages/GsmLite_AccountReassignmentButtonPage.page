@@ -1,3 +1,0 @@
-<apex:page controller="GsmLite_AccntReAssignmentCtrl" action="{!init}">
-<apex:pageMessages />
-</apex:page>

@@ -1,3 +1,0 @@
-<aura:component implements="force:appHostable">
-    <c:SF1_Component_ListViewCustom sObjectName="Opportunity" />
-</aura:component>

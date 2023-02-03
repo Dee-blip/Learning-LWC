@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
-    <apiVersion>28.0</apiVersion>
-    <availableInTouch>false</availableInTouch>
-    <confirmationTokenRequired>false</confirmationTokenRequired>
-    <description>This is used in custom console component on SC app footer to display new Case Notifiactions.</description>
-    <label>SC_HomePageCaseNotifications</label>
-</ApexPage>

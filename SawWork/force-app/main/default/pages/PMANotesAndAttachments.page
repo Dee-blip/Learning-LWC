@@ -1,3 +1,0 @@
-<apex:page standardController="Partner_Marketing_Activity__c">
-    <c:NotesAndAttachmentVfComp parentSobjectId="{!Partner_Marketing_Activity__c.Id}"/>
-</apex:page>

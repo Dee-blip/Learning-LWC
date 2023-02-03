@@ -1,5 +1,0 @@
-<aura:event type="APPLICATION" description="This is a event for adding logs in to the logger object" >
-    <aura:attribute name="ErrorMsg" type="String"/>
-    <aura:attribute name="StackTrace" type="String"/>
-    <aura:attribute name="IncidentId" type="Id"/>
-</aura:event>

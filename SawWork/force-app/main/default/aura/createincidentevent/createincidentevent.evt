@@ -1,3 +1,0 @@
-<aura:event type="APPLICATION">
-    <aura:attribute name="incident" type="BMCServiceDesk__Incident__c"/>
-</aura:event>

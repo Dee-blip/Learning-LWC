@@ -1,7 +1,0 @@
-<apex:page standardController="pse__Proj__c" >
-  <BR></BR>
-  &nbsp;&nbsp;<img src="/img/icon/hammer32.png" alt=" "/> 
-  <h1><font size="3">Creating Projects</font></h1>
-  <BR></BR>
-  <BR>&nbsp;&nbsp;New projects must be created from an account or opportunity.</BR>
-</apex:page>

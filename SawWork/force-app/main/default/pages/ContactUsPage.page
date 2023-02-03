@@ -1,5 +1,0 @@
-<apex:page showHeader="false" sidebar="false">
-
-<h3>Contact Us</h3><br /><br />
-For questions and comments about the program please write to <a href="mailto:wizards@akamai.com">wizards@akamai.com</a>
-</apex:page>

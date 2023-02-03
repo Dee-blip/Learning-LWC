@@ -1,7 +1,0 @@
-<!--
- - Created by jrathod on 8/25/21.
- -->
-
-<design:component>
-    <design:attribute name="dormantMode" label="Dormant Mode" default="false" description="In dormant mode, the component will be hidden and listening to scPageLayoutButtonOpen__c message channel publishes."/>
-</design:component>

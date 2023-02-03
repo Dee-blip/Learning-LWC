@@ -1,6 +1,0 @@
-({
-    regexhelperMethod : function(helper) {
-
-}
-
- })

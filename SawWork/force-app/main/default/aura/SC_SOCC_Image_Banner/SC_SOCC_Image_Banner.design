@@ -1,8 +1,0 @@
-<design:component>
-    <design:attribute name="imageURL" label="Image: URL" />
-    <design:attribute name="textColor" label="Text Color" />
-    <design:attribute name="textSize" label="Text Size" />
-    <design:attribute name="borderColor" label="Border Color" />
-    <design:attribute name="height" label="Height" />
-    <design:attribute name="opacity" label="Opacity (Enter value from 0.0 to 1.0)" />
-</design:component>

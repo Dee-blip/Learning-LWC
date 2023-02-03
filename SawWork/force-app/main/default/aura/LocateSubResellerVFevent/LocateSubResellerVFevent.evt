@@ -1,4 +1,0 @@
-<aura:event type="APPLICATION" description="Locate Sub Reseller Event to VF page">
-    <aura:attribute type="string" name="msg" access="global" />
-    <aura:attribute type="string" name="recordId" access="global" />
-</aura:event>

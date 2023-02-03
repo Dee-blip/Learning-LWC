@@ -1,8 +1,0 @@
-<template>
-        <div class = "slds-grid slds-grid_vertical-align-center">
-                <div class="teamSkillDiv slds-m-left_x-small">{supportTeamSkill}{login}{team}</div>
-                <template if:true={isSkill}><lightning-button-icon class="slds-align_absolute-center slds-m-right_x-small" size="small" icon-name="utility:edit" style="float:right" onclick={handleEdit} variant="brand" name="editSkill" alternative-text="Edit" title="Edit"></lightning-button-icon></template>
-                <template if:true={isLogin}><lightning-button-icon class="slds-align_absolute-center slds-m-right_x-small" size="large" icon-name="standard:user" style="float:right" onclick={handleDetails} variant="bare" name="showDetails" alternative-text="Details" title="Details"></lightning-button-icon></template>
-                <template if:true={isTeam}><lightning-button-icon class="slds-align_absolute-center slds-m-right_x-small" size="large" icon-name="standard:team_member" style="float:right" onclick={handleAccountDetails} variant="bare" name="showAccountDetails" alternative-text="Details" title="Details"></lightning-button-icon></template>
-        </div> 
-</template>

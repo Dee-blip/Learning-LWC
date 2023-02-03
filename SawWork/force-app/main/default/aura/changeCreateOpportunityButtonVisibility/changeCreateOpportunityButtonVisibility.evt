@@ -1,3 +1,0 @@
-<aura:event type="APPLICATION" description="Changing visibility of Opportunity Button" >
-    <aura:attribute name="currencyValue" type="String"/>
-</aura:event>

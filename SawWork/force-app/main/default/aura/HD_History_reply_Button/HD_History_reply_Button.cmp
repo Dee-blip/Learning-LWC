@@ -1,7 +1,0 @@
-<aura:component access="global" controller="HD_History_reply_ButtonCtrl">
-    <aura:attribute name="ActionHistoryId" type="Id"/>
-    <aura:registerEvent name="HD_Email_Composer_Docked_Event" type="c:HD_Email_Composer_Docked_Event"/>
-    <button class="slds-button slds-button_neutral" onclick="{!c.openEmailComposer}" style="position: absolute;right: 0px;top: 10px;">
-        <lightning:icon iconName="utility:reply" size="xx-small" alternativeText="Refresh" />
-    </button>
-</aura:component>

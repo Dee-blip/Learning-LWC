@@ -1,8 +1,0 @@
-<!-- opportunityTypeChangeEvent -->
-<aura:event type="APPLICATION" description="Used for rendering Contracts List.">
-    <aura:attribute name="selection" type="String"/>
-    <aura:attribute name="acc" type="Account" />
-    <aura:attribute name="acc" type="Account" />
-    <aura:attribute name="showContracts" type="Boolean" default="false"/>
-    <!--aura:attribute name="withBaseline" type="Boolean" /-->
-</aura:event>

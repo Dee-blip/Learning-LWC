@@ -1,9 +1,0 @@
-<apex:page standardController="Account_Reassignment__c" extensions="AccountReassignmentEntension" action="{!overrideCutOff}">
-<apex:pageBlock >
-    <apex:pageMessages ></apex:pageMessages>
-    <apex:form >
-        <apex:commandButton title="Back to Account Reassignment request"  value="Back to Account Reassignment request" action="{!backToRecord}"/>
-    </apex:form>
-</apex:pageBlock>
-
-</apex:page>

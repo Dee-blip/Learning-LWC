@@ -1,3 +1,0 @@
-<aura:component implements="forceCommunity:searchInterface">
-  <c:searchAkamaiBar id="search_bar_id"/>
-</aura:component>

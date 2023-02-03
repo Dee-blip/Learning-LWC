@@ -1,7 +1,0 @@
-<aura:component implements="force:hasrecordId,force:lightningQuickActionWithoutHeader" controller="SC_PSAutomationMassDisableController">
-    
-    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
-    
-   
-      
-</aura:component>

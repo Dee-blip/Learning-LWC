@@ -1,3 +1,0 @@
-<design:component>
-	<design:attribute name="action" label="Action" datasource="Case Page, Order Approval Page" />
-</design:component>

@@ -1,3 +1,0 @@
-<apex:page standardController="SFDC_MDF__c">
-    <c:NotesAndAttachmentVfComp parentSobjectId="{!SFDC_MDF__c.Id}"/>
-</apex:page>

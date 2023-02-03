@@ -1,6 +1,0 @@
-<aura:component implements="lightning:actionOverride,lightning:isUrlAddressable,flexipage:availableForAllPageTypes">
-    <aura:attribute name="recordId" type="String"/>    
-    <lightning:workspaceAPI aura:id="workspace"/>
-
-    <c:scJarvisCaseQuestionnaire recordId="{!v.recordId}" oncloseclicked="{!c.handleFilterChange}"/>  
-</aura:component>

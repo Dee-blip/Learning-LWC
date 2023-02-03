@@ -1,5 +1,0 @@
-<apex:page StandardController="BMCServiceDesk__Incident__c" extensions="SC_SI_Utility" action="{!redirect}">
-    
-   
-   
-</apex:page>

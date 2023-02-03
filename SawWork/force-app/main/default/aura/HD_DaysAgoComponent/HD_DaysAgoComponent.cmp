@@ -1,9 +1,0 @@
-<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:appHostable" access="global" >
-
- <aura:attribute name="undate" type="String" />
- <aura:handler name="init" value="{!this}" action="{!c.initAction}" />
- <aura:attribute name="days" type="Integer" default="0" /> 
-    <aura:if isTrue="{!v.days == 0 ? 'false' : 'true'}">
-    <span style="background-color: #aeb6bf;line-height: 2.25;" class="slds-badge slds-text-body--xx-small"><aura:if isTrue="{!v.days == 1 ? 'true' : 'false'}">Today<aura:set attribute="else">{!v.days} Days Ago</aura:set></aura:if></span>	
-    </aura:if>
-</aura:component>

@@ -1,4 +1,0 @@
-<aura:component implements="force:lightningQuickAction,force:hasRecordId,flexipage:availableForAllPageTypes">
-    <c:scPSAutomationPublish recordId="{!v.recordId}"></c:scPSAutomationPublish>
-    <p  style="font-weight:800;" class="slds-align_absolute-center">Records Publish is in process.</p>
-</aura:component>

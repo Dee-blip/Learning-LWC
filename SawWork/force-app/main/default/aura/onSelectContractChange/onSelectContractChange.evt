@@ -1,4 +1,0 @@
-<!-- onSelectContractChange -->
-<aura:event type="APPLICATION" description="Event Template">
-    <aura:attribute name="flag" type="Boolean" />
-</aura:event>

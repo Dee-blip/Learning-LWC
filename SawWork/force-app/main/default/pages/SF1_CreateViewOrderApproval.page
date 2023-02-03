@@ -1,5 +1,0 @@
-<apex:page controller="ViewOrderApproval" action="{!init}">
-    <apex:pageMessages id="showmsg">
-    
-    </apex:pageMessages>    
-</apex:page>

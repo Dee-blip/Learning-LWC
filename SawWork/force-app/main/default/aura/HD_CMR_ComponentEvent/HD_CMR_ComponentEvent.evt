@@ -1,8 +1,0 @@
-<aura:event type="COMPONENT" description="General Component Event " >
-    <aura:attribute name="message" type="String"/>
-    <aura:attribute name="setBoolean" type="Boolean"/>
-    <aura:attribute name="calStartDate" type="Date"/>
-    <aura:attribute name="calEndDate" type="Date"/>
-    <aura:attribute name="eventtype" type="String"/>
-    
-</aura:event>

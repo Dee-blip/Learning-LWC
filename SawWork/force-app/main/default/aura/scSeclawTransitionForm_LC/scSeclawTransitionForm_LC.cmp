@@ -1,3 +1,0 @@
-<aura:component implements="force:lightningQuickAction,force:hasRecordId,force:hasSObjectName,lightning:actionOverride">
-    <c:scSeclawTransitionForm recordId="{!v.recordId}" objectApiName="{!v.sObjectName}"/>
-</aura:component>

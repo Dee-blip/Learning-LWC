@@ -1,5 +1,0 @@
-<!--/*Customer Community Component*/-->
-<aura:event type="APPLICATION" description="Event template">
-    <aura:attribute name="videoId" Type="String"/>
-    <aura:attribute name="videoTitle" Type="String"/>
-</aura:event>

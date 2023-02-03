@@ -1,9 +1,0 @@
-<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,lightning:actionOverride,lightning:isUrlAddressable" access="global" controller="PSA_CreateProjectTempController">
-
-	    <lightning:workspaceAPI aura:id="NewCaseworkspace"/>
-
-    	<aura:handler name="init" value="{! this }" action="{! c.init }"/>
-        
-
-    
-</aura:component>

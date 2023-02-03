@@ -1,3 +1,0 @@
-<apex:page controller="updatePBMonthModifiedDateController" action="{!init}">
-    <apex:pageMessages />
-</apex:page>

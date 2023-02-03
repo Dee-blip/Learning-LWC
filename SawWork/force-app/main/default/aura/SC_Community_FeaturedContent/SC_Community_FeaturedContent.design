@@ -1,6 +1,0 @@
-<!--/*Customer Community Component*/-->
-<design:component >
-    <design:attribute name="url1" label="URL of First featured content" />
-    <design:attribute name="url2" label="URL of Second featured content" />
-    <design:attribute name="url3" label="URL of Third featured content" />
-</design:component>

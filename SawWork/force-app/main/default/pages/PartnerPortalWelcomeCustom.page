@@ -1,3 +1,0 @@
-<apex:page controller="PartnerPortalWelcomeCustom" contentType="application/json" showHeader="false" standardStylesheets="false" sidebar="false">
-{!displayDetails}
- </apex:page>

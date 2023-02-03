@@ -1,4 +1,0 @@
-<apex:page showHeader="false" sidebar="false" standardController="Opportunity">
-  <div style="color: red;"><b><apex:outputText value="{!$Label.Click_on_Locate_Account_button_to_choose_an_account_before_approving_the_deal}"></apex:outputText>
-  </b></div>
-</apex:page>

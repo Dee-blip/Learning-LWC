@@ -1,8 +1,0 @@
-<design:component>
-    <design:attribute name="liveChatLabel" label="Akachat Header" default="New! Live Chat is now available for business support issues or questions"/>
-	<design:attribute name="businessSupportLabel" label="Business Support Label" default="Business Support"/>
-    <design:attribute name="technicalSupportLabel" label="Technical Support Label" default="Technical Support"/>
-    <design:attribute name="businessSupportLabelTag" label="Business Support Label Tag" default="CP code, user access and management, Luna Control Center, reporting, etc."/>
-    <design:attribute name="technicalSupportLabelTag" label="Technical Support Label Tag" default="(Coming soon)"/>
-    <design:attribute name="disableLivechat" label="Disable Akatec" default="true" description="Check this box if you want to disable Technical Support"/>
-</design:component>

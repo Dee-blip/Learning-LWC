@@ -1,3 +1,0 @@
-<apex:page StandardController="Account" extensions="Account_Revenue_Dashboard_Controller">
-<apex:outputPanel ><apex:iframe src="{!dashboardLink.Value__c + account.AKAM_Account_ID__c + dashboardLink2.Value__c + account.AKAM_Account_ID__c}"/></apex:outputPanel>
-</apex:page>

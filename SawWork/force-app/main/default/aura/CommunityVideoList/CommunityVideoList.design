@@ -1,3 +1,0 @@
-<design:component >
-	<design:attribute name="topicId" label="Topic Id" default="{!topicId}"/>
-</design:component>

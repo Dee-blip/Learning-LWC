@@ -1,5 +1,0 @@
-<apex:page standardController="Draft_Invoice__c" extensions="DraftInvoiceCreateNew" action="{!pageRedirect}">
-<apex:form >
-Please wait...
- </apex:form>
-</apex:page>

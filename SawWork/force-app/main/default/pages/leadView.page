@@ -1,2 +1,0 @@
-<apex:page standardController="Lead" title="Lead Detail" label="Lead">
-</apex:page>

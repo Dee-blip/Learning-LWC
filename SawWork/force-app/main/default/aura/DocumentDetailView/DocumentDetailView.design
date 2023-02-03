@@ -1,3 +1,0 @@
-<design:component>
-    <design:attribute name="DocuId" label="Document Id" default="{!recordId}" description="Enter if you are on a topic detail page"/>
-</design:component>

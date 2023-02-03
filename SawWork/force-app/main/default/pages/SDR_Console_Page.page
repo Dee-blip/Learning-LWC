@@ -1,7 +1,0 @@
-<apex:page controller="SDRConsolePageController" sidebar="false" showheader="false"> 
-
-
-       <apex:iframe src="{!dashboardURL}" 
-                    scrolling="true" 
-                    height="800px" width="100%"/> 
-</apex:page>

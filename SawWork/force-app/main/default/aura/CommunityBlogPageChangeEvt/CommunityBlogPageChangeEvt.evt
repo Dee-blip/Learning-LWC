@@ -1,5 +1,0 @@
-<!--/*Customer Community Component*/-->
-<aura:event type="APPLICATION" description="Event template" >
-    <aura:attribute name="pageNumber" type="String"/>
-    <aura:attribute name="currnetPagesCount" type="String"/>
-</aura:event>

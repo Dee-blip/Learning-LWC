@@ -1,2 +1,0 @@
-<apex:page standardController="RAMD_Orange_Zone_Countries__c" extensions="RAMDExecuteOZoneProcessor" action="{!executeOzoneBatch}" id="myPage">
-</apex:page>

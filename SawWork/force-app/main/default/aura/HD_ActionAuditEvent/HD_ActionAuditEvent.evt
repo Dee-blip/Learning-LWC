@@ -1,3 +1,0 @@
-<aura:event type="APPLICATION" >
-    <aura:attribute name="state" type="String"/>
-</aura:event>

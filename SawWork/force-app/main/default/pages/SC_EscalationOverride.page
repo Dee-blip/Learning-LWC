@@ -1,5 +1,0 @@
-<!--------------------------------------------------------------------
-Description     : Redirection page for Escalation creation, edit and clone
----------------------------------------------------------------------->
-<apex:page StandardController="Engagement_Request__c" extensions="SC_EscalationExtTeam_Ctrlr" action="{!Redirect}" showHeader="false" standardStylesheets="true">
-</apex:page>

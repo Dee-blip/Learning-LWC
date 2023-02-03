@@ -1,3 +1,0 @@
-<apex:page standardController="SFDC_Channel_Account_Plan__c">
-    <c:NotesAndAttachmentVfComp parentSobjectId="{!SFDC_Channel_Account_Plan__c.Id}"/>
-</apex:page>

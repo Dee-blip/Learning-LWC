@@ -1,3 +1,0 @@
-<aura:component controller="SC_SOCC_EscalationListCtrl" implements="lightning:actionOverride,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:isUrlAddressable" access="global">
-     <c:SC_SOCC_EscalationList_CreateEdit operation="New" isEditPage="true" />
-</aura:component>

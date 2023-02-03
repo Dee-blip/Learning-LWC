@@ -1,4 +1,0 @@
-<aura:event type="COMPONENT" description="Show/Hide Event" >
-    <aura:attribute name="show-hide" type="Boolean"/>
-    <aura:attribute name="record" type="Object"/>
-</aura:event>
